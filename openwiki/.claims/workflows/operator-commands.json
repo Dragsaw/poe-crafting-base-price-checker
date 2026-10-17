@@ -1,24 +1,24 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:3cbda25a216152722443e1f3ceabace006d12e0ecb84eb06884dafc2528dc033",
+  "pageVersion": "sha256:6755478916cae4f2d644d8009962a5390338452f693403d3a11a3f8106e0a903",
   "claims": [
     {
       "id": "claim_8f81244d624f4708bbbf267b4e41d4ac",
-      "statement": "The live and human-invoked commands are package.json scripts run under bare node, with sync, sync:batch, fixtures:record and catalogue:refresh loading .env via --env-file-if-exists; deferred:issues runs tools/deferred-issues/deferred-issues.ts.",
+      "statement": "The live and human-invoked commands are package.json scripts run under bare node, with sync, sync:batch, fixtures:record and catalogue:refresh loading .env via --env-file-if-exists; deferred:issues runs tools/deferred-issues/deferred-issues.ts and currencies:refresh runs tools/currencies-refresh/currencies-refresh.ts.",
       "evidence": [
         {
-          "resource": "repo://package.json#L10-L28",
-          "version": "repo-lines-v1:sha256:1340de856ec94966c40ca26f2f480db04a74bd1f04c4cd5cef13221971b07f70:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxZTZlNWI0Y2U1N2U4NTM4OWU5MzRiNmRmNjM5OWI2MTE4N2M1ZTVhMmExYjNlMzA5ZmUwN2FmOTU3MDVhOGEifQ"
+          "resource": "repo://package.json#L10-L33",
+          "version": "repo-lines-v1:sha256:748504b0b801b6477d277b9728dd2caea9e5816cf1468a428a3c421b301c2166:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhmOGY4NjVlNjU4ODRjYTMyMzk1MzRjNGUzZTY1N2MxMThiZjViN2QzZjI3MDM3ZTI1OTNjNDUwMTY3ZDExODIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkMDA0N2U5MmU0ZGNiZGM4MGJmOWIyNTNjMzliNzA0MTQ4YzlhMDJiMjdiNDE1OWM5ZWI3OWJjMGE5MTZiMWIifQ"
         }
       ]
     },
     {
       "id": "claim_e1e5dde28b284c2e860bb6f3b5a04f85",
-      "statement": "pnpm sync:batch refuses with exit 1 before any request when the User-Agent is missing, otherwise runs one chunk with the real filesystem, clock, fetch port and read-only git port, prints the outcome kind and completed count, exits 0 on any outcome and 1 on a throw.",
+      "statement": "pnpm sync:batch refuses with exit 1 before any request when the User-Agent is missing, otherwise runs one chunk with the real filesystem, clock, fetch port, read-only git port and the session-cookie holder, prints the outcome kind and completed count, exits 0 on any outcome and 1 on a throw.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/sync-batch.ts#L63-L98",
-          "version": "repo-lines-v1:sha256:b7d596715ae8a690c5969ab4c7398f9b7571967e618111f444e6360b17360683:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3Y2M1NWVhYjhjOTI2NmJlN2EyYjI0YmFmY2JlYTgwMWIwMWE3M2Y5ZmYwYjczZDFiYzdhYmRmN2Y4ZDUwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNhY2MwMzRkN2RjM2E1M2QyNmVkZmFiM2I2Y2YzNmE3N2Y3MzVlMDQ3NGQxYTMzNjBmMzFjZGFmMDI5ZmZlMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3M2ZkY2VjMWIzNjY3ZGUzYmM1Njg2Mzg0MzIzNjg2ZjllMmZkOTExYjhlZDNiNzJhNDViMzk0NDIyZmU1ZDYifQ"
+          "resource": "repo://packages/sync/src/sync-batch.ts#L20-L87",
+          "version": "repo-lines-v1:sha256:817219266eea303a5f1422db97b9bb707f488ef5d6561b29b3f6cd916f3aa70d:eyJzZWxlY3RlZExpbmVDb3VudCI6NjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2NThhNjdhODQ3OGU0ZjFlMjIxNmRkZmQ2MTFjN2Y5NzMzYmI0ZWQwYjFiYjBjMTU5YTg5ZmNkMmZiYmUzNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgwNWJmN2JhMTA0NGI5NDUyY2FiY2I0ZWMyYjE1OWRlYTJmZTg2OWM3OTM4MDA2N2NjN2JhNjZiYmMzMTJhMjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -27,12 +27,8 @@
       "statement": "pnpm sync:dry runs the same composition over an in-memory snapshot and the recorded-fixture port, skips (and lists as unrecorded) an entry whose search has no recorded fixture, rejects on any other unrecorded request, defaults its clock to the latest lastAttemptedAt or DRY_RUN_INSTANT with a --at override, never lets the real notBefore defer it, and writes nothing to disk.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/dry-run.ts#L1-L98",
-          "version": "repo-lines-v1:sha256:502080f26b913c14812da39e01ed3994c453c82920f1bd198f45c24d6a8b53df:eyJzZWxlY3RlZExpbmVDb3VudCI6OTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhNGUwMjlkZTYxMGQzNDI5OTM0NTQ4OGMzODM1N2E2M2M1NzAzYWUwMGViYTVhMWE0MjQyOGRlYjhlZWY1M2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1NDQyMDYyYmRhNDA4ZDBkOThkNWFjOWM3NGVjODhlM2ViMTUzMTI4NjVjOWZiZjg2ODk1ZDUxOTVjODU1NGIifQ"
-        },
-        {
-          "resource": "repo://packages/sync/src/dry-run.ts#L204-L287",
-          "version": "repo-lines-v1:sha256:d836ae01534bac65dc9dd01c725a66c9981907c5a9a0e81e63a3cbfa2fa0be4d:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM0NjhkMjE0ODZjZDBlMmRlNTJmNTc0ZmRjMzI1ZWJlM2ZmOTE2OWRlNThlYTUyZjFkNTM0Y2I4YzU3ZDE3MzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ4NDQwODgxNmM5YzZiMGE2NzNhZDQ4OTJlNGMwNzk1MzYzNjkzYzUwNzEzYzRiYWIxOTlhYWE1NDJkODM4NzYifQ"
+          "resource": "repo://packages/sync/src/dry-run.ts#L1-L288",
+          "version": "repo-lines-v1:sha256:c47fe4459a82a8ebcb1a84ad8633d2114ef7eb5b3e3fed5327cbfe4866a6296a:eyJzZWxlY3RlZExpbmVDb3VudCI6Mjg4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2ZGM4OGJkOTFiNjViMDRmOWRkMzgyYmI0ZTA5MTUzZmRmNzEzODhiYzAxMTE3MjdlMjYzMWQ4ZWFhMmI4NjMyIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
@@ -41,12 +37,8 @@
       "statement": "pnpm catalogue:refresh sends exactly four GETs in one lane counted as catalogue-refresh, validates all four before writing any file, and on a write failure reports how many files had already been written.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/catalogue-refresh.ts#L1-L28",
-          "version": "repo-lines-v1:sha256:eec885db78ada3887c6cbd2468859209e58aaa6b1bf345559bc73cdc5082292a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkYjU0NGE1ODg2MzQzNTBjMTkxNjlhODI0M2I1MzFiZjMwOTVlYjU3YzhmYjAzZTQ0ODM2OTQzZjA4MTY4ODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiMmI0MmIwZGM3M2Y3Njk2ZDUxN2IzOTdjY2ViNjU5M2U0M2I4ODE1MTM0MTM3MjkzNmRhNTA5NzcxYTI2NjAifQ"
-        },
-        {
-          "resource": "repo://packages/sync/src/catalogue-refresh.ts#L173-L296",
-          "version": "repo-lines-v1:sha256:e6dbfd7077e4e374d08ca5e395026a81b7b2e189bc0578b08dc355912348d605:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3YjI3N2Y3OWMyNjhjNjE4YjZhNjIxNGU0NzUzNzhhMDc2OTQ4Mjg1ZDk2ZmZlZjYwYmQyMGJkYTQyNDk0OGNiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJjNDE1MzM1OGM3NjNiODljYzc4NGYzMzhkYWQ5ZTBlOWQyMzRkYWQ3NzFkMDY1ZGVlZDQ4NDkzYWI4NWY5YTJlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIxZWJlNTVjZmY0MzljYTk2NDJmYTQ1ZTQxNzRmM2M0YzkyNGRkNmRkNTUyMTcwYzhlYzlmYjBhNjc5YmJjNzlmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJhNzMyZTAyNTYxNWI2MDc3ZjkzMmRlOWI3N2ZiYWIyMDI3ZTFhYjAwYzU2ZmVkYzFhOTFhZmY3ZTA4ODk4NzAwIn0"
+          "resource": "repo://packages/sync/src/catalogue-refresh.ts#L1-L295",
+          "version": "repo-lines-v1:sha256:2db71a9095d1f9a54e8b5e07a57b967ac903cd631e9c044abb1e7fa7b55c6538:eyJzZWxlY3RlZExpbmVDb3VudCI6Mjk1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
@@ -55,40 +47,32 @@
       "statement": "pnpm fixtures:record records the leagues and four data endpoints plus the search and fetch for every non-pruned entry of the fixture workload fixtures/tracked.json (not data/tracked.json) using the production search body builder, and redacts personal identifier values while keeping their keys.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/fixtures-record.ts#L1-L26",
-          "version": "repo-lines-v1:sha256:176392ee3c7560920d48afe7e12a3795c5a5d3816d7691d8b9d4ea9c750ff88b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwMjE1MjQwNzMyZWRiNWZkOWJlMDVlM2Q4YTMzNDgzYzY3ZmU2M2U2MTY3YzJhNTkyMDA3ZDMxOTVmNGE2NmYifQ"
-        },
-        {
-          "resource": "repo://packages/sync/src/fixtures-record.ts#L133-L168",
-          "version": "repo-lines-v1:sha256:566ee944512593c0548e02e674f37c57176cafe178e9295847c25c534b68adce:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNkYTQyOTMwZTBmYzIxNjE1M2Y2MGUyMTk4N2MwYWU3OTYwZDMwM2JmMTAwNzUyZjc4Y2UzMDc3MGU2N2ViNTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4NjQwZTFhZDMyYTRkMzc5ZGVmNmM0NGUxN2Q4MTg5NjU4MTc2MjE0ODUyZmQ0ZTYyZWM1NDZhY2JlYzk2ZjcifQ"
-        },
-        {
-          "resource": "repo://packages/sync/src/fixtures-record.ts#L355-L362",
-          "version": "repo-lines-v1:sha256:b73987df27e7f1d8413f00c44fe43a36d472437b948b24de57567c1dfd66ef22:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2I4NTExMGNiMDk3OWY2NzlmNDZlMzg2OTE3ZDQyZmMwOTU0Y2NlNjRiNGQ2ZGYyYTUxNzdkZTA2NGRjMzA0YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGRkMTI2MDA1OWZjN2MwOTdiOWQ1NGJmZWY3MzJhZTdmNDY5MzFkOTBhYWVhNWZjOTU1YjcyMTQ1YTBlYTdiYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzZlNTFlMGQwMDhmMTZjN2EyYjcwMDJlOGJjNDY1NDg3YWUyZjVhMzNiMDhmNzNmNTM1ZDAwYmYyOGI4N2ZlMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzUwNjA0NWE1OWY1Y2ZhNjE3NTY1ZTE0MzAwODkxYmIwYzNkMmZmNzhjNTg5M2Y0NTYxNTg3NTg3ZGIzZWJjZCJ9"
+          "resource": "repo://packages/sync/src/fixtures-record.ts#L1-L365",
+          "version": "repo-lines-v1:sha256:bf8720446c58e5d2b31d967c2641263f5cedc1b8604c513b3db7680dabe40669:eyJzZWxlY3RlZExpbmVDb3VudCI6MzY1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1MjcwMzk1MmE2MWI5OGQ3NjQ2YzIxNWViY2IzZTFkMDhkMDMwNmI5NTg4MzgzNjNiYjk4NjA3MDFiM2VjZDg0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
     {
       "id": "claim_37f8ca98b3534f3db20d42655b606357",
-      "statement": "pnpm tracked:check is read-only and runs the schema, pinned-cap, catalogue and cross-file checks with production validators, printing ok, checks and issues; the cross-file check runs core's five checks against weights.json and is skipped when the file is absent.",
+      "statement": "pnpm tracked:check is read-only and runs the schema, pinned-cap, catalogue, cross-file and recipe-reach checks with production validators, printing ok, checks and issues; the cross-file check runs core's six checks against weights.json and is skipped when the file is absent, and recipe-reach is skipped without a recipes or usable weights file.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/curation/check.ts#L1-L30",
-          "version": "repo-lines-v1:sha256:0021b80d28a41e5554a6c0e2bc254364b310ae518b81b576cf25e0a1ccdc44da:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhMTAxYjQ0YmNkOWEyMTg0OGI2NzRlZmE2YTIwOTY4Y2Y4ZmJlYzA0ZDU3NDk1OTE1NGQ1ZGMwNjY4YmU0YzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImViZmM4OWRmOGUwZjhkOTI0YzI2MDNlMjcyMDZlNDE1NGExMzM0ZGUxZDQzZjNiMjY4ZDcwZmZlMjc1YWM0ZDMifQ"
+          "resource": "repo://packages/sync/src/curation/check.ts#L1-L80",
+          "version": "repo-lines-v1:sha256:60a82d4962c32110a19565e1c46fe04a91fd6a466c5f4fab656482c66f3d1ac5:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwMWIwOGUyOGYxNDUwMTdiY2VmM2Q4ZTc2NmJmYTBmYTQ1N2I2OWViZGUzNWMzMGUyYzYzMTRmMjllNjc2N2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2YzAwZmYwMjQ5NjgxYWIwOTExYzg1YTk4ZDVlMTg2OTgyZWEyNzliZjM5ZDFkODQ0NDExYjIxNTE4ODBiM2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhhYTcwYjY1MTgxNzNkZTdlZTM4OWNkZTQ4ZDdmODA2ZjU0ZWZhOTc4Y2YxZWE5NmZkYzZiMjgwYjYwYjY4MDgifQ"
         },
         {
-          "resource": "repo://packages/sync/src/curation/check.ts#L130-L215",
-          "version": "repo-lines-v1:sha256:071010670bb7590b8806b665faa5cdb10ee64f364e367b1547209a121de001e7:eyJzZWxlY3RlZExpbmVDb3VudCI6ODYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmYzFmNzUwODI4YzA2MjI0NTU5MDY4ZjBmYWEwN2FmZTNmNGU2ZTE1ZjYyYTUxYjk0MmM2ZjllOGFiYTg3OWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhYzQ0M2ZjOTgwNGEzMzZkNjVhNmE3NWYzMGEyMmM3NjAzZGRiYTQzNzgxZjA5MjBkZDk0M2Q5NTRmODc5N2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBjNDFkMDJiNWE0MjlmNGJiY2JhYjllYjBjYWUxMWQ4NTE1MmE3MTVmMjEzNDNjODFhNWQxYTBhY2I5NDgwMjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMyZDY4ZThlYTg5ZTlmZWM1MDNkMjMxYmNhNWY4OTc3Nzk0ZDQzZWI3MWY4N2I3MzQwOWI4Mjc2NzE3NWQ2YTUifQ"
+          "resource": "repo://packages/sync/src/curation/check.ts#L140-L359",
+          "version": "repo-lines-v1:sha256:9f37aa3ee3ecba63638eab8f97110813de6d3ae6c428d77392381c7cc63d56c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI2NmE1ZGNmZTQ5M2Y3ZTQ5ZjUxOTUxNTFmN2NhNjc4OTU5ZWVmMDFiNDkwYTRkOTEwYjBlMzljZTExZTA3NTQ0IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
     {
       "id": "claim_d85fa3b4c1094831b600e2abbcae7361",
-      "statement": "pnpm tracked:lookup reads the committed catalogue as plain JSON and parses weights.json with the contracts WeightsFileSchema, prints JSON, caps stat and base matches at 50, derives nothing, and exits 1 with {error} on a lookup error including a schema failure.",
+      "statement": "pnpm tracked:lookup reads the committed catalogue as plain JSON and parses weights.json with the contracts WeightsFileSchema, prints JSON, caps stat and base matches at 50, takes the interval and line set from core, and exits 1 with {error} on a lookup error including a schema failure.",
       "evidence": [
         {
-          "resource": "repo://.claude/skills/tracked-json/scripts/lookup.ts#L1-L40",
-          "version": "repo-lines-v1:sha256:a981eafb49d5fac203e8c279dc2544efd19ab41759a487656170a076b298f1e6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxZTFmZWYyY2ZmOWZmMjE3NWMyZTRjNjZjODk4OGE4ZWZmNGNhOTdjNDQ5NWFiYmYzOTBiMGI2NGI1YmVmOGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3NjU3ODA1NDE0OGJhYTMxMzdmZTQwZDM5YmMzMGNiMjhiN2VjNjljNWYwN2U2ZjIzZWQwYjRiODg0YmZjMDgifQ"
+          "resource": "repo://.claude/skills/tracked-json/scripts/lookup.ts#L1-L60",
+          "version": "repo-lines-v1:sha256:5892eeb341f9c6b7e77f82a25e38ee18cc8037da3255aa3813588207ad34af9a:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU0ZGQwYzllOTQwMmYyZjdkYmM4ZTJkN2Q0YWM5YmRjZjYzYjI2Y2VjMDk5M2RmNzU2ZWUzYzMzNjMyYzY4MTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4YWRmM2JhMmExMTdiNzczOTMwNzNhNzRiNDQzM2UwNzNjMDYzMDU0MmUyMzJjNjAzMTMzZjY1MjhjNzhlNjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMxZWY0N2I3NzRjZGI4ZDE2NjZiMjRkNzM3Yjg4OTI0NTk3MzJlMDE1ZjNkYWVlOTVhMzc0MjI5N2Y3ODg4NzYifQ"
         }
       ]
     },
@@ -97,12 +81,8 @@
       "statement": "pnpm dev:stop refuses a port listener that is not Vite from this checkout's node_modules, climbs from the listener through script shells to the first pnpm dev without passing its own ancestors or a parent started after its child, kills those trees, and exits 1 if the port stays taken; a failed or unreadable listener query is an error, never a free port.",
       "evidence": [
         {
-          "resource": "repo://tools/dev-stop/dev-stop.ts#L116-L215",
-          "version": "repo-lines-v1:sha256:c43fd96ce3114872833921b734f4adb059080b4c69871826af5d1cb02ffae8a1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjM2FlNzBjODQwYTM2MGIyYzU0ODFjZTMwMGEyMWJjMTZiOWQyYzQ3N2ExMmNmMDk5Y2UzYzgxOGVmYTlkYjQ5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyZWU2MDhkY2ZjZTgyZDUzZmM5YjlhYmFhN2IzNjhjYjQzNmJkZTVmYTNiODBhYzNjOTlmZjE5YWY2NjUzMjVkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmZDY0YjhmMjZhZmVkNjEyNTM5OWI0NDk4MTdiZTlmYjNlMTFhMzBhMDk4NWJlYmRjZjM3MmNmZjQ5ODg1MTE2IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI2ZDQ4ZDFhNjNjMjBlNjk1MDQ1OWNhMDUxZjYzNTY4ZjkwZDVmOGM4MGY2MGRlMmQ0MzUyMGM4Y2MzMTRjMDRjIn0"
-        },
-        {
-          "resource": "repo://tools/dev-stop/dev-stop.ts#L267-L330",
-          "version": "repo-lines-v1:sha256:c3a8d009297a4318a848bc11244a8b01ab38e229423592b1c1990f63da3d2018:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmYWIwNDYxYWY1MTlhNjYxYmI4OTEwZTg4ZGYxMzU2MGFjZjY4ZDQ0NTk0NTgwNmY1NTU5M2ViMWJlOTU1NjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhYWMzM2JkODFmZjc3MjcyNWVlYTI3NmZkMzZmOWJmYjQ4MjE3MDQ4ZDhjZGQzM2E4ODkyOGZkMGY2ZDczZmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZiOGRjODU0OThkYmRiZWY0NzdiNmNmOGQwNTIxNTc5OTQ2ZWY0NzIwZDVjYWQ3NzE0MTRjN2E3YTZkM2Y3NmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQzY2M1ZGUxNzM4OGYyMDFkMzNhMTk3ZTI4YWE4YzMzMjMyNTY1ZTEwYTM4YzU3NDRkMzc2MGJmZmZiODg2NjAifQ"
+          "resource": "repo://tools/dev-stop/development-stop.ts#L95-L307",
+          "version": "repo-lines-v1:sha256:ca58aee03c538aa6171148fead5fc517512cc3f2837d698b42178e8be719c989:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJhMzc1YmRiMGY0Y2YxYzQwYmMyOTQyMmQ5NTJjNjEwYTgxZGIwNTYwNDEzNzE5ZjYxOGIyODNhMmFmY2FhMTc2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlZTgwOGMzOWQxNGY5NzE0OTg5NmYzNDE0YTI2OTZmNDE0ZTkwNDBjMjQ4MDczZTQyNDA3YzlmNDBjYzNmMjc4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
@@ -111,14 +91,38 @@
       "statement": "pnpm sync runs until the first SIGINT or SIGTERM and exits 0 after a stop; it exits 1 only for a bad --pinned-max-age argument or a missing User-Agent, and a throw inside a chunk is printed and waited out.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/sync.ts#L525-L603",
-          "version": "repo-lines-v1:sha256:fc9184ba395dd52573a70067e8876f3fbbbd0f180200030600e27642c0a864bc:eyJzZWxlY3RlZExpbmVDb3VudCI6NzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxN2MxMzI4NjA5NjY4NWE3Yjc2NWEyMWY2MzJjYTYxNjQ3NjBjMWZjODE0ZjI2MjZkNzdhZGFmYTg3YjRhMGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVkYzExZmNiYjAwYWMyZTUwMDI4M2UwY2MyN2JjMjJhMjg1ZGU0ZjliYjUwNWY1MWE5ZTZmYTBhYTVhNjFkY2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZkMWNhZGU1NWNlYWRiYzNhN2ZjZTg2YTdlNjVhMDBlMmU1MTIyZTY0ZWM0NGVjMWM1Y2Q3OWU1MzU4YWI5ZTMifQ"
+          "resource": "repo://packages/sync/src/sync.ts#L214-L260",
+          "version": "repo-lines-v1:sha256:e31292978e8b8c1f040cb2330ebaaecddee8e167bbde8facd880ac5094761b0a:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxN2MxMzI4NjA5NjY4NWE3Yjc2NWEyMWY2MzJjYTYxNjQ3NjBjMWZjODE0ZjI2MjZkNzdhZGFmYTg3YjRhMGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc0MjQ0NTg0MDEzY2E4ZmZjMjBiZWZhYWJjMzNmZTgyZDkxOTVkZDQyMjIxMjNiZTA0MDk2Mjk2YjVkZjY4ZDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZkMWNhZGU1NWNlYWRiYzNhN2ZjZTg2YTdlNjVhMDBlMmU1MTIyZTY0ZWM0NGVjMWM1Y2Q3OWU1MzU4YWI5ZTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ae386051ab244697b847267e16376cca",
+      "statement": "pnpm currencies:refresh rewrites each existing entry of data/currencies.json as its poe2scout price divided by the divine price, rounded to 3 significant figures, keeping entries with no positive price unchanged with a warning, refusing without a positive divine price, and writing through a temp file renamed into place after schema validation.",
+      "evidence": [
+        {
+          "resource": "repo://tools/currencies-refresh/currencies-refresh.ts#L99-L150",
+          "version": "repo-lines-v1:sha256:04427da437c6087153a2621d14dd464f1e7b7c409cf1fe7100429483376a7691:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmZjc4YmZlMmU1OTg3M2M4MWNlYjcyM2IxOTFiMTczMzA3ZWU1YmRmMzExODczMjA2NjEwZWIwZjJjMzUxMGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YmU0ZDQ0Y2U4NDNjODZhNDFmZDJlMGM3YjRjNmJhMTU1MDZiNzM2MzZmMzFmYjZmNGQ3MTdkMWExNTZiYWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI4MjZiNWE3ZmYxY2Q2NjEzZTdkYjJiM2ZmNTU3OTM2ZGJjNjZmOGViNjE5NzU4Nzc2NDJiYmRiODBhNDE3Y2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQzODFjNDEwOTkzZGUyMDI5M2EwZjVlMjMxYTg2N2M3Y2FkM2M3NjAxZTk1N2YyYWE0ZThlZDk2MDkwNGQ1MDIifQ"
+        },
+        {
+          "resource": "repo://tools/currencies-refresh/plan.ts#L36-L99",
+          "version": "repo-lines-v1:sha256:b234c652e002743220dcbc4ae2c02bf395c5b55d49fbd849adbe51f9d6d965b9:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQwYzlkNDY4MWI0OWY1MWExM2VlNTM5N2VjMDQwMzc5ZThjZmYzYTEyMzA1ZTgzNTNjZTA4ODUyYTliM2FmN2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiZTJmYzg0ZGQ3ODk5Mjg4OTYyOTgyZmU3MjZjODc0ZGRiMjg4OWUxZDczMmUwMGI3NzZjYjc4ZTRjY2I1ZjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2695c6f615a2458c9b5256d1e3a4bf3a",
+      "statement": "tracked:lookup mods prints one row per mod family, a modGroup plus one stat-id set, so a hybrid modifier is one row, and tiers reports per recipe whether the recipe floor keeps each tier.",
+      "evidence": [
+        {
+          "resource": "repo://.claude/skills/tracked-json/scripts/lookup-mods.ts#L1-L147",
+          "version": "repo-lines-v1:sha256:f3386081ab7d9a72e35f790bbb5bbf0fa68cf91f4b60cf0437975c6146bef660:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQ3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0ZGExMWU1OGNjYjJhYjc1MmM4MTZkMjMyYWZmODMzYjNjMGJjYjhkMDZmODk1OGM2ZmY1Yzg3MmM3YmU3Y2E4IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-10-03T11:56:06.252Z"
+    "at": "2026-10-17T13:54:42.734Z"
   }
 }

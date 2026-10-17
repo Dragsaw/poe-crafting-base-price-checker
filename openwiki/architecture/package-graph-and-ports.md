@@ -16,6 +16,8 @@ sources:
     resource: repo://packages/core/src/index.ts
   - id: openwiki-source-2f0b966b270953f200695dca
     resource: repo://packages/sync/src/git/read-only-git-port.ts
+  - id: openwiki-source-564e005c8065fb28e964692e
+    resource: repo://packages/sync/src/no-git-write.test.ts
   - id: openwiki-source-869e9d6242b1ef866e244695
     resource: repo://packages/sync/src/shell.ts
   - id: openwiki-source-e53b6b5ad4b9153dd9ed5b3c
@@ -26,10 +28,10 @@ sources:
     resource: repo://tools/boundary-check/boundary.test.ts
   - id: openwiki-source-98d5ddb014a0fd4d678f6f2a
     resource: repo://tsconfig.json
-generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
+generated: { by: "claude-code", at: "2026-10-17T13:54:42.734Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-10-03T11:56:06.252Z
+    at: 2026-10-17T13:54:42.734Z
 ---
 
 # Package graph, ports and purity boundaries
@@ -44,15 +46,15 @@ The repository is a pnpm workspace of four TypeScript packages under `packages/`
 | Package | Role | Workspace deps | Notable external deps |
 | --- | --- | --- | --- |
 | `@poe/contracts` | Zod schemas for every shared concept, the four effect ports, and in-memory fakes | none | `zod` |
-| `@poe/core` | Pure logic: the ranking, the probability term, craft cost, provenance, the five cross-file checks and the refresh rotation | `contracts` | none |
+| `@poe/core` | Pure logic: the ranking with its per-row price-trust verdict, the probability term, craft cost, provenance, pool coverage, the six cross-file checks and the refresh rotation | `contracts` | none |
 | `@poe/sync` | The imperative shell: CLI commands, trade client, chunk runner, file writes | `contracts`, `core` | none (uses Node builtins) |
-| `@poe/web` | The static React page that loads the published files and renders the ranking | `contracts`, `core` | React 19, Mantine 9.6.1 |
+| `@poe/web` | The static React page that loads the published files and renders the ranking | `contracts`, `core` | React 19, Mantine 9.6.1, bundled Inter (`@fontsource-variable/inter`) |
 
 `sync` and `web` are siblings and never import each other. A shape both need belongs in `contracts`. Logic both need belongs in `core`. For example, `web` calls `core`'s `rank` directly at read time (see [Core: ranking and refresh rotation](../core/ranking-and-refresh-rotation.md)).
 
 ## Functional core, imperative shell
 
-`core` is pure. It performs no I/O, reads no clock, generates no randomness, and reads no environment. Time and every other input arrive as arguments. It returns typed results and does not throw for expected conditions.
+`core` is pure. It performs no I/O, reads no clock, generates no randomness, and reads no environment. Time and every other input arrive as arguments: `rank` takes the current instant in its input and uses it for the price-trust ages (see [Core: the price-trust verdict](../core/price-trust-verdict.md)). It returns typed results and does not throw for expected conditions.
 
 Effects go through four ports declared in `packages/contracts/src/ports/`:
 
@@ -69,7 +71,7 @@ Each port has a pure in-memory fake in `packages/contracts/src/ports/fakes/` (`c
 
 The real effects are concentrated in the shell:
 
-- `shell.ts` is the only `sync` module with `fetch`, the system clock, a real delay and real file writes. It has two delays: `sleep`, used inside a chunk, and `abortableSleep(ms, signal)`, which the long-running `pnpm sync` session uses for its waits. `abortableSleep` resolves (never rejects) when the signal aborts, so the session reads `signal.aborted` afterwards and exits 0 on the first SIGINT or SIGTERM (see [The pnpm sync session](../sync/sync-session.md)). `createNodeFilesystemPort` resolves every path against the repository root, so code below it names `data/...` exactly as the fakes do. `createExclusive` opens with `wx` (O_CREAT|O_EXCL), so of two concurrent takers exactly one succeeds. The chunk lock depends on this.
+- `shell.ts` holds the real HTTP, clock and filesystem adapters. It is the only `sync` module with `fetch`, the system clock, a real delay and real file writes. It has two delays: `sleep`, used inside a chunk, and `abortableSleep(ms, signal)`, which the long-running `pnpm sync` session uses for its waits. `abortableSleep` resolves (never rejects) when the signal aborts, so the session reads `signal.aborted` afterwards and exits 0 on the first SIGINT or SIGTERM (see [The pnpm sync session](../sync/sync-session.md)). `createNodeFilesystemPort` resolves every path against the repository root, so code below it names `data/...` exactly as the fakes do. `createExclusive` opens with `wx` (O_CREAT|O_EXCL), so of two concurrent takers exactly one succeeds. The chunk lock depends on this. The fetch adapter aborts a request after `REQUEST_TIMEOUT_MS` (30 s).
 - `read-only-git-port.ts` is the only module in `sync` that starts a child process. It runs one fixed `git --no-optional-locks log --no-show-signature -1 --format=%at -- <path>` through `execFile`, with no shell. It returns `undefined` when there is no history, no repository or no `git` binary. `no-git-write.test.ts` bans the child-process module everywhere else in `sync`.
 
 ## How the boundaries are enforced

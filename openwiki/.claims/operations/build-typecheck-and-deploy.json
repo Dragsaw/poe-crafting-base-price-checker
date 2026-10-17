@@ -1,14 +1,22 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:c3f17ac7377f92620dae4a8f468907365a26138cbc7478be9f58b3c439d093bd",
+  "pageVersion": "sha256:c4db6a903cd67ca347c460a2a34dbac1ed77e257a500c24892023051e9c806e9",
   "claims": [
     {
       "id": "claim_3ec8252b68e54c9db1d5c588cee0a121",
-      "statement": "pnpm check runs typecheck (tsc -b followed by the .d.ts specifier rewrite), eslint with zero warnings allowed, and dependency-cruiser over packages; pnpm build runs vite build followed by tools/prune-pages.mjs.",
+      "statement": "pnpm check runs tools/check/check.ts: stage A (typecheck with the .d.ts rewrite, eslint with zero warnings, depcruise, jscpd, knip) in parallel, then stage B (test, test:data, build); every step runs even when another fails, and it exits 1 if any failed.",
       "evidence": [
         {
-          "resource": "repo://package.json#L10-L22",
-          "version": "repo-lines-v1:sha256:4b7c1f2e694d04926606c968d419bf212b05a1d022d35e91a24653f3c7e90a38:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0OWVhMDFhZmM5NDc1M2VkY2JhMzdlNjU3ODg1ODlmZmNjODIzNzQ4MjIyMjgxNmM2NGM0MDlhZTJkM2NhNGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxNmRiMDg1NTk0ZjhhMjA2YjQwMDBkMjY5YzY5ODg2N2NjZGEyMGY2ODRkOTQ5YWQxY2E3NmRmNTNmYTFkYzkifQ"
+          "resource": "repo://package.json#L10-L33",
+          "version": "repo-lines-v1:sha256:748504b0b801b6477d277b9728dd2caea9e5816cf1468a428a3c421b301c2166:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhmOGY4NjVlNjU4ODRjYTMyMzk1MzRjNGUzZTY1N2MxMThiZjViN2QzZjI3MDM3ZTI1OTNjNDUwMTY3ZDExODIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkMDA0N2U5MmU0ZGNiZGM4MGJmOWIyNTNjMzliNzA0MTQ4YzlhMDJiMjdiNDE1OWM5ZWI3OWJjMGE5MTZiMWIifQ"
+        },
+        {
+          "resource": "repo://tools/check/check.ts#L114-L166",
+          "version": "repo-lines-v1:sha256:54d929f044650983f226eb23bd2677451c1c5dd710bf3ed5fd3917854ec56206:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlOGNlYThkMjUwZjhjOGM2NmFkMWNlNjZkYTViOGUwMmIxM2Q4NWM3OTdjYzQ2NmE0ZmI4OTU0YzU1OGU0YTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk5NmE0NWQ5MmYyYzRkZmM0YTg5MjBmMDRiNzYxMzQwZDhjM2I1YjNkNWI0MjljNmNiYjAwOGExM2E2MDM4ZWIifQ"
+        },
+        {
+          "resource": "repo://tools/check/check.ts#L18-L27",
+          "version": "repo-lines-v1:sha256:e7cbc0ba38aff6e35f83b872888aaa40aecd0392c97922a4ca6648a7796bc3f0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJjZTgxZGZhNWM3YzAxYjQ2OGI4MTlmMjA1Njc4YzQzYjViZWRmMGViMzRjMTFlZjFiZjUxZWEwMDlkODEwMWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc4M2I1NGI2MGI1ZWRiYTkwYjI1MTg1NzQ2MGE2MDlkYTBhNGM4MTRkM2NlNjcyOTc5ZTdhOTE0YmUxZjc5M2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY2MmNmYTVkOGJiM2RkMDQwOGE3MTNmNmE4OTRhNzg1ZDNhNDcxNDM1MWZiMjFhMDhhYWIzMjg5NThhMDdjMDIifQ"
         }
       ]
     },
@@ -17,8 +25,8 @@
       "statement": "The Vite config uses the repository data/ folder as publicDir, a relative base, appType mpa with no SPA fallback, and port 5173 with strictPort so a taken port fails instead of moving.",
       "evidence": [
         {
-          "resource": "repo://packages/web/vite.config.ts#L16-L32",
-          "version": "repo-lines-v1:sha256:4305a95c79699af44c49b8da84e8214f5d2b534300d62c98c1838ba394272cad:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyY2VjYjE0NGE0NmY1ZGNmMTJhNjE2OWZjZWVkNzY5NWU4Mjk0YjA5MGRlNzZmMzY2MWNkZDAyNDkzMDAxNDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4Njg2MmFkMGIwMjM2MWM2ZjU2MWUwMmQzODg4ZjBjNDg4YmI5OGRjYzI3MDhjZDdiNjRlNWJiMGUyYzU1NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIzMTcyMmU3YjZlM2U2MjQ5ZjYxOGExY2ViOTMyZjIzNzE2ZjhlNGVkYmY5Zjg3Y2Y3OWFmNDVjYjdmZTI2MTUifQ"
+          "resource": "repo://packages/web/vite.config.ts#L7-L24",
+          "version": "repo-lines-v1:sha256:188c6ebba893a791f43d62925c795d6ec47984aebc3a1cd4601eaf41fa3abce5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyY2VjYjE0NGE0NmY1ZGNmMTJhNjE2OWZjZWVkNzY5NWU4Mjk0YjA5MGRlNzZmMzY2MWNkZDAyNDkzMDAxNDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5MzZkZjdhNWEzYWFmMTgwY2ZmZDFkNjVjNjQ2ZWY2YWVhMzUyY2MyNzc3NDY4NjE5OWNkOGZiM2U4OTljN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyNDlkMzA5NDg0NjY2NTAwYmJiZmYwODcwYTUzMzk3ZTFmM2Q4MTNkZjM2NDE1Y2YxNmExYWE0MzMzMTgwMGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQxNWNmODVjYWRlZGVhNTg1Y2I1ZTMyY2M2MTIyNmRhNmE0ZDU3YWFkZWIzM2RmZWMxNTQwMTI5ZWM2YzFiYWUifQ"
         }
       ]
     },
@@ -27,12 +35,12 @@
       "statement": "The dts rewrite walks the dist of contracts, core and sync, converting relative .ts/.tsx/.mts/.cts specifiers in emitted declaration files to .js/.mjs/.cjs, leaving .d.ts specifiers untouched and writing only changed files, because those packages are emitDeclarationOnly with allowImportingTsExtensions.",
       "evidence": [
         {
-          "resource": "repo://tools/dts-specifiers/rewrite-dts-specifiers.ts#L12-L40",
-          "version": "repo-lines-v1:sha256:56ee157c1154be65ea40f814b16fcba91b1fc0e3be41ee7832770ec632d3c6fc:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhY2ExNmNlYjI3MmViYThkNGNlZWU4NTZlNjU3NGJiZDc4ZmVlYTgwMmY1NjdmZjBiZjU1NWU1NThmYTQwNTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU3MmY2OGFiMDc0OTMwZmM5MzM5YjRjMzExZjdmYzY3OGQ3YmM1ZTU3NWM1NjY3YmViMTJiYTU5MjgyM2UwNmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVhYTczMGQyNGNmZjgwNWVmYjUzYzA3NmE4ODIxN2JhNWVjNDY4ZWQwNTJlNjNkM2U3MjBjNWRmZDFkOTUxYmMifQ"
+          "resource": "repo://tools/dts-specifiers/rewrite-dts-specifiers.ts#L13-L37",
+          "version": "repo-lines-v1:sha256:fc5dc4daa3a0b6dce5005a1ddf997121b8e4f66997baa92bd1b63990686c4d94:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5YTY0ODI4ODNjNzUzNjVhOTQ0ZDcwYWQyZjg1NzhjNmQ4Y2ZiN2ExNDE1OTllNTQ5NGU5ZDRiOTUxZjY1YTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzZmFlMDY3ODc4ZGM2YWU3MTgxODM4ZTRmYTk4Y2Q3ZTQ4NzJhNDNmMjhkNGE1Yjg3YjhiZWY1Mzg5Nzc1NWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkxMWUwNWQ3NzljYzVjOTVkYmVjN2IzYzIwZDQ0N2ZmYTBjZGYzZTE0NTFlYjhiOWRkYzM0M2NmYmY3NjE5MmEifQ"
         },
         {
-          "resource": "repo://tools/dts-specifiers/rewrite-dts-specifiers.ts#L84-L92",
-          "version": "repo-lines-v1:sha256:c4aececcbcbbbe02bcd45cabc0fb241d0bfb41893ee800dcc6d801f2b43b89be:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUxYTYxZmMzNWY1NGE5NzRkMzdlOTIyNjgyYmI0MmUwYTQ3MjU2MmYwYjk4NzQ4MTkzODhjYzQzZjVmMTRiYmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYyZDQxNzRjOWM0ZTg4MThlMWVkOGYxNTA2YWYyM2E3MGM3MDY4YzNhZjAyNTUxN2EzMzA0ZGUxYzg0MjViMDgifQ"
+          "resource": "repo://tools/dts-specifiers/rewrite-dts-specifiers.ts#L55-L76",
+          "version": "repo-lines-v1:sha256:80374433abcf5dd99a1e437c5a30e2684f3bb6ffac9366376b3154c09fa90100:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwZTdjM2ZkOThkODA2MTUzNTljMDkyNjkyMGVhNmNjYjkxNjcyYWJkMmUxMDMwMmVmNTIzNWNjMjk5NjVjNjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjMDA3NDJmN2YyYThmZmRhMmFmNzc4OTRlMjBkYzcxZDEyNjdhNTE3OWQ2ZDA4Y2U2MzlkMGVlYmMwMTlmMGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiZjc1Yzg3ZjJjMGE4ODcwZmRjMDhiZDFjMTEwNTNlNGJmY2U3YTZlZTIxOWU4ZGU2MzUxZDJkYjU3NTE5ZWMifQ"
         }
       ]
     },
@@ -41,8 +49,8 @@
       "statement": "prunePages deletes every file copied from data/ into dist that is not on the seven-entry allowlist, removes emptied directories, and throws naming any missing required artifact, while the three tolerable artifacts may be absent.",
       "evidence": [
         {
-          "resource": "repo://tools/prune-pages.mjs",
-          "version": "repo-file-v1:sha256:711c04528bd17cde1a63ddead30736496f0ca727c84ed3c1ce307881ec17cb35"
+          "resource": "repo://tools/prune-pages.mjs#L8-L74",
+          "version": "repo-lines-v1:sha256:c7a6a20fbd056e2c01681bb716e15ef26343e35b6352b5dbb547bb93011225a7:eyJzZWxlY3RlZExpbmVDb3VudCI6NjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkMmIwNmQ5OTEzMjA2YTU2ZDg3YjIyNjNiNzQyMmI4NWZmODFmNTRlZWZkZTkwY2U3OTUwYzZiNDYzZWRjZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2NTQ5ZmRkZWIxNGUwMTBiNzQyNDFjMWY3YzkyZGY2NWJhZmYwMjQxYTc3MmQzOTA3NmFhZjA2MTc1Yjg0ZjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkODQ1NGE3ZmUyZjAyNDVlZmZmNzNlMGM3YzEyOWIxZTFkNzIwYWEwZjEwZmJjMGY0MGE3OGU4M2EzYTc0ZWUifQ"
         }
       ]
     },
@@ -58,57 +66,95 @@
     },
     {
       "id": "claim_b6efe4cb78b44cfbb4dfac9a5dc18266",
-      "statement": "The deploy workflow runs on pushes to master and manual dispatch, installs with a frozen lockfile, runs pnpm check and pnpm build, and deploys packages/web/dist to GitHub Pages without running pnpm test.",
+      "statement": "The deploy workflow runs on pushes to master and manual dispatch, installs with a frozen lockfile, runs pnpm check (which includes the test and data-invariant suites) and pnpm build, and deploys packages/web/dist to GitHub Pages.",
       "evidence": [
         {
           "resource": "repo://.github/workflows/deploy.yml",
-          "version": "repo-file-v1:sha256:11d640f5b0e590546c325f4d6176d42fa7a7df2e1222ca9f67a6ca69c1df579f"
+          "version": "repo-file-v1:sha256:03a5dea4f20e5164da8a57d6c56bc26b1b6df51b849283e106f0f653cb5d02af"
         }
       ]
     },
     {
       "id": "claim_9a2d11a26a9745d595c84636a7fc7648",
-      "statement": "The commit-msg hook requires a lowercase known type, forbids a trailing period except for the deferred scope, and requires feat/fix/test commits scoped to known packages to name a story or retro item.",
+      "statement": "The commit-msg hook requires a lowercase known type in the type(scope): description form and forbids a trailing period except for the deferred scope; Merge, Revert, fixup! and squash! subjects pass.",
       "evidence": [
         {
-          "resource": "repo://.githooks/commit-msg#L8-L79",
-          "version": "repo-lines-v1:sha256:5cd9da44529fd45da50953b0ad4293787b60ea5135375d90872750183a0130a7:eyJzZWxlY3RlZExpbmVDb3VudCI6NzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkMWQzMGU0NWRjMTEzMzFmZTIwMmQ2MWMwZjA3YTNmMzlkODQzOWQ1NjU0ZmUxN2VlMzllMTlkYWI4OWJhNzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZlZTIxNWYwZGVjNDJkYTNmYzA2OTg5Mjg1NzgzZjJjMWQwOTM1Zjc0NmE4ODI1ODY5YWNiYTE0OTlmYjNkMTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5MTAyMTg5MDIyZWU5MTQ0MDA2MjUzYzZiOTEwNGFiOTk4ZGZiYTMyNTg1YjcyZGNkMGY2ODVjZTA0NGUyZTIifQ"
+          "resource": "repo://.githooks/commit-msg#L8-L71",
+          "version": "repo-lines-v1:sha256:26a7f68155ca0b42bdf0509c54e480dc2ef96e6363fabf0f0d8d2c80f0b1852a:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkMWQzMGU0NWRjMTEzMzFmZTIwMmQ2MWMwZjA3YTNmMzlkODQzOWQ1NjU0ZmUxN2VlMzllMTlkYWI4OWJhNzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4ZGM0Yzc0YTlkNzQ4NzY0MDk3MDVhYThiOWI5N2UzOWMwNjQ0MTE5NTQxYzdmMjhiZGU2YTg3MGZkYjQ0NzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY1YmZhZWQ3NGUwMjg0MDQzZTFhYzM1OTFiNTU1Nzk3N2Y5NjdmZjI3ZmNiMDMwMjM0ODA3NzRlZjU5ZjhkNDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
     {
       "id": "claim_5b7f04ea28bc4a50adad2247c86a3660",
-      "statement": "The prepare script points core.hooksPath at .githooks unless the checkout is not a git work tree or another hooks path is already configured.",
+      "statement": "The prepare script points core.hooksPath at .githooks unless the checkout is not a git work tree or another hooks path is already configured, in which case it warns and leaves it.",
       "evidence": [
         {
           "resource": "repo://tools/setup-git-hooks.mjs",
-          "version": "repo-file-v1:sha256:2100c4461575b56c84aaecbef9666d8c273708156f05ff3c284b0cd30ce331dd"
+          "version": "repo-file-v1:sha256:89fb3c93101c385d88b555150b42b22a8890a558c133c0b245bae62ceed675ae"
         }
       ]
     },
     {
       "id": "claim_9c0294c8ed8244c9a2a56bd16aa1e39e",
-      "statement": "The OpenWiki update workflow runs daily and on dispatch with full git history, runs openwiki code --update, removes openwiki/.run.json, opens a pull request on branch openwiki/update that adds only the openwiki folder, and fails the job when the OpenWiki step failed.",
+      "statement": "The OpenWiki update workflow's daily schedule is commented out so it runs only on dispatch; it checks out full history, runs openwiki code --update with continue-on-error, removes openwiki/.run.json, and opens a pull request on branch openwiki/update that adds only the openwiki folder.",
       "evidence": [
         {
-          "resource": "repo://.github/workflows/openwiki-update.yml#L1-L80",
-          "version": "repo-lines-v1:sha256:e5aeb393b057295bff7abbc7092f80a3256638501beff2af25c9f49a0441adce:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2MDI3ODdhZjZkY2MwODM0ZGUxMjFjYmIxY2I5NWY5NDU5YjcyMWVhYjAzNDlmMTA1MDFiOTk2YzFjNzdmZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2NzE4ZjA2N2I1ZTVjMWYwOTkxYTZlNzQ3MjZmZTJhMjNkMjY0MzQ1ZTA4ZTRlYWQwNGZhZjczYzI3ZWQ0NDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://.github/workflows/openwiki-update.yml",
+          "version": "repo-file-v1:sha256:f9ded084dade139330e85bad6bf872ee0cb6530ed999f40d5775b5cf4cd63da7"
         }
       ]
     },
     {
       "id": "claim_1681b3968fab485e8b4d8eefca6741b1",
-      "statement": "tsconfig.tools.json is a noEmit project with allowImportingTsExtensions that includes test/, the tools/ scripts (among them tools/deferred-issues) and the tracked-json skill scripts, so pnpm check typechecks code outside the packages.",
+      "statement": "tsconfig.tools.json is a noEmit project with allowImportingTsExtensions that includes test/, the tools/ scripts (among them check, currencies-refresh, deferred-issues, lint-on-edit) and the tracked-json skill scripts, so pnpm check typechecks code outside the packages.",
       "evidence": [
         {
           "resource": "repo://tsconfig.tools.json",
-          "version": "repo-file-v1:sha256:22b5f297b974f6de398df472a75b8aa4e8b9edeebd456658ec48709f171fd0c0"
+          "version": "repo-file-v1:sha256:e11b8eddd92c5ee817c1344ac4d8ef421c29394e77c6cc0a73a1b2dbecc43947"
+        }
+      ]
+    },
+    {
+      "id": "claim_01268ee3901e4054a5aa92454e158ca7",
+      "statement": "The pre-push hook runs pnpm check with git's local environment variables removed and blocks the push on failure; a push that only deletes refs is not checked.",
+      "evidence": [
+        {
+          "resource": "repo://.githooks/pre-push#L1-L66",
+          "version": "repo-lines-v1:sha256:6c1579d01bddbf0b69a685ed8eeae4471944599d2178f556b97646a0daa5692b:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1OWM0Nzg3MmI3MWYxMjU4OTk0Mjg5MjQ2NGU3NjRjMGRiMzUwYzIwYjcyMjI4NjQ1NjE1Y2MzNmUwYTA3MjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiZDQyZjc3ZTYxMGYwMmI1NDUyOGJjZjRjMjQxOGM0ZDZhZDY0Mjk2MTFlNmNmNmU1OTY1NDM3NGExMzAwYjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_68109448372f466787f10f36608bcbf0",
+      "statement": "The pull-request test workflow always starts, uses a paths filter inside the job to skip when no code or build config changed, and otherwise runs pnpm check.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/test.yml",
+          "version": "repo-file-v1:sha256:262fa16670bfef139170056f9711b8f9589d4afa2d7ab1a823226c37a226c5ca"
+        }
+      ]
+    },
+    {
+      "id": "claim_667c4bdf5db54fd0a05814393251c218",
+      "statement": "The agent PostToolUse hook runs fast lint and depcruise on each edited file within 30 seconds, and the Stop hook runs tsc -b once per turn within 90 seconds, exiting 2 to hand diagnostics back.",
+      "evidence": [
+        {
+          "resource": "repo://.claude/settings.json",
+          "version": "repo-file-v1:sha256:b798946a820fc70577b1294ea573a2e5a26d827ca22bcd852a6adfab440d3ab4"
+        },
+        {
+          "resource": "repo://tools/lint-on-edit/lint-on-edit.ts#L1-L30",
+          "version": "repo-lines-v1:sha256:5e07c515d2131b1e36299cadfb4d2a20106b842e5c0f89d9fe888fc23558fa13:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5MDU4MzRhMGYxNTdhNDJjNDUzYmZmNWZkNWJkNDE5YTE1YjhiMWViYmExYjlmMmI2M2FiNzkzYTI0MDM3YmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiY2M5YWI5NTMzNWRhNDkzZTFlZWM0NjQ0ZjM0MWI0ODM0ZTI2YjRmNWQ0MDcwMjRmMjI0Y2UyMTJmYzQzZjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3ZTY4MDI5ZGE4N2NiMWUxOGMyNTY2MmQ2NDI0ZWQxNjg2ZWNiZjRkZDRkZWYxMmFmMGZlNzE0MjAzNzU2YmMifQ"
+        },
+        {
+          "resource": "repo://tools/lint-on-edit/typecheck-on-stop.ts#L1-L30",
+          "version": "repo-lines-v1:sha256:eefc8318f82e63b1d18f69fa2bbb3865a312b976698f2b4e5a468398cbc8988e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZjY3NzA0Njc3OGEyMmVjMjM5NzlhYTY4Mzc2OWQwMGIyNTUzM2M4MWM5OTFlMDg0ZDY2NjM1MzliZDI2ODUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFmYjRhYmVjYzZmZmRmNTMyNzQ0MDE2NGYyNWQwZTU1YjY4MmIwOWZhNzIwYjVjNjczYmE4NTM5MTQ4NzdmYzUifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-10-03T11:56:06.252Z"
+    "at": "2026-10-17T13:54:42.734Z"
   }
 }

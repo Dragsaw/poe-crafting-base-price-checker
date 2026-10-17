@@ -6,6 +6,8 @@ tags: [testing, vitest, msw, no-network, fixtures, fakes, jsdom]
 sources:
   - id: openwiki-source-c0f6629587ebf863c9fd5ce3
     resource: repo://fixtures/README.md
+  - id: openwiki-source-5b54a58d1b51cd490b0e7162
+    resource: repo://package.json
   - id: openwiki-source-ea0ee5e3beb707ae9018055e
     resource: repo://packages/contracts/src/ports/fakes/http.ts
   - id: openwiki-source-1ab71563450d38af3980fb7d
@@ -16,8 +18,6 @@ sources:
     resource: repo://packages/sync/src/pricing/fixture-port.ts
   - id: openwiki-source-b461097e85ad1a703b98fdfe
     resource: repo://packages/sync/src/pricing/price-entry.fixtures.test.ts
-  - id: openwiki-source-3041748540f59eec928d359e
-    resource: repo://packages/sync/vitest.config.ts
   - id: openwiki-source-c560b764fea9e1d479552dbb
     resource: repo://packages/web/src/test-setup.ts
   - id: openwiki-source-d518aa7bfa6850809e2f0f46
@@ -28,6 +28,10 @@ sources:
     resource: repo://packages/web/vite.config.ts
   - id: openwiki-source-250c33b9b813269819c57fc1
     resource: repo://test/deferred-ledger.test.ts
+  - id: openwiki-source-b7ee0e69b8585c6263a2471c
+    resource: repo://test/directory-structure.test.ts
+  - id: openwiki-source-4a9e81f33a4c1d5c16c455fd
+    resource: repo://test/fixtures/frozen-data/README.md
   - id: openwiki-source-ad79c5cacb4d735af09eefb9
     resource: repo://test/global-setup.ts
   - id: openwiki-source-d121a27980b15c40a65a882b
@@ -44,10 +48,10 @@ sources:
     resource: repo://test/setup.ts
   - id: openwiki-source-fbadcd8591b65031efaaedce
     resource: repo://vitest.config.ts
-generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
+generated: { by: "claude-code", at: "2026-10-17T13:54:42.734Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-10-03T11:56:06.252Z
+    at: 2026-10-17T13:54:42.734Z
 ---
 
 # Test strategy and network guards
@@ -56,14 +60,19 @@ verified:
 
 ## Layout and commands
 
-`pnpm test` runs `vitest run`. The root `vitest.config.ts` declares projects, because Vitest 5 has no `vitest.workspace.ts`:
+`pnpm test` runs `vitest run --project=!data`; `pnpm test:data` runs the `data` project alone. Both are steps of `pnpm check`. The root `vitest.config.ts` declares projects, because Vitest 5 has no `vitest.workspace.ts`:
 
-- `packages/*`: each package's own config. `contracts`, `core` and `sync` run in Node with `src/**/*.test.ts`. `web` is declared in `packages/web/vite.config.ts` and runs under **jsdom** with `src/**/*.test.{ts,tsx}`.
-- `root`: the workspace-level guards that belong to no package: `test/**/*.test.ts`, `tools/boundary-check/*.test.ts`, `tools/deferred-issues/*.test.ts`, `tools/dev-stop/*.test.ts`, `tools/dts-specifiers/*.test.ts` and the tracked-json skill's script tests.
+- `packages/*`: each package's own config. `contracts`, `core` and `sync` run in Node with `src/**/*.test.ts`. `web` is declared in `packages/web/vite.config.ts` and runs under **jsdom** with `src/**/*.test.{ts,tsx}`. Every package project excludes `*.data.test.*` files.
+- `data`: the invariants of the **live** `data/` files, `packages/*/src/**/*.data.test.{ts,tsx}` (today `curation/check.data.test.ts`, `dry-run.data.test.ts` and `web/src/list/tracked.data.test.ts`). They are kept out of `pnpm test`, so a sync result or a tracked-list edit cannot break the ordinary suite.
+- `root`: the workspace-level guards that belong to no package: `test/**/*.test.ts`, the tests of the `tools/` directories (`boundary-check`, `check`, `currencies-refresh`, `deferred-issues`, `dev-stop`, `dts-specifiers`, `entry-guard`, `eslint-rules`, `lint-on-edit`) and the tracked-json skill's script tests.
+
+### Frozen data
+
+Data-dependent tests in `pnpm test` read `test/fixtures/frozen-data/`, not `data/`. It is a verbatim snapshot of `data/` at one commit (its `README.md` names it), except that `weights.json` keeps only the classes `tracked.json` references. Sync never regenerates it, and tests never write to it. So the ordinary suite stays green while the player's live data changes; the live invariants run in the `data` project.
 
 Every project lists `test/setup.ts` in `setupFiles` and `test/global-setup.ts` in `globalSetup` (the `web` project, which has its own config, is covered by the same setup file). `web` also adds `src/test-setup.ts`, which provides jsdom shims for Mantine and React 19 (`matchMedia`, `ResizeObserver`, `IS_REACT_ACT_ENVIRONMENT`).
 
-`pnpm test` does not run in the deploy workflow (see [Build, typecheck and deploy](../operations/build-typecheck-and-deploy.md)).
+`pnpm check`, and so both test runs, gates the deploy workflow, the pull-request workflow and the pre-push hook (see [Build, typecheck and deploy](../operations/build-typecheck-and-deploy.md)).
 
 ## The no-network guard (test/setup.ts)
 
@@ -108,21 +117,26 @@ The real hooks are tested by running a **child Vitest** over a fixture directory
 | `test/core-purity-lint.test.ts`, `test/core-rank-purity.test.ts` | `core` purity bans fire |
 | `test/no-hardcoded-rate-limits.test.ts` | no rate-limit rule, policy or rate constant in non-test source |
 | `test/prune-pages.test.ts` | the Pages prune step |
-| `test/commit-msg-hook.test.ts` | the commit subject rules |
-| `test/hand-listed-coverage.test.ts` | the hand-listed code outside every package (the `tools/` directories `boundary-check`, `deferred-issues`, `dev-stop` and `dts-specifiers`, `tools/prune-pages.mjs`, and `.claude/skills/tracked-json/scripts/`) stays under `pnpm check` and `pnpm test`. Each target's `tsconfig.tools.json` include, root Vitest project include and `eslint.config.mjs` glob is checked by asking the tool itself (the TypeScript API, `createVitest`, `ESLint`). Directory contents are read at run time, so a new file is guarded without an edit. Each check also runs against an in-memory config with one entry removed, so it is proven not vacuous. |
+| `test/commit-msg-hook.test.ts`, `test/pre-push-hook.test.ts` | the commit subject rules, and that the pre-push hook runs the gate (through a test seam that replaces `pnpm check`) and skips delete-only pushes |
+| `test/session-cookie-shells.test.ts` | only the two sync shells and the holder name `POESESSID` or import the session-auth holder (see [POESESSID session auth](../sync/poesessid-session-auth.md)) |
+| `test/directory-structure.test.ts` | placement rules lint cannot count: at most 25 entries per source directory (with a shrinking allowance for two directories), no catch-all module names, no barrels |
+| `test/css-comment-run-lint.test.ts` | the real `eslint.config.mjs` applies the local `max-comment-run` rule (`tools/eslint-rules/`) to CSS files |
+| `test/hand-listed-coverage.test.ts` | the hand-listed code outside every package (every `tools/` directory in its `TARGETS` list, `tools/prune-pages.mjs`, and `.claude/skills/tracked-json/scripts/`) stays under `pnpm check` and `pnpm test`. Each target's `tsconfig.tools.json` include, root Vitest project include and `eslint.config.mjs` glob is checked by asking the tool itself (the TypeScript API, `createVitest`, `ESLint`). Directory contents are read at run time, so a new file is guarded without an edit. Each check also runs against an in-memory config with one entry removed, so it is proven not vacuous. It also fails when `tsconfig.tools.json` or the root Vitest project lists a `tools/` or `.claude/` entry that has no `TARGETS` row. |
 | `test/deferred-ledger.test.ts` | `docs/stories/deferred-work.md` stays parseable by `pnpm deferred:issues`: every top-level `- source_spec:` bullet parses as an entry, no two entries share an id, and no old-style sweep run-state marker is back in the ledger (see [Deferred work as GitHub issues](../workflows/deferred-work-issues.md)) |
 | `tools/deferred-issues/*.test.ts` | the ledger parser, the pure sync plan and the command, with an injected `Runner`, so no `git` or `gh` process is spawned |
 | `tools/dev-stop/dev-stop.test.ts` | `pnpm dev:stop` port parsing and stop planning over recorded process chains. The chains are data, so the test kills nothing. |
+| `tools/check/check.test.ts`, `tools/lint-on-edit/*.test.ts` | the `pnpm check` stages, flags and report, and the agent lint and typecheck hooks |
 
 See [Package graph, ports and purity boundaries](../architecture/package-graph-and-ports.md) for what these guards protect.
 
 ## Replacing live effects
 
 - **Port fakes.** `createFakeHttpPort(fixtures)` answers requests keyed `"METHOD url"`, records every request it received, and **rejects** an unfixtured request instead of returning a default 404. Filesystem, git and clock fakes work the same way. Units take ports as values, so `sync` tests build a chunk entirely in memory. `run-chunk.test.ts` is the largest suite.
-- **Recorded fixtures.** `fixtures/` holds real trade-API responses captured by `pnpm fixtures:record`, a command that only a human runs. Nobody writes a fixture by hand. Personal identifiers are redacted when the fixture is recorded. The pricing fixture port (`packages/sync/src/pricing/fixture-port.ts`) serves `trade-search-*`/`trade-fetch-*` files by a digest of method, URL and body. It serves `trade-data-leagues.json` for the league gate. It rejects any other request with a message that names the missing fixture. `price-entry.fixtures.test.ts` and `pnpm sync:dry` use it.
+- **Recorded fixtures.** `fixtures/` holds real trade-API responses captured by `pnpm fixtures:record`, a command that only a human runs. Nobody writes a trade fixture by hand. The workload includes a summed-`statId` entry, whose capture is the evidence for the summed filter. `fixtures/poe2scout-currencies.json`, the `pnpm currencies:refresh` answer, is captured by hand once and cut down as `fixtures/README.md` describes. Personal identifiers are redacted when the fixture is recorded. The pricing fixture port (`packages/sync/src/pricing/fixture-port.ts`) serves `trade-search-*`/`trade-fetch-*` files by a digest of method, URL and body. It serves `trade-data-leagues.json` for the league gate. It rejects any other request with a message that names the missing fixture. `price-entry.fixtures.test.ts` and `pnpm sync:dry` use it.
 - **The fixture workload.** `fixtures/tracked.json` (`FIXTURE_WORKLOAD_PATH` in `packages/sync/src/pricing/fixture-names.ts`) is the one hand-edited file in `fixtures/`. It is the recorder's input, not a capture: a small fixed list with one entry per distinct search shape, owned by the fixture-backed tests. It is deliberately not `data/tracked.json`, so the player's list can grow with no new recording. `price-entry.fixtures.test.ts` checks that every non-pruned workload entry has a recorded search. An edit to the workload changes the digests and needs a new `pnpm fixtures:record`.
 - **Web artifact server.** `serveArtifacts` in `packages/web/src/test-support/artifact-server.ts` registers MSW handlers for all seven artifacts on the shared server, with minimal valid bodies (`VALID_BODIES`). Every web fetch test registers all seven. Loopback URLs pass through the guard, so a missing handler would reach a real socket instead of failing. It also serves a trap for `catalogue/static.json` (`NEVER_FETCHED_PATH`), a file the site publishes but the page must never fetch. It returns a log of each request's URL and `cache` mode, so a test can assert the fetch set and the `no-cache` mode. A per-artifact `ArtifactAnswer` overrides a response with a JSON or text body, a status, a network error, or a `gated` answer that waits on a `gate()` promise to test the loading order.
-- **DOM helpers.** `packages/web/src/test-support/dom.tsx` holds the shared helpers for the web component tests: the fixed test clock `NOW`, `rgb(hex)` (a token colour as jsdom reports it), one mounted React root per test (`mount`, `rerender`, `unmount`), `mountList`/`rerenderList`, which rank a raw workload through `core` (with `weights: null`) and mount `RankedList`, and the `rowsIn`/`cellIn` queries. A file that mounts through these calls `unmount` in its `afterEach`.
+- **DOM helpers.** `packages/web/src/test-support/dom.tsx` holds the shared helpers for the web component tests: the fixed test clock `NOW` / `NOW_ISO`, `rgb(hex)` (a token colour as jsdom reports it), one mounted React root per test (`mount`, `rerender`, `unmount`, `flush`, `settleTo`), `mountList`/`rerenderList`, which rank a workload through `core` and mount `RankedList`, and the `rowsIn`/`cellIn` queries. A file that mounts through these calls `unmount` in its `afterEach`. Siblings in `test-support/` build entries and dataset rows (`list-fixtures.ts`), sync reports (`sync-report-fixtures.ts`), hover and threshold-typing events (`hover.ts`, `threshold-input.ts`) and read computed CSS numbers (`css-number.ts`).
+- **Package test support.** `core` has `rank/test-support.ts`, `probability/test-support.ts` and `cross-file/test-support.ts`; `sync` has `trade/client/test-support.ts`, `sync/test-support.ts` and `pricing/*.test-support.ts`. They build typed inputs for one module's tests.
 
 ## Commands no test runs
 

@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:6a62efbcb6f8a6c6bb1218ac4e2812e63ad22d5da46eddf975fb5f38ab025407",
+  "claims": [
+    {
+      "id": "claim_d894dee35610425c9bf30fc255b2a652",
+      "statement": "createSessionAuth reads POESESSID from the environment, settles an empty value as absent and a non-RFC 6265 value as malformed without keeping it, and otherwise keeps the value with the holder unsettled.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/trade/session-auth.ts#L284-L301",
+          "version": "repo-lines-v1:sha256:6c5f3f84b37aedf0ae5bb3a2acabda0fcf729426b06294d2b0d1cf6df402942f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxZTQwN2FhNGY5YzAxMGEwMDYyYjUyMzU1NTk3MGNkNjI0OGRhNmNkNTEyYTY1OGQ4YzY3MWM2N2QxNjdjNDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxMGRmNjU3YTliZWVjYWU3ZmFhYjhlYmViMGJhNTE4ODNhOTdjYTY5ZTcxN2QxYmQ1NTk4ODZjYmM2NjZlMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_11cef8c107f347fc93f069a9cf8f9e15",
+      "statement": "SessionAuth keeps the cookie in a private field, exposes it only through withCookie, prints only its state in toJSON/toString/inspect, and redact scrubs raw, URL-encoded and base64 forms of the value in place from thrown values.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/trade/client/serial-sender.ts#L14-L29",
+          "version": "repo-lines-v1:sha256:7930b3de9c7d0a1ef75bf290dfb9fa833e383e11799761e11ed913f0e524f714:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhMmU3NmIzMWY4MzlmNmRmNDNkYTlhNTkxMmZlYThmYmFhYTUzNDY0ZDljZDMzNTAxZmZmOGEzOWRjZjFhMzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNjVmMDdjYzk2NTU4OWY2MzAyMTEyMjRhYWEzMmY3NDQ5NWU2YjRmZmYyMjQ1OWJjOWJhNDExMDM5ZjY2YzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU0MDgxZTNmNDE0NGU5YTE0MmNjMGQyYjA1NzFmNDg5MGRmNWJkY2MyYmM2ZjI0ZmI0NjM1MTJjZDYxMGI0YzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI1MGViYmM1NzRlZThmZDdiOTBiZDQ2YWU2MjIzY2FlNmRiMmQ5ZDM1MjNlODliZGQwMjI1ZTY2NWUzZDFhYTQifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/trade/session-auth.ts#L55-L278",
+          "version": "repo-lines-v1:sha256:7d787d99c0a4a9ada739c6a7cc5f416976518d9b84e1480987d1c2d7a908143f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjI0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJkMmU3ODM4ZGYzZjNkZjJiMjFmMzJmYzljOGI3Yzc0OTkwYTMzMTU2NjJkMjY0ZTU3MTM1NWRiYjMzY2VhYzIzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjZDQwNDc2NWEwYjk2NmRmODE0NzE5OTU0MDY1YTJjYjBkNTQwYWQ0NWIwZDhjMjg2Yzk2MGY2M2ZmOWJmYzUyIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIwZTY4NWRiNGFjMjVjNTRiNmU2YjBjOTEzZTk0YTM2YWNmODAwZDM2ZDE2YzU4M2FkYTUyNWFkN2FjYWVlNWJhIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_55628072fadb4da7a9b1110e25c95e94",
+      "statement": "A source scan test allows only sync.ts, sync-batch.ts and session-auth.ts to name the variable and only the two shells to import the holder's values.",
+      "evidence": [
+        {
+          "resource": "repo://test/session-cookie-shells.test.ts#L1-L25",
+          "version": "repo-lines-v1:sha256:641b707e4653554b346bc1485ea2790bc5187b42f4f0ddf6a3fcc7755b1c6e47:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzYTY3OGI2MTg0ZjllN2JiODQzN2JmNmY3NjM3MTJhMTVmNmJiMDllNDJkYzVmNDE2YjFhMDEzM2QwZWMwZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5MzRlYzJkYzRiOTJjM2IyODg0MTZmN2ZhN2VjMDcwNzdmMmY5NGZiMGQ2NDY1ZWYwNTJkOTg1OWQ5NTUyMzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYyNDMxN2ViZjBiYzRlMTk3ZmNkYTU3ZWRkMGY2YWMxYWJiNjg0NDNjMWU1ZjU0NTE1ZGNjMjBmMmJhYzllYzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_08c68b91c50d499fb3faa4d5a64317bf",
+      "statement": "The first 2xx cookie-eligible request sent without the cookie is the baseline; the governor repeats it once with the cookie and settles authenticated only when the probe's rule-name count exceeds the baseline's, not-elevated for a 2xx without more rules, probe-rejected for a non-429 4xx, probe-failed for other answers or errors, and latches a 429 without settling.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/trade/client/exchange.ts#L83-L102",
+          "version": "repo-lines-v1:sha256:6640693be186579b30c7f378aacf57a2443befc7c4c88aece5ac7b85a03cb8a0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxZGVjMDFiZjY4M2YxNmI5ZThlMjVhOTg3NDdkZGM4NGFmNjZhMWYwZjgyNTJhMjBlZjNiYWFhMGU2NWVkNGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhOGM2MDMzYjk1MmI5MGI0ZmFmMDk3MGQzMDk4MWE4MDk2NmM1NzJlYWZhNGE1NTQyYmNiYjEzMGY0NGNjOTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiNjNkMmQzMGQ0ZDgwNzg3NDIzMWQ4NDJmYmM1Y2ExZWUxMDE1OGEyNzRhNmYyNGI2YjUwZTkxMzc3OTA2YmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/trade/client/session-cookie.ts#L56-L136",
+          "version": "repo-lines-v1:sha256:8bceddb2d10127628d77dee44c5fbd3b2436dd4b6891eb41586525f07651a4b6:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyZWUzNzAzZjlmMWRmNDA3ZmY4NWQ2YmJiNmQwNDMzODMxMWFhM2ZiNTQxYmNiZGQyMDE2MjU4MDM3ZmQxZjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ff5098fbff634695a4a154e37f27f525",
+      "statement": "Only the pricing step's search and fetch requests are marked cookieEligible, and the probe is sent on a separately counted session-probe port.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/compose-chunk.ts#L91-L93",
+          "version": "repo-lines-v1:sha256:41ab01f159a91cd6b4c319d38e88e90e0263447ea6943dab74bb9dda7eed20e1:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjk1MTUxYTk3MmUyZjlkZWQ2YmQ4ZDNmNmJlYWFiNjY5MWFmZDA2MTExOTViZWY1YzgzY2FhZGNhNjBkNDE0MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2IyNzM0NTE5NWFhOGFlZTc5ZjcxZGJlYjBiZWQ3YjkwMTZiN2M2ZGIzZjliYzFkZjlkM2RjMTQwZWVkZDBjYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTFjNmRmNWJmMTg4ZTQ2M2NhN2UzYWIxMzVmYmJmOGExYTVhNGYwMzZiOTM4ZWJmM2MxZDk5NjQ0NWM3MjQyYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmQwZjJkM2EzYWFkYTI3NTg2NDU3OGQwYTQzOTE1NjM4ZDU0M2ZlY2EyYzk0ODU4ZGI5NDEyMTFlODZjZWYyYiJ9"
+        },
+        {
+          "resource": "repo://packages/sync/src/pricing/price-entry.ts#L229-L229",
+          "version": "repo-lines-v1:sha256:30694d04c312a27e2cdfd7f63c3eba8bc5f68e1e9cf78de1b05c8d134cf54a5e:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzA2OTRkMDRjMzEyYTI3ZTJjZGZkN2Y2M2MzZWJhOGJjNWY2OGUxZTljZjc4ZGUxYjA1YzhkMTM0Y2Y1NGE1ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzA2OTRkMDRjMzEyYTI3ZTJjZGZkN2Y2M2MzZWJhOGJjNWY2OGUxZTljZjc4ZGUxYjA1YzhkMTM0Y2Y1NGE1ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWJhNjExODlmMmJlOWQyNTJiZjYzOGNmMGVjOWNhZTIwOWM1OWFkMzRkOTRkMTZkZWE0YTk3MjZlOWUzOWMyNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzA2NWQ0ZGRkMDg1MDkyMjEyMjA1ZDIwNjNkMjc5MDNhMzQ5MGRlMTQ1NzBhMjQ2ZDhjZGRkYmJhYzJiMWRhNCJ9"
+        },
+        {
+          "resource": "repo://packages/sync/src/pricing/price-entry.ts#L254-L254",
+          "version": "repo-lines-v1:sha256:7941e71e9893daf51124c5d03a48543a730b8cd7b7073f9610338da80ebd4e60:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzk0MWU3MWU5ODkzZGFmNTExMjRjNWQwM2E0ODU0M2E3MzBiOGNkN2I3MDczZjk2MTAzMzhkYTgwZWJkNGU2MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzk0MWU3MWU5ODkzZGFmNTExMjRjNWQwM2E0ODU0M2E3MzBiOGNkN2I3MDczZjk2MTAzMzhkYTgwZWJkNGU2MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjc2YTA5Mjk3ZDAzODg4YTI1ZWQzZTFlZDQ0YjM2M2I5YjNjOWUwYmFhNDFmZGNkYTU5OTkzNmRmYWJlZWY1MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzM2YjY1MDQ0MTYyZGMyM2ZlNTRkODc5NDQyMTRjZmE0YWU4NGMwZWY0M2MxZjY3N2NjODI5NzFlODFhZjc5ZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e2a8c7f457b44716992c35a299d06b55",
+      "statement": "A cookie request answering 401/403, or 2xx under the baseline policy without more rule names, is a downgrade: the governor drops the cookie, resets pacing to cold, settles the holder expired and yields with reason session-expired without counting the answer.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/trade/client/exchange.ts#L54-L60",
+          "version": "repo-lines-v1:sha256:bb096d2c022506fc5e52edc1cabdba49199a8488348f10244ae702c36dcb0b78:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzJlNWE1MjRmNjBhZThiY2U5ZDc5NWYxYzE5NjFiNGVhZDY2NjY0MWIzMWRhOTJhMWNmMzczNTAwNWYwMDllZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTcyZDAxYjM0NDc4ODY4ZWMxMThjZGE5NTgzM2FhNzcwYTVlZTg4ODYxODlmYzZkZjc3YzM0MDk3YTQ0Y2YyNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODZmOThiZTMxMDNiMGUxOTMzOTFkZWIyYTIzMDNhYzE4OWU3ZjAxMDI1ZDk5Y2NjZDNhZjNhY2MyNjE1MTIwMiJ9"
+        },
+        {
+          "resource": "repo://packages/sync/src/trade/client/session-cookie.ts#L25-L86",
+          "version": "repo-lines-v1:sha256:23370db7e15e968328513f17ed0c227ff937c10fee7b68bb85ea40da452c6f76:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzZTYxYWY3ZDlhYTFhZTgyYzYxMDIyMmYwMGIxZDFlN2JkYzJkZGE3NWQxOWRkODNkYzc4NDFjOWZjM2I0ZjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlMjMzNjQzNWQ3YThlZWYwYjNiYTg5NmJlZWRkOTkzYjI1NzQ4MjZmMzcwNjc5NGM3OGEzNzVlYzFkZTRlMjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg4ZTA1YTExY2Q1YmRlMGE3MDljYWU5MzZkMzBmZDIxNTY0MDI1OGRmMWFkYjNkMjdmZGRjYzhlYjVkYzk0MWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4064c9a448fb448099049eeae2cb4439",
+      "statement": "authenticated records a clear of authHoldOffUntil and not-elevated, probe-rejected or expired record a write of now plus 24 hours; while a run starts before the stored hold-off, a holder that could probe settles held-off and sends no probe.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk/publish-artifacts.ts#L14-L24",
+          "version": "repo-lines-v1:sha256:a2b312bbc2b590254bdc1da4c865da09e566078661b56e297d09a328f8e2fd14:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNhZWMyYTM3OGIyYzQ5MTU4ZjUzMzE3YWQzNjhmMjVhNjUwZTk4YmFmMDEwYTdhM2I4NTE1NjgxMjFkZDkzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5YjIzNjFhMWFlMThjYWI1NDcwMDE1OWZmMDUxYWM4YjRiYzllNDRmODllYjAxM2UwNWY0MjAzODkyMGE2OWMifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/trade/session-auth.ts#L189-L209",
+          "version": "repo-lines-v1:sha256:07c0bbfda6a99581b3ba358be26a907cc353d136e332a5e7b00bd74af8124253:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5ZGM4YWViNjM0ZWI3NGNlYjkyYWZhYTYwM2QxMTNhZWJlOTExMzBhNWEyNDMzY2Y0ZmUyNDJiZTJiNWIzNzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwNjYwNTg5Y2Y1NGJiZTYxNWY3MDliNjllMjk5MzFkNDFjZmJiN2Q4ODM5MGE3ZjdmODQ3OTQ3ZGIwOTMwMDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ3Njg4M2ZiZDFjMTAxN2ZiY2Y1MDZjODM4ZGYwNGM3YWI4YzA4MWQ0ZmY5M2E4MTU4MWUwMDczODU3MjZmNmUifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/trade/session-auth.ts#L21-L30",
+          "version": "repo-lines-v1:sha256:7813c7c021a0adbef1999d07c1117c7675e4591e018a2bb2aac19639fc189ce6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0NmUzNjY0M2ZlYzczZGJkNGVmZDUyMjhjZDk1NTNlNzAxY2JmMjIxMWJhOTQzMmE5YjI3MjE5NGU3MDAwNGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA4NjJjYzA3OWU3ZjkwMWMyNWQxMzlhODEwYmQ1NWIwZGZmZDhhNDczNTk5YzAxYzkyYjU0ZTNmNWNkNDg5MDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQyMGY1NDYyNzk2Y2I5NDkxZjU0OGU2NzMxYWJiZTE4YzcyMjk4YmI1NDg5MWM3OGZhY2YyOTU2M2NmMjEwNTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_15765f576bc14555b5fac3fef0da3d19",
+      "statement": "A pnpm sync:batch run that ends with the holder still unsettled settles it not-probed.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/sync-batch.ts#L43-L59",
+          "version": "repo-lines-v1:sha256:dfc29a10ca886121025f25472ae1ff7ed367fac19a8c0455f7628c80efaab23a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlZDQyNTdiMzc5YzEzZTAwMjViNTY3MTZkMDJmMWFmYTlmMDY4NTkyZmI4NGUwNDVlOTY4M2IzN2U5M2QxZjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRlZjVmZTNhY2ZhMzJlY2M1YjE2OGRjZTNmNzZhZTc0NDlkZTcyMTdhYmZjZTc5MzFkYTc3ODRiOTZhNzdiZTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZkMWNhZGU1NWNlYWRiYzNhN2ZjZTg2YTdlNjVhMDBlMmU1MTIyZTY0ZWM0NGVjMWM1Y2Q3OWU1MzU4YWI5ZTMifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-10-17T13:54:42.734Z"
+  }
+}

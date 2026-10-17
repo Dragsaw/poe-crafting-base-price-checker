@@ -1,14 +1,18 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:99fab7e4d5c9c82a64a4f13e9c3115510b60252634bdad14d722880dbcddf859",
+  "pageVersion": "sha256:237b8fb1883f5cd4eb209831c80e17c2a0b5f2a13b875b76097b55e9bc5de566",
   "claims": [
     {
       "id": "claim_37ae47639de84db3be7b936fdbd65fdb",
-      "statement": "rank groups each non-pruned raw tracked entry by its dataset entry: missing is not-yet-synced never-synced, priced in another league is not-yet-synced league-mismatch, priced below the threshold goes to belowThreshold, priced at or above goes to ordering, and no-listings, unresolvable and not-yet-synced keep their own groups; pruned entries appear in no group.",
+      "statement": "rank groups each non-pruned raw tracked entry by its resolved price: missing is not-yet-synced never-synced, priced in another league is not-yet-synced league-mismatch, priced below the threshold goes to belowThreshold, priced at or above goes to ordering, and no-listings, unresolvable and not-yet-synced keep their own groups; pruned entries appear in no group.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/rank.ts#L325-L400",
-          "version": "repo-lines-v1:sha256:9a006053a6e514a9cf31e38c6f6cb10d3955fb586777e2e5a10a56ce05aca499:eyJzZWxlY3RlZExpbmVDb3VudCI6NzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4YmZiMjE3NTQ5NGIxYzc4ZjQ0YmYxMzRkMmNjMjI4MzUwN2NlMTVhZjMxNGQ3YzY5ODg3NGRlOGEyZGU1YjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0NjM4NTQxYjVjYjExYTRhZGNhZWY4NDk4YzhkYzViNjhmNmE5ZGQyNzdiYzUwNjZmMGMwOWZmYWE3NjA5NmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdmM2FlZmNkNWZhYmIxYjI0OWQ1NzI4YTk3MjIxMDE2NzRlYzYzZDQwMjI3NWMwNjNlOWQ0MDcyN2JhNzNiMGUifQ"
+          "resource": "repo://packages/core/src/price-trust.ts#L24-L33",
+          "version": "repo-lines-v1:sha256:989d2f12b5277945be93e915ee4fb657dfa37f0d451a7a6b0e92b0e8210345b2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlNGQ0Y2VlYTA5NDMxNzQ1ZWFmY2YzYWRjOWYwNTdjZWNmOTcyNGEyNzg4MTBkY2ZlNjI1OTk5NjM0YWU4MjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEyMzVlODAxYTRjYjUyM2UzMGIxODk5ZTAxNDA1NjYzM2ZjMGJhMmYwYTE5NzBjYjU2NjlkN2UzMWUzZWVlMTMifQ"
+        },
+        {
+          "resource": "repo://packages/core/src/rank-raw-groups.ts#L38-L123",
+          "version": "repo-lines-v1:sha256:2b5415f1adbbeb11ed4eebf131f7ca2d74298fae593f49dffe852f1a0aeea53b:eyJzZWxlY3RlZExpbmVDb3VudCI6ODYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmZTQyM2E1MTYwOTAyZDI0MmZlMTkxMmJlNDIyNWZlYWEyODljYjJkZjYyYjUyNjgzMmMyZDAzZTM4MTYyZWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM3NDU4YzU0OTFkMzhlZjE4NjE5YTllNjU4OWY5MDlkMzY4YTEwMjI0NzE0MDdmOWVhMzliNWJkOGY3MjFmZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -17,22 +21,22 @@
       "statement": "A raw ranked row's EV equals the observation's priceDivine verbatim and its craftCost is the literal 0.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/rank.ts#L381-L391",
-          "version": "repo-lines-v1:sha256:39b8a58923d3b81ee143fb62912f0b55ddc0c0644f9f3e6099bf05472fd82463:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhODE2OWM1OWE4MTc1NDI5YjQ5NjZiNWZiOGQ2ZGUyMzk2MjgyNDQzNGI2N2ZkZGRmYWVjZTliOTFiYzcxN2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1Y2RlZjgwODVhZTc0YWI2MzZkNjQ1OWY1YzZkNWZiZmIwZGIyNjRmMWIwZDc1YmFjNTE5YzliM2Y2NzE3YWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk2ZTVkMTY4NjcwNzllNDgzOGFkOWExNGI3MmY4YzYxZDg4OTVlMzY3MjYzYWQzYzU2MjRhY2YzZTI1MzhlZDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkODJlM2M4MzA5NTdkNTg3YzJjYjM1ZTNhNTJjNjE0ZGEyN2Q5ZWUwYTRlMGMyOWRkYzk5ODA3YWI0NTY4MzkifQ"
+          "resource": "repo://packages/core/src/rank-raw-groups.ts#L59-L78",
+          "version": "repo-lines-v1:sha256:c3acefb8b396f6972fcdcc0f522142e467d8258cd35169c5aeccb868d49024a2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzOTAwNzlhYWQ4NmIzN2YyZjFmNzZhN2VjMTQxZTk4ZTViODA2ZjE5ZjIzMDI3NTM3MTBkOGU3YmUxMDJhZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMxMWE1YmJkMGJmMDA2NDM4ZWY4YTdlODg3ODgyODFlMDA4NWQ3YjdlNjY5MjkwYmE4MGY5ZTQwNTNlOGIzNTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVjMGE3NzUxMWU3YWNjMzkxMmMzNTEwOWM0MjJhYTNkZGUwMjdiYzNhYmVkMjA4NGZlMDAyMzI2MjBmOGMzMTYifQ"
         }
       ]
     },
     {
       "id": "claim_9a7c1b563aa84b2bbde4ce68b06539fb",
-      "statement": "The ordering sorts comparable rows by EV descending, then rows of an uncostable recipe by gross payout descending, with ties broken raw-before-crafted, then by canonical or class key, then recipe id; belowThreshold, noListings, notYetSynced and unresolvable sort by canonical key.",
+      "statement": "The ordering sorts rows with an EV figure by EV descending, then rows of an uncostable recipe by gross payout descending, with ties broken raw-before-crafted, then by canonical or class key, then recipe id; belowThreshold, noListings, notYetSynced and unresolvable sort by canonical key.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/rank.ts#L216-L252",
-          "version": "repo-lines-v1:sha256:27664e6cbab49a76160e97033fb101cd567df667413b5cfb65480a066eeb7a8e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZhNmEwZTIzYmMyZGMwYzc4ZjVjNjFmNGZiODUxMWMyMDRhYmMxNTRmODIxZjk2MzE1YzdiMTA3MmExZDk1N2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRlZTY2ZTA0YWIzNmQ1MmEwNGQ5MTEwNzZhYjZlNGQwODNlNWI1NGFmZWMxYTJkZGUwYWNiNzIwZGVjNjU3NTAifQ"
+          "resource": "repo://packages/core/src/rank-order.ts#L1-L32",
+          "version": "repo-lines-v1:sha256:0fdfe55898fd9e20fef4c4dcd094e65e4d13a5778a1d99b0cf1c450b81771d54:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkMjNkN2M5ZmNhYWU5MWYzNGRhYzYyYzBiZWUzN2VmOWIzMDIxM2YwMDhkMDRlNzFkZGI1MWM3NTU4M2NhOGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/core/src/rank.ts#L439-L445",
-          "version": "repo-lines-v1:sha256:0acfdfe5fbc74aa35221357bc34541367f282f5ef4b47950a16e76558282ca79:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDk1ZmEwZjExMTdiNWVhNDA0MzQxNDBkZGUxYTM0MGM3MjBkZGJmMzI2MjEyZTE5MTgzOGQ0YjE1NmQzMTZiYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTE1M2I0YmJhZjAxZmEyZmIwZjY5MjJmYzFlMWJjZjRkZGZmOWM0YWQyZmE5ZmE5MDEzZGZiOGM5MjRkOTM0NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWUxMmI2MTE4OTQzZTMwYzAwNjgzM2U3ODE2MzBhNTNiMzJmNDE3ZWY1Zjk3OTVjM2YxMmYzMzA4MDI0YzVkOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2IxYzk0NWNkMzk4YjkxODc5NDNiMWM0ZjhlZjk5MzI5Zjk1NWRjYzY4MDMzZjEyODdkMjFiZDM5M2Q3ZmQ4MCJ9"
+          "resource": "repo://packages/core/src/rank.ts#L310-L321",
+          "version": "repo-lines-v1:sha256:e7ac38387b2e34ed9b65083c4add43e655ee5c8f29a77f6c11f93e180eadec4e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5NWZhMGYxMTE3YjVlYTQwNDM0MTQwZGRlMWEzNDBjNzIwZGRiZjMyNjIxMmUxOTE4MzhkNGIxNTZkMzE2YmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNlMzU2NWNiMzdjYWE5ODk1YWM1OGNjMmZiZDViYWU4ZGQ2OWZiODY0MzM3ZTBlMDc0NWYyYzk4MDE2MzIyOGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         }
       ]
     },
@@ -41,12 +45,8 @@
       "statement": "chunkOrder places non-pruned entries in three rows: pinned non-unresolvable entries (only stale ones when pinnedMaxAgeMs is given), active non-unresolvable entries less completed keys, and unresolvable entries due after 24 hours or never attempted less completed keys; within a row entries sort oldest lastAttemptedAt first with absent first and canonical-key ties.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/chunk-order.ts#L31-L47",
-          "version": "repo-lines-v1:sha256:9b167f66f8cc4d0e97e20989af38d32017632725658d97ba35967d5627a1396c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlYTkyNDdhNWFiZmM1YTJmYTkzYjdjMDFlOWE1NTc4NzE4MzA2Y2Y0YjMzZTYwMWQzNzJiN2I2NjQ5MGQ4OTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxZWVlZDZjOGMzNDU3ZDIyZmM2MzBhMDA5NmVlY2FhYTg0NDQxMWI0MzQ0YjYzN2JkOTU0OThhYTUyOWY5YmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzODFiOTQyNGMxNTI4MGM3OGExMjRmYTQxZjA5NjM1YjI4Njg2YjE1NzU0Y2NkYzk0MzJkYmEzZTI3MmNjZDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU3NzEzZmRkZWMwYTRhZjEwMjU0M2JjZDliMmU0MTQwZjZhNzRkOGM2OGY1NjhhYzZiN2ZkYTI4ZTE3MmY5NTAifQ"
-        },
-        {
-          "resource": "repo://packages/core/src/chunk-order.ts#L72-L126",
-          "version": "repo-lines-v1:sha256:d5813cc7fa2af63d6fd389f60c9c776dfaf163f8977c73a12503755895e6ba3d:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkNTgyNWEyNThjMzljMDI5MWZhODViODA1NjU1NWM4NGIxNDliNDU0Yjk3ZjdmNWU0NTEzNjNjOGNiNDAzZDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlZmJhNGQ5YWUwODJkYTZlZjc2NTI3YWNiYmVjYjc3ZGQ1ZjJmNmE2MWI2ZmJjZThiOTM4ZmE4NTdiZTA5ODUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZjNTNmNTAzMmVlY2FlN2Y5YWE5ZGEwODgzZWM1MGM1MGE1NjRkOTJhMGVjOTM4YTA4YTA3YjQ4NTBhZGQyMWIifQ"
+          "resource": "repo://packages/core/src/chunk-order.ts#L41-L110",
+          "version": "repo-lines-v1:sha256:7ef6595dfa6ffcc96fc284810d199f1cbbcaa958f29ec1cc4376b3602f34e3e3:eyJzZWxlY3RlZExpbmVDb3VudCI6NzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkNTgyNWEyNThjMzljMDI5MWZhODViODA1NjU1NWM4NGIxNDliNDU0Yjk3ZjdmNWU0NTEzNjNjOGNiNDAzZDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlZmJhNGQ5YWUwODJkYTZlZjc2NTI3YWNiYmVjYjc3ZGQ1ZjJmNmE2MWI2ZmJjZThiOTM4ZmE4NTdiZTA5ODUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkMzNkM2NlNmI4NDM5NjU4ZTQxMGQxMzg1MGFkMDA0YTk5ZmMyNzcxYjc1YTE1NDNkMjc4NGRmNDQwY2RhN2MifQ"
         }
       ]
     },
@@ -55,46 +55,46 @@
       "statement": "When every due rotation entry is already completed, chunkOrder starts a new pass: newPass is true, the completed set resets to empty and all due entries reopen.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/chunk-order.ts#L128-L139",
-          "version": "repo-lines-v1:sha256:d75fdb3c9b1817d40aad1576a2e6171137e0d960f25a5cd27d6b956fb7554c84:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzZmI1NDJlNGVmZmRmMWM2M2NjM2IwMjIxMmNlMWVhNGZhNDdiNTY5NGVjMmU4YWIzNWI4YWY1YTcxODc1M2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgifQ"
+          "resource": "repo://packages/core/src/chunk-order.ts#L112-L127",
+          "version": "repo-lines-v1:sha256:8a7c2a0d83f6ed377aef5ef19b4470c929e81e880cc5ff0eb05fec4c25d321bd:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiN2JjYThjNWYxZjZmMWIyZDQ0YzAyN2FmZTZiNjFlODFlNWI0OTU2MTkyZmYxMzJiMTNlNDkyZjZjOWRhZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxZmI2NTEwOWQwZDI1ZTc4NDZjYzgxOGIwNTE2MmM1OTYyOGEyNTBkNjZhMmE2ZjFhOWUwYzRmNmFkMGY3OWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEyYWVlZGI4ZTIxOTk1MjQyY2M2YmFjYjQ3NzU0NTEzNzRiMDQyOTcxMTBjMWNlMDBjNjY4YTMzMTZlMThlZGYifQ"
         }
       ]
     },
     {
       "id": "claim_eb4d2d3b9e9248539799a8f1be77ee58",
-      "statement": "pinnedToKeep keeps all remaining pinned entries unless rotation work is waiting and remaining searches are fewer than left+1, in which case it keeps max(remaining-1, 0) to reserve a search for the rotation.",
+      "statement": "pinnedToKeep(left, remaining) keeps all left pinned entries when remaining is at least left+1, else max(remaining-1, 0) capped at left; the sync step loop applies it only when rotation work is waiting.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/chunk-order.ts#L142-L154",
-          "version": "repo-lines-v1:sha256:4214fd998a8b33a41492a827af2d5c666768534e04554e728b7c24bc5a557c00:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/core/src/chunk-order.ts#L129-L132",
+          "version": "repo-lines-v1:sha256:b87b02caca6063bfb9f2b2df153cd82b2abc05e9257957010178cfb2900cf380:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjY0ZmE5NThlYzMwZjIyYTFkM2JjY2M0Y2MzMmQ4YTc3NDc3M2YyMTEyNjYwZjM3NTE4MzRmMDNjNzRiNjA2ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTIwNDBlMDk1YTk0ZTJhZGE3NGU0MjFmMzcxODc1MWE5MWE4MTBiZmQ2NmY0OGY0ZTkzOWM3Yjc0ODBlYjY3MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk/step-loop.ts#L78-L81",
+          "version": "repo-lines-v1:sha256:be60b6768eeb1a01b38c941287924fe65fe03d9c180650fa60d62f1ce6e35b98:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGE0YmJjY2Q2YzdjOTNmMTkwNTU4NGU4MjVmOTA2NjZmNGY5ODY1MjNkYzk5ZDk4YjY2Yzk5ZDk0NTg0YjU2YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2MyNmQyMjNkYTI2MTM5YWU1OGIwNmY4YWM0ZDk1Yjg4NzU3MTgzM2JjODM5NWZhYWZhMWVkMTcxYzhlMjkyOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2JhNGE1NmRkYjM4YTBmNzhiZGI1ZmMzYjJhZTE3YzM4YzZmZGMxMjIyZTQ1NDdlZjExYWYzNzgzN2IwYjEwNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzk5MzJkN2EyODljMDc3M2YwMzI4NzYxNjhhY2YxMzA2OTM0MGYxYjZiMzE3M2FjZDQ2NzQ0ZjIzNGVmOTA5ZiJ9"
         }
       ]
     },
     {
       "id": "claim_0192a4889be54b2d8b0d4d2dabf0b5b7",
-      "statement": "rank throws a RangeError before grouping when the threshold is not a finite number >= 0; 0 is valid and the threshold is never clamped or coerced.",
+      "statement": "rank throws a RangeError before grouping when the threshold is not a finite number >= 0 or when now is not a parseable instant; 0 is a valid threshold and the threshold is never clamped or coerced.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/rank.ts#L148-L153",
-          "version": "repo-lines-v1:sha256:f58cd74c583477281b1156cd639e389a3a12527613b70034b3fa147931303d48:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjEzMGYzYzM3N2ZkMjkyMDJmNDgxY2Y2YjI5NzhkODJkNjA3NjM3YTQ2ZjBmYjQyY2NmYzFmYWYwYTMxOThmNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2YwYmFhZDE3OTIzNTY3MTIyZjI4NmMyMmY2YTU0MWM4NjljMDVlZDY2YjNkMzg0ZWRiYzFhNDgyOGUxMjU2ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmIyZGFiMzMyOWFhYjdhYTA5NjQ3NTVjYjYzNmI5YzEzNjRkMWY2ZjdkOWMzNjVlNGM5ZDZiNjk2YzA0OGFkYyJ9"
+          "resource": "repo://packages/core/src/price-trust.ts#L17-L22",
+          "version": "repo-lines-v1:sha256:093297f06fa22131f1cd71f188d5be1d5119e18be6b1221ea64178b200d0d0a9:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWQ2YjY1OTg1NDg5ZGQyMzdjZWMyMWNlNDczYzY4OWNkODAyZDQwNTA0MzBiNjc3ZjRkZGJjNzM4ZjljNjczNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODdmMjE1M2EzNGYwYjA5ZTNjM2U1YTlmYzY3YWI0M2UxZmVmNjA2Y2Y0YTU3N2JkZWEwZTEyMzlmNjU2NzI4YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjI2YjMwN2IzZDJhZDIyOWJlYmNlZmY5MzdlMGI5YWZhOGI3MjUzMzRmOWI4YTE5ZTBlMGNmNTdkNTBlNTRmOSJ9"
         },
         {
-          "resource": "repo://packages/core/src/rank.ts#L49-L53",
-          "version": "repo-lines-v1:sha256:11c5fe45356426fa98fdaa43ab083b0e0b37678ee6cd0ec5e12d5d5d4ea8ef70:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGYyYTJmOTk2ZjA4ZTY4MGJkMjkyMTM1YTZmYTQ5NzhiZGEyNmU2MDJkODRmMzNjYjFkNTk0Nzc1ZDQzMDRiNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjM5YTJiZmFlZTBhNTBmYjVmNzQyODk5NzQ5M2FkOTEwNGUwOGE5OGVmNDlhMDY3ZTFhYzJkOTllNDNjZGU1NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmM4NjQ2YTc1MmFiOGY4MzM2ZDdlMjM3YmIwMjdmMGMwOTEwNDY4MGM4MzlkZjJkZDkzODNjMzJhZGFiMjQ4MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjY0NWQ5YmVlZjI3YTM5ZTU4NjQ5ZTVjNmIyOTU2YTgwMDFmMzVmZmI1MjMzMmVhNzFjZmIzNzdhMWYyNjljYyJ9"
+          "resource": "repo://packages/core/src/rank.ts#L287-L294",
+          "version": "repo-lines-v1:sha256:a440ca47189de8e33b5456b9ca834f26f4bb5aad28f116c3c932c395662c1707:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGY5MzllZmJiYjFiOTlmZTk5OTlkNzIxMmM2ZGNlMWE3NjZjZWE0Njc2Mjc1YTcwOTc3Nzk1MzQ3MDg0NWNlNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGU5NmI2YWVhNDE4NTVjZGI1YTYxMWYwZmJlZDE5ODg5NmY3MjA4NjJkNTUzYjE3M2NlMTY5ZjM0YTIyZDQ5MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTM4YTgzODZlODJkOWZmMDZmNmJkOTNiNzNlNGRjYTkwZTM3NTdiODI3NjAzN2ExNDQ4MTg2NjZlMjA2MTM5YiJ9"
         }
       ]
     },
     {
       "id": "claim_f937a2accae04976922c652c2efded15",
-      "statement": "rank looks each non-pruned crafted (categoryId, className) up directly by own keys in weights.bases: no file or missing pair gives 'class absent from weights file', a partial pool gives 'pool partial', and a pair named by a cross-file failure gives 'class disagrees with weights file' unless one of the first two applies.",
+      "statement": "rank looks each non-pruned crafted (categoryId, className) up directly by own keys in weights.bases: no file or missing pair gives 'class absent from weights file', a partial pool gives 'pool partial', an empty slot pool gives 'recipe cannot reach this class' under every recipe, and a pair named by a cross-file failure gives 'class disagrees with weights file' unless a lookup reason applies.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/rank.ts#L271-L290",
-          "version": "repo-lines-v1:sha256:3ccf033cca715e37f89fccba01c05b9731913d5a69b2bc797d3216f5c205c928:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzMDNjN2ZmMzU5ZTQ4ZTg2OTdkZTNmMjliNDkzOGVkM2Q3ZjM5MDdjMGFjMWM2YzVjMTdlZDY4YTIxMzc5MTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmYjBkZThmYzE5MGI0YWVmYzRkZDBjYjc1OTdlNmRmMGZhYzBkMTVkMTczYjc5ZTRlY2IxYWE4ZWQxMGI0MGQifQ"
-        },
-        {
-          "resource": "repo://packages/core/src/rank.ts#L325-L343",
-          "version": "repo-lines-v1:sha256:b1c820deb86e90b9dbe81b8688c44ba20a1b55fac8a2b60bd5ebbb6e67b4bc37:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4YmZiMjE3NTQ5NGIxYzc4ZjQ0YmYxMzRkMmNjMjI4MzUwN2NlMTVhZjMxNGQ3YzY5ODg3NGRlOGEyZGU1YjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0NjM4NTQxYjVjYjExYTRhZGNhZWY4NDk4YzhkYzViNjhmNmE5ZGQyNzdiYzUwNjZmMGMwOWZmYWE3NjA5NmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0NDdkMTE2Y2I3ZTIxZGNjZjM3NTM3NTQ4MTAzZDllMDYyZTc0ODA3ZTc4NzJiN2I1OTQxM2I3NzYxMjI1NmEifQ"
+          "resource": "repo://packages/core/src/rank.ts#L129-L194",
+          "version": "repo-lines-v1:sha256:2b7e4069b55b2197a37e75dbfdfba586b0cf844511f4e2ac683a41e016dc0a5b:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjZWNkOWI3ZDhlNmM2MmYwNDAzMTYzNjI4NmQ2NzJlYWRjZDYyOTgyOTg1YWRmMDE0OGFlY2MxNzBmYmQ5NDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzMDNjN2ZmMzU5ZTQ4ZTg2OTdkZTNmMjliNDkzOGVkM2Q3ZjM5MDdjMGFjMWM2YzVjMTdlZDY4YTIxMzc5MTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY0ODg5MTk5ZTc3MDJiZTdmMTliMTFmMjRhMDdmYWMyZGMwMDE1ZmViNDkzMTdlYTk4NzI3NzdjZTZmZjIxMGUifQ"
         }
       ]
     },
@@ -103,18 +103,68 @@
       "statement": "The crafted branch ranks every rankable crafted class once per recipe: EV is the sum of probability times price over entries priced in the active league at or above the threshold, less the recipe's craft cost once; an uncostable recipe gives EV null and a class a recipe cannot reach is Unrankable under that recipe only.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/rank.ts#L402-L437",
-          "version": "repo-lines-v1:sha256:3d31e711f558f0f124259ff46c72c30759d70f672baf456a5df6a3b94480af81:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkMmQ3ZmI3NWYwZDkwZGVhOTVmYTk4MWFhNjdjZmVjMmE4OWQxZDYwNGZlYmU0M2I1ZGU4YzAwZWUzMzk2NzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFhMGQwZTg0NjEwNDQyYzRjYTQzZDAzNzY2MWMwNmNjZGRjZTA4MGQ5ZTM3ZWNiODE0NTNiZTY5MzdiYTc0OTUifQ"
+          "resource": "repo://packages/core/src/rank-crafted-row.ts#L54-L128",
+          "version": "repo-lines-v1:sha256:b99d4050e99182bd6a51ea272c87ac43e6a03eb987333139ee40c007040e7cf9:eyJzZWxlY3RlZExpbmVDb3VudCI6NzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlOWZlMjNhY2ZjMWZlNzcxOGFlNTBiM2I3MjhlZGVjZDhkODY1MzcxMTBlNGZlZjQyZjk0MzdiZTVkMmI1ZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/core/src/rank.ts#L457-L514",
-          "version": "repo-lines-v1:sha256:42a2e51ed7215fa123a99a1740f08fdbd62f9ff5eee65eb4a20e7226f1b4c7d1:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/core/src/rank.ts#L251-L265",
+          "version": "repo-lines-v1:sha256:59cc72dc12f6db97668d7e1a6bc6075dd049e08e05a3835babd02c5f4a3ae6e3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2OGVlNmZkMzYwOTAwMjI5NzhjOTkxMzYzMjZkNTE4NjQ3OWUyZWM2YTY5NGIwNjFmZTkyNjVmOTAxZmVlMjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE0YWE4NGM4YzUzYTA4NmUzOTNjNzQ1NjYxMGNmOWE3NzY0MTJjYjViNTQzMTk1NjVkNzYyMmNkOGI2NTk1NjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcwZGQ2NDkzYjc1NmE4NmQ1OTFkZGZjMDhiZjM0OGU2Yjk2MTBmYzY0MTNjMDJhYjMzMGVjNjM4MDY3YWU4ZWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_85fb6697655844f4b2b2ff16324e3148",
+      "statement": "The recipe floor keeps tiers at or above the recipe's modifierLevelMin per modGroup, but a group whose top positive-weight tier is below the floor keeps that top tier; the item-level scope is applied after the floor.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/probability.ts#L126-L149",
+          "version": "repo-lines-v1:sha256:7bdad2fe5b7884405c82036a5964c29530e1ad5e0c2294a4d8f040cf615eadcf:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmY2M0MzMyY2Y1MzA3YzI5MmFhZTQxZjJlYTg4ZGU4NzJmODg0ZmE0ZDQwNGQ1ODk1ODgzNThiN2U3MjZhYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4MTE0Yjg5N2Q2Y2FmMjIwYzQxMTg4MzZlYjBkYThiNGZiYzM3ZjBlOTA4OTk0MTNlYzlkM2U2ZDUzMmZlMWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_938a2c176ab4478299811ae627638faf",
+      "statement": "A hybrid reference is contained by a positive-weight tier only when the tier's stat-id set equals the reference's and every reference line is covered; summed stat ids compare by stat id only.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/probability.ts#L107-L117",
+          "version": "repo-lines-v1:sha256:6f92b85a2a1e62464e0b383b36a5f6663c71ba42ecb60e07a85556649e34044d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEwMmIwNjY1MzNjNjg5YzFmM2IyYjQyOTcxMmRjMjI2YmQ4ODM4ZWY1MzZkMWNjOTU3MmJlNDdmZjJlMDhkNDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczMWExZGVmNTk3YWFkMjA3MjFjYTlhMTRiNDc2NWI4MWIyYzk1MmJkNjlhYzJiN2M4NzZmYmUzZjEwNTcyNjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8b3ac615d1db489e92891cd42f43657c",
+      "statement": "combinationProbability sums both draw orders, each first draw excluding its modGroup from the other slot, and returns empty-eligible-pool, empty-contained or augment-exhausted as values instead of throwing.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/probability.ts#L213-L283",
+          "version": "repo-lines-v1:sha256:4192360404015b3532e311349bdc64536e4bfc2a60567fc83401dc54c5dd07e6:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1NWQ1YWQzZjVlNTAzZmVmY2VmZGJlYTQ1YTNmZWFjMzYxZmI3YTM3M2RiYjlkZTM3ZGQxOWFiOGM1Nzg3NDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMxOTNkYmIxNjA5YmQ3MWEyZTAxYmEyYTk5YzY1MzM0YzE5ZjM1Njk2OGFiMmEzYTc3MjU0MGVjODU0Y2RmZjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9345431899bc43eba14eb19c89e5d84a",
+      "statement": "crossFileChecks marks every crafted entry weights-absent without a weights file and partial-pool for a partial or missing class, always runs class-discriminability, and otherwise runs the per-reference checks and the hybrid co-occur pair check, sorting failures by entry key then check.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/cross-file.ts#L289-L352",
+          "version": "repo-lines-v1:sha256:dcc12cb4821367b1d4d2bfff12b36062f9107461c592703e256afa8d26960fa6:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUxZTU0M2ZjMGIyYTJkN2YwYjY1ZDM3ZGVhOGQxYWQzNmVlZmE2YzliOTkxY2U5YjFkODEyMDU5YzUyZWJhZTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImViYjg1MjhkMGRjYjkwNTdiNTA3ODU2NzMxYTQxMzQ4YTM2ZDY5MTE3NWY3YzExY2Y2YmFmMDE4ZWVmOTllMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0f372f49f8fb4332bfbe10637ded48b1",
+      "statement": "Craft cost sums quantity times the active-league rate per recipe currency and is uncostable, naming the currency, when any rate is missing.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/craft-cost.ts#L1-L33",
+          "version": "repo-lines-v1:sha256:339c59d720b4b01c4f32f957c0032a299c7891f7b285560ddb6bd5d3152bb887:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2NjI3N2M3ZDYzODJiNWE3OGZmMjFkNmUyNDk4NjExY2Q0MWQ0NmFiYzcxYzM0NGE5ODcwMWRlYmNmZWU4ODkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-10-03T11:56:06.252Z"
+    "at": "2026-10-17T13:54:42.734Z"
   }
 }

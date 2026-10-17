@@ -1,32 +1,28 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:413fe40b017d959faa5736fc8cb32c92ef7171e4672f8a8def1f52e64277b0fa",
+  "pageVersion": "sha256:f0187953ce7104ac19f4115369a5a78613973a75e945e24e27892433b8b28cd5",
   "claims": [
     {
       "id": "claim_ad8c9e97dfd54e3696e4d68856f64390",
-      "statement": "The repository is a pnpm workspace over packages/* whose root scripts provide check, test, dev, dev:stop, deferred:issues, build, sync, sync:batch, sync:dry, fixtures:record, catalogue:refresh, tracked:lookup and tracked:check.",
+      "statement": "The repository is a pnpm workspace over packages/* whose root scripts provide check, test, test:data, dev, dev:stop, deferred:issues, build, sync, sync:batch, sync:dry, fixtures:record, catalogue:refresh, currencies:refresh, tracked:lookup and tracked:check.",
       "evidence": [
         {
-          "resource": "repo://package.json#L10-L28",
-          "version": "repo-lines-v1:sha256:1340de856ec94966c40ca26f2f480db04a74bd1f04c4cd5cef13221971b07f70:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxZTZlNWI0Y2U1N2U4NTM4OWU5MzRiNmRmNjM5OWI2MTE4N2M1ZTVhMmExYjNlMzA5ZmUwN2FmOTU3MDVhOGEifQ"
+          "resource": "repo://package.json#L10-L33",
+          "version": "repo-lines-v1:sha256:748504b0b801b6477d277b9728dd2caea9e5816cf1468a428a3c421b301c2166:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhmOGY4NjVlNjU4ODRjYTMyMzk1MzRjNGUzZTY1N2MxMThiZjViN2QzZjI3MDM3ZTI1OTNjNDUwMTY3ZDExODIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkMDA0N2U5MmU0ZGNiZGM4MGJmOWIyNTNjMzliNzA0MTQ4YzlhMDJiMjdiNDE1OWM5ZWI3OWJjMGE5MTZiMWIifQ"
         },
         {
           "resource": "repo://pnpm-workspace.yaml",
-          "version": "repo-file-v1:sha256:de3d59e274a93a24d84c069d7d31521584c145efd974797b2217099f817c1e42"
+          "version": "repo-file-v1:sha256:32b9180fabb80c1eb182f8e62d9d61fcff3d77560f79f81f0a66d5390672b184"
         }
       ]
     },
     {
       "id": "claim_92bf17c270844defa3bfa87751d7b749",
-      "statement": "The web App loads the artifacts once, runs the cross-file checks once, and ranks the tracked and dataset entries with core's rank at the active league and the player's threshold, passing the weights file, the recipes and the currency rates.",
+      "statement": "The web App loads the artifacts once, runs the cross-file checks once, and ranks the tracked and dataset entries with core's rank at the active league and the player's threshold, passing the load time, the weights file, the recipes and the currency rates.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/App.tsx#L170-L215",
-          "version": "repo-lines-v1:sha256:6007d7f1f6fd237dc7c7ede37bd985ee47415b87577842914b272523a9d5c1e3:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1NGFhZjU1ZGFhNGVkMDZkMzlmYzIxMzMwMzExYmQxNjU5NjVhOGZhZDQ1MzA5MjA1ODYwZmQ3YTRmYzZlNjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3ZjQ4NDIyYTg5ODQxZGM5YzRkMDIwZjNhMWIzZWYwZTYyYTMyODQxYWQ3OWU0NjkwNjhlYjE3ZDBhMDZlZGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjOTY3ZjE3ODMzMjJmZTBkNDE5NzE3Y2RlZGU4ZTZiOTI0NGU5MWMzNzI4MGU2M2MwZDczNzIxY2U2MDZhNzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjOGE2ZTg5ZDg5NjdmYjNjMWJmMzQwOTYwYjExNDE4M2I1ODQ4YWY1YzVjZTBlM2NkYmYzNGJjNjdkYzJiOWEifQ"
-        },
-        {
-          "resource": "repo://packages/web/src/App.tsx#L49-L93",
-          "version": "repo-lines-v1:sha256:6914c26a7bc55d4eddcef81bf25230efac41fecc7da9f0d5e6f48d1c1953e6a2:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0ZGUyMDIwMWY5NmNmNWQ0MjQ1NDBmZWYwN2FkMTM0NTRiMjgzN2E2MjhmNmUyYzM2MDg2ZTU0NzQ4NTEzNTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkYzUyZjA4YjM5YjA4YjAxYzhkMzA4YmY4ODBiMGJlZjAyZmQxZGZjYzlkOWFhOTNhNGQxYjVmNGQ1OGI2Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwYjNmMzE4OGE5ZWQ0MTEyNzNiZWVhODZiZjRjZDJhZWVlZjk4ZWUwM2ZmZGRlMjUwNmMwZTRlNzBmMjRmZGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjOTNlMjlhOGU0ZTA3Mzc0YWVlYjEwMTY2MzgxMmFlNzJlNmMwMGZhZWIwY2JmMmZkNTczNGFlMTdhZmI4ZTcifQ"
+          "resource": "repo://packages/web/src/App.tsx#L81-L159",
+          "version": "repo-lines-v1:sha256:3ac3cf3a98ce6cfa9b5d109ad32dc6b0424d71e840c5a20aded7035b539f9e58:eyJzZWxlY3RlZExpbmVDb3VudCI6NzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyOGY5ZWFjMmUxZWMzZWJjMmY2YTgyNjM3ZDAxYzI5ZGI1ZjdhNmM3MWFiMjQ4NGU2MWFiMTA3YzQ1MGE3MWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhZDNmYTdlNjY2MjZiMGViYzM2OTY4ZDU2ZTI0ODFjNWYyNDY3MjY3ZWY5NDMzMjYzNTNkMzVlMGU5YjU2MTQifQ"
         }
       ]
     },
@@ -35,54 +31,60 @@
       "statement": "The sync CLI targets the Path of Exile 2 trade API at /api/trade2 with realm poe2.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/trade/endpoints.ts#L13-L34",
-          "version": "repo-lines-v1:sha256:34fd52670be4caeda575465f7c915c930a25bb10da2008ef6ae4fcd24ebb3eef:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxYTRiOTA5Y2Q4OWE3YjVmMDIxNGFiYmI3YjBmYTc3MmI1NDRhZTQyMWE0YWI4OWM3MDdkMmI0OGM4YWE5MDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzNzlmMTBlYjYxNzgzNjU0NTgyMjM1ZjBhYjZhYWFmOTZiZjM4NmM4YWYzOGQzZWEzYTBjOGQ4NDA0NzgzZDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5ZTNkMWQ3MWRhNzUxZDE0YjllMzI2NGM4NzBiZGE3NGVhNDNjMzA3MDI1YjhiZTJmODE5NDY5YThjNzUxNTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2NzI2MDc5YThjOWYxY2MwNjlkNDI0NGZiNjVkZjE5MWE4ZTYzMWYyNDczZWI5MTAzMWZmMTdiY2FhOWE3NzYifQ"
+          "resource": "repo://packages/sync/src/trade/endpoints.ts#L1-L32",
+          "version": "repo-lines-v1:sha256:e8de42165b97265bb9a0f8ba1da05f045c765f4128e39ac4128e729e2978df5b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiYzUwNDRiNWEzNGQzZTQzYjc0ZmZiYzVjMzUwOTcyZTFjNjI4Y2Q5ZTI2M2M5NjM0MDZmYzFlZDYxMDZjYjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1MTYxYWNhMjRjZjcwZGEzNGYwMzBkNjEwOTBhOTIyNGQwNWE4Nzg2Y2JmOWRmZjRjMDY1NDMxMmE3MDNhNWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhYTg2YTA5ZWE0ZTA3OGJjZjliYmU0NWI1YzQ2M2I2ZTliNDhiNWI0OTdhYmY2ZjRmMzNiZDRkNzIxNTk2ZmUifQ"
         }
       ]
     },
     {
       "id": "claim_1eb68a08412e4e97a4d9f199c55e4ccd",
-      "statement": "The page lists a crafted Item Class in the Unrankable appendix when no weights file is loaded, its class is absent from the weights file, a pool is partial, a cross-file check fails for it, or (per recipe) the recipe cannot reach it; all other crafted classes rank once per recipe.",
+      "statement": "The page lists a crafted Item Class in the Unrankable appendix when no weights file is loaded, its class is absent from the weights file, a pool is partial or empty, a cross-file check fails for it, or (per recipe) the recipe cannot reach it; all other crafted classes rank once per recipe.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/rank.ts#L271-L290",
-          "version": "repo-lines-v1:sha256:3ccf033cca715e37f89fccba01c05b9731913d5a69b2bc797d3216f5c205c928:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzMDNjN2ZmMzU5ZTQ4ZTg2OTdkZTNmMjliNDkzOGVkM2Q3ZjM5MDdjMGFjMWM2YzVjMTdlZDY4YTIxMzc5MTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmYjBkZThmYzE5MGI0YWVmYzRkZDBjYjc1OTdlNmRmMGZhYzBkMTVkMTczYjc5ZTRlY2IxYWE4ZWQxMGI0MGQifQ"
+          "resource": "repo://packages/core/src/rank.ts#L129-L194",
+          "version": "repo-lines-v1:sha256:2b7e4069b55b2197a37e75dbfdfba586b0cf844511f4e2ac683a41e016dc0a5b:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjZWNkOWI3ZDhlNmM2MmYwNDAzMTYzNjI4NmQ2NzJlYWRjZDYyOTgyOTg1YWRmMDE0OGFlY2MxNzBmYmQ5NDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzMDNjN2ZmMzU5ZTQ4ZTg2OTdkZTNmMjliNDkzOGVkM2Q3ZjM5MDdjMGFjMWM2YzVjMTdlZDY4YTIxMzc5MTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY0ODg5MTk5ZTc3MDJiZTdmMTliMTFmMjRhMDdmYWMyZGMwMDE1ZmViNDkzMTdlYTk4NzI3NzdjZTZmZjIxMGUifQ"
         },
         {
-          "resource": "repo://packages/core/src/rank.ts#L325-L343",
-          "version": "repo-lines-v1:sha256:b1c820deb86e90b9dbe81b8688c44ba20a1b55fac8a2b60bd5ebbb6e67b4bc37:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4YmZiMjE3NTQ5NGIxYzc4ZjQ0YmYxMzRkMmNjMjI4MzUwN2NlMTVhZjMxNGQ3YzY5ODg3NGRlOGEyZGU1YjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0NjM4NTQxYjVjYjExYTRhZGNhZWY4NDk4YzhkYzViNjhmNmE5ZGQyNzdiYzUwNjZmMGMwOWZmYWE3NjA5NmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0NDdkMTE2Y2I3ZTIxZGNjZjM3NTM3NTQ4MTAzZDllMDYyZTc0ODA3ZTc4NzJiN2I1OTQxM2I3NzYxMjI1NmEifQ"
+          "resource": "repo://packages/core/src/rank.ts#L251-L265",
+          "version": "repo-lines-v1:sha256:59cc72dc12f6db97668d7e1a6bc6075dd049e08e05a3835babd02c5f4a3ae6e3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2OGVlNmZkMzYwOTAwMjI5NzhjOTkxMzYzMjZkNTE4NjQ3OWUyZWM2YTY5NGIwNjFmZTkyNjVmOTAxZmVlMjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE0YWE4NGM4YzUzYTA4NmUzOTNjNzQ1NjYxMGNmOWE3NzY0MTJjYjViNTQzMTk1NjVkNzYyMmNkOGI2NTk1NjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcwZGQ2NDkzYjc1NmE4NmQ1OTFkZGZjMDhiZjM0OGU2Yjk2MTBmYzY0MTNjMDJhYjMzMGVjNjM4MDY3YWU4ZWUifQ"
         },
         {
-          "resource": "repo://packages/web/src/App.tsx#L203-L229",
-          "version": "repo-lines-v1:sha256:fec4f449ee6784b1ce5729745f8c09965b083d31c258c4cce6b7f7e982f4f370:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0ZjZiODdlOWUwOTJjYjYxYWE5MzIwOGE4ZjVlYTA1OGVlOTdlMGJhNzNiYTc2ODA4OWY0NDM2YjZjYmJjZDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEwNDBkYjg3MDRmMDNiMjQxMmU4YzE5YWU4OGRjNzgyZTE2M2Y0Yjc0OGMwMTI5OTE4ZDRkYmQyYWM5ODZjZTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzMjE3ZDU0Zjg3NmYyYzBiYjIwNmYzYjFjNThkZTAwYjE0MDZlNTYyODU5NjAyYWFlZTgzNTRmMGVmZjYyM2QifQ"
+          "resource": "repo://packages/web/src/list/active-ranking.ts#L1-L34",
+          "version": "repo-lines-v1:sha256:7eba590648cba75576b101e653fc158752b3db5e6a3fef1948e4f0670a42ea8b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NTEwMzg0NTdlNDI4YmZlYzFjMmM1Y2U0ZmQ4OTUzMTYzMWFmZjRkOTllYzhlZDUyOTgyZTkwNjk0NzZjMjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
     {
       "id": "claim_978f9e12aaf745828bf1da60560033a3",
-      "statement": "pnpm sync is a long-running session pricing one entry per locked chunk with even request spreading, while pnpm sync:batch runs one bounded chunk per invocation; both use the real filesystem, system clock, fetch port and read-only git port.",
+      "statement": "pnpm sync is a long-running session pricing one entry per locked chunk with even request spreading, while pnpm sync:batch runs one bounded chunk per invocation; both use the real filesystem, system clock, fetch port, read-only git port and the optional session-cookie holder.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/sync-batch.ts#L1-L31",
-          "version": "repo-lines-v1:sha256:e03ed7032f93699a385f2bbd4ba682000f04227f39c45d209c711d89cd13a813:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkN2RmYWY1MGEwYWJjYWM3YTdmMmY1OGUyMjZkYTIyYzA1OGY0MjEwNzNmMjlhYWM2ZDBlM2U1NWJkNDYwMWEifQ"
+          "resource": "repo://packages/sync/src/sync-batch.ts#L1-L87",
+          "version": "repo-lines-v1:sha256:d3395d69a79868aa70e1baa39ef2fc783008b0130b3f11010401270c9a28128f:eyJzZWxlY3RlZExpbmVDb3VudCI6ODcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlNDg0NWZhNmE5MDY5YTI4NTRkNWVlMDAyYzlkMjJmMjE4ZGJiMTQ2N2UxZGE1MGUwMTE5ZjFiNzcxZjQwNTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/sync/src/sync-batch.ts#L86-L98",
-          "version": "repo-lines-v1:sha256:e5338e8b1bec0721ce586be292d11d3f16f9e62354cf970d8f3aea192441fa07:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxODQ0NjU1OThkZTI4ZTU3ZTVmMmFhNjNhYTg2YzYwZDVlMWZmZTFjZDAzMDY3ZDlhMTE5YzYzZTBiYmIwOWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYwMzRjYzNkYjUyYjllODdiM2NlMTg2NDE4MzYzOTAzNDgyYmJiZTU0MDUwNWIzNzMzYWI4ZmU4YTNlMWM0MzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3M2ZkY2VjMWIzNjY3ZGUzYmM1Njg2Mzg0MzIzNjg2ZjllMmZkOTExYjhlZDNiNzJhNDViMzk0NDIyZmU1ZDYifQ"
+          "resource": "repo://packages/sync/src/sync.ts#L140-L288",
+          "version": "repo-lines-v1:sha256:b750ba92e8a3b44e7363323883ab661295c00a8ec20ba669c8f1c59a2df78eca:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQ5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwOTM5OGUwYzFlMmQ2NTBkNDgxMzM3MGM4NWExMGQwODc5MWYwMjMwMTI4M2M0ZjhiYWUzNTQ3N2QzMDUxZGJkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI2YjFlMzBjN2M1NzU1NmM5YzQ5ODJjODZmNjU3MTllOTU4N2E5YTdhYjZlMDgzZTkyY2Y4ZTA2MGZiZTVjZDUwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIzZTgwMDM4YTlmMmE5NTk0YjdhM2MyNWRkY2QyY2I5NzczZTM1NzMxZjAzMzVjZTBmNTRhZjM4OTI5N2Q2MDg4In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_b1ccae8fffe74d0f93e6fd6004c65c31",
+      "statement": "An observed price is the mean of the first two listings normalised to Divine, and every ranked row carries core's price-trust verdict.",
+      "evidence": [
+        {
+          "resource": "repo://packages/contracts/src/ranked-row.ts",
+          "version": "repo-file-v1:sha256:88f253c0b6e53bc27e36667b2e1fcade275982d96c62cd76d09cb2696d33d081"
         },
         {
-          "resource": "repo://packages/sync/src/sync.ts#L1-L33",
-          "version": "repo-lines-v1:sha256:cf16ee9d375437a2669adbb3c261d493f0a735fa6a308915cb87ad8c85b3f001:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkN2RmYWY1MGEwYWJjYWM3YTdmMmY1OGUyMjZkYTIyYzA1OGY0MjEwNzNmMjlhYWM2ZDBlM2U1NWJkNDYwMWEifQ"
-        },
-        {
-          "resource": "repo://packages/sync/src/sync.ts#L608-L631",
-          "version": "repo-lines-v1:sha256:b77317a5aacc7187ae3bb07de7badfa71dfcb89e43f9f83f934680594d2f2150:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxODQ0NjU1OThkZTI4ZTU3ZTVmMmFhNjNhYTg2YzYwZDVlMWZmZTFjZDAzMDY3ZDlhMTE5YzYzZTBiYmIwOWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYwMzRjYzNkYjUyYjllODdiM2NlMTg2NDE4MzYzOTAzNDgyYmJiZTU0MDUwNWIzNzMzYWI4ZmU4YTNlMWM0MzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3M2ZkY2VjMWIzNjY3ZGUzYmM1Njg2Mzg0MzIzNjg2ZjllMmZkOTExYjhlZDNiNzJhNDViMzk0NDIyZmU1ZDYifQ"
+          "resource": "repo://packages/sync/src/pricing/price-entry.ts#L123-L157",
+          "version": "repo-lines-v1:sha256:bf13a7fbfedf59dc46a97fc2d3826b38f836de2915c464955a4763d3de0a10bf:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiODdhMzA0NWYzZTA5ODQzYzk3MjU1MTIwMjRkYjA2ZmIzNzgzNmUwY2E1MmQ3YWY0ZmIwOWEzODVhZTEzYzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjViYjc4M2ZkYjg2OGJmMGEzMDEzNzlmNzdmNzkyZGVjODcxNzU3Zjg2ZTIzYzliOWFjMTliYjE5YzRhMTQzN2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM4MWI0MTUxY2ZmZWM1MWY5MmM4ZWJlYWM4MjdhMTNkYTY4MWQ2MTljMDdjNDdiZjQ4ZDZjNWE0M2FjZGRhZDYifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-10-03T11:56:06.252Z"
+    "at": "2026-10-17T13:54:42.734Z"
   }
 }

@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:7c6d97703a6f5f65718d921512a66ca526a73045b617219cba16b5772f14ec9b",
+  "pageVersion": "sha256:76c1ef3f7366a3a1db8d6deaf73ffba5655c96867d6dc6213105ae35d7ff2989",
   "claims": [
     {
       "id": "claim_d01bf9fcaf58434f8e20c303607357f4",
       "statement": "parseEnvelope probes schemaVersion before parsing the body and refuses a differing major as unknown-major or a non-semver string as malformed-version, naming both expected and found versions; only then does it parse the body and return invalid with issues on failure.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/src/envelopes.ts#L239-L277",
-          "version": "repo-lines-v1:sha256:3f3de1a5b03a6db29f944b47124add700960f82d03ca53504af4b25a5876d1e5:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2NDEwNzE2MjgwYzM5MDZiMGQxOGRiNzNkNzllZGNjNTljNWI0YzI0YTYzOGY1YzNiZDM5NWRlY2MzZTE5ZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlkZGNkM2JkYjNmNzg0NmIyMjNkZGQ3NDJkMTkwMDY1MTMzZTA0MjE0MzUyYzU5MzQ4OTE1OWI0YTFiYzlkMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/contracts/src/envelopes.ts#L186-L224",
+          "version": "repo-lines-v1:sha256:373a4280377a96aecdaae83cfa52f26b2e55f06a841f6e5819ef272ca705c161:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlODhiYzJmZDM1NjBlOGQ5YmNmMTVkYjliYTkxNTZlZWNmZjBmZjc4YmIyNjVhYjhmZWU2ZTFiODhiMzc5MmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ2MDhjYjc5MDQxNDJlZjI0NWU0YzVlNTEzNzEzOGJlZGY1MDYzZTUzZWMxNTVmYWVmNWRkMDMwOWE4NTAyMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/contracts/src/schema-version.ts#L63-L73",
-          "version": "repo-lines-v1:sha256:73caba57ce5fa51a44d42fc080b8251717f6491dfb337c8d79429ce7e739ae54:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyYmI0YzU4YWFmMjJjMzM1ZTMyNjNhMjJlNjZkMGQyOTJjYWVlNjA3NzMwMmQ0ZDQ4NGY1YTQ5NDhlYjk3ZjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzOTgyYzM2YWM1MzVmMjQyMTAxNzFiMzY3Yjg1YTViNmYyZGI1MzYyN2E5NzBlMTM3YTY1ZTZlNzZlZTYwM2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/contracts/src/schema-version.ts#L43-L51",
+          "version": "repo-lines-v1:sha256:1ea4e59f815c19f6d92057daa0ac386973a70a69743e7af275cd3f5a4aaa98b2:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2Q3NDFlNzE4YTcxZWM0NDY4ZjdhNGUxMTMxN2U5OTE3ZTk5NzU1YzIyYTQwY2FjYjMyYTQyNjY4Y2E5YTczZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDFlNmY5NjVhZmUyOGM5ODg3NGUwMmE3MWMzYjkxZjQ0MWJlNDY4N2FkNmRkNzdmODBiZTEzM2NjZmJkYTkxMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzU5MjZhODIwODk5YjczMjFhYjlkM2ZkOTBkZDNmODM2YmU1YThiMmIzY2RiMzY1ZmRiODJmZDU0Zjk1ZWEzMSJ9"
         }
       ]
     },
@@ -21,8 +21,12 @@
       "statement": "TrackedFileSchema rejects a repeated canonical key and DatasetFileSchema rejects a repeated entryKey, each reporting one issue per repeat at its own index naming the first occurrence.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/src/envelopes.ts#L54-L73",
-          "version": "repo-lines-v1:sha256:dec09619b606aa794fb56e7854cc09bbadfe01c3bfa623a2fab8185d321c5db7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2YWNkOTMwZmMyMTA1MjM0NDAzNDg1NmNjMDg1NzEyMmI3ZjIwY2Y2NWYyZmVhOTFhMjhkNTRjM2VjMDg5N2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZDExY2FmNDNlOTdlZjM2OWU2YmVlZDFhMjY4YmQwNTgzOGYyOWI5ZGQyNTRiZjY5YmE2NDg4NDE0NzIzNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIyNjk3ZjM0NTIxNDYxNjMyZWU4OTJmMDY0YTg3NDVjNDhlNDljZWI0MDg5Zjc1NzA3ZjU3NzMyZTAyZGNjODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmY2I3MTE5YzNiZDEwMDA2YmI2NGEyNTcyODg3YTMxOTA5MDVmZGVhYWVlZjI2YTkxZjFiZDg2ODljNWMwZWQifQ"
+          "resource": "repo://packages/contracts/src/envelopes.ts#L98-L125",
+          "version": "repo-lines-v1:sha256:11b9cbfd4ca3e9450759314e3f904ddae9a3184f6a12dfd7eed39395970bc222:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhNTgzNGI2ZTZhZjgzZGNiOThmZGIxYjk2YTFkMzRmYTdiNDM5NGJlZTkxNzg1MzFjOGMyM2IyOGM3MGMxODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJmMTVhNGEyOGNjNzNkYTZmZWQ5ZDY2ZWE1MzQ2M2I1ZjY0ZWVhZjYyNTgyNDNmODdiNTllZGJkOWMwYjM3ZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBmZTRlYWM3ZTU1OTFkYjEyYmViODVlNzE4NDE3NDllMjU0YWRmNzhkNWUxOGEyYjA0YzRkYWM1NWUxOTMxMTAifQ"
+        },
+        {
+          "resource": "repo://packages/contracts/src/envelopes/tracked-file-checks.ts#L20-L35",
+          "version": "repo-lines-v1:sha256:0f227b702e33b48db38f5f06c1bd5e387c0d443f481c51dc8b7e73cefd006771:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1NTBlMmM4MWRjOTNkNTNmMDkwMTU5NjM0NDgwM2E2ODhmYjI0Mjk2MTY5YmQ1MjM5ZWE4NzUyZjk5YTA0YTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJiYzgwNjEzOTRiYmRlNDMxZjQ5ZGIzYTdlNTdjNTVmMWUzMTk3NTE3YjQ3Nzc0Y2NlNDg4YWUyOTk0Nzc3NTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI2YjE0MWEyZTBjOTZiYjhmZWQ3YzIzNmI4YTdkYzA4MTVkZTg3NzFkYmNjZmJiYzNjOTBjYzVkOTQ1YjA4YTYifQ"
         }
       ]
     },
@@ -31,28 +35,28 @@
       "statement": "config.json is a strict object holding only schemaVersion, league and an integer minChunkSearches of at least 1.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/src/envelopes.ts#L116-L125",
-          "version": "repo-lines-v1:sha256:696bf615b8a26a2bf2e29a76bafd53f83e83884ef223a90eea77041a1617d9a0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJlMjk2ZDJkYzRiODRhNzI3NmIzZTY3ZDI2ZDE1ZTZkZDdkMmEwZDI2ZmIxODUzY2E5OGFkNjlmOGVmYTg5ZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5MmRhMzhmYjEwNWUxYzU5OTY1ZTJkMDUzYTY0OGFiMDM4Y2JmZjBkY2I4OWU4YTg0NzdkNDQ1MDFmYWI5YzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUxMmY1MWM4NzM2ZGYzMGMzMjQ4YjJhNzVkZTFkOWIwZmUxY2JkMzkyY2VhMTFmY2JhZGU1YTU1MmE2NDA0YzAifQ"
+          "resource": "repo://packages/contracts/src/envelopes.ts#L86-L96",
+          "version": "repo-lines-v1:sha256:4ccf4085dcc6923f86f503ff7388bba6269a2ca1cdd95b4e0806867964f0cc16:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhNjNhMTQ3OWY3OTg2ZTlkNzVlNjgzOWVjM2EyOWIwYTllNGI0ZjRkYzBlYjIzNjc4OWEzZWE4MzU0YWU4YjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc4MmZjZGZlMzJlNTM3MDc0MGNkZmVkM2FhNzBkZjEyNzAyYjBmMmE4MDk5ZjU4MmJjMGFjYmQyYmE4OWZhNTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjYmE4Y2U0MDU1ZjBjN2JhYmY2Mzk5ZThkNWJhZWRhY2MyNWM3MDAwOTMxMDZiZTdiMDBmNDRlMzMwMjM2MDMifQ"
         }
       ]
     },
     {
       "id": "claim_c1885e6ddfe746219ee38608afc4c5db",
-      "statement": "A tracked entry is a discriminated union of crafted and raw strict objects; a crafted entry needs at least one affix, and prunedReason is required exactly when status is pruned.",
+      "statement": "A tracked entry is a discriminated union of crafted and raw strict objects; a crafted entry requires both a prefix and a suffix reference, a raw entry carries a categoryId and className outside its key, and prunedReason is required exactly when status is pruned.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/src/tracked-entry.ts#L39-L87",
-          "version": "repo-lines-v1:sha256:6871eb69a4a630ffec9b60875f2b6c8949ee0f9e7307adc3e8353c332d0db993:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhZTZjMDlhYzdlYmY0MDVkYzExMDU5NWFhMzZiNWQ1NmI1ZmJjZDBlMTgxYzJiMTk3MWIzYjI0ODYxYzJiNjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExOTA3NDY3OGNkY2YzNGM4MDQ4YzNkOThiYmZhZmQwYTVlZTE0YWU5ZTdjZGJiZTcyMThhMDMwZGE5NmZlNzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI0ZTgwMzFmYjc2NWFlYTIzMGJiODhkOGM5YWVjMDA0MGQ1YzUxOThmNTdkYWQ1OTIxY2Y0OWE0MTY5ODVmZGIifQ"
+          "resource": "repo://packages/contracts/src/tracked-entry.ts#L25-L64",
+          "version": "repo-lines-v1:sha256:baa77bd674345a9ee54b9b25ad7398bb6c66314ffd573523466042f37ea3d065:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjNWM1MDQ3ZDBjMGQwNWNmNDI4MzdhNmU2Y2YyZjhkZmJjNzA4MTA2MzNkZDJiYTkyNmY3MzBjZjU2MDQ1YjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExOTA3NDY3OGNkY2YzNGM4MDQ4YzNkOThiYmZhZmQwYTVlZTE0YWU5ZTdjZGJiZTcyMThhMDMwZGE5NmZlNzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI0ZTgwMzFmYjc2NWFlYTIzMGJiODhkOGM5YWVjMDA0MGQ1YzUxOThmNTdkYWQ1OTIxY2Y0OWE0MTY5ODVmZGIifQ"
         }
       ]
     },
     {
       "id": "claim_0d5cb091d71945eb9428940866fe88fe",
-      "statement": "The canonical key is the JSON serialisation of kind-first key elements, with an affix encoded as [statId, valueMin, valueMax], [statId, null, null] for valueless, or null when absent, and keys compare by Unicode code point rather than locale collation.",
+      "statement": "The canonical key is the JSON serialisation of kind-first key elements, with an affix encoded as [statId, valueMin, valueMax], [statId, null, null] for valueless, or [\"hybrid\", lines] for a hybrid, and keys compare by Unicode code point rather than locale collation.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/src/canonical-key.ts#L32-L109",
-          "version": "repo-lines-v1:sha256:eff4da3b624358163f06256ce3babdd836396be716242e3cda1fefb41ebe5c9a:eyJzZWxlY3RlZExpbmVDb3VudCI6NzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2Yzk5ODg1MTM4Y2RhZTBlYjRiYjY3NTU3YzJhMGYyOWFmYmJmNDQ3NDhjNDdiM2U4MGZhZWZkYTQ3NWYwYjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzMWZlMzRjN2IwMDRiMDI0MDQxMjExMjlhNmIzN2FhMGI2YTE1NDIzNmRlMmU0MjlhNWQ5NmExNTA5OWJkOWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/contracts/src/canonical-key.ts#L1-L92",
+          "version": "repo-lines-v1:sha256:27b233ec3c0b4169a26a0b2f567e31abc5a00cd2e5d64331e5da7ca3b8e08050:eyJzZWxlY3RlZExpbmVDb3VudCI6OTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU0MjZmMzE5ZjU5MDhmZWIxNmEwNzMyYjRjZThiNjEzMTcxYmU3NmRmM2E4MWJkMTIxZjIzMzFhYjA5NDJlZjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -61,18 +65,18 @@
       "statement": "A dataset entry's price is one of four states (priced with an observation, no-listings, not-yet-synced with reason never-synced/league-mismatch/no-exchange-rate, unresolvable), and lastAttemptedAt, lastSearchId and lastSearchLeague are optional fields beside it.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/src/dataset.ts#L17-L82",
-          "version": "repo-lines-v1:sha256:232f841dac9352b43d6805e318df6a928828e818970f59a8b5db9b1a14f76695:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliYzAwZjcxZGJkYjE4NzM2ODM0NDc3OThjYzUwYzllNDBmNmMyZGUyN2UzNzQxNDkxN2VmYTk4NjcwMDczMDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxZTdiNGUyODJmMDU5ZGJkY2FkZjcyZDljYjgyYmI5NDY5Yjc2MDA1OGIwNTAxMTEzZTlkNDEyNDcxMTdjMTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgxMGJiZDAwZGM0MTk4Y2Y1NmQyMjM3OTZjNGNkNjA0YzhmM2QzMWUxNmM1YzFjMTllNDgwYWY3YzZmYzBkMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ1NjRjMzQ4YmJjNWM3Y2I5YzdlYzEzYmU4ZWEwZTkzY2MwNTNhZjM3MmY2YjI3ZmZhM2M0ZGU1YmQ0NmE4YjQifQ"
+          "resource": "repo://packages/contracts/src/dataset.ts#L6-L59",
+          "version": "repo-lines-v1:sha256:31cc5f205739be83e9dbb93baac5d1d0e07c89b0ad76b7234fa59968bab78512:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxZmE0ZjUwZjQxMDU1Njc2ZDVlOWE0NDI4NTczOWE5Y2ZlZjMwNmIyOWRkOTI1ZWQyNjlkNjAzYjMxNzU2NDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjOTJmYjVlOTNmMzA4ZDM0OWFmMmFjYzc0N2Q4ZWVkNzc3Nzc4ZmE3MGU0MzI2OTUzYjJlZWM5NzQ1MGI5YTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQxZmZkZDQ0YzJlMTRjOGFiMjI4ZTk4M2FkZDIwZjUyNmRmMjkzZTljODA5YTQ2MGUzOWVhZThmMzYxZTRkOTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
     {
       "id": "claim_abe9d71b6a514e27b25dc84b60466f11",
-      "statement": "sync-progress.json records the unique completed canonical keys of the current pass and an optional notBefore penalty instant, at contract version 1.1.0.",
+      "statement": "sync-progress.json records the unique completed canonical keys of the current pass, an optional notBefore penalty instant and an optional authHoldOffUntil session-cookie hold-off, at contract version 1.2.0.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/src/sync-progress.ts#L29-L46",
-          "version": "repo-lines-v1:sha256:10990a9d1abf90667dc7ad102337e60495a5474e599f127963d5e57133ed9a5c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5ZDMxNDRkMzA3ZjJjNWUzMzEyZDU1ZTdlNDE0OTBkMWFmODY1NTM1YTE1N2Y0NjY1M2NkMzYwM2IwNzUzMDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmNjA2YzIzYjBkNWUxNDMxZGFhYjViYTllMDY3MmI0Y2U2NjY4Nzg2MWE4YjliYmZkYzE2MWE2Yzc4OGRkMjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg1ZmVmNDIyOWRmN2FkZDQ0ZDlmMzRiMGRjNTNlMDAzY2NhNjYyZTk5NDkyM2I0Y2M4Y2VlYWQyZTIyOGZkNDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4NGJmM2ZjMWYyZGRmM2MwYmE5YjRjMjYwOGZjMGIwYzE5OTUzYzU1NTdkMTQwOTUyNGViMjhmYjlhMWRkZmIifQ"
+          "resource": "repo://packages/contracts/src/sync-progress.ts#L19-L35",
+          "version": "repo-lines-v1:sha256:3eb103ba9bcc3b1b4264ac79bcc4c8e66c4e70fd2813f61c39d27c4a71b5f38d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3OGQ4ZTYxZGZlNGEwM2M2MDdjOTFkNmY0YjViMmMzZWY0ZTJjZDc1NGFiMzZiYjYzZDliNDk3MTQxMDNjYTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3ZTY1MWQwYjlmOWNlZWY5YTE0YWMyZmUyZWE2ZDYxYzg5MjFlZmQzYTBiYWIxZTk2Njg3YTljMGQ0YTdiZjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2MGYyOWZhYmEwYzcwNGUxNTEzMjgwOWFkNTExMTdjZDAxYzkyMDlkYTI0N2Q5NzM3MGM3YmQ1NjllMmU5OTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU2ODEzMGMzMzc1MTM0ZTRmNTQ5NjhmODYyZjIzMWMyMDM2OWVhNzNiZTM1ODZmOGI1ZDkzZjhjZjU3YTdmZmYifQ"
         }
       ]
     },
@@ -81,11 +85,11 @@
       "statement": "writeArtifact validates a value against its schema and writes the parsed value via serialiseJsonArtifact, throwing InvalidArtifactError and writing nothing when validation fails.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/shell.ts#L40-L42",
-          "version": "repo-lines-v1:sha256:37929e91e0f99c3e825de69b435fb6484d1b0a1df2f46561abf1a29f04188b88:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzM5NDRlNjViMDA5Nzc5NmY3Mzc2YmY3YmYxNmZjYzcyNWNiNDQ2Zjg1MzEyMGRhZjc4OWNiMTE2Y2I5YzRkNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2RiNGJkYzI3ZGViNmZlODA5ODhkYzY0MDEwZDViMTRiNGUwNWMxZjlkNjBiZmUwODU2YzBlMGM2OTBhYjhkMyJ9"
+          "resource": "repo://packages/sync/src/shell.ts#L16-L18",
+          "version": "repo-lines-v1:sha256:63461687887e528d9b4ea668faaffbe1f4a2e480b47fcd94466f55706a688648:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDQ2NDVjZmJmNmM0ZDVlMmFmMmY5ZjBiNTMwYTkxOTFkNDJkMWExNjBjNDJmMTg2OGYxNGY4ZjI0YmZmZThjOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTg5ZWNkNTViYjBlOWFiN2FlM2QyY2JhYmQ0ODFiZGNhYzBiMTYyMGFmOWEzNTI0Y2JhYTlkNDg2ODA3OTdiOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjgyNGNhMGVlOTI2YTE2MmQzNzgzODMwMWEwYTQwMzhhNjY2NGY5OTBjNTIyOGVjZmU1NWExNTJiMjhhNGJkZCJ9"
         },
         {
-          "resource": "repo://packages/sync/src/write-artifact.ts#L30-L58",
+          "resource": "repo://packages/sync/src/write-artifact.ts#L17-L45",
           "version": "repo-lines-v1:sha256:06c9e94a243fa286ac94550bce1268b76b9adff2a5c490b56b28b2496a8371c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQwODYxNWNjNGI0YmVkOWRiZjQwODgyYTQ1ZTE4MzkzNmRiMmEyMWJlOTNhZWYwMTYwOWY4YWI3ZTFkNmFiMGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0ZWUxZGVlMmI2NTI1ZmJlOGRlZjAwOTA1OGRhMzI2NTQwMGViMjFiODE2ZDc4N2U4ZmI5MmIyZjE5ODhlYmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
@@ -95,8 +99,8 @@
       "statement": "The web page fetches seven data artifacts (dataset, sync-report, weights, recipes, tracked, config and catalogue/stats) and never fetches catalogue/static.json.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/load/artifacts.ts#L14-L68",
-          "version": "repo-lines-v1:sha256:ec23a325719946e6e6e273ffacabd797d4a106910fb66144addc89e9a62d8459:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0ZDFiOGE5OGY1NDgwMDE3YWYyMzc4YTkyMGY5ZWJlZWYwNmY4NzVlYjgwNzFlMjQyY2RkZmY1ZmE4MGRhODkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxYmE5MzY2M2NmZjQxYmMxMWZkZmQzYzI5NTNmMGU1ODIxYjI5ZDUzM2I1ZWEyYTg1MGNkMDgxZjAzNjg1N2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwYTZlZDQ1MGQxMjRlM2FkNTU3MzM4ZWU3YTQyNDRhMjk4NDBiYjAwODhiZjI4ODcyODBlMzBhYzNlZmI1YWEifQ"
+          "resource": "repo://packages/web/src/load/artifacts.ts#L44-L52",
+          "version": "repo-lines-v1:sha256:199bc9f44b52315c5f4ac67cc67e118189c4bddc2457c535b055e1198de8280a:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWVlNjZkMGQzMDljMzc2YjEyNmZmOWY2MWQ1NDExNDhmZGJmNmU2ZTBkZjhjMGQ3ZjAxYjVmMmFlNTk2NWU5OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTc0ZWU4YThkMWFhODQ1MzkxYmM2NzllYjcwY2U3ZjQ2YTNjZDZmYjJkMTZmY2NhNjdmYTE3OGY0ZjhjMWUwZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTY2MWI0ZWQwODRhYmNkOGM2NmYxYjllMTQyNDE0MzNiZDA4ZWU5NDZlN2Y4YTljNzk3MDA1YTc0OWM0ZTE5MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDY5MzFjNzIxZDU1NTQ0OWY4MmU0NGRmOGQ4MjAxMzA5ZTdkM2EzOGExMWQ3OGYyNjg4NDA3YTRlNGQ4NmRhNyJ9"
         }
       ]
     },
@@ -105,12 +109,12 @@
       "statement": "WeightsFileSchema types the full weights contract (gamePatch, producer, and bases mapping categoryId to className to prefix/suffix pools) with loose objects, and WEIGHTS_SCHEMA_VERSION is 6.1.0 with only the major compared.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/src/weights-file.ts#L172-L184",
-          "version": "repo-lines-v1:sha256:653d96ec145e81ae6a14b866feed0aa942385b328c28dbf5beaf86e8c53c4dff:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFlYjI4YWU2YTU4YmMzMWU3NWI0MGFmYTNjODA2MmViZDYxMmFiZDg1NzUxN2E2MTJhNzJjZGFkYjk1YmM1ZTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyMGZjOWU2N2RiMDdlZDIzOWJiM2FkMjMxMmVhYWI5YTcwZTFmNmZiYTAxMjg4YjBiYTZlNjFkN2Y4ZWU3ODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjZmUyYWI5OGY4ZmNmMjlkMTA1NGQzM2FkNTAwMTY5MWZkZTNlNDMxZjc0ODVkN2JmYWZlOTM1NTdiOGRhZGQifQ"
+          "resource": "repo://packages/contracts/src/weights-file.ts#L158-L170",
+          "version": "repo-lines-v1:sha256:e3bfef91570ec533e692e08d019a0e33a4803b3599bdf372044585f16cae1440:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3NjkyMmE5ZWQ1ODRlNDBkYzhjOTIzYmM4OWMyMmE4ZjA3NDA0YWIxODhkOWUzM2UwNTM3Nzc5NGE5NjA4NTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ODY5YWVjNTliMGFlY2JiYTBkMzI0ZmU4Y2FmOTYwMzRhNzM4ZDc4OGEyNGU1N2ExNTkwMDNiYTI5NGYzNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVjNGU4M2IyYTkyMDRjNWQzMjkyNTY5Yjg1YTFkNzI4NmM5YjBmZDQ1N2FmOTYxNzU0YTFkZTVmMzc0ODRiZTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA1OWM5NzIwZjZiNWQ3ODU5ZjRkMjk0Yjk2MDZiMTEwN2UwMTZmZTdiMTYzMDY3N2NiMGE1NjhhNzAzZDkzNzIifQ"
         },
         {
-          "resource": "repo://packages/contracts/src/weights-file.ts#L9-L24",
-          "version": "repo-lines-v1:sha256:7fe68b07225905b688599f49657cde5657c57e6116353bbb1a576c166f05e253:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE3NTAzZWM5NDM1ZWE5NTRjMDRlZTA3YjdiMDA5YTc1MjA2ODQzYmZhNjkwMDhiYmQ1MTM2YWQ5OTA2YjE5NDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZhZDRhMTkyM2E4MTg2YWMyZjZlN2EwNTY2Y2IyZmYzMmM3OWU1ZDFmM2E1MDkwMDBkNzg3YTc3ZWYxOGI1Y2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1Y2JmZDVjYWE3ZGE1ZmUzZmViMGVkODU4ZmI2ZWY3ZjQzMDg2ZDNhNDFhZmQ2Yzk2MTliODY3NDZkZDg3NTEifQ"
+          "resource": "repo://packages/contracts/src/weights-file.ts#L9-L13",
+          "version": "repo-lines-v1:sha256:65baa829a8a797eb9c86c5ae6089ee6c60484862f4633cd2c1c59ec4bca84734:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmEzNmY0MGIzNDQ5YzU1NTZmMDdlNzExNDUwNGMzMjczMGNkMjA0OGQ4M2YwODAzM2Y5M2FjMjhhODY4MGE4OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDg0YmIzZjJmMjQ1NTg2NjhlMGUwZThlMDc5MDBjMWE1MTZmNTQzYmU5M2RmYjUzOTQzYTcwYjRmMWE4YmQ1ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmFkNGExOTIzYTgxODZhYzJmNmU3YTA1NjZjYjJmZjMyYzc5ZTVkMWYzYTUwOTAwMGQ3ODdhNzdlZjE4YjVjZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTE5MGMxNGVhNGQyMWFhN2Y1ZmU4ODMxZmZiNjE0NzNmOWU4ZDIxMTY3NWEwNzEwZWFkMTg0Y2NkNDg5OGNjZiJ9"
         }
       ]
     },
@@ -119,8 +123,8 @@
       "statement": "The weights schema refuses a not-in-game entry with non-zero weight, a statId repeated among one entry's lines, a line with more than two range pairs or min > max, and a sourceModifierId repeated within one slot pool.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/src/weights-file.ts#L26-L109",
-          "version": "repo-lines-v1:sha256:239ac227cb442cd3db18528fde459c72d25ad493c71157e8efbdbc408080453d:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1NzhlMjE4NzkyZDliMGE5NWZhYzNjM2JhOWNkMjlmNGJjODRjMTNiNGM0MGZiOWEzYWRlMDY5MjVmOTJkMTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkYWJiOGJmZjExYzY2NzE0ZmY0MGVlZDAwZmY4OGIxMDRjMDJkOTU5MWMzNGRmYWIzODA5NzI0Yzk0M2ViYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxODg2ZjBkZmQxYjg0YjhmZjNjY2FjNzEwMDQ5Y2Y0MjEwMGYxNTdmZmM1MmM1ZWUwMzgyYzQ0ZDZkZjIyNGMifQ"
+          "resource": "repo://packages/contracts/src/weights-file.ts#L15-L96",
+          "version": "repo-lines-v1:sha256:040dd0091f7d115dafdc8604eb2d81d762d226d29ad1aa63c542269e756cba4e:eyJzZWxlY3RlZExpbmVDb3VudCI6ODIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJkOTY5NTYwZWEwYTBlOTI0MTBiYjVjYzU2OTdmODUwZjZiMmUwOTU3NDQ5OGQ2NDU5NTY5Yzk3ZDhlYzQyODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxODg2ZjBkZmQxYjg0YjhmZjNjY2FjNzEwMDQ5Y2Y0MjEwMGYxNTdmZmM1MmM1ZWUwMzgyYzQ0ZDZkZjIyNGMifQ"
         }
       ]
     },
@@ -129,8 +133,8 @@
       "statement": "Within one categoryId, the weights schema requires defence-suffixed class keys to have a non-empty family and distinct letter sets, and refuses mixing defence-suffixed and plain class keys.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/src/weights-file.ts#L117-L170",
-          "version": "repo-lines-v1:sha256:b6445b5412835401ebd527789867a0bc67541b46735c02746a195922538bd68a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlMzYwOGEwMjYwMmU2Y2VhMDZiZmU2OTcwMjk2MzEzZDM3NjlkMDFhYjQxM2I4MDM1OTllNzYzNDljMmU0NTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzNmQ5MmJjMjRhNGFiMGE3MTkwOGMzMzFhOTAwNzJjNGM0MjcxODk3NGEyNjI5MGFlZWJhZGM5MzllZTM5Y2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjllMmJjZGZlNTI1MDBlODA2OTkyMjhlMDc3OTFmYjUyNGIxNjMwMGE2NTk2ZWRkODc4YjI1NTBmNTAxMzdiMGYifQ"
+          "resource": "repo://packages/contracts/src/weights-file.ts#L104-L156",
+          "version": "repo-lines-v1:sha256:29ba233ee7a53cac7fcee91b550e2dce3a85621d42b79a8e762058c8967d0599:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlMzYwOGEwMjYwMmU2Y2VhMDZiZmU2OTcwMjk2MzEzZDM3NjlkMDFhYjQxM2I4MDM1OTllNzYzNDljMmU0NTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyODU1MTdhNzc1YWQ1YmQwODI3YWQ0MjIwODQ4YWRhNzUwM2Q5MDMyY2FhMGIyYjI3OGNmY2Q0MjQwMzBmOGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzNmQ5MmJjMjRhNGFiMGE3MTkwOGMzMzFhOTAwNzJjNGM0MjcxODk3NGEyNjI5MGFlZWJhZGM5MzllZTM5Y2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYzNjVhMDY1ZDQ5M2VkMWJmNzBjMWM2NTMzMjcxOGZmMDVlMjA4MWIxZGMxNzcwN2UwY2E2YzgzZjU1N2RjZTIifQ"
         }
       ]
     },
@@ -139,16 +143,16 @@
       "statement": "defenceLettersOf in class-name.ts is the single definition of the defence-suffix grammar (maximal trailing run of distinct str/dex/int tokens with at least one token before it), and sync's search-body builder imports it from contracts.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/src/class-name.ts#L1-L34",
-          "version": "repo-lines-v1:sha256:1b321fcbe5a548f26f9cdc686ed6f6f9ada5a4673e82286e7b1d2f199d22e7bd:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/contracts/src/class-name.ts#L1-L25",
+          "version": "repo-lines-v1:sha256:a4d9d3ef6f7be942315e98628a7a787bda32ce4c964963a87db90a7f58408b22:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmM2ZhZWNhMDU0Y2UxNDYwOWU2MjNmNGVhMzhiZjkxYzI3YjFhODU1YWI5OGZmZTgxMzNkZjg5NTRkOGVmMjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/sync/src/pricing/search-body.ts#L130-L130",
-          "version": "repo-lines-v1:sha256:2eeef6a0ce53c388cdaa76ae2d9ee0655238b47703e9ffe0f407752eecbcd8c7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmVlZWY2YTBjZTUzYzM4OGNkYWE3NmFlMmQ5ZWUwNjU1MjM4YjQ3NzAzZTlmZmUwZjQwNzc1MmVlY2JjZDhjNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmVlZWY2YTBjZTUzYzM4OGNkYWE3NmFlMmQ5ZWUwNjU1MjM4YjQ3NzAzZTlmZmUwZjQwNzc1MmVlY2JjZDhjNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjM4YTA5ZmU5Mjk0ZjRmZGVmMzM0MTIyMzIyMjk3N2M1NzczZDY3MjBhZTNmOGQ5Njk0MWRkNDdhN2NiMDFmYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGY5NDZmNjk5Zjk0OTAxNmNkMmJjOTMzMTY3NDg0N2Y0YzkyNDcwZDg0YWNiY2VhMGQ1N2ZkOTk0MWE0ZWU3YyJ9"
+          "resource": "repo://packages/sync/src/pricing/search-body.ts#L5-L5",
+          "version": "repo-lines-v1:sha256:61231bf4e8b977d07a68daf812d3ebde0eb78a19c84f6b2d1071628df09753c9:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjEyMzFiZjRlOGI5NzdkMDdhNjhkYWY4MTJkM2ViZGUwZWI3OGExOWM4NGY2YjJkMTA3MTYyOGRmMDk3NTNjOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjEyMzFiZjRlOGI5NzdkMDdhNjhkYWY4MTJkM2ViZGUwZWI3OGExOWM4NGY2YjJkMTA3MTYyOGRmMDk3NTNjOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGU4MWIxMDBhYzhlMjIxNjc0OTZjNGE2YzRkOWNiYWQ2NjQ2MjliMjVjNDk2N2EzZTIyMWQ5OTFlMmI4NzkwMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjBmMTFhNGUyNjMwOTkyZjk5YWIwYjk2YTg5NzE4ZmNmMGI3YTFkMjIzOTRjODZhMDhjYThiNmY4MjQ2NDgyZiJ9"
         },
         {
-          "resource": "repo://packages/sync/src/pricing/search-body.ts#L16-L16",
-          "version": "repo-lines-v1:sha256:04d3870ecb3b5f758e51570505eea8bbfef99e79a9fe758397ba89b9f51a2663:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDRkMzg3MGVjYjNiNWY3NThlNTE1NzA1MDVlZWE4YmJmZWY5OWU3OWE5ZmU3NTgzOTdiYTg5YjlmNTFhMjY2MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDRkMzg3MGVjYjNiNWY3NThlNTE1NzA1MDVlZWE4YmJmZWY5OWU3OWE5ZmU3NTgzOTdiYTg5YjlmNTFhMjY2MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTU4NmVjMzQwNjNhNGU3ODM5NjhlNzE5Zjk0ZjkzZjIwZGVjODc2MTgzYWMxYmJiMGE2YTZiYzg4MzYyNzFkZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTJlZDgzN2NhMmJmMTExYmYzY2JmZjk3OTlhYTM0N2RiYmEyMTgxNmNlNjExMjg4YjY0MGUyYTlhNzIyMGRiYSJ9"
+          "resource": "repo://packages/sync/src/pricing/search-body.ts#L92-L92",
+          "version": "repo-lines-v1:sha256:2eeef6a0ce53c388cdaa76ae2d9ee0655238b47703e9ffe0f407752eecbcd8c7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmVlZWY2YTBjZTUzYzM4OGNkYWE3NmFlMmQ5ZWUwNjU1MjM4YjQ3NzAzZTlmZmUwZjQwNzc1MmVlY2JjZDhjNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmVlZWY2YTBjZTUzYzM4OGNkYWE3NmFlMmQ5ZWUwNjU1MjM4YjQ3NzAzZTlmZmUwZjQwNzc1MmVlY2JjZDhjNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmZhZmM3MTdkNDg3OTc5ZmRlMzc1M2U2MTE0Y2M3ZWQ3M2U3Mzg2Zjk4MWEyZjkzNzg2NjFjNjljMmI1OTM0ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGY5NDZmNjk5Zjk0OTAxNmNkMmJjOTMzMTY3NDg0N2Y0YzkyNDcwZDg0YWNiY2VhMGQ1N2ZkOTk0MWE0ZWU3YyJ9"
         }
       ]
     },
@@ -157,28 +161,58 @@
       "statement": "The web page's expected weights version is the WEIGHTS_SCHEMA_VERSION constant imported from contracts, and the weights artifact is parsed with WeightsFileSchema as a tolerable artifact.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/load/artifacts.ts#L22-L23",
-          "version": "repo-lines-v1:sha256:b84f40f8fe3755e9ebeda22c552c394fc29917c075e0df923c44697e3af8f17d:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTExZjVhZDdlMjQ2YTQzNmZlM2JmZDA1MmI5OTgxZGRiZmFhNTQxZjVhMWE4NWQ5ZGFkMmFkMDUzOTUzNzRlOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjE4YTI0ZDhhMjJhZmI5M2I2YzE4MzgxMzZkMDY2NGFlMWZmMDNmZjhjMzBiNzM2Y2ZhYjQ3YzdjMTY0ZTI1ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI0YzFlOTFkNTQzNWU1MDQxNGE0MTQzNjg5M2RjODY5YzM0YTE5YTk4YjlkYzRjZWRhMzcyMDllNTliNzI1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTU2M2NiZGUxYTMwYjkzMjk0MGEyMzkzY2ZkMGE1MDY5ZGQ3YjdkN2Y4ZmMxNGNlNzdiNTAxYzk3NDI5ZTBmMSJ9"
+          "resource": "repo://packages/web/src/load/artifacts.ts#L18-L19",
+          "version": "repo-lines-v1:sha256:87a24cd4e85ac0d99dae30e78826ad2d5e08231ca864b1c87e7c8f3a6e3f90f4:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTExZjVhZDdlMjQ2YTQzNmZlM2JmZDA1MmI5OTgxZGRiZmFhNTQxZjVhMWE4NWQ5ZGFkMmFkMDUzOTUzNzRlOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjc4YzVhYTNlN2Y1Mzc4ZmUwZWU0M2E3NDRmOGEzNDA3YzFlODc1YTlhNWRkNWMzZGU5ZDYxZDExMDJkYWE5MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDNkYTdiNzczYzRjMTRkY2MyZWJiZmQwNzU0ZmE3MWViMTQyOTMxOWIzYWM4OTc2MWZkZmJjMGYyNWMwMjI1MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTU2M2NiZGUxYTMwYjkzMjk0MGEyMzkzY2ZkMGE1MDY5ZGQ3YjdkN2Y4ZmMxNGNlNzdiNTAxYzk3NDI5ZTBmMSJ9"
         },
         {
-          "resource": "repo://packages/web/src/load/artifacts.ts#L51-L51",
-          "version": "repo-lines-v1:sha256:7cdaf49b73d2231787b7796beb80b7feba35cbf0f22cd76f0ffcbc83fe9e723e:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2NkYWY0OWI3M2QyMjMxNzg3Yjc3OTZiZWI4MGI3ZmViYTM1Y2JmMGYyMmNkNzZmMGZmY2JjODNmZTllNzIzZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2NkYWY0OWI3M2QyMjMxNzg3Yjc3OTZiZWI4MGI3ZmViYTM1Y2JmMGYyMmNkNzZmMGZmY2JjODNmZTllNzIzZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjRhNTk2NDU0ZDBiMzYyNzZhMWI1MTVmNjg1NGQwOGY1NzMzNWNjN2I1ZmJjYzJjNTlmOTY2MmY4MWFlYjRjOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmE5YWYzN2VkNmZmNWQ2M2Y0YzJkOWZhZjZlMGViMGY5NDM4MzY0YzFjYzYwOTM2MWI1YjY0OTExZDc5NmE3OCJ9"
+          "resource": "repo://packages/web/src/load/artifacts.ts#L47-L47",
+          "version": "repo-lines-v1:sha256:7cdaf49b73d2231787b7796beb80b7feba35cbf0f22cd76f0ffcbc83fe9e723e:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2NkYWY0OWI3M2QyMjMxNzg3Yjc3OTZiZWI4MGI3ZmViYTM1Y2JmMGYyMmNkNzZmMGZmY2JjODNmZTllNzIzZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2NkYWY0OWI3M2QyMjMxNzg3Yjc3OTZiZWI4MGI3ZmViYTM1Y2JmMGYyMmNkNzZmMGZmY2JjODNmZTllNzIzZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjRhNTk2NDU0ZDBiMzYyNzZhMWI1MTVmNjg1NGQwOGY1NzMzNWNjN2I1ZmJjYzJjNTlmOTY2MmY4MWFlYjRjOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGY0MjQ5YWYzYjNjY2Y2YmNhZDJhMTIyY2Q2MjVmYTY0ZDI1MDEwOGEwYTA4NDMzMGEwMjM4ODFiMjgwYTgxYSJ9"
         }
       ]
     },
     {
       "id": "claim_c631ffc871b64d468c10c543deba4a4d",
-      "statement": "TrackedFileSchema also requires the non-pruned crafted entries of one class to share one itemLevelMin floor and refuses never-co-occur overlap between them; pruned and raw entries are exempt.",
+      "statement": "TrackedFileSchema also requires the non-pruned crafted entries of one class to share one itemLevelMin floor, refuses never-co-occur overlap between them except where a hybrid is involved, and requires one line kind per statId; pruned and raw entries are exempt.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/src/envelopes.ts#L74-L119",
-          "version": "repo-lines-v1:sha256:cb7aa21620888c1da838aa0478e7c286906d42a2b12dcca3976f9cde8c6a1343:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFjYTZlZWFhNGQ0OGZkMWE0MWFkNWU3M2JjZTljY2Q5MTQ1NTViMWIyZWEzYmI2NGY3ZmRkNzEyMTJhYzFlMWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZDExY2FmNDNlOTdlZjM2OWU2YmVlZDFhMjY4YmQwNTgzOGYyOWI5ZGQyNTRiZjY5YmE2NDg4NDE0NzIzNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM2ZTE4MDE1ODMzNGY2MTg5ZjY4MTk5YTg2NjA5ZDI5YmYyNDQ0NjAwY2QyMThjODczOGJjOGEwZmNkMDczNjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0Njk0YjljMDQ5MWYxNjdjMGMxNmY1N2Q2NDU2MTE0OWNmMWM5MjMxNTE5YTEzOTEzNTY2Yjg3ZGFhZGUxMjgifQ"
+          "resource": "repo://packages/contracts/src/envelopes/tracked-file-checks.ts#L37-L145",
+          "version": "repo-lines-v1:sha256:d3116e622990c7d20875a66616288ef74027b1bf9f2221a04d4eb16fe48eb522:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2OGMxMDhiOGNlZTU4ZjNhYzBhNzIwMzgzMjU2ODc4ZjQ0ZjRjYzc4OWFkZDNkZTVlNmY3MjU1MmY3YTU2MWVkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmYjU4MGU5NjRmODNhNDczZjQzZDQ0Mzg0NjI5NDlkNjhiNTYwMGZkYTc4N2YxNjM3NDVkMDBkZTg5Y2JmMzZhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_5c9a0ed00eea4597ad501b675eb105e0",
+      "statement": "A hybrid modifier reference names at least two lines with distinct statIds, each banded or valueless, and the schema sorts its lines by statId on parse.",
+      "evidence": [
+        {
+          "resource": "repo://packages/contracts/src/modifier-reference.ts#L74-L110",
+          "version": "repo-lines-v1:sha256:f5f5d4338596ed160d0cef7744d24dd9420f7f636fbc520f39e08bcae14d7891:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAyYzk2Y2I0NGI5OWIzYjYwNTVkYjliZjBkYjdkYzU1MDQwZDBkNzQxOWU4NjhmNTdhNTQ0MDBlYzcwMDg1OGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI4MmI3YjYyZmJkNTIwMWVjNGVmYWI0ODg2MGFjZTVkMzNkNjIxYTk3YmMxMGMwYzczM2ZlOGNhMjg3NGVhYzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJmZDM3ZjkzY2NlZjYyZTliZDViOWI3ZTU1OGM4MzVkYWQ3ZDBjMGMzMTVlMDk4OGFkNzU1NWQ1NDNkM2Y4MzEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bc5b29605c1d4f7dba19530349659fc0",
+      "statement": "TRACKED_SCHEMA_VERSION is 3.0.0, and a 1.x or 2.x tracked file is refused with a message listing the major changes and telling the curator to re-author rather than retry.",
+      "evidence": [
+        {
+          "resource": "repo://packages/contracts/src/schema-version.ts#L53-L73",
+          "version": "repo-lines-v1:sha256:214b2e2d7cfbf89a653bf9fb3ce6de38c2fd29e60e0b23677ef58fd8c180e928:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhMjkzZjZlYTViMGNiZmMwMzFiZWQzNzA3N2MxNzhiZWI1YWRlM2I4ZDk4ZjkzY2NmY2VmZjY1NDg2MTYwM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExZWY3MzA5NmNjN2FhNDg4MzUwNDM2NDllYWFiNmIwZGExNTQxNTZjOWZlYzZkNThlOGJjNmRhNzE3M2QyMDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c9511b86cbcf414aaa87764995f500b2",
+      "statement": "The sync report's requestsBySource figure counts tracked-list, league-validation and session-probe requests, and a preprocess lets older reports parse by dropping the legacy catalogue-refresh key and reading a missing session-probe as 0.",
+      "evidence": [
+        {
+          "resource": "repo://packages/contracts/src/sync-run-report.ts#L8-L51",
+          "version": "repo-lines-v1:sha256:8648448f800ecc02bb292c92a603913f7e0f42f87386ea6d70e9e6feced92c1c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhYTZiOGQxODk1NGYzYmZlNjZjNjBkMGM1ZWVkZmZhNmM4NzUyNjFjNjEwM2FmMjEwZjVkYWU5NDJmOWIxZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkN2UxNmIyNTczMzIwMmUxMTc4ZWI1MmNjN2ZjYzM0NTA1ZDk5ZDQ3NzEyMGQwOWEyZTk2YWQ1ZTZmZDlmYjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgwYjE1Mjc5YTk3ZGFjMjU0ODczZTAyMmJhZTczMzA0NzFmMjJhNzljMTFjYWE2ZGZmOGM4YjUwNGFkYWQ3ZDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdlZGJkNDU4ZGI2N2RlZTNjMzUwNDViZjU4ZWQ1YzJjMDJiYTZkNzQyNzNhYzdmZTk1ZmM0NDA2NjllZmU3YzUifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-10-03T11:56:06.252Z"
+    "at": "2026-10-17T13:54:42.734Z"
   }
 }

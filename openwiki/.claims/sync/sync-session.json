@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:0653b2d7024f326cfefbe4ef6ee3a5833f202e5ff860a3a4cc68fa300dd513cb",
+  "pageVersion": "sha256:a30ff3111f4d3e441650c0b559bb674e78b214821952cf4cd5613b33b670319a",
   "claims": [
     {
       "id": "claim_0b10e01bef33463ea93a8dc2336b622e",
-      "statement": "pnpm sync is a long-running session that runs one chunk per iteration with maxEntries 1, sharing one PacingState and one request counter across all chunks and passing spread: true, so the lock is taken per entry and never held across a wait.",
+      "statement": "pnpm sync is a long-running session that runs one chunk per iteration with maxEntries 1, sharing one PacingState, one request counter and one auth holder across all chunks and passing spread: true, so the lock is taken per entry and never held across a wait.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/sync.ts#L1-L33",
-          "version": "repo-lines-v1:sha256:cf16ee9d375437a2669adbb3c261d493f0a735fa6a308915cb87ad8c85b3f001:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkN2RmYWY1MGEwYWJjYWM3YTdmMmY1OGUyMjZkYTIyYzA1OGY0MjEwNzNmMjlhYWM2ZDBlM2U1NWJkNDYwMWEifQ"
+          "resource": "repo://packages/sync/src/sync.ts#L140-L166",
+          "version": "repo-lines-v1:sha256:a0ded98f2dd8dd239840fb47ccc8540455c2d32b2bfba0c57c173e70a43d435a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5Mzk4ZTBjMWUyZDY1MGQ0ODEzMzcwYzg1YTEwZDA4NzkxZjAyMzAxMjgzYzRmOGJhZTM1NDc3ZDMwNTFkYmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZiMWUzMGM3YzU3NTU2YzljNDk4MmM4NmY2NTcxOWU5NTg3YTlhN2FiNmUwODNlOTJjZjhlMDYwZmJlNWNkNTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI2NTkxNzMwYWNjZDljZmVhNTEyYzE5NTVmNjI2ZGJkZDgzZTU4NTk5M2I3NWU3ODg2YjdjMjYxYTNmZDgyNmYifQ"
         },
         {
-          "resource": "repo://packages/sync/src/sync.ts#L542-L582",
-          "version": "repo-lines-v1:sha256:8291772abe5bcbd3829cddd9fbf8ad352eea42d796017b53afc5e2291f2f4e8f:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwMDY3MDEyN2I5NWE4YThjMjEyN2M0MzI3NTlhZGIyZGJiOTc5MjUzOGNiNmEyMGExOGQ2NTRiNDhiZjMwNDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY3ZmY2YTE5OWExYWIxMjE0ZGRiNDQyYTIxNTI2MDA5Nzk1NjgwYzFlN2ZhOWI1Mzk5NjAwNjlmNWNmZmEwNjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMzYzk4NzY0YTY2ODUzM2Y0ZmM1ZmMzZThmOWIxNWRiMDdkNGIwMzNhNTgzZTVmYTVhN2VlYWZmOGY3ODEwN2EifQ"
+          "resource": "repo://packages/sync/src/sync.ts#L214-L260",
+          "version": "repo-lines-v1:sha256:e31292978e8b8c1f040cb2330ebaaecddee8e167bbde8facd880ac5094761b0a:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxN2MxMzI4NjA5NjY4NWE3Yjc2NWEyMWY2MzJjYTYxNjQ3NjBjMWZjODE0ZjI2MjZkNzdhZGFmYTg3YjRhMGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc0MjQ0NTg0MDEzY2E4ZmZjMjBiZWZhYWJjMzNmZTgyZDkxOTVkZDQyMjIxMjNiZTA0MDk2Mjk2YjVkZjY4ZDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZkMWNhZGU1NWNlYWRiYzNhN2ZjZTg2YTdlNjVhMDBlMmU1MTIyZTY0ZWM0NGVjMWM1Y2Q3OWU1MzU4YWI5ZTMifQ"
         }
       ]
     },
@@ -21,8 +21,8 @@
       "statement": "pnpm sync:batch runs one batch chunk per invocation through composeChunk without the session-only options, exits 0 on any outcome and 1 on a missing User-Agent or a throw.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/sync-batch.ts#L44-L81",
-          "version": "repo-lines-v1:sha256:d46859ac2d3b3a06ff497d60d52600dfd5b36e798b5b41f3734c35920829b10f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg5NTNhMTVkNGVhYzdjYjFmMzJlODE3ZWY5NjY3YjU0OTUzZmY1MzE5OWZmMGFjYTVhZWExZjc3YjEwMjliYjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZkMWNhZGU1NWNlYWRiYzNhN2ZjZTg2YTdlNjVhMDBlMmU1MTIyZTY0ZWM0NGVjMWM1Y2Q3OWU1MzU4YWI5ZTMifQ"
+          "resource": "repo://packages/sync/src/sync-batch.ts#L20-L60",
+          "version": "repo-lines-v1:sha256:bc6d2b602e50fe9ddd6af4b6c63d659a05ea2e749e9e6a004bb52471ae420b28:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2NThhNjdhODQ3OGU0ZjFlMjIxNmRkZmQ2MTFjN2Y5NzMzYmI0ZWQwYjFiYjBjMTU5YTg5ZmNkMmZiYmUzNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgwNWJmN2JhMTA0NGI5NDUyY2FiY2I0ZWMyYjE1OWRlYTJmZTg2OWM3OTM4MDA2N2NjN2JhNjZiYmMzMTJhMjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwMzRjYzNkYjUyYjllODdiM2NlMTg2NDE4MzYzOTAzNDgyYmJiZTU0MDUwNWIzNzMzYWI4ZmU4YTNlMWM0MzYifQ"
         }
       ]
     },
@@ -31,40 +31,40 @@
       "statement": "Before each chunk the session pre-waits, outside the lock, the largest spread delay over the search and fetch lanes plus the data lane when the league gate is due; the gate is due when no league is confirmed, the previous chunk ended a pass, or the input-file signature changed since confirmation.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/sync.ts#L343-L357",
-          "version": "repo-lines-v1:sha256:a2a7a536b1a1e09f81fe683d2e37bacab4422cbeea26a0d598c5926d8b905c81:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxNjk5OWFkZjAyMTdkNzUwODg2M2ExZWQzYmVjZjQ3MmYwYmUyOTczZWRkNjYzZGExNDI3ODNjMzk0MzdmMDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwMmQyZDk4MzU4NTA2NzkzODkwNDRmYzMzMjllN2ZhMzRjNTcwMTIxZThhNjFmYWYyYmYxNzVmMzE0ZThjMDIifQ"
+          "resource": "repo://packages/sync/src/sync.ts#L127-L138",
+          "version": "repo-lines-v1:sha256:3e1a35d4e4d51605bacc760f71ad40521864b0f60266a131901288469a158f64:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3NWZiNmNiMmYxODM0MTc0ODdmYzVkNzAyZTJlMTZiZjk1YTAyM2NkNTI5Y2I4MTA4NTE4MWQ2NWI4NDM1ZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNhY2MwMzRkN2RjM2E1M2QyNmVkZmFiM2I2Y2YzNmE3N2Y3MzVlMDQ3NGQxYTMzNjBmMzFjZGFmMDI5ZmZlMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjMGVhOGI1YzdjZDA3ZGNlZDFjYWY3NjZhODgyMDVhNzA5N2IzZGQxNTBlYTI2OTdjNzY0YzQyNjQxMzgzMzQifQ"
         },
         {
-          "resource": "repo://packages/sync/src/sync.ts#L547-L558",
-          "version": "repo-lines-v1:sha256:fecc5b7db161c07d4e201997e44d819921b507bb059a652d537f826945ab4d44:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkYWZhZjE2ZGU4YTJhMmJlMWQyMmE2YTg1NzlmYjYyYmZlNzNlNjkyNzcyYWQzZTk2MmEzNWE5ZTNkMWFmMjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiY2Q3NjExYjI4ZTg1YzU3MTRjMjY0MGM1ZGY1ZTMyMzA4YTBhYzJkZTNjMmQ5N2RhNmM2ZjY4ZDU2MzVkNjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjllODE4YmEwMDMwNTlkZTJkM2JiYzdkZjA4NjZkYTU4ZjQyODU0NzMyZTg2YTU3Nzg3MmU1ZTdiNDA4ZDc1M2YifQ"
+          "resource": "repo://packages/sync/src/sync/session-pacing.ts#L1-L25",
+          "version": "repo-lines-v1:sha256:5b6e16c6f33bbbf8b1ae9e4be6d9203f009b3085f3162b6598d38b3cc416fe68:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyNDA3MzY4ZDUyZTFmYjE4NTQ0ZjAyODlmODgwNDljYmM4NDIxNzYzYWNmMDBhNjYzMzE4YjVlZmU0NWQ5ZjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/sync/session-state.ts#L224-L229",
+          "version": "repo-lines-v1:sha256:87108d021f8ea8677c0ce9a6e700d9849b85c23efb6d2b40e94aef15fcdeca97:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI0MjVjMjZjYWFhYTcyMzM0ZTQ1NjQxMDljOTkyNzFmMTdiNzNiZTQyNTA0NTNmOTQ5YTg5Y2ZkOGFhZGQ1NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTIwNDBlMDk1YTk0ZTJhZGE3NGU0MjFmMzcxODc1MWE5MWE4MTBiZmQ2NmY0OGY0ZTkzOWM3Yjc0ODBlYjY3MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         }
       ]
     },
     {
       "id": "claim_91e2e65cc08248cd92a23593694bf846",
-      "statement": "nextWait maps chunk results to waits: busy or dispossessed wait for the lock to be free or stale, deferred and 429 yields wait until notBefore, a no-answer yield backs off, a refusal (including a cross-file gate failure) waits for an input-file change, other throws wait for an input change at most until the backoff, and a completed chunk with nothing due waits for an input change at most 24 hours.",
+      "statement": "nextWait maps chunk results to waits: busy or dispossessed wait for the lock to be free or stale, deferred and 429 yields wait until notBefore, a session-cookie downgrade or no-answer yield backs off, a refusal (including a cross-file gate failure) waits for an input-file change, other throws wait for an input change at most until the backoff, and a completed chunk with nothing due waits for an input change at most 24 hours.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/sync.ts#L180-L300",
-          "version": "repo-lines-v1:sha256:bbd1c9da40371369edb4acbbdfac89201699314110fa8971afc04da35b4ff800:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIzYTAyZTllMjQ3ZmM0MjE4ZWVhMjFmM2EyODRkZjlhMWQyN2ZjMjRhMTQ4OThjMTJkMTA2Y2RlYjFiMTg1NWVhIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwZTQ2YTY2YmIwNDZmMjNkNmE0MzJkZWJiNjEzMzM1MTBkNWU1ZWYxNDJhYmYxNTBmMzExMmQ0NWY3YjAzZjU2IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmYWZhN2JiNjcwNTM1MWJiNWFkYjVhMzFjYjIyM2ZlYjI0NWY1MmViYmZiODM3NzA4NzE4NDFhZGMxYjMxYTlmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI3OWFkMzVlNDA3MWZmMmM4MzQyOGU1ZWY2YzljYTBmMTJhYWM1ODdhNTgwMjU2NjRjYTU2NzJlN2I3ZTg2OWI0In0"
+          "resource": "repo://packages/sync/src/sync/session-state.ts#L57-L174",
+          "version": "repo-lines-v1:sha256:e7fe7e304d4ef0684ee235bac565e7bb0fc0a17a6259a693d36f27fb76acd01c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0ZDYxZWMzMWEyYWJjOGNlMzA2MDllNWEyODBmZjE2YTE3ZjMwZDc0Y2ZhNWQyNjU3M2FkZmViYzI3OGViMWMwIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiMmIxNDM4NzBjMGQ1NDFiNWUwNWQxYzkwYzQ5YTA3NDlhYzE0ODQzMjBmNGYxYzY4MzI5MDY0MTZjNjkzZjRhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiNDAxZTAzZjk5YWI4NzdkYTE2ODZlNTg4YzI5NjZlMDM2NGJkMTI2NTVkNGY4OWM1ZWY2MDA2MzUzYTE2ZmNiIn0"
         }
       ]
     },
     {
       "id": "claim_548e93fa08e44bf1af75af23cea52557",
-      "statement": "The session backoff is the tightest even interval doubled per consecutive backoff and capped at the six-hour stale-lock threshold; a lane with no read policy counts as a 36-second cold even interval.",
+      "statement": "The session backoff is the tightest even interval doubled per consecutive backoff and capped at the six-hour stale-lock threshold, restarting at 1 after a fresh reading or a downgrade; a lane with no read policy counts as a 36-second cold even interval.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/sync.ts#L219-L231",
-          "version": "repo-lines-v1:sha256:5f0235df4619d086e334ea660385e3b5ede3fc6c3b262ea638518892f2fd2b13:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1NGQxMzU4MGNmZTY0NDY3ODdkNTg3N2JlYzE4Mjc0ZjQwZjY1OGUyNjE1ZjdlMzczZWZlNjcyNzIwNzljOGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIyZDgyYTE5YTQ2ODEyNTdiMzg5OGEyNGJlZDM4ZTE2ZGUyN2UyYjM3OGM3ZmM2YWQxNWJlNzhjYWMyOTgxYzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczNzRjZWRmNTU2NGQ4NTIxNTlmZWFlYzQwNDUzMzcxMjgwYzhhYjNhZDhhYzJlZmNkNDQ5ZDc1NWUwNTk2NGQifQ"
+          "resource": "repo://packages/sync/src/sync/session-pacing.ts#L6-L25",
+          "version": "repo-lines-v1:sha256:ff5dd468e8d487204244cac3bed2232668f0c68bb518b7608e5f2b673f728986:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdjYWVmYzdhOThhZWExZjE1N2Q0ZDEwYTUzZDFlNGZkNGEwNDE0Zjg2ZTEyMTA2NDVkNGZjYzMxZmFhMWVlNTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkzOGE3NmYxZmE3YjMyNDkxZDY4ZmQ1OGVjMWViYmMyMjM3NTBmMDI2OGQ3NDY1NmNiZmNkYTAxZTQyMDA5OTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/sync/src/sync.ts#L359-L369",
-          "version": "repo-lines-v1:sha256:684c4d339c9bc15441fe536717175e3bd4064fce0bfb08e6258920705a600448:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzNmM2ZTFmODJmZTk2YTFiOWI3ZjhjNDAzNGI5ZTE4YjhlZjI0YzU4NWQ2ZTg5MDlkMGIzYmZiZjljYzIwZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA1ZThiZWM0OGRkMGNlNTc5ZTNkMTgwNTkzYzFhNjMzYzI4Yjk1NDBiODc2OTUzMTYzMjI5YWI5OGQ0YzkwYzIifQ"
-        },
-        {
-          "resource": "repo://packages/sync/src/sync.ts#L80-L85",
-          "version": "repo-lines-v1:sha256:1bda864122a622d0fcaeae4c234e4838f4b40f54c02178b5bb1487fbca42a44a:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWRhN2I4ZjU2ZmJlNGRkYTRmNjVhN2RjMGJkNzUzYjIwMTBkYmRhMjA5NzFkMzA3YjkwYzk0YmYwN2I2MjEwYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzFlOTI5Y2VlZDA2ODljMWJhMWQyZmRiMjU0ZTQwYzNjOGFmZmEzMmU2MzgxNjJjYWI5ZGZmZjdjYzA5MTUxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjFmNTU4NjBhMmE1YjhkYjUzNjBjMGNiYWRlOTY4YjI4NmQ4ODBiMWQxYzVmZmMzYjNjOGMwYWZmMDRmNjQ1NSJ9"
+          "resource": "repo://packages/sync/src/sync/session-state.ts#L81-L90",
+          "version": "repo-lines-v1:sha256:e356152e5101225969b9f246a5bfab7a1524cd12ad4ac2dcef8c5036d67b3370:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwZThkOGZjNzNjZWQ1NWNhM2M4OGM0MmQ4MjNhMTY0NzM3ODJiNmJlMzc0ODBmODBlMTcxZTI0MjY0MjNhYmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIyOGFlZGQxMGU0NzM3N2EyOTFjYWZjYWEwNzViMDYwYTg0ZjMyMWIxODZjMGI4MDM1Y2Y4ODkyMmFmMmRkOTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjljNGUyMjY3Mjg0YzdhY2JlMDdlY2Q2NjlhYjIxNDJmNGEyYjVkOGQxNWMxM2EzNzAyODhhMzljMTZiNGNjYzkifQ"
         }
       ]
     },
@@ -73,12 +73,12 @@
       "statement": "nextState clears the confirmed league only on a LeagueMismatchError, resets the pass-start request snapshot when a chunk starts a new pass, and passes it back as requestsSince so the report's request figure covers the whole pass.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/sync.ts#L304-L341",
-          "version": "repo-lines-v1:sha256:4899e7d760bd1f18516f87aa8a017879d088a8c8098f5eceff8b147e6ae7578c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3OGE3NjFiN2UyZmFmNGVjZjcwYTI1ZTY5YmRhNGEyM2ViNWUyYzA1NjMyYjRhODUxNjhlNTU2OGEzNzFkYjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ5MjVlMTlkOWNhMTRjYWFlOTEzNGY0M2RmNzBhNmU3MzFkOWUzZWYzNTkyNTdhMWM5NWU4ODkxOGU3ODU2YmQifQ"
+          "resource": "repo://packages/sync/src/sync.ts#L151-L156",
+          "version": "repo-lines-v1:sha256:64a73f2bbc24c977397fb8f84477a2b9c0070c48ab8dd1c033321256e69f834e:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTBmYzA1NmJiNzY4ZmVhZWJjZjM5YzA1MTZiYTBkYTM5YmY2ZjZiYzI2YTAyOGI3NzdjNTQzNTAyYWQ1NmQ1ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjk3OGUyNTAzYjhjZjM3YTA2ZjdkNmYwYTNhNmI2ZmUzNTY5MWZiY2FiNTBiODc3NWNhYjZmYWJjNzFjNTkyYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTRjZDk4NmYxMWMyYjEyMjhmZTg3ZDJlZTJlYWM3N2VhZDVmNWQ3Mjg3NGQzYzcxYTgxYTFmMGY4ZTcyOTJhMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDExNDg1YzNiYzQ2MDcwMTAyYjU3MzFjMTM4ZTg0N2JjNDYwY2JjYTkzYWRiM2UyYTU0N2Q2ZTVlNDlhZTdlOCJ9"
         },
         {
-          "resource": "repo://packages/sync/src/sync.ts#L570-L575",
-          "version": "repo-lines-v1:sha256:82516d12d9e3bcda400c720fb58f251e927a62cb34ce5ec6e2c2ec17c7f080b7:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWVkZTQ5YTFkODk5YWMxYjY5YjI2ODBjMDg3YzdjYWI3MGNhMzM0Yzc2OGIwZWRlYTE1NWU5Y2NkNDY0YmJmNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWU2NzNhYmQ0NTdhOTdlZWExN2E2MDA2MmViMGZhZWE2YmRmMDk0ODY4Y2M2YjhmOGMwZWJkYTJmNjFlZDQyZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmJiMjljZDZmOGRjYmRhYzNmNDVmOGVhYWQ3YzM0OGI5ZWMzMzkyZjhmMzUxM2Y3MjQ0YWJmNTg5NzkxNzRkNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmJiNTQ1ZjMyOWY3Mjc3YmIxZmMzZDk1NzIxMzNkYzExMjFiYjZhNDdiZmYwMzQ2NWE0ZDZkNmMwYmFkYWY1OCJ9"
+          "resource": "repo://packages/sync/src/sync/session-state.ts#L185-L222",
+          "version": "repo-lines-v1:sha256:7dcbe5161ee58b0eb2b873b413ac9bd394d943c44f4f9aab857c49aab1b2813f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljMmZhZDYzZTc2MzIyZTFkMzJmYzU3OWUzMjQ0NTk3NGE1NWQ0OWI0YTliNTQ4OTg2Mzc4YmY3ZTgxYzlkN2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRkNTBjNjVkMzg0MWYyZTRkMDUyYzI0MmQyNjYwMzNmNmJhMDQ3OTdlNTgzY2ZkMmY2ZDNjOWFiZmVhODcyZTUifQ"
         }
       ]
     },
@@ -87,32 +87,32 @@
       "statement": "Session waits send no requests: they sleep, poll the input files' presence and modifiedAt, or poll the lock file every 5 seconds, and a failing local read never ends the session.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/sync.ts#L374-L477",
-          "version": "repo-lines-v1:sha256:0b2a180d2ffd93630598bf6b9f3bcaadba14fc0ce96a2211f9d55ebacb577b54:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiMDQ1NDdjOTEyZDFlNWI4YmIxYTU4NmI1NGVlZTgzZmIwNzhlZWFlODUwYjYyM2FiYmUzMGNjNGMzNDkzM2NmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJhOGJlYzBjNWIzNjFmOGJlOWQyMTUzZGY3MGMzOGYzYjhiMzgyMDkwNGIyMzExNjQ0ZmI4Y2RlZWVhNDNlMzUxIn0"
+          "resource": "repo://packages/sync/src/sync/session-inputs.ts#L13-L60",
+          "version": "repo-lines-v1:sha256:81fac14026d7b4e12cfd8dde855d0a7261d2447c967cc44112cda679b6f0d601:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2ZDVkNGQ2NzdkZDFmMzgxYTllNDc4NzhkZTNmNjZiMmE5MDVjYjYyYWU4NzRlOTYxNDcxMTg3Y2FkMDU4MGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUyNzBhOTc2NzQzMGM2ZDEzNTRhOWJiZDljZGVhMjcwOGRiM2UyZTczZWJmMDllM2VkNGYwNDE2NTZkMjEwNmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/sync/src/sync.ts#L87-L106",
-          "version": "repo-lines-v1:sha256:723e413623e6398dc94ea5bec80a42a2620dbd8f9a4bcbc6a6318ca621413e73:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY0M2I2OTYyMzM1MTk4YWU3OTk5MTI5ZTY1NzU0NGU3YTZhMzEzMDM5NjJiYzZhZjI0NWM2MThiOTRmNTk2YzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiYjRjM2MyOTBmNzUyZjNjOTQwNDBmNGQ1MjE4MzU1NzZlNWY5NGZiMzJkZWVkYmE4MjA2ZGQxNGZkNWIxNTEifQ"
+          "resource": "repo://packages/sync/src/sync/session-wait.ts#L1-L108",
+          "version": "repo-lines-v1:sha256:20fb3d977a9a53e91a0f5e79b3ee84b2a512fa73fa7af6ab35081c18e59cd6bb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyMWUxYzAyZjA4YjU4YTFmNGQ1MDYwZWNhMmNhZTU0OGI4MzQzMTJhM2UzMGRjYWI1NDZkNThjNTg5OGY0OTg3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
     {
       "id": "claim_909ecf5645e646e685769cb35e322b50",
-      "statement": "The first SIGINT or SIGTERM aborts the session's signal; abortable waits end at once or the running entry finishes, and the command prints stopped and exits 0, while a second signal gets Node's default handling.",
+      "statement": "The first SIGINT or SIGTERM aborts the session's signal; abortable waits end at once or the running entry finishes, and the command settles an unsettled auth holder as not-probed, prints stopped and exits 0, while a second signal gets Node's default handling.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/shell.ts#L81-L98",
-          "version": "repo-lines-v1:sha256:c3ec53bfef27c340a7d2c386ab9952d36136143227ed071cd688ce2edf4f3f5e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMwOTFiZWI0Y2I3MTZkZjUwOGZmNWNiYjQzODUxMjFmYzlhMGQ4OGI3YzdmM2FkMGNmODAwZTYzOWE4MmJhYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFjM2ZlMTMxM2Y2YzdmNjkzNzdhOWIwMTY2NzFhODNmYWRmMTUwN2YzZmMwODg4ZDA2YTU5ODE3ZjM0YWIwMWQifQ"
+          "resource": "repo://packages/sync/src/shell.ts#L51-L67",
+          "version": "repo-lines-v1:sha256:c3724c18c7b3af9daa0e56ab4483663a455068abce54dc37f9a62bd01b826596:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhOTE3OGRlMDA3NTE4ZTE4MjJkNjMwMTRkYzNkMTZmOGQ0OGMxM2IwYmFlMGZiZjk5NjY0NjkzNGUzMjI4NTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4YzFjMzQ3ZTVkOTc1ZmQ4NmIxNWNkZTUzMTdjYjE2YmUxYWQxNWRjZmNhNjA3OGFlNDJkMWNmMGIzODE5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMwOTFiZWI0Y2I3MTZkZjUwOGZmNWNiYjQzODUxMjFmYzlhMGQ4OGI3YzdmM2FkMGNmODAwZTYzOWE4MmJhYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEyY2YyOGRmNDViOTViNWJkOTg1ZWI0YmU0NmVhODJlZmQ3ZWE1ODIzNWU2Y2M2YmMwYzEyMDMxMWYwY2EyNjYifQ"
         },
         {
-          "resource": "repo://packages/sync/src/sync.ts#L595-L631",
-          "version": "repo-lines-v1:sha256:95b53ace656855556a654777a1450faea7f8db0922804b0d8ba41489f5b8712c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlYmNmMzhmMjFhOGM1NjllZDFiYjY2NzRjNGY2NjBkN2MxMWVmODY1MjAyNzhiNzI4YWQ0ODIzMTUzYTU1N2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFkZjQ5MmMzNzFhNTU3ODg5MDY2ZWJmNzNiYTAzNzRlYzNlZTU4NzlkYmU1ZDI3MWRjODY5NTQ3M2E4ZjZkMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3M2ZkY2VjMWIzNjY3ZGUzYmM1Njg2Mzg0MzIzNjg2ZjllMmZkOTExYjhlZDNiNzJhNDViMzk0NDIyZmU1ZDYifQ"
+          "resource": "repo://packages/sync/src/sync.ts#L245-L288",
+          "version": "repo-lines-v1:sha256:ad190cf657f5885036bbef1f078d2e0577f225b410280f036b368ba23f74d8b7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2NTk1ZjRlZTVmZjYzZDUwOTUwNDE5ZGMzNDQxNDUxMzg1MWRjOTczNmZkMTdhNGY3YmZhOTMwYjI2MWI2ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5ZWFjNGI2Y2U1ZjNlYzUxMTVhODFlNmM0ZmI0ZjM4OWU0Yjg4MGVhNTcyYTc4NGNhYjk3MjY2ZjJmOTFjMDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNlODAwMzhhOWYyYTk1OTRiN2EzYzI1ZGRjZDJjYjk3NzNlMzU3MzFmMDMzNWNlMGY1NGFmMzg5Mjk3ZDYwODgifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-10-03T11:56:06.252Z"
+    "at": "2026-10-17T13:54:42.734Z"
   }
 }

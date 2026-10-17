@@ -4,6 +4,8 @@ title: Operator commands and curation workflow
 description: The human-invoked pnpm commands — sync, sync:dry, fixtures:record, catalogue:refresh, tracked:lookup, tracked:check and dev:stop — what each reads, writes and sends, their exit codes, the POE_SYNC_USER_AGENT requirement, and the lookup-edit-check loop for curating data/tracked.json.
 tags: [workflow, cli, sync, dry-run, fixtures, catalogue, curation]
 sources:
+  - id: openwiki-source-c7d002531dc4623243a8b75b
+    resource: repo://.claude/skills/tracked-json/scripts/lookup-mods.ts
   - id: openwiki-source-92f333db8794b007cec6ef03
     resource: repo://.claude/skills/tracked-json/scripts/lookup.ts
   - id: openwiki-source-5b54a58d1b51cd490b0e7162
@@ -20,12 +22,16 @@ sources:
     resource: repo://packages/sync/src/sync-batch.ts
   - id: openwiki-source-4c0582c853fafa6e932bf71d
     resource: repo://packages/sync/src/sync.ts
-  - id: openwiki-source-391c3262b7014fb5ca5796f2
-    resource: repo://tools/dev-stop/dev-stop.ts
-generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
+  - id: openwiki-source-2e99890660ef3f42dcff6003
+    resource: repo://tools/currencies-refresh/currencies-refresh.ts
+  - id: openwiki-source-2040e16752074e5afd8eca12
+    resource: repo://tools/currencies-refresh/plan.ts
+  - id: openwiki-source-fa4f54715b72e3c963fd8023
+    resource: repo://tools/dev-stop/development-stop.ts
+generated: { by: "claude-code", at: "2026-10-17T13:54:42.734Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-10-03T11:56:06.252Z
+    at: 2026-10-17T13:54:42.734Z
 ---
 
 # Operator commands and curation workflow
@@ -38,6 +44,7 @@ The product runs as a set of `pnpm` commands run from the repository root, plus 
 | `pnpm sync:batch` | yes | the same three files | Run one live batch chunk, for an external scheduler |
 | `pnpm sync:dry` | no | nothing | Predict the next chunk against recorded fixtures |
 | `pnpm catalogue:refresh` | 4 GETs | `data/catalogue/*.json` | Refresh the trade catalogue |
+| `pnpm currencies:refresh` | poe2scout | `data/currencies.json` | Refresh the exchange rates from poe2scout |
 | `pnpm fixtures:record` | yes | `fixtures/*.json` | Re-record the API fixtures |
 | `pnpm tracked:lookup` | no | nothing | Find ids for tracked entries |
 | `pnpm tracked:check` | no | nothing | Validate `data/tracked.json` |
@@ -47,8 +54,9 @@ The product runs as a set of `pnpm` commands run from the repository root, plus 
 ## Configuration
 
 - **`POE_SYNC_USER_AGENT`** (environment or `.env`) holds the whole `User-Agent` value: the tool name and a contact address. `pnpm sync`, `pnpm sync:batch`, `pnpm catalogue:refresh` and `pnpm fixtures:record` refuse and exit 1 before any request when it is unset or blank (see [Governed trade client and rate limits](../sync/trade-client-and-rate-limits.md)).
+- **`POESESSID`** (optional, environment or `.env`): a logged-in trade session cookie that `pnpm sync` and `pnpm sync:batch` may send on pricing requests after a one-time probe (see [POESESSID session auth](../sync/poesessid-session-auth.md)).
 - **`data/config.json`**: the active `league` and `minChunkSearches`.
-- **`data/currencies.json`**: hand-maintained exchange rates per league.
+- **`data/currencies.json`**: exchange rates per league, hand-edited or rewritten by `pnpm currencies:refresh`.
 - **`data/tracked.json`**: the curated workload.
 
 ## pnpm sync
@@ -94,13 +102,24 @@ It prints `{outcome, completed, entries, progress, dataset, records, report}`, p
 
 The output is a git diff to review. A game patch that renames a stat id shows up as one changed line. After a refresh, the next chunk's catalogue check marks any tracked entry whose ids no longer resolve as `unresolvable`.
 
+## pnpm currencies:refresh
+
+`tools/currencies-refresh/currencies-refresh.ts` rewrites the rates in `data/currencies.json` from poe2scout (`https://api.poe2scout.com/poe2`). It is the one command that talks to a service other than the trade API. It uses plain `fetch` with a timeout, not the governed trade client, and sends no session cookie.
+
+1. It reads `data/config.json` and `data/currencies.json` through their envelopes, and turns the active league into a poe2scout slug (lowercase, letters and digits only: `Forbidden Rites` → `forbiddenrites`).
+2. It fetches the league's currency pages one after another until the response says no pages remain, with a guard against a page counter that never ends.
+3. `planRates` (`plan.ts`) needs a positive `divine` price, because every rate is divided by it. For each **existing** entry of the file it writes `rate = price / divinePrice` rounded to 3 significant figures (divine itself is exactly 1), with `source: measured`, the active league and `asOf` at second precision. An entry missing from the response, or with no positive price, is kept unchanged with a warning. It adds no new currency.
+4. It validates the planned file against `CurrenciesFileSchema`, writes it to a sibling temp file and renames it into place, so a failed write never leaves a truncated file. It prints the number of rates written.
+
+It exits 1 on any refusal before the write. Its test uses the hand-captured `fixtures/poe2scout-currencies.json`.
+
 ## pnpm fixtures:record
 
 `packages/sync/src/fixtures-record.ts` is only for a human to run. It records the leagues endpoint and the four data endpoints, with URLs from `trade/endpoints.ts`. For every non-pruned entry of the fixture workload `fixtures/tracked.json` (`FIXTURE_WORKLOAD_PATH`) it also records the POST search and its fetch. The workload is a small fixed list with one entry per search shape, not `data/tracked.json`, so the player's list can grow with no new recording. An edit to the workload changes the digests and needs a new recording. The search bodies come from `buildSearchBody`, the same builder the pricing step uses, in the configured league. It sends through the same governed client, reads `data/` and the workload without writing them, and writes `fixtures/`. `stripPersonalIdentifiers` replaces account and character names with a redaction marker and keeps the keys, so the shape survives. The rules for fixtures are in `fixtures/README.md`: never hand-written, one fixture per interaction shape, remove bulk but never structure.
 
 ## pnpm dev:stop
 
-`tools/dev-stop/dev-stop.ts` stops the `pnpm dev` server that listens on a port (default 5173, or `--port <n>` / `--port=<n>`). It then checks that the port is free. It exists because a runtime's "stop background task" kills only the PID it started. On Windows, the death of a parent does not reach its children. `pnpm dev` puts Vite five processes below that PID (sh → pnpm → cmd → pnpm → cmd → node), so Vite keeps the port.
+`tools/dev-stop/development-stop.ts` stops the `pnpm dev` server that listens on a port (default 5173, or `--port <n>` / `--port=<n>`). It then checks that the port is free. It exists because a runtime's "stop background task" kills only the PID it started. On Windows, the death of a parent does not reach its children. `pnpm dev` puts Vite five processes below that PID (sh → pnpm → cmd → pnpm → cmd → node), so Vite keeps the port.
 
 The command works from the listener upward:
 
@@ -109,18 +128,19 @@ The command works from the listener upward:
 3. From each listener it climbs through parents while each parent is pnpm's script shell for one `vite` command or `pnpm dev` itself. The climb stops at the first `pnpm dev`. It never goes above that process, because the shells and shims above `pnpm dev` (for example `bash -c "pnpm dev & pnpm test"`) can own other work. The climb also stops at the tool's own ancestors and at a PID cycle. On Windows it stops at a parent that started after its child, because Windows reuses the PID of a dead parent.
 4. It kills each root's tree (`taskkill /T /F` on Windows, children first with `SIGTERM` on POSIX). It then polls the listener for up to 5 seconds.
 
-It exits 0 when nothing listens or the port becomes free. It exits 1 on a refusal or when the port is still taken. Run it after stopping a background `pnpm dev`, even when the task already reports stopped (see [Build, typecheck and deploy](../operations/build-typecheck-and-deploy.md)). `tools/dev-stop/dev-stop.test.ts` tests `parsePort`, `ownAncestry` and `planStop` over recorded process chains, and kills nothing.
+It exits 0 when nothing listens or the port becomes free. It exits 1 on a refusal or when the port is still taken. Run it after stopping a background `pnpm dev`, even when the task already reports stopped (see [Build, typecheck and deploy](../operations/build-typecheck-and-deploy.md)). `tools/dev-stop/development-stop.test.ts` and `stop-listeners.test.ts` test `parsePort`, `ownAncestry` and `planStop` over recorded process chains, and kills nothing.
 
 ## Curating data/tracked.json
 
 The `tracked-json` skill (`.claude/skills/tracked-json/`) runs a **lookup → edit → check** loop:
 
-1. **`pnpm tracked:lookup stat|base|class|mods|tiers <query>`** reads the committed catalogue as plain JSON and parses `data/weights.json` with the contracts `WeightsFileSchema`, then prints matches as JSON. The `stat` and `base` queries print at most 50 matches. It derives nothing: `tiers` and `mods` print the weights data unchanged. A lookup error, including a weights file that fails the schema, prints `{error}` and exits 1. Zero matches is not an error.
+1. **`pnpm tracked:lookup stat|base|class|mods|tiers <query>`** (`.claude/skills/tracked-json/scripts/lookup.ts` and its `lookup-*.ts` siblings) reads the committed catalogue as plain JSON and parses `data/weights.json` with the contracts `WeightsFileSchema`, then prints matches as JSON. The `stat` and `base` queries print at most 50 matches (the rest are counted in `truncated`). `mods --class <className> [--slot] [--category]` prints one row per mod **family**, a `modGroup` plus one stat-id set (`core`'s `lineSet`), so a **hybrid** modifier is one row with several stat ids. Each row says whether every tier is trackable and lists untrackable tiers with `core`'s reason. `tiers <statId> --class <className>` prints every tier of the class that carries the stat, verbatim, and, when `data/recipes.json` is usable, whether each recipe's floor keeps the tier (`core`'s `floored`). It derives nothing else: the interval and the line set come from `core`. A lookup error, including a weights file that fails the schema, prints `{error}` and exits 1. Zero matches is not an error.
 2. **Edit** `data/tracked.json`. Each entry is `crafted` or `raw` with a status of `active`, `pinned` or `pruned` (see [Contracts, envelopes and the data/ files](../architecture/contracts-and-data-files.md)).
 3. **`pnpm tracked:check`** (`packages/sync/src/curation/check.ts`) is read-only. It runs the production validators and prints `{ok, checks, issues}`:
    - `schema`: `TrackedFileSchema` through `parseEnvelope`, including canonical-key uniqueness;
    - `pinned-cap`: `checkPinnedCap` against `config.minChunkSearches` (pinned count ≤ 0.5 × minChunkSearches);
    - `catalogue`: resolvability through `checkCatalogue` with an empty dataset;
-   - `cross-file`: `core`'s five cross-file checks against `data/weights.json`, the same call the sync run-start gate makes, one issue per failure. It is `skipped` when the weights file is absent and `failed` when the file is refused.
+   - `cross-file`: `core`'s six cross-file checks against `data/weights.json`, the same call the sync run-start gate makes, one issue per failure. It is `skipped` when the weights file is absent and `failed` when the file is refused.
+   - `recipe-reach`: for each crafted entry and each recipe in `data/recipes.json`, `core`'s `recipeReach` must be able to roll the entry; each unreachable pair is one issue per slot it blames. It is `skipped` when the recipes file is absent, or the weights file is absent or refused.
 
    It exits 0 only when every check passes. A pass still does not confirm that a declared floor is the one the implementation notes derive: a floor declared too high passes every mechanical check.

@@ -6,24 +6,26 @@ tags: [sync, pricing, trade-api, search-body, divine, median, league]
 sources:
   - id: openwiki-source-296818e62a60a3d8c9064ad5
     resource: repo://packages/sync/src/catalogue/weights-ids.ts
-  - id: openwiki-source-674c962be00b9b26529f4d45
-    resource: repo://packages/sync/src/chunk/run-chunk.ts
+  - id: openwiki-source-2f721c706d0090364a64ff1f
+    resource: repo://packages/sync/src/chunk/run-chunk/load-envelope.ts
   - id: openwiki-source-1586f13640754a9ac798c146
     resource: repo://packages/sync/src/league/league-gate.ts
   - id: openwiki-source-e1ea73778672f5f776de6c82
     resource: repo://packages/sync/src/load-data-file.ts
   - id: openwiki-source-96fe542c9b978e4fb23f0314
     resource: repo://packages/sync/src/pricing/normalise.ts
+  - id: openwiki-source-b54ed94a8564e603cc7dbfdc
+    resource: repo://packages/sync/src/pricing/price-entry-leg.ts
   - id: openwiki-source-b293525c0b4d3d93a18fe376
     resource: repo://packages/sync/src/pricing/price-entry.ts
   - id: openwiki-source-6463c78c974805557d576aa0
     resource: repo://packages/sync/src/pricing/search-body.ts
   - id: openwiki-source-f003d449d6194f288151c79f
     resource: repo://packages/sync/src/trade/endpoints.ts
-generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
+generated: { by: "claude-code", at: "2026-10-17T13:54:42.734Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-10-03T11:56:06.252Z
+    at: 2026-10-17T13:54:42.734Z
 ---
 
 # Pricing step and league gate
@@ -36,10 +38,15 @@ The target is the Path of Exile 2 trade API: `https://www.pathofexile.com/api/tr
 
 `buildSearchBody(entry, itemTypes)` in `packages/sync/src/pricing/search-body.ts` is pure. It builds the body from the tracked entry and the committed item catalogue only. Its object literals use a fixed key order, so one entry always serialises to the same bytes. The recorded fixtures are keyed on those bytes (see [Operator commands and curation workflow](../workflows/operator-commands.md)).
 
-Every body has `status: securable`, the price filter `exalted_divine`, `sort: { price: 'asc' }`, `ilvl.min = itemLevelMin`, and one `and` stat group.
+Every body has `status: securable`, the price filter `exalted_divine`, `sort: { price: 'asc' }`, and one `and` stat group.
 
-- **Raw entry**: `query.type` is the `baseTypeId`, with no category, rarity `normal`, and no stat filters.
-- **Crafted entry**: `type_filters.category` is the `categoryId` and rarity is `magic`. There is one stat filter per affix. A banded affix sends `{min: valueMin, max: valueMax}` exactly as declared, never rounded. A valueless affix sends `{}`. Every filter has `disabled: false`. The `className` then chooses one of three arms, tried in order:
+- **Raw entry**: `query.type` is the `baseTypeId`, with no category, rarity `normal`, `ilvl.min = itemLevelMin`, and no stat filters.
+- **Crafted entry**: `type_filters.category` is the `categoryId` and rarity is `magic`. A crafted search sends **no item-level filter**, so it admits listings below the entry's floor (AD-16, OQ-21). There is one stat filter per reference **line**, prefix lines first, then suffix lines:
+  - a banded line sends `{min: valueMin, max: valueMax}` exactly as declared, never rounded; a valueless line sends `{}`;
+  - a **hybrid** reference sends one filter per line, in its sorted line order;
+  - a **summed** `statId` (named by both the prefix and the suffix) sends **one** filter at the prefix's position, whose band is the sum of the two bands (`summedInterval` from `contracts`). The suffix's line on that stat is not sent again. A summed stat with a valueless operand throws before any request; the tracked schema already refuses such a file.
+
+  Every filter has `disabled: false`. The `className` then chooses one of three arms, tried in order:
   1. **Defence arm**: the class ends in a run of `str`/`dex`/`int` tokens, such as `body_armour_str_int`. All three `equipment_filters` are sent. A letter that is present gives `{min: 1}` for its defence (`ar`/`ev`/`es`), and a letter that is absent gives `{max: 0}`. The split is `defenceLettersOf` from `@poe/contracts` (`class-name.ts`), the same grammar the weights schema validates class keys with, so the two cannot drift (see [Contracts, envelopes and the data/ files](../architecture/contracts-and-data-files.md)).
   2. **Type arm**: the `categoryId` names a whole group in `data/catalogue/items.json`, for example jewels. The class, with `_` replaced by spaces, must be one of that group's base types, and it is sent as `query.type`. If the base type is not in the catalogue, the builder throws `UnknownClassBaseTypeError` **before any request exists**.
   3. **No discriminator**: the category filter is already exact.
@@ -60,16 +67,16 @@ Every body has `status: securable`, the price filter `exalted_divine`, `sort: { 
 
 `createPricingStep` in `packages/sync/src/pricing/price-entry.ts` returns a step with this flow:
 
-1. Build the body. On `UnknownClassBaseTypeError` the entry is marked `unresolvable` with nothing stamped. The step returns an `unresolvable` record (`identifierKind: baseTypeId`), sends no request, and the chunk continues.
+1. Build and serialise the body. On `UnknownClassBaseTypeError` the entry is marked `unresolvable` with nothing stamped. The step returns an `unresolvable` record (`identifierKind: baseTypeId`), sends no request, and the chunk continues.
 2. Stamp `lastAttemptedAt` with the clock.
-3. **Search**: `POST /search/poe2/{league}`. Only the league segment is percent-encoded. The request goes in the search lane.
+3. **Search**: `POST /search/poe2/{league}`. Only the league segment is percent-encoded. The request goes in the search lane and is marked `cookieEligible` (see [POESESSID session auth](poesessid-session-auth.md)).
 4. If the search is answered, set `lastSearchId` (the response's top-level `id`, stored verbatim) and `lastSearchLeague`. These are set whatever the fetch returns later. An empty `result` array gives `no-listings`.
-5. **Fetch**: `GET /fetch/{ids}?query={searchId}&realm=poe2` for at most the first **10** result ids (`FETCH_LIMIT`). The request goes in the fetch lane.
+5. **Fetch**: `GET /fetch/{ids}?query={searchId}&realm=poe2` for at most the first **10** result ids (`FETCH_LIMIT`). The request goes in the fetch lane and is also `cookieEligible`.
 6. Parse the priced listings. A `null` result, or a listing without a finite positive amount and a currency, is skipped and not counted.
 7. Compute the price:
    - no priced listings gives `no-listings`.
    - any listing whose currency has no current rate gives `not-yet-synced` with reason `no-exchange-rate`. No listing is stored without normalisation.
-   - otherwise each listing is normalised to divine and the **lower median** is taken. The result is `priced`, with an observation of `league`, `observedAt`, `priceDivine`, `sampleSize` and the `exchangeObservation` rate behind the median listing.
+   - otherwise each listing is normalised to divine, and the price is the **mean of the first two listings** in the order the trade site returned them (cheapest first, because the search sorts by price ascending). With one listing, that listing is the price. The mean is rounded once to 4 decimals. The result is `priced`, with an observation of `league`, `observedAt`, `priceDivine`, `sampleSize` (every readable listing fetched, not just the two) and the `exchangeObservation`: the rate of the first of the two listings that was not in divine, else the first listing's rate.
 
 The step returns `completed` with the new entry and the `remaining` search and fetch allowances from the response headers. The runner uses these to bound the chunk.
 
@@ -81,6 +88,7 @@ The step sends each request once. It has no retry and no queue of its own.
 | --- | --- | --- |
 | Search answered | `lastAttemptedAt`, `lastSearchId`, `lastSearchLeague` set, whatever the fetch returns | continues |
 | 429, 5xx, timeout or network failure | `lastAttemptedAt` stamped and price state kept. On a fetch, the search fields are also set. | **yields**. After a 429 the yield carries `retryAfterMs`. |
+| Session-cookie downgrade (`session-expired`) | as above; the downgrading answer is discarded | **yields** with `sessionExpired`, no `retryAfterMs` |
 | Any other non-2xx | as above | throws `MalformedRequestError`, and the chunk aborts |
 | 2xx with a body of the wrong shape | `lastAttemptedAt` stamped and price kept, published. On the fetch the search fields are set too. On the search they stay as published before. | throws `UnexpectedTradeResponseError` |
 | Jewel-arm base type missing from `items.json` | `unresolvable`, nothing stamped, plus a record | continues |
@@ -92,8 +100,9 @@ A request that gets no answer never changes the price state. An older price stay
 `packages/sync/src/pricing/normalise.ts` holds pure functions. No rate is ever fetched. The rates are the player's `data/currencies.json`, loaded by `load-currencies.ts`.
 
 - `currentRates(rates, league)` keeps only rates whose own `league` equals the active league. A rate from another league counts as missing and is never relabelled. When a currency appears twice, the first current entry wins. `divine` is always exactly `1`.
-- `toDivine(amount, rate)` computes `amount × rate` with the unrounded file rate, then rounds **once** to 4 decimal places. `core` never rounds again.
-- `lowerMedian` takes the lower of the two middle values on an even sample, so every stored price is a price someone actually asked. It throws on an empty sample. An empty sample is `no-listings`, never a price.
+- `toDivine(amount, rate)` computes `amount × rate` with the unrounded file rate and does not round.
+- `meanOfFirstTwo(values)` averages the first two values in their given order, never re-sorted, or returns the only value. It throws on an empty sample: an empty sample is `no-listings`, never a price.
+- `roundDivine` rounds **once** to 4 decimal places, applied to the mean. `core` never rounds again.
 - `outputRate` / `outputRates` write divine at exactly 1 and every other rate at 4 decimal places. The file's `league` and `asOf` are copied unchanged. This is the `currencyRates` set published in `dataset.json`.
 
 ## The league gate
@@ -112,4 +121,4 @@ A gate yield sends no search. So no budget is spent under a league that was not 
 
 ## Tests
 
-`price-entry.test.ts`, `search-body.test.ts`, `normalise.test.ts` and `league-gate.test.ts` drive these modules against the fake HTTP port and fixed clocks.
+`price-entry.test.ts` (with its `hybrid`, `summed`, `fixtures` and `yields-and-failures` siblings), `search-body.test.ts`, `search-body.hybrid-and-summed.test.ts`, `normalise.test.ts` and `league-gate.test.ts` drive these modules against the fake HTTP port and fixed clocks.

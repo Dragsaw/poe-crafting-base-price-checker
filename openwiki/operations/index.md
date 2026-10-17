@@ -1,3 +1,3 @@
 # Files
 
-- [Build, typecheck and deploy](build-typecheck-and-deploy.md) - How pnpm check, pnpm dev, pnpm build and the GitHub Pages workflow work — the tsc -b solution build with its .d.ts specifier rewrite, lint and dependency-cruiser gates, the Vite config that serves data/ as publicDir, the prune step that limits the published files to seven artifacts, the scheduled OpenWiki update workflow, and the commit-msg hook.
+- [Build, typecheck and deploy](build-typecheck-and-deploy.md) - What pnpm check runs (its two parallel stages), how pnpm build prunes data/ for GitHub Pages, the dev server rules, the deploy, test and OpenWiki workflows, the commit-msg and pre-push hooks, and the agent lint-on-edit and typecheck-on-stop hooks.

@@ -1,14 +1,18 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:c29a02bb9a5fe1855cfc67396c1b214d96707b8be75e2d201d3ed9094fb5037b",
+  "pageVersion": "sha256:9620236504296325cb6f7dad1af91df6fce7b19b8673a453f34403f4ee8d3cb5",
   "claims": [
     {
       "id": "claim_dd00cbda501d4d93b7a0ce547c0ae51c",
-      "statement": "The page fetches exactly seven artifacts in a fixed order, of which dataset, tracked, config and catalogue/stats are required and sync-report, weights and recipes are tolerable; an absent tolerable artifact is null in the set.",
+      "statement": "The page fetches exactly seven artifacts in a fixed order, of which dataset, tracked, config and catalogue/stats are required and sync-report, weights and recipes are tolerable; an absent tolerable artifact is undefined in the set and listed in absent.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/load/artifacts.ts#L48-L85",
-          "version": "repo-lines-v1:sha256:78dc29da43a0800eff3b77993db13536c07c042bd7d75f726cd986b1d5b9178b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllZTY2ZDBkMzA5YzM3NmIxMjZmZjlmNjFkNTQxMTQ4ZmRiZjZlNmUwZGY4YzBkN2YwMWI1ZjJhZTU5NjVlOTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2NjFiNGVkMDg0YWJjZDhjNjZmMWI5ZTE0MjQxNDMzYmQwOGVlOTQ2ZTdmOGE5Yzc5NzAwNWE3NDljNGUxOTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/web/src/load/artifacts.ts#L44-L60",
+          "version": "repo-lines-v1:sha256:990beaf363d17815f10fad064c4a780d11cd1fb71917b2ea6d31e652da2b08da:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllZTY2ZDBkMzA5YzM3NmIxMjZmZjlmNjFkNTQxMTQ4ZmRiZjZlNmUwZGY4YzBkN2YwMWI1ZjJhZTU5NjVlOTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhZGRlMTYwMDU4ZWE4MWNiNzAyNWE1OTI5NjJjY2YxMmM5MTYyZmVhMzEzMTkzYmZmODAyNjJkMmYwOWJhZDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2NjFiNGVkMDg0YWJjZDhjNjZmMWI5ZTE0MjQxNDMzYmQwOGVlOTQ2ZTdmOGE5Yzc5NzAwNWE3NDljNGUxOTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjNDg0MDZhMTE3MzNmOGUzNDJkODY1ZGE1ODNkM2ExNDRjOWE0N2Y2MDc3MzczOGExYjhiM2E5NDBlNjdmMTcifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/load/load-artifacts.ts#L156-L170",
+          "version": "repo-lines-v1:sha256:73e1af5b5812c609c3cc67fbf73906144bfb6edbb4454ff332b1b55056814f94:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkZWYzZmU5YWI5M2QyZmRlOWE4ZTlmOTdiZWVhYzkyMzNjNGI0NzJiNzU1ODZkNTk5NjQ5NTYwZTkwOTdhNzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcyMjY4NmY1NzMzZDExZTUxNDFmZTU2MWE4NWY5NjY4Y2FkMmE5NDNmOGQwY2I3NDQ4NTk0ZmZlMDZlYWY3M2QifQ"
         }
       ]
     },
@@ -17,56 +21,32 @@
       "statement": "loadArtifacts fetches each artifact with cache no-cache and never rejects; a 404 is absent, other failures are not-arrived, bad JSON or a failed envelope parse is invalid with a version or content cause, and precedence gives failed for any not-arrived, else refused for any invalid artifact or a required-absent one (cause missing), else ready, naming the first failing artifact in order.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/load/load-artifacts.ts#L84-L186",
-          "version": "repo-lines-v1:sha256:8c9165b8bc3b99d1971e6b829615605b6fb9b711f518371cadf4d09498882ef0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlZmZlYTRjNmM1NGZlNTI2NWVlODIzNjU2ZmRhNzJmYWY3YTE4YTI2MDA0ZjY3OGQyNGE0NGM5ZGU0MmYwNjZmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5ZDg4MDM3MzZhMzQ1YTU3OTgwNDNiNTczNGQxNjJkNmFjM2I3OGRhOTA2YTlhNjc0N2IxYjNkMDYxZDE0ODJiIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIyZjczNmMxN2MyZWIyZDI2ZGQ2N2U0ZGY1MjFlMjI1MzI5MTQzODY2NDFiNzIzODEwODdkN2Y2NDVhOTcxM2VmIn0"
-        }
-      ]
-    },
-    {
-      "id": "claim_67fede0587404efc898fd12317cb7d52",
-      "statement": "App moves from pending to exactly one of ready, refused or failed in one transition, reads now once and runs the cross-file checks once when the set resolves, and retrying re-runs all seven fetches.",
-      "evidence": [
-        {
-          "resource": "repo://packages/web/src/App.tsx#L29-L93",
-          "version": "repo-lines-v1:sha256:a9a8dd07bcbe3058ba06e1e2f8e0e56e54886ae5557a805984b47e0d6d1da382:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkYzUyZjA4YjM5YjA4YjAxYzhkMzA4YmY4ODBiMGJlZjAyZmQxZGZjYzlkOWFhOTNhNGQxYjVmNGQ1OGI2Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlZTIwYmExNDQ5ZjNmMjYxY2M2ZWU3MTdlOGVjMDE4YmM1MDJmZTE5YzBiNTUxNDE1ZDc4OWJiYjE4NDY3OTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjOTNlMjlhOGU0ZTA3Mzc0YWVlYjEwMTY2MzgxMmFlNzJlNmMwMGZhZWIwY2JmMmZkNTczNGFlMTdhZmI4ZTcifQ"
+          "resource": "repo://packages/web/src/load/load-artifacts.ts#L11-L179",
+          "version": "repo-lines-v1:sha256:537b87f62632ac12dd2f46c986c760c7b1c10a6e3d832b1ea63669d9ce708fc6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTY5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2YjYzOTZlMGQyMTY3MTg0OGJiOTJjMzQzNzU2ZDU2ZDkxMzliNzM4MzZlNTk5OTQxMmI5ZTc3YjIzYTg4Mzk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIwZTAzNDE5NzQ1ODc0OGI5NWRjNjllOTEzNmM1MWIxMTEyZjBiZjE0MTdmNTUxMWY1OGY0YzY5YjdlMWUxZjJhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
     {
       "id": "claim_23b42750386642e2a6c9922173a11041",
-      "statement": "The ready view ranks the whole loaded set with core's rank at the player's threshold over every recipe, passing the weights file (or null), the cross-file failures, the recipes and the currency rates, memoised on the set, the threshold and the failures; the active recipe only narrows the ranking.",
+      "statement": "The ready view ranks the whole loaded set with core's rank at the player's threshold over every recipe, passing the weights file, the cross-file failures, the recipes and the currency rates; the active recipe only narrows the ranking through forRecipe, which keeps raw rows, the recipe's crafted rows and the Unrankable classes that hold under every recipe or this one.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/App.tsx#L161-L215",
-          "version": "repo-lines-v1:sha256:de96ef175554c86213a4705db4fdccae641a899b96640ee619f87c21ea493274:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3ZjQ4NDIyYTg5ODQxZGM5YzRkMDIwZjNhMWIzZWYwZTYyYTMyODQxYWQ3OWU0NjkwNjhlYjE3ZDBhMDZlZGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjOGE2ZTg5ZDg5NjdmYjNjMWJmMzQwOTYwYjExNDE4M2I1ODQ4YWY1YzVjZTBlM2NkYmYzNGJjNjdkYzJiOWEifQ"
+          "resource": "repo://packages/web/src/App.tsx#L137-L159",
+          "version": "repo-lines-v1:sha256:63a555bdd1a1d2b8e9391d7c332f70e8592341b0dea90f7689cdbc9bd9532bba:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YWM5ODExZDgyMmRhMGFkNzQ0ZmFjNzEwYjJhZjA2NjJhOTkyMDdiNGJlNWVmN2RhZWZiNjA3NjI2ZWY3YTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY0MWMwNGZjODRjMTAyNzFkNDFlNzU2ODM3OWZhMmRjNGI2MjJlMTAxNmJhMzU1YjIzODU2M2UzODk2MTI1YzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhZDNmYTdlNjY2MjZiMGViYzM2OTY4ZDU2ZTI0ODFjNWYyNDY3MjY3ZWY5NDMzMjYzNTNkMzVlMGU5YjU2MTQifQ"
         },
         {
-          "resource": "repo://packages/web/src/list/active-ranking.ts#L1-L46",
-          "version": "repo-lines-v1:sha256:fe3f8900d19ecd1b9fda8c5faf318873ee37a893020813d92dc0a8c6866183f0:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NTEwMzg0NTdlNDI4YmZlYzFjMmM1Y2U0ZmQ4OTUzMTYzMWFmZjRkOTllYzhlZDUyOTgyZTkwNjk0NzZjMjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
-        }
-      ]
-    },
-    {
-      "id": "claim_e3b49061721d451f8d8b855298250785",
-      "statement": "The Payout Threshold is persisted in localStorage under poe-cbpc.payoutThreshold within 0 to 3 at 2 decimals, and any unreadable, out-of-range or throwing storage read returns the 0.25 default.",
-      "evidence": [
-        {
-          "resource": "repo://packages/web/src/shared/product.ts#L9-L10",
-          "version": "repo-lines-v1:sha256:d2cad484ad7700867d1f3c22e2abf9dd178fc0f36d223569ed1c66d90154a311:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdiNTNmMzgwYzU1NGRmMWM3OTg3ZGEzM2I5OWVjMWMzMDRmMGY4MjUyNWJiNzIwOTIzMzVkZTEwMDViY2NkOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmQxNTQ2ZGY1OThhYjYwYjA2NDIxYTRhOTk2ZWM1OWY1ZWIzYjlkYTQzOTk5N2I0MzZhMjMwMTgwOTY4YjI1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzczMTVhM2Q1YWU3YmM2NzMyOTE4NTlkNGNkMTYyOGE3YWRmNjIzZjZmMDJjYjdmODVjOTU5MzQwNzliMDM1MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2FjMjgzZTE0OTk0OWZjZGNjY2NiOWZiNmQ4YWI3NTFjYjQxNGRjMDFjMjI1MzZhNDhiMjAwOTJjYjk5Yzg3ZCJ9"
-        },
-        {
-          "resource": "repo://packages/web/src/threshold/threshold-storage.ts#L8-L63",
-          "version": "repo-lines-v1:sha256:54763da5b836be28293e55c3bd7141a67248a16b03599d2a3da33e5facb8708d:eyJzZWxlY3RlZExpbmVDb3VudCI6NTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiZjgwOTgzOWMxZjMyNTQxMzQwYTJkMDNlNWNhNjZlN2Y4MDczNmJiZTAzZjVkODk0NTY2MWZlMmZkOTE5OTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBmZTI3NzZhMzdkMDkxMjg3ZmJjMzczYmJkYWZmYTljNDhmYjA2NTVlMDZmNDgxZTU3YTVkMDI3MmY2MmE1YTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/web/src/list/active-ranking.ts#L1-L34",
+          "version": "repo-lines-v1:sha256:7eba590648cba75576b101e653fc158752b3db5e6a3fef1948e4f0670a42ea8b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NTEwMzg0NTdlNDI4YmZlYzFjMmM1Y2U0ZmQ4OTUzMTYzMWFmZjRkOTllYzhlZDUyOTgyZTkwNjk0NzZjMjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
     {
       "id": "claim_27d70c68479044e0913c2dc49c797f07",
-      "statement": "Display rows list ordering rows (raw rows and crafted Item Class rows with chase cells and combination rows) numbered by position with tiers 1-5, 6-10 and 11+, then unnumbered no-listings, not-yet-synced and unresolvable rows at tier 3 with money-slot phrases; in the honest-empty state all rows print in canonical key order with every EV cell reading no figure yet, and in the split state the raw and crafted branches print apart without numerals.",
+      "statement": "Display rows list ordering rows numbered by position with tiers 1-5, 6-10 and 11+, then unnumbered pending crafted classes, no-listings and not-yet-synced raw rows, broken crafted classes and unresolvable raw rows, then recipeless classes; in the honest-empty state all rows print in canonical key order with no numeral and no EV figure, and in the split state the raw and crafted branches print apart without numerals.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/list/display-rows.ts#L199-L339",
-          "version": "repo-lines-v1:sha256:1c72c493a73a96d293a717d9436159623488e9dd57d1bc8a987db23764dcf2fb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5MjA0MGUwOTVhOTRlMmFkYTc0ZTQyMWYzNzE4NzUxYTkxYTgxMGJmZDY2ZjQ4ZjRlOTM5YzdiNzQ4MGViNjcwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/web/src/list/display-rows.ts#L128-L347",
+          "version": "repo-lines-v1:sha256:9ac96e67934f3aa509f71cd7a0167a7be84b4dfbe26b764411ebed96eaf3d506:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIzZjVmMTM5YzE2MjY1OWQwMTU4YzQ1MGM4OTVjN2M4Zjg4YzgyNTA1NWU5ZjcyOTc5OWVhNWYxZmNjOWIzNGQ0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI2MDY0YzljMWI2NTJjNmI1NjM0NTg3MjUzZGVhOTFmMzdlM2FiZmNmZGE2ODM4ZWM4OGI4OTExMTc2Mzc0NmM0IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
@@ -89,8 +69,8 @@
       "statement": "The list statement is honest-empty when nothing is priced in the league and a row exists, uncostable when the active recipe is uncostable and the list is split, nothing-clears when no raw row is ordered and no crafted row has a summand but something is listed, and otherwise none.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/list/list-statement.ts#L1-L99",
-          "version": "repo-lines-v1:sha256:783d372d9d8b8a4aa1b95f9e5be3ef5b3d8dd55bc4cbb7505c6afbf09a87eacd:eyJzZWxlY3RlZExpbmVDb3VudCI6OTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NTEwMzg0NTdlNDI4YmZlYzFjMmM1Y2U0ZmQ4OTUzMTYzMWFmZjRkOTllYzhlZDUyOTgyZTkwNjk0NzZjMjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/web/src/list/list-statement.ts#L1-L71",
+          "version": "repo-lines-v1:sha256:a2045e2a6fac14543eb3d90e788275b09897ba8209e2cc982cb8fb4ca6d86060:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NTEwMzg0NTdlNDI4YmZlYzFjMmM1Y2U0ZmQ4OTUzMTYzMWFmZjRkOTllYzhlZDUyOTgyZTkwNjk0NzZjMjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -99,84 +79,50 @@
       "statement": "The trade link renders only for a non-pruned entry whose stored lastSearchLeague equals the active league, as the trade2 poe2 search URL with the league percent-encoded and the search id verbatim.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/list/trade-link.ts#L1-L25",
-          "version": "repo-lines-v1:sha256:adbe421983e56cb68d262451e146b85272df65fb882e4a9633bfada15acda818:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExNGU5YzBjNjdhYmVmMzFkNTI1MWQxNDAwOTRhNDE4YzY5MWEyZjJkMzQxY2Q1NDZlNmQ5ZTBmMDgzYzc2MDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
-        }
-      ]
-    },
-    {
-      "id": "claim_1259603e62b94b6fa040f31805ff31c9",
-      "statement": "The health line raises exactly two signals from the sync report: a count of unresolvable records and pinned starvation from the one record matching the loaded pinned count and minChunkSearches, and none for an absent report.",
-      "evidence": [
-        {
-          "resource": "repo://packages/web/src/frame/trust-facts.ts#L76-L123",
-          "version": "repo-lines-v1:sha256:7968cd4f81de219863da638621bd674f58f4eb41af7e43c4a254137fbad76ec2:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0ODU0NWNmMzA1ZGVkMGI1NGRmOTRlOGE0MTM1MTYyMTliMDA1NDgzNThhMzVjMDU1MDc2MTg0MGI5ZjFhZTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2ZTVhMzNhYjE0NDNiZjU4YjM0YzY3ODU1NDE5NTNmZjg3MzVjYWI3YzlmZjk1NWQxMDg1NDQxNGZhYmY5YjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4NWUxY2RhYWZmZmE5NGQ1N2E3NTU1MjYxMjUzZjQzOGI5ZTJmZWI2MjMzMWQxNjliZjU5YzAwNmZiYmRmZjEifQ"
-        }
-      ]
-    },
-    {
-      "id": "claim_933fc1db72ea4750a8bbd38a3f7658c7",
-      "statement": "The Mantine theme uses a sepia primary palette, ink and paper as black and white, zero radius and no shadows, with tokens transcribed from DESIGN.md.",
-      "evidence": [
-        {
-          "resource": "repo://packages/web/src/theme/theme.ts#L65-L100",
-          "version": "repo-lines-v1:sha256:84f397402279865671846ebf1a0f324a213f34cf9833e98bae43d354de830e9d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5YmJiZTQxOTQyOTRkNWZjOGJjZGYzZTMzYjFkMDk5M2NhZjhkNzBiYmRhMzc1ODE4YWRkNGM3MmIzY2E5NzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5YWY0NTQ1ZGEyNTJjYjgzNzEyZWUxNjQwMzQ3OWI4YjgzOTg4OGIwY2I3MDI4OTM5ODM4YjhmZTZjMjk1NGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhMzhlZTljYzczYzlmMWYyYzhmOGM1NmQwMGJkMDBkZTViMDczNjlmMTJlMDgwYWJiZDc5YzhjNDM3NTZjMTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdmM2ZmMjlmOTcyNGE5ZWQwYjU4MzBiZjA3YWM0YTFjMzI2NjRhNWRlMGQ2Y2IxZWM1ODE3MTY2NmE2NjhkZWMifQ"
-        },
-        {
-          "resource": "repo://packages/web/src/theme/tokens.ts#L1-L7",
-          "version": "repo-lines-v1:sha256:976dd7ca8bba1f34302588f0212c1feb2832c0ba5b35044c3439014babf4dbec:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTI4ZmU1MjYzZTZjZTMyYWIzZmEyOWNiYzJiOTU4MGJiNjgwOTM1MWMyM2VlYzc1MjUwZWNlZjZjODQ5MWE0YiJ9"
+          "resource": "repo://packages/web/src/list/trade-link.ts#L1-L15",
+          "version": "repo-lines-v1:sha256:32070210fc6823bcd47657868f16a85ccd2b476484d3f3fb9fc4415da20127f3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExNGU5YzBjNjdhYmVmMzFkNTI1MWQxNDAwOTRhNDE4YzY5MWEyZjJkMzQxY2Q1NDZlNmQ5ZTBmMDgzYzc2MDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
     {
       "id": "claim_9f0997eb4829470bb45f5f58ec4c800b",
-      "statement": "The page tail holds the Unrankable appendix (ready state only), then the key block and running foot, pushed to the frame's foot by margin-top auto.",
+      "statement": "The page tail holds the Unrankable appendix (ready state only), then the footer legend, pushed to the frame's foot by margin-top auto.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/App.tsx#L231-L245",
-          "version": "repo-lines-v1:sha256:4e36f98f4adf1a0dfc0ec7fccffb9a0ebf19fd0ae9dd4a01200d8fae9b10ce4d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/web/src/App.tsx#L246-L254",
+          "version": "repo-lines-v1:sha256:430666072a31e87e3fc54b0bfbdf23faf76e2901b7fd3a8b2658b7ad4cfc9aa5:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTczMDU2MDkyNWE5N2FmZWI3YWI4ZmIyZGFmYjE3ZjkzZjliZDg3NjM3NWFmYWNkNzJlOWY2OGMzYjdmMjNlOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDk0ZmMwYzE3M2QxZWMzZmM1MDFkN2RmYTkyODU1MDFjNTI3Y2ZiNDcxMjU4M2RhM2NjMzYxODA1NjZiNGJlMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         }
       ]
     },
     {
       "id": "claim_b89e97f57d70474b95adb31baf6ab3a5",
-      "statement": "UnrankableAppendix renders one non-interactive row per Unrankable Item Class with class label, unknown mark, reason and a note shown only for the cross-file disagreement reason; with no rows it renders only the title with the count in ink.",
+      "statement": "UnrankableAppendix renders one non-interactive row per Unrankable Item Class with its label, reason and a note for its reason, adding a raw-ranks note when the class's base types still rank as raw rows.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/list/UnrankableAppendix.tsx#L20-L134",
-          "version": "repo-lines-v1:sha256:3fba6d55d2cedb1ac77cc3dc50e7849312b83372ea6e6090478dc74a1b9419b3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3MDJhNzA5OTIxZmI0NzE4ZjA5NmM0MmFmNTE2NGE1OTRhNDZhNDQwMGQ4ZDNjMjk2OTY4MTNmODM1NjQwNDMxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjYmQ0NzIzZjhiMTJlOTg1MmMxMDJlMmRhYTFhZDYxYTAxZjI4NDFhN2E3NWZjZWM3NDU4ZjQwNmVhNDIzMzBlIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
-        }
-      ]
-    },
-    {
-      "id": "claim_7a35b6cb328c466aab5df11f05fb9d55",
-      "statement": "The refusal screen prints one body sentence per refusal cause: a version fault names the declared (or no declared) and expected versions, a content fault names only the expected version, and a missing file names neither; the fetch-failure screen offers Try again.",
-      "evidence": [
-        {
-          "resource": "repo://packages/web/src/frame/FailureScreen.tsx#L8-L137",
-          "version": "repo-lines-v1:sha256:bfb4796839982e27c3c9746c4716efe0cef8264d1ec8eeffa13d0aa7e5024d98:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlMDBkYzc3OGJlNmJkYWNjNzIyODEyMTA3NGZjMjAzN2E5MzM1YjJmZGQ0NDYzMTFlN2M4MjczMjM1MjhjMzNiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI5NWVmMDFiYzA4ZGJjM2I2M2U0ZTc1ZWEzZDI2YTViOTQxODkxODc3ZTI3YWQ4OTEzMjljODQxMWQ3ZDhkYzRkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIxOGFmMDcyNmM2NDU3Y2FmMzI5MmM1ZmZiMDJiYjkzMTFkZjY4NzAwZmMyNWQ4MDMwNGQyNzA4MDYzNzNmN2I5IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MSwiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIn0"
+          "resource": "repo://packages/web/src/list/UnrankableAppendix.tsx#L8-L134",
+          "version": "repo-lines-v1:sha256:998410d2b7044f7a2c5306292316a117dc4541ff853986e8336fd40ac95684b6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1YjEwMjZiNzA1MDMyMTM5MmNiOTU2OTM1YjRhOGI1MGQ5OWE4NjRjODkwMmUzMDNmN2M2ODgzMWUyNTM4NWU2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlZWE0OGRjMGY4MGY2Njc5NTk1ZGY2NjMzZTQwZTFjNzE0NDY3YWUyOTMzZmRlNjMwZDliZGZiMTBmNzdhODI4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
     {
       "id": "claim_c49faf54f071425d8900d1e5b1074013",
-      "statement": "The web shared/ modules are the single homes for the top-N bound, default threshold and Divine denomination, the 2dp money formatting with the < 0.01 floor, the clock units and age spellings, and the plural helper.",
+      "statement": "The web shared/ modules are the single homes for the top-20 row and top-8 line bounds, the 0.25 default threshold and Divine denomination, the 2dp money formatting with the < 0.01 floor, the age spellings, and the plural and joiner helpers.",
       "evidence": [
         {
           "resource": "repo://packages/web/src/shared/money.ts",
-          "version": "repo-file-v1:sha256:23b556e235725c2cccef8294301f5a8571eb2feb01b540936f1bb0efcfdeff24"
+          "version": "repo-file-v1:sha256:2e4a9c3e85344d3b7194a669fcdca75b407f76941efb1e35cefa915aa4ad17dd"
         },
         {
           "resource": "repo://packages/web/src/shared/product.ts",
-          "version": "repo-file-v1:sha256:9abbee6861dea95ac71c31b0eef4429934bbee3ec6550124123532688accd88a"
+          "version": "repo-file-v1:sha256:0f43f83dff481b430d13729c6641975511625480fd663128b0aa6558ed7b920e"
         },
         {
           "resource": "repo://packages/web/src/shared/text.ts",
-          "version": "repo-file-v1:sha256:a792b1633d834d379d0b43e15f60aba14e5eb323d5f8c02e62cfa511bfd9338b"
+          "version": "repo-file-v1:sha256:e13e38ea4032d7cdc2bd656bbb6d790faa41d5daa31b6da9545c9fc8022d61b2"
         },
         {
           "resource": "repo://packages/web/src/shared/time.ts",
-          "version": "repo-file-v1:sha256:60d636a7ea4bfa0d5085066a117241c4abf5bd9a428c8af6cfb1eacebdcc8390"
+          "version": "repo-file-v1:sha256:9793b6b43e0007dda543df0057e22f4e0260101288dd0f205ef83425af8694f3"
         }
       ]
     },
@@ -185,46 +131,70 @@
       "statement": "The web page parses weights.json with the full contracts WeightsFileSchema at WEIGHTS_SCHEMA_VERSION, so a file breaking a hard error of the weights contract is refused as a content refusal.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/load/artifacts.ts#L22-L23",
-          "version": "repo-lines-v1:sha256:b84f40f8fe3755e9ebeda22c552c394fc29917c075e0df923c44697e3af8f17d:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTExZjVhZDdlMjQ2YTQzNmZlM2JmZDA1MmI5OTgxZGRiZmFhNTQxZjVhMWE4NWQ5ZGFkMmFkMDUzOTUzNzRlOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjE4YTI0ZDhhMjJhZmI5M2I2YzE4MzgxMzZkMDY2NGFlMWZmMDNmZjhjMzBiNzM2Y2ZhYjQ3YzdjMTY0ZTI1ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI0YzFlOTFkNTQzNWU1MDQxNGE0MTQzNjg5M2RjODY5YzM0YTE5YTk4YjlkYzRjZWRhMzcyMDllNTliNzI1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTU2M2NiZGUxYTMwYjkzMjk0MGEyMzkzY2ZkMGE1MDY5ZGQ3YjdkN2Y4ZmMxNGNlNzdiNTAxYzk3NDI5ZTBmMSJ9"
+          "resource": "repo://packages/web/src/load/artifacts.ts#L18-L19",
+          "version": "repo-lines-v1:sha256:87a24cd4e85ac0d99dae30e78826ad2d5e08231ca864b1c87e7c8f3a6e3f90f4:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTExZjVhZDdlMjQ2YTQzNmZlM2JmZDA1MmI5OTgxZGRiZmFhNTQxZjVhMWE4NWQ5ZGFkMmFkMDUzOTUzNzRlOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjc4YzVhYTNlN2Y1Mzc4ZmUwZWU0M2E3NDRmOGEzNDA3YzFlODc1YTlhNWRkNWMzZGU5ZDYxZDExMDJkYWE5MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDNkYTdiNzczYzRjMTRkY2MyZWJiZmQwNzU0ZmE3MWViMTQyOTMxOWIzYWM4OTc2MWZkZmJjMGYyNWMwMjI1MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTU2M2NiZGUxYTMwYjkzMjk0MGEyMzkzY2ZkMGE1MDY5ZGQ3YjdkN2Y4ZmMxNGNlNzdiNTAxYzk3NDI5ZTBmMSJ9"
         },
         {
-          "resource": "repo://packages/web/src/load/artifacts.ts#L51-L51",
-          "version": "repo-lines-v1:sha256:7cdaf49b73d2231787b7796beb80b7feba35cbf0f22cd76f0ffcbc83fe9e723e:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2NkYWY0OWI3M2QyMjMxNzg3Yjc3OTZiZWI4MGI3ZmViYTM1Y2JmMGYyMmNkNzZmMGZmY2JjODNmZTllNzIzZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2NkYWY0OWI3M2QyMjMxNzg3Yjc3OTZiZWI4MGI3ZmViYTM1Y2JmMGYyMmNkNzZmMGZmY2JjODNmZTllNzIzZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjRhNTk2NDU0ZDBiMzYyNzZhMWI1MTVmNjg1NGQwOGY1NzMzNWNjN2I1ZmJjYzJjNTlmOTY2MmY4MWFlYjRjOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmE5YWYzN2VkNmZmNWQ2M2Y0YzJkOWZhZjZlMGViMGY5NDM4MzY0YzFjYzYwOTM2MWI1YjY0OTExZDc5NmE3OCJ9"
+          "resource": "repo://packages/web/src/load/artifacts.ts#L47-L47",
+          "version": "repo-lines-v1:sha256:7cdaf49b73d2231787b7796beb80b7feba35cbf0f22cd76f0ffcbc83fe9e723e:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2NkYWY0OWI3M2QyMjMxNzg3Yjc3OTZiZWI4MGI3ZmViYTM1Y2JmMGYyMmNkNzZmMGZmY2JjODNmZTllNzIzZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2NkYWY0OWI3M2QyMjMxNzg3Yjc3OTZiZWI4MGI3ZmViYTM1Y2JmMGYyMmNkNzZmMGZmY2JjODNmZTllNzIzZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjRhNTk2NDU0ZDBiMzYyNzZhMWI1MTVmNjg1NGQwOGY1NzMzNWNjN2I1ZmJjYzJjNTlmOTY2MmY4MWFlYjRjOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGY0MjQ5YWYzYjNjY2Y2YmNhZDJhMTIyY2Q2MjVmYTY0ZDI1MDEwOGEwYTA4NDMzMGEwMjM4ODFiMjgwYTgxYSJ9"
         },
         {
-          "resource": "repo://packages/web/src/load/load-artifacts.test.ts#L168-L184",
-          "version": "repo-lines-v1:sha256:0d233b190ce1750b65aedcba9b5574e9fb62ffa70d93b05233890f9e311afbfc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1NTA2MjZhZTcyYmZhNTU3ZTA3YTM1ZTdhZGMzZGMyZWVmMDkyZmVhYWI4NWEwNTE0YzRjYmMyNTYxZTJhN2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxNjQ4YmMyYWEyODlkNmM2YzcwZmQ2ZjIxMmY1OGQwMDU5YmYzMjUzMWU0YTQ1M2RlNzc2NjMyOTZmZDE1MzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMwMTQ2ZDZlZjE3YTczM2I3YzY1ZTBlZjc1YTYzMmU5OGJiMGQyY2IyYjNmODQ3ZjUyY2Q1ZjU3YzkyY2JiYWUifQ"
+          "resource": "repo://packages/web/src/load/load-artifacts.ts#L81-L111",
+          "version": "repo-lines-v1:sha256:2ffca331bf84a742accb8fad4f76da257c7a10193e908b5cdd4e580656978d9e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzOGNlYmVmMDk5MTY2ZDE4ZDhjYzE3NDY2OTJmMjhlZGEzMmZiMDgzOTRhN2I5YTIzOTA1YmVlZDcwZjQ2MDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk2ZGRmY2NkZjI3NGQ5NmM5YzJiNTA1NzY4NWU3MTlkZTFlYzAwOWVhZDY2NTcwYzY4NTc1OGJiMTZmMjJkYmIifQ"
         }
       ]
     },
     {
-      "id": "claim_d23c5967e02e4c399d89bc1da4653bc8",
-      "statement": "The Craft Recipe control persists the active recipe id in browser storage beside the threshold, falls back to the first recipe when the stored id is gone, and prints the recipe's craft cost once or no figure yet when uncostable.",
+      "id": "claim_590b17ded55a4f4893be0a2f7c89eb0c",
+      "statement": "A crafted row's chase column shows its first summands as Combination text in three cells while each would be at least the 177px budget wide, else two, measured once for the whole list.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/recipe/recipe-storage.ts#L1-L46",
-          "version": "repo-lines-v1:sha256:53ca527ccd2d405c51344b83594fdeb0ab4ae97da21acbee5c8ecdbf01067dc4:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/web/src/list/display-rows.ts#L150-L166",
+          "version": "repo-lines-v1:sha256:b17c2992dc0b2a56f5a4b615d3db5f988caacd08e8a2f44fd1f6f31188f7d7ad:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViYWI2MjI3NWM0NjFmMWE3YTMxNDYyOWQ4MTA4N2ExMDAzNDNkMDlmZjhjYjdiY2YyN2UyOTA3N2M1NmVmMjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA3OTY0ZjdkYmY2MGVlNjIyN2Y5YTAzNmE3OWM1NTg1Yzc3ZDFjNzNiYTI3MTBhYTAyNDMyZGQ1MGU0MzI4MWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlMmNlYmZhZTNlOGZlMTFjMzFlMjE2NDU4OTViNTg4M2I0ZjZlYWJjMmYxZjJhNTA5NjE0N2RlYWM3YzRiNTgifQ"
         },
         {
-          "resource": "repo://packages/web/src/recipe/recipe-view.ts#L1-L32",
-          "version": "repo-lines-v1:sha256:378d83c6ab3e988509f633b7922fe8ed581f5137e5d7f6f055ec275033fe43be:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4ZTcxN2ViZGE4ODdiNjEyMDJmZTIxMGFhYmM1Y2VhY2I3ZWU4ZDU1MzQ4YWIxNjFhYzBkZDgzOTliNDczOGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/web/src/list/ranked-list/chase-count.ts#L1-L54",
+          "version": "repo-lines-v1:sha256:d4fac2a12607ad72d82d95a31743f438e7f1718e0cc6a17f8a68d8cf088f84eb:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc5ZmMxNDgxNWY2NWQxMjNiNzE0ZjBjMDc3M2U1M2EwZTlhZDMyMTVlNDAyOWQ5NGZjOWFlNzJkOGQyMDU1NzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
     {
-      "id": "claim_258114f31b2b4998aa46547a296e8668",
-      "statement": "The sync report panel prints one verbatim line per cross-file failure computed at load as a sixth group under what is broken, and no group when there is no failure.",
+      "id": "claim_1ff5207ed1b0417fbe91ff4b0e1bdbae",
+      "statement": "Row names take the rarity-magic colour for a crafted Item Class and rarity-normal for a raw base.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/frame/trust-facts.ts#L1-L261",
-          "version": "repo-lines-v1:sha256:e577797c72bc2769d1f1e1bf8a0b315ae679a1a7de00553fb1265a5493e334f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3ZmVhNjFlZWUzYTRjYzNkMzIwMTEyYzllOGExNmI0MzZmM2M1YTU5ZTNmYWJlMmY0Mjc4YjM3MDJkZTNkYmNiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/web/src/list/RankedRow.tsx#L24-L25",
+          "version": "repo-lines-v1:sha256:05b94084e1c5ad843c90104049564a9248a8b564e3407008516732a45e14085a:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmJjYmZhOWZiMDM0YjA3OWJkZjZlMDEzM2RhODY5MjJlNDY0YjQyNDVmNjg4MWQ1ZDczNGRhMDA5ZDU1MTc5MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODBkNGQ5ZWRjOGVmY2QyZDM1ZGRiZGMzZDFkMzk3YThhMDMzYzI2NWJjNGUzN2U5YTIzNTdkYzg4MDA3YjhjYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjQzNTNlNjZkMjZmYTBjZGZjMTY0NGUwNjlhMDdlMWYxNjdjNjkwYTQ0MDczYmQ3OTE3NGFmZDMwY2MxOWNiNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODliNDk3Nzk4MzQxMGY0NTcyYzM3OTdlOTc4MjkxNTMxYzMzMGNjMDgxNDFkNzg1NjAwZTM1MTU3NWMzMjU3OSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_82ec9d1c05704a40b4daeb171342ea8b",
+      "statement": "A crafted expansion lists one line per entry in core's order, summands then other combinations including below-threshold priced entries, showing the top 8 with a toggle, then pruned entries with their reasons.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/list/ExpansionPanel.tsx#L60-L110",
+          "version": "repo-lines-v1:sha256:7f914d501e31d62602931212937ab49377a68184bc31c57bba257feaf6667d6e:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4N2EzMGY2NzBmNzQ1ZDY5NDJjOWM3ZmJiNmM1Njc1MDQ4NGYzMTBmNWM0NWFkNzU0Mjc2MGIzMDRmZmY1ZjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBhN2E0NjFhMDI5M2JjYzMwNjYyNmFjYWRmMGQxYTY5YjQzM2U1MWJlYzBlM2E2OGY0MGIwYzBlM2Y0YTAyZDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiZDUyNTY3NGU5ZjdhMmVlNTFiZDIzYzMxNjIyZDk0ZmM5ZGEyZDg1YTdhN2VhMzQxYTBjZTkwMDE2NzZiM2MifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/list/display-rows.ts#L150-L206",
+          "version": "repo-lines-v1:sha256:c49dafc1fe93440d47a870e1d682f7828e93b7c0998d25d513af6179b20e0201:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViYWI2MjI3NWM0NjFmMWE3YTMxNDYyOWQ4MTA4N2ExMDAzNDNkMDlmZjhjYjdiY2YyN2UyOTA3N2M1NmVmMjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA3OTY0ZjdkYmY2MGVlNjIyN2Y5YTAzNmE3OWM1NTg1Yzc3ZDFjNzNiYTI3MTBhYTAyNDMyZGQ1MGU0MzI4MWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1MGFjMGViYTdiYmIzMzgxMTA1OTY3YzhmNmM3ZmYwMjI1NzdkNTU1NGMzOTZlYmZmOTU5N2Q1MWQwZjIzMjcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8d9bbb3c33a74b23b68f5af3b93ea0c7",
+      "statement": "A hybrid affix prints its accepted tier and all its lines' short forms sorted and comma-joined, and falls back to verbatim catalogue texts unless every line has a short form.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/list/combination-text.ts#L36-L80",
+          "version": "repo-lines-v1:sha256:e0032ae0a7d8bb1407c973511c501066ecac454cfe83c6df3ee78e1cd745c1d3:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmNWIzNmI5MzNlZTE4Mzg0N2MzODA4YmU4OGFlMzlhYzUyZDNkZTk5NmQzNjA3MjZkZDYzZjI3NjhmODcyYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhMmMwMTBlOGQ0M2Q0NzFlNGVmM2JjZGMwOTRjYjc3ZTNlZGQ3NmJmM2VkMTQ5OWFkMzhmNzAwNGI1YzA3ZDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNmM2U2NDlmOWY3NTM3OGIyN2Q3MGViYTAwZGRiYmY3YjczOWI1MmFkMTdjMGM0NTkxNWY3ZTk0Y2YyNWNiN2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUzOGZkOTRjOTcxYmMyY2VlMTk2NGExOWIxOTgyZTUwNjlkNmRmODA1ZTNmNTQ4MzVlY2U1YzhhZWIyNmRiMzQifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-10-03T11:56:06.252Z"
+    "at": "2026-10-17T13:54:42.734Z"
   }
 }

@@ -1,32 +1,32 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:56a364ec4aba33a20d6079c8fb00d4fdb74787c1f852aeb9665a16f5f39cc130",
+  "pageVersion": "sha256:cc8a8558ea1c9cc9e987e07caca6bb13a3825858b8807463058957de44651817",
   "claims": [
     {
       "id": "claim_d1a342264ab8403a889d58264af5ba8a",
-      "statement": "The root Vitest config declares each packages/* project plus a root project running test/, boundary-check, deferred-issues, dev-stop, dts-specifiers and tracked-json skill script tests, all with test/setup.ts as a setup file and test/global-setup.ts as a global setup.",
+      "statement": "The root Vitest config declares each packages/* project, a data project for packages/*/src/**/*.data.test files, and a root project running test/, the tools/ directory tests and the tracked-json skill script tests, with test/setup.ts as a setup file and test/global-setup.ts as a global setup; pnpm test excludes the data project and pnpm test:data runs it alone.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/vitest.config.ts",
-          "version": "repo-file-v1:sha256:52d2a107a83f26d9efd3292ebe16b7669f6293ea163f98c652cfdb76fc02f11c"
+          "resource": "repo://package.json#L19-L20",
+          "version": "repo-lines-v1:sha256:ea7ff18e44c02eb77eec2404dd5ab20420eca4689d887a8a9045b6576d6d1862:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjUzNGIzNDJjNWFmNGVhYjViZWIyMWI3YjA2ODRmMDYyMmEwMDUzOWRjNGVlZTUyZjUyNWY1ZDZjMmM3NWQ5ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGUwM2U2OTdiZDIyMjBiNzZiMmM1MWJmYmU1MmVlNmFiOTRiYjczNGY0OTFiYzhmNWY1NzBmNTIzZGY1ZGQ2ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2JhMmI4MWQ2MmY3MzYxNThlNTI4NDBhNGZiY2Y4ODBhNmM3OWU5MmFiNTFjYzVkZmExMTIwZTU1MGRlMzYwMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDhiMDY2ZDVhOWVkNWIyMGUxMmUxZDU5ZDM1NzUxNWQwZjIwMjA4ZmIzZDk5OTRmOTFkNjI2Y2JkMmFkMmYzMCJ9"
         },
         {
-          "resource": "repo://vitest.config.ts#L1-L30",
-          "version": "repo-lines-v1:sha256:de7540a8ac730ac6d17ec7dea65742a3b99c5d1b57c3fb51e95de88bb216c003:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0YTE5MjExYzNhMDNiOTg3OTQ3ZjI0YjY5YmRjYzQ2OWY0Nzk0ODI5YTVmNWE0YTE4OGVhMmUxODE2NTRiOWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://vitest.config.ts",
+          "version": "repo-file-v1:sha256:8e82629bae78264d9ff3727a4835cd992bac154c369e93ef4ac045e6c7c3c85c"
         }
       ]
     },
     {
       "id": "claim_d738d659df9f4889861593748607a891",
-      "statement": "The web project runs under jsdom with the shared test/setup.ts followed by src/test-setup.ts, which shims matchMedia, ResizeObserver and IS_REACT_ACT_ENVIRONMENT.",
+      "statement": "The web project runs under jsdom with the shared test/setup.ts followed by src/test-setup.ts, which shims matchMedia, ResizeObserver and IS_REACT_ACT_ENVIRONMENT, and excludes *.data.test files.",
       "evidence": [
         {
           "resource": "repo://packages/web/src/test-setup.ts",
-          "version": "repo-file-v1:sha256:2d9b3befade9b3fefbc1b7039577210e8db0cb2cc2508066188f5c7f81abff2b"
+          "version": "repo-file-v1:sha256:65bf94287c9336115e51eeb2ce512caec9c576bbf06d341052bfb3cbcc7580a4"
         },
         {
-          "resource": "repo://packages/web/vite.config.ts#L33-L38",
-          "version": "repo-lines-v1:sha256:105b51a601e0cc93f59dac67f1eaa3a214f53cc137fb6596f7c305f1b9cd3451:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTkzNmRmN2E1YTNhYWYxODBjZmZkMWQ2NWM2NDZlZjZhZWEzNTJjYzI3Nzc0Njg2MTk5Y2Q4ZmIzZTg5OWM3YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzEyZmY1MTA3ZDYxZjRlZDAzYTY2MjczZDNlZGRjZWI3YjVlN2MwMWRjYzhiMTA3M2I0YThkZGQ0MzE3NjQ3OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiJ9"
+          "resource": "repo://packages/web/vite.config.ts#L24-L31",
+          "version": "repo-lines-v1:sha256:96974e6c6a9e04fc4df188ff4b2e43d522c5c6bdd4aeb4a399aacd32fbe54ac1:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTkzNmRmN2E1YTNhYWYxODBjZmZkMWQ2NWM2NDZlZjZhZWEzNTJjYzI3Nzc0Njg2MTk5Y2Q4ZmIzZTg5OWM3YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzEyZmY1MTA3ZDYxZjRlZDAzYTY2MjczZDNlZGRjZWI3YjVlN2MwMWRjYzhiMTA3M2I0YThkZGQ0MzE3NjQ3OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         }
       ]
     },
@@ -35,8 +35,8 @@
       "statement": "The shared setup installs one MSW server per worker whose onUnhandledRequest callback lets file: and loopback URLs pass, and otherwise records the request with the issuing test's identity, writes it to disk if no test file is open, and throws to block it.",
       "evidence": [
         {
-          "resource": "repo://test/setup.ts#L86-L147",
-          "version": "repo-lines-v1:sha256:97d260df52e36d6604d6475f291bc46a4a5da874b3a70ef44a5c197ed2ca18fb:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2ZTNjYjMyZmY5YmIyMjY5NDA5YmFjZjQ2MGEyOWI3MzZlYzAyMjdmNWQxMDBiNTA2YmIxYWRkYTgwMzg4MDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ4OWZhYTBlYjgwMTdmNmM1YjZkOTE0ODkzZDQ2ZGM2NzA3NjU5NjkyMzA3YzIzMWIxODIyMWI0ZGZlNzk4ZjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBmZmIyNTk2N2NhOTRlMzAxNzdjZDEwY2I1NTk5NzRiZjQ0NWUzMTViNDcyYmE0ZjFjZmUxNzE3NDMxMGViNjEifQ"
+          "resource": "repo://test/setup.ts#L25-L107",
+          "version": "repo-lines-v1:sha256:ab53c30cc79c7e4e8caaf06560383db20dd81ac486a2e29def3adf52c2090430:eyJzZWxlY3RlZExpbmVDb3VudCI6ODMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxNjk0NzAxYzU1MGFiNDA1ZjcxYTg2NjE4NWIyNjdiMTYwNTU0YWZhYjE1MDY3Y2RiMDgyNmFiMzk2OTQyMmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg2YTkwMTkwNWY1N2M5ZDc2OTg4N2Y0YjYzMGFjZGJlMDg5ODI1ZDBjZDk5ZDkxMzZhNTI1NjljZjMyNzA3NGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1ZWYyNmUwMzY3NWViMDljZmFkYWYwOGE1MTIwYjRiNzkzODNmOTM2ZTYwMDY5ODI2YTdkOWQ5NGZlODExMTkifQ"
         }
       ]
     },
@@ -45,8 +45,8 @@
       "statement": "The running test's identity is stored with AsyncLocalStorage.enterWith in beforeEach; afterEach fails a test on its own escaped requests, and afterAll fails the file on any remaining ones, naming each issuer; the server is never closed.",
       "evidence": [
         {
-          "resource": "repo://test/setup.ts#L149-L178",
-          "version": "repo-lines-v1:sha256:1ed66a1a8e90aa1ad6665b5b08f2b47f2b9958a2fb141212239b9856fac3ff83:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1N2NjMTBiN2UxZGI0Zjg3ZTQyYmIyMTU0M2RlNjJmZGQxMWVhMjllNGI0ODRmNmU2MTg5Y2IwNTQ4YTQxMjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyYjRjYjVkZTlkMGZmMDk0NjA4ZmNlYzQwNTE0ZDBlZTIwMzE1ZDM3M2VlZDVhYjRiNTVmYTFjMGY4NjU5ZDQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ3YWJiNWI3ZWQ3NWRmMTEwNzJmNDI2ZGEyNzAyN2M5ZjcwOGI1NGQ1OTE5MTM2OGRjMmE3MzdhZjc1YmE2ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxZWJmNjNhNzg0YzNkODRkOGM2ZjM1Njg5NjEwMzY1ZjE1NzFjNWY0YmU2MWE3NmU3ZTFiMTBhZjViYzgwMmYifQ"
+          "resource": "repo://test/setup.ts#L108-L189",
+          "version": "repo-lines-v1:sha256:89439d97fc51d614d2b10a807edc1354d22adf739bc8e5f981da879abb58e6a9:eyJzZWxlY3RlZExpbmVDb3VudCI6ODIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1N2NjMTBiN2UxZGI0Zjg3ZTQyYmIyMTU0M2RlNjJmZGQxMWVhMjllNGI0ODRmNmU2MTg5Y2IwNTQ4YTQxMjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3Mjg2ZDQ0ZmI3MWJhNWM2NDc1YWU2MzU0YmVkOTMwMjJhYzE4NDNmOWJkMTllNThiODk5ZGM0ZTJkZDljMzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ3YWJiNWI3ZWQ3NWRmMTEwNzJmNDI2ZGEyNzAyN2M5ZjcwOGI1NGQ1OTE5MTM2OGRjMmE3MzdhZjc1YmE2ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -55,20 +55,20 @@
       "statement": "Guard tests run child Vitest processes over fixture directories to prove the real hooks attribute requests correctly under concurrency, in hooks outside tests, and in reused workers.",
       "evidence": [
         {
-          "resource": "repo://test/guard-concurrent.test.ts#L1-L25",
-          "version": "repo-lines-v1:sha256:5a6e382b2bc51a49475e383803817d920eb44bbb98922247d23c044954c37a37:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5MDU4MzRhMGYxNTdhNDJjNDUzYmZmNWZkNWJkNDE5YTE1YjhiMWViYmExYjlmMmI2M2FiNzkzYTI0MDM3YmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE0ODU5YjRiZjc3MTZiZWE1YjNiODA1YjMwNzZmOTVjMDBlM2ZkYTI2ZTBlMjM3ZTIyMjk2ZGVkYTUyYzQ1ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAxZGJlYTM1MDJiNDMyZTA1ZGNhZWNjNzgwMzQwODJmYmJkZjBkZTA5M2RkMjc1YTlkOGFhOTMxOWNkM2UzM2IifQ"
+          "resource": "repo://test/guard-concurrent.test.ts",
+          "version": "repo-file-v1:sha256:23d06f35e55c1607fefcdb0b13bda762fe403502e58d439172473d4dc05d922c"
         },
         {
-          "resource": "repo://test/guard-hooks.test.ts#L1-L20",
-          "version": "repo-lines-v1:sha256:8bdeef8aedf6fd8e37608eea273a4a4c81493f4fc0b96bfd395af13f93eb990b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5MDU4MzRhMGYxNTdhNDJjNDUzYmZmNWZkNWJkNDE5YTE1YjhiMWViYmExYjlmMmI2M2FiNzkzYTI0MDM3YmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiY2I5NzliMTE5ZDJlNGUzMDA1NTBmNDNhZjRhOWRhMWJmOGEyNmUzNTU0NmE5ODgzMTIyOGRlOTg0NDk4ZjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlNzg2ZDM2YzQ4NjNhMTk1MzhhNDVjN2Q5YjBiODc5YTFhZDQyMGZjMzc4YWNlMjgxZjYwMjAyMzhmMDAwZjgifQ"
+          "resource": "repo://test/guard-hooks.test.ts",
+          "version": "repo-file-v1:sha256:e508231f4c5752daca94ac1771d7876efbe1beae530eeedc5420bd10959f0652"
         },
         {
-          "resource": "repo://test/guard-linger.test.ts#L1-L20",
-          "version": "repo-lines-v1:sha256:2a94bfb257596352dbbd6081327e5156617ea90757a0bd1633d8b596c782bf15:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5MDU4MzRhMGYxNTdhNDJjNDUzYmZmNWZkNWJkNDE5YTE1YjhiMWViYmExYjlmMmI2M2FiNzkzYTI0MDM3YmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3ZTVhYTZjNThhODMzMDhjYjAzZGU0ZjAwYTAzYTY3ODM5NmE3NmUzN2ZmY2Y1MjE3ZWI5OGRlNjViMmU2M2YifQ"
+          "resource": "repo://test/guard-linger.test.ts",
+          "version": "repo-file-v1:sha256:9296965df57a4e9bfda8efff0bfec6fbbb1d18e606f3dd1c7dbacc9f60db1a6c"
         },
         {
-          "resource": "repo://test/guard-reuse.test.ts#L1-L20",
-          "version": "repo-lines-v1:sha256:10369ce9ad5c66180fb81b537a59acd854ec7f1cb7bc1de1769f6afa311b6d4c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5MDU4MzRhMGYxNTdhNDJjNDUzYmZmNWZkNWJkNDE5YTE1YjhiMWViYmExYjlmMmI2M2FiNzkzYTI0MDM3YmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4YzZiMTZlNDY3YTg2NDk2NDY2NWMwMzJiNWY5NzE5MzY5MDMxZDZiODk1NzYyOGFiNWVmM2RhYzVmMDg5MGUifQ"
+          "resource": "repo://test/guard-reuse.test.ts",
+          "version": "repo-file-v1:sha256:66aeee17e5b59164a93f96e99e8c9074741d4cf629a17b76f66968bb0bb56af6"
         }
       ]
     },
@@ -77,8 +77,8 @@
       "statement": "The fake HttpPort answers requests keyed by method and URL, records each request, and rejects an unfixtured request rather than returning a default.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/src/ports/fakes/http.ts#L1-L50",
-          "version": "repo-lines-v1:sha256:3b84d4ae5ccea9f70f3c428da6d896ac2e016948bdb84c76c61bcdbb58745fd5:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkNDZlZjUxNmZhZDkyZmQ0ZGJlMDIyMzA1ZTBmYzJmZDc3NWJmMzUyODUyMWRmYjQzMDg2YzQxYWQxNzc4YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/contracts/src/ports/fakes/http.ts#L1-L38",
+          "version": "repo-lines-v1:sha256:0c5d7d86b4831893cb51f772d252501cdbff02eba6f9bc6d82f20d1e2363fbb9:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkNDZlZjUxNmZhZDkyZmQ0ZGJlMDIyMzA1ZTBmYzJmZDc3NWJmMzUyODUyMWRmYjQzMDg2YzQxYWQxNzc4YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -87,18 +87,18 @@
       "statement": "The pricing fixture port serves recorded trade-search, trade-fetch and trade-data-leagues fixtures by name derived from the request and rejects any unrecorded request naming the missing fixture.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/pricing/fixture-port.ts#L1-L40",
-          "version": "repo-lines-v1:sha256:dfffbb6966eb67e0718b5e2af7a34d48ed08e5902a4296deb3a8b763d926ce67:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVmMmU2Y2UyNGQ3Y2Y5NDk4ODRlNzA1MmI4ZTk2YjM4OWZhNWNhNTA5YjJhM2JlZjk2MjY0NDljMjQ3YmVkM2UifQ"
+          "resource": "repo://packages/sync/src/pricing/fixture-port.ts",
+          "version": "repo-file-v1:sha256:d1df4a20d516cc8a32c499cf1e58bcf966400dea800600bd2d27649864c9a708"
         }
       ]
     },
     {
       "id": "claim_a55121ec959545d2974a255b2de81be6",
-      "statement": "Fixtures are real trade-API responses recorded only by a human running pnpm fixtures:record, never hand-written, with personal identifiers redacted at record time.",
+      "statement": "Trade fixtures are real trade-API responses recorded only by a human running pnpm fixtures:record, never hand-written, with personal identifiers redacted at record time; the poe2scout currencies fixture is captured by hand once.",
       "evidence": [
         {
           "resource": "repo://fixtures/README.md",
-          "version": "repo-file-v1:sha256:f62dbb153b82b26218eabbd661e12e6d555de7b523053ef4931c3102b77658a5"
+          "version": "repo-file-v1:sha256:ead9229cebdb119e03109f641bbcaf87de6909b43db6b4b96df8a7b9133741c9"
         }
       ]
     },
@@ -107,8 +107,8 @@
       "statement": "The web artifact server registers MSW handlers with minimal valid bodies for all seven artifacts on the shared setup server, plus a trap for the never-fetched catalogue/static.json, and logs each request's URL and cache mode.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/test-support/artifact-server.ts#L1-L128",
-          "version": "repo-lines-v1:sha256:41e3073525133772788088a49f5a9e5e3df044aae37e28c2a26c076fb87f5fa6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJkMTM3NmMyNTgxNDU3OGI0MjEyOWRhNGY4NDZlMWFiYjQyZDIwYjZkMzk5ZTQ3NDMxN2MzMzEyNWY3MWEzMGY4In0"
+          "resource": "repo://packages/web/src/test-support/artifact-server.ts#L1-L149",
+          "version": "repo-lines-v1:sha256:1e4ade34a64aa823a2f19cd0b8f4cda6d70d000f9660f20a185152811a397ad0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQ5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0YmY1OTE0OTI1MmU0YzMzZWIzMDY3MWJkYjFmMzA2ZDc1OTYxOTUzNmNmNDA4ZjNmMDlhNmIyZmEwMjdjMDk5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
@@ -117,46 +117,46 @@
       "statement": "A catalogue-refresh test asserts that only shell-fetch.test.ts names createFetchHttpPort.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/catalogue-refresh.test.ts#L295-L320",
-          "version": "repo-lines-v1:sha256:0c9bf648c5217406f7d1ee3b5b78b72d25608ab52a5e4f52524d5b80ebff32aa:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxOTU2M2ZhMGRiMGU5ODQzYjY3ZjNlYjE0NjIwZmYyMTBhYWZkNThjZWFiNTg1Y2IyZWYzMmJjYzYyM2M2ZGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiNjgwZTFhNDIyZGRkMGI4ODQ2NDAwM2UxNzAyNDc1YjE3NjM4MDAyNzA4NThlZWUyNDEzZjRhY2UzZmQ1YTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMwODAwN2NjNGY3N2Q2ZTA1MTg3YTY1ODMwYzBiNmE1NjJjZjY0MDc5NWFhNjYwY2RlNGRkMGRiMjMxZjczZDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1ZDVhZjcxNmFkMDg5YjZjZGE5ZWE1ZDExNTEzMDlmZTk3ODJjNjE5ZTI2NDhmYjY0MzY0MDE0ZDllNDBiNzEifQ"
+          "resource": "repo://packages/sync/src/catalogue-refresh.test.ts#L125-L150",
+          "version": "repo-lines-v1:sha256:03a2cb7b83cca548452f0ca8531b911519aad096e772a08b01456a6e14ecab1c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxOTU2M2ZhMGRiMGU5ODQzYjY3ZjNlYjE0NjIwZmYyMTBhYWZkNThjZWFiNTg1Y2IyZWYzMmJjYzYyM2M2ZGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4ODQ2MmQ1MTg5ZWFkYmE5MzI5ZmU2YjFjYTRhYzJlMTBmOGZjZGYyNTcyYzExODJlNzZiYTA5ZTY1NTU2ZmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxODZhN2RlYmU4ODkzOWYwYmFjODA5ZGI4ZjRjMjEyZmJlYjgzNGYyMjljZTk5YjA4MDc0ZmVmMmI0YjdhY2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzNDI2OTVlM2EwNzc2OWQ3N2ZkMDk1MjY5ZjU3NzYxOWU1ZWQ4Mzg1MGVhMmJhMTVmMGQ0NWJiMDRhYjRkZGEifQ"
         }
       ]
     },
     {
       "id": "claim_e5b32b69dc03468fa2522e8b8178863f",
-      "statement": "fixtures/tracked.json is the one hand-edited file in fixtures/: the recorder's fixed input workload, one entry per distinct search shape, deliberately separate from data/tracked.json; price-entry.fixtures.test.ts asserts every non-pruned workload entry has a recorded search.",
+      "statement": "fixtures/tracked.json is the recorder's hand-edited fixed input workload, one entry per distinct search shape, deliberately separate from data/tracked.json; price-entry.fixtures.test.ts asserts every non-pruned workload entry has a recorded search.",
       "evidence": [
         {
-          "resource": "repo://fixtures/README.md#L36-L53",
-          "version": "repo-lines-v1:sha256:817a2696989ab7eb9662ac5e4704501cba231f69d49d883d632c7470414ae10a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhOWE5NjA2ZWNmMzViYzM5NzlmNTliMDUwMTUyZjdjYjc2NjI2ZmM5NjljYjUxMWU3OTRjODZkYjkxN2M4NjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyNzUxMjcyNmM0MDNiYzc4Yzc1MzVjZjEzNTI2ZDU2ZjY3ZTg0YmZkYjI1YzQzMGYwZmZlNjdmY2VlMjI0NzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5N2UyZDQ1ZjIyNTQzYzdiZGI4M2MwZDhmMTUzNTExYmRjYThmMjk1YzFmOGZiM2RhYjQ2NzUwYzJmNzBmMGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://fixtures/README.md#L52-L63",
+          "version": "repo-lines-v1:sha256:f0dbe287dafaf16feabae5b0011b625b14845e6a6517feb1765800cff727c837:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0ZmI4NWI3NmRjMTI2Njk2NTM3OWFiNDUzYjFmYzM1NDE4NWI4OWVjNzcyODVmYzI0OTFkNjQzMmRmN2I0ZWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyNzUxMjcyNmM0MDNiYzc4Yzc1MzVjZjEzNTI2ZDU2ZjY3ZTg0YmZkYjI1YzQzMGYwZmZlNjdmY2VlMjI0NzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhlMTY5NzYyZGZlY2E4ZDNmMGZkNDA1ZTYxODYyNjk3MTEzZTQ2MWVhNDMyZTdhYmM4YjE0YWYwM2FiNDk2NDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/sync/src/pricing/fixture-names.ts#L57-L74",
-          "version": "repo-lines-v1:sha256:d4531296918ecdec38f9f80ccb1c32f2d3d19aa754481593339e98e2e3cf6003:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRlNWNiMzc4MjUwNTk2ZTIzNGYxYTg4ZTYxMGJhNmVmYjlkZDM4ZjE0YjA0NWM5NDA4YmE3ZDk0ZTA1OThmOTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/sync/src/pricing/fixture-names.ts",
+          "version": "repo-file-v1:sha256:550294a97b17b9d0f4b481228f0d9827ece1ff5e016d27418b6ac1e563858ebc"
         },
         {
-          "resource": "repo://packages/sync/src/pricing/price-entry.fixtures.test.ts#L50-L82",
-          "version": "repo-lines-v1:sha256:f6b2ba37e2118db843e3782cb8930db38867e6aa46e7c0f467960340d4c48381:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwZGZmZWY5Zjg5ZTA5MDk0MDJmNTI1NDI5NjFjZmZkNDhmNGQ2Y2IwNThmMWYwZmE1MGZlZjRiMGRmMGRlOWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRmNjc3ZGY4ZDU2OTFmZmE1OWI5MzA3ODU4ZDEwN2FmNzRiNzYyMmUwYzJkYTFlZTFjMDhjYWZlZWNiOGYwYTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZmZjRiNWYxZjdhMzE5NzFkZTU5ZDUyYTA0M2ZjZjQ0Zjk1ODljNDkxZDNjZGExZDFjY2YzOTQ3MGIzZGM2MWUifQ"
+          "resource": "repo://packages/sync/src/pricing/price-entry.fixtures.test.ts",
+          "version": "repo-file-v1:sha256:28cde126454fc7c77b72bfebe5328fa25bb0c1451a90abea1726bd1bf33e2189"
         }
       ]
     },
     {
       "id": "claim_4fd01a1af0b24a5b9ea328d5362edbd2",
-      "statement": "The shared web DOM helpers provide a fixed test clock, a jsdom rgb() colour spelling, a single mounted React root per test, and mountList, which ranks a raw workload through core with no weights file and mounts RankedList.",
+      "statement": "The shared web DOM helpers provide a fixed test clock, a jsdom rgb() colour spelling, a single mounted React root per test, and mountList, which ranks a raw workload through core and mounts RankedList inside the PageProvider.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/test-support/dom.tsx#L1-L103",
-          "version": "repo-lines-v1:sha256:be59857c7590f810d81463801eb41c10273ff9d6dc8866e9faa7f0431a52a210:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/web/src/test-support/dom.tsx#L15-L131",
+          "version": "repo-lines-v1:sha256:b83dbabc169ad60e3120556b43b93c5a4fdf7a622dfc3e8c0520ee56ebe8c003:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0NTc3NTgyYTQxOTE5MDFlMmU1YTc4ODE1MWEyMzdhNDExODBiMWQ0MjRkMzI3YWJmZGMyMGQ5OThhMjlmODBkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJkMzQ1MWNmNjRhMmY5M2ZhN2JjNTAyYmEzOTk0YjJjYjY2NTU0MDY2NDRjZTU4N2FkMmNjZmE1ODhhZjA0MmY5IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI0YjE4ZDkxNjI0Y2E0NjA5MGNhNGU3YTY2M2Y3OGU1YWNmNzM2NjIxODcwNDQ1ODM3MzQ3OGMxMGFiOWEwZGUyIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI2YWM0MDgxN2U0YjA4NGE1NjJlYWU0YmE3ZjU1ZmFkNDZmNjBjNDZkNDUwMWQ3NzA5M2JkMzg3YzM2Y2YzMzE4In0"
         }
       ]
     },
     {
       "id": "claim_fe53d8c29d344012a82ec5ae8c34d673",
-      "statement": "test/hand-listed-coverage.test.ts asks TypeScript, Vitest and ESLint whether tsconfig.tools.json, the root Vitest project and eslint.config.mjs still cover every file of each hand-listed tools/ and tracked-json skill target, and reruns each check against a config with one entry removed to prove it is not vacuous.",
+      "statement": "test/hand-listed-coverage.test.ts asks TypeScript, Vitest and ESLint whether tsconfig.tools.json, the root Vitest project and eslint.config.mjs still cover every file of each hand-listed tools/ and tracked-json skill target, reruns each check against a config with one entry removed to prove it is not vacuous, and fails on a config entry with no TARGETS row.",
       "evidence": [
         {
-          "resource": "repo://test/hand-listed-coverage.test.ts#L1-L100",
-          "version": "repo-lines-v1:sha256:54c3320c2d97b8799d41defd7118202dfac8e76e2d18d1cc3cd9e750cb5f79c1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1M2ZjY2FiMGVhYTU2ZDljYWZjNGUzNGY4YmVkMDRjMGJmMGExMThjY2U4MTg3ZTgwZGVjNTQ0MDJmMDc2YzFhIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJhYTFkMWE2MzM5MDIyOWM3OTgzNDdlODNhMDQwNTQ0MWM5NDAwMDM1Mjg0YWQxNjhjMWJmNmNkZjFkNzBhMzcwIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0YzkzOWU0YTEwZTk0MTFlNTlmMGQzNmUxNzdiZGNkODIxMzBhYTAwYmY1MWIzYTNiZDY2NGZjNTQ3MjI4NTE3In0"
+          "resource": "repo://test/hand-listed-coverage.test.ts#L1-L225",
+          "version": "repo-lines-v1:sha256:46c582d1f1fca32f649b0df00a2b562e31412ab0550b925622addf513c60663d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjI1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1M2ZjY2FiMGVhYTU2ZDljYWZjNGUzNGY4YmVkMDRjMGJmMGExMThjY2U4MTg3ZTgwZGVjNTQ0MDJmMDc2YzFhIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiMzc0MWU3MDkyOTQ5ZTM2ODY3YWZjOTRlNWFhOGE1ZDRlZTIxMDMwNzQwZmExYzQ3NjI0N2Y3N2E3ZTFhYmQ4In0"
         }
       ]
     },
@@ -165,8 +165,8 @@
       "statement": "test/deferred-ledger.test.ts fails pnpm test when the deferred-work ledger drops a source_spec bullet from parsing, has a duplicate entry id, or carries old sweep run-state markers.",
       "evidence": [
         {
-          "resource": "repo://test/deferred-ledger.test.ts",
-          "version": "repo-file-v1:sha256:523ddf8aa87e3ff6239b84c18dce9e058ec4dee80055da2588f1fb9265884033"
+          "resource": "repo://test/deferred-ledger.test.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:e07e5a154f0b273cfb76430af14c6345abb84054930f3eda7db9fe59c8a31e0e:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0YWRjNmU5Y2ExNjhjYTVkMmFhMGVjM2IwMjdiNTk3ZGY1NGI1ZDEzN2Y5Zjc4ODU0MzkwMGI4NTZiNmUyODYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -175,18 +175,42 @@
       "statement": "A request blocked after a worker's last test file closed is appended to a record directory provided by test/global-setup.ts, whose onClose check fails the whole run after every worker has exited and names each URL.",
       "evidence": [
         {
-          "resource": "repo://test/global-setup.ts#L22-L58",
-          "version": "repo-lines-v1:sha256:c3c96cabf663a91c689a32261d6ae9f5d9c0bf13a1e0c6ff6555bbf7e0d07e27:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkMWU2ODk5Mjk1NTI5MTYyZDcwODkxZWE4MzcwNmY2ODVmZGNkNDBkMjM0MGM1ZDQ4ZjdmNDEzOTU2OGRiYzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIwNWIzN2NlMjIwNjFmZDNmN2FmMDczN2I0NGI3NTNiYWYyMGE3MjAzMWNlYjM3MTQ0NTNmYTk4YTI5OTkxYzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+          "resource": "repo://test/global-setup.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:1b47130eeaa9642cca2e93265537d211758979d6726f8b8a075034e5e6632012:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmNjhmZmYyODk1MmI5YzIyZmY2MWRiMGMzYjU4ZmJiYjllMDYxZTZlMzI4MjE1OWE0YzZkZWNmMzI4MzY3MTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyYWMxOWUxZDlkNTUyN2YzM2QwOGJmZDM2NWYyZWM3MzU1YzU5YjFjYmM0ZDNkOGE4N2FmNjVhMzg2MTNiZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFkOWQxZjkzNjE4YTcyYWVkMDk0Nzc2OGE0YjAxOWU3YTVlMzUyY2NmNTU5YWU3M2VjZjE2ZjI3YTliMTA3YmMifQ"
         },
         {
-          "resource": "repo://test/setup.ts#L94-L113",
-          "version": "repo-lines-v1:sha256:73fe9749fc2b42544691b11622a41e88d613d8ec337b52a500e44c7b8e02dbdb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjYjQwYzM2YTRhZTRjMTA2OWNhODk1MzhiZGUyNzk5ZGM2YTlkMGMzMGY4ZDk2NDY3MGVlNzI3YzQxYThlNzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzOWI0NDEzNWUyZTRhMzFkNzIyYTkwNGY3YjdlMzVmNTYxY2NmYThkMjgyZTA4MGVlMWMxYjZlNmQ3MTgzNDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQzODU0NzRiNzM2ODVmOGVmNzYzZmMyMDFiYjhmYmQ2MGQ0NzgzMjJhNDY5OGNjNmJjNDBhZjcwZTQ4ZDUyYWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZmMWI4YzE1NTJiMDg0Yzc1YmRmODc4ZjcyMmRlM2Q2ODJhMjkxY2Y3YTg0MDM3YzQzNGJjNjRjYTIxNzY3MjIifQ"
+          "resource": "repo://test/setup.ts#L60-L75",
+          "version": "repo-lines-v1:sha256:9d3b035acd6a834e465d8a753a33b1541828f408aec22df8913c5388dbfe0829:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkNDg0ZTQ0Mzk3MmM0ZDllNDFmM2EzZDBiZDUwNzg3NDJmODExYWE4NWJkNzdmNzJlZDg1ODQyYzI2MTY0OTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRjYTdmODAzNzBjOThkZGFkOGM2YmMwNGNjNGQzNDRlMzc2NDcwNTY4N2ViMDhmOGMxNjc3OTFmNGExNWYwMjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5ZTY5ZDk0ZjQ1ZDMzYjYzZjA3ZDhkM2JhYTQ2YjMzOGUxZjU4NTJmNjg2MjdkY2NiODBiMDZlOGM5ZDVhNWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b0630d8c3eb84b118faea7f6fac26d49",
+      "statement": "Data-dependent tests in pnpm test read a frozen snapshot of data/ under test/fixtures/frozen-data that sync never regenerates and tests never write, while invariants of the live data/ run only in the data project.",
+      "evidence": [
+        {
+          "resource": "repo://test/fixtures/frozen-data/README.md",
+          "version": "repo-file-v1:sha256:3241a11134520a4fca520b4f49dc432263c85c16393e4b4b651649012b5a815c"
+        },
+        {
+          "resource": "repo://vitest.config.ts",
+          "version": "repo-file-v1:sha256:8e82629bae78264d9ff3727a4835cd992bac154c369e93ef4ac045e6c7c3c85c"
+        }
+      ]
+    },
+    {
+      "id": "claim_47efbf0dd42142648a1f1ccd8c11fbc1",
+      "statement": "test/directory-structure.test.ts caps source directories at 25 entries with a shrinking allowance for two directories and checks catch-all names and barrels.",
+      "evidence": [
+        {
+          "resource": "repo://test/directory-structure.test.ts#L1-L15",
+          "version": "repo-lines-v1:sha256:43cd55f960eb0c2a12f5254cf74b6bcd022454be34f776f796d1e1ccb0999401:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZjY3NzA0Njc3OGEyMmVjMjM5NzlhYTY4Mzc2OWQwMGIyNTUzM2M4MWM5OTFlMDg0ZDY2NjM1MzliZDI2ODUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVkMDIzNjdhNTYzZWM4ZGNiZjZiYWFmNWM4MjMzZjk1YzNlYzM1NmY1ODZjNjU3NjM1MTRmYjNhZjI0NGRmNGIifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-10-03T11:56:06.252Z"
+    "at": "2026-10-17T13:54:42.734Z"
   }
 }

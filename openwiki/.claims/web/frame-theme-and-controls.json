@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:2f82fe2bd436a3e27172571203d10c38f8c50e16633e33f3766a7ad42d02c4c7",
+  "claims": [
+    {
+      "id": "claim_c24b86da3b0d4419b2d44bcb33b9982e",
+      "statement": "App reads the clock once when the artifact set resolves, runs crossFileChecks once, and ranks with core's rank over all recipes, so a recipe switch re-filters with forRecipe while a threshold change re-ranks.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/App.tsx#L207-L232",
+          "version": "repo-lines-v1:sha256:ce4c917318d6b1b17fc058f3efb9b2e44969c039df7406c2bd7ade83218b98e5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxN2NjNDI3YmRlMTU2ZGI2ZTg5ODlmMzJiYzA2NjAwMGE2OWQ2M2EyOTQwNGVmNGYwNTczYWQ3OGJhZjM4YjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkOGRmYzdiOTdjYTk1NWIzMzRiNjYxYTVhZjNkYTExNGVmMjJmNDNjZDllYjU4MDI2YWZlOTE3ZmQ2YTI3YmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzM2VkZDEyNTVjZjdiNGEyOWRiZmVmODQ2ODgxMjNhMjg0MDMyNTZjZjdiMDQwYzg1NTdjZDVhNjgyNDI2NDkifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/App.tsx#L81-L159",
+          "version": "repo-lines-v1:sha256:3ac3cf3a98ce6cfa9b5d109ad32dc6b0424d71e840c5a20aded7035b539f9e58:eyJzZWxlY3RlZExpbmVDb3VudCI6NzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyOGY5ZWFjMmUxZWMzZWJjMmY2YTgyNjM3ZDAxYzI5ZGI1ZjdhNmM3MWFiMjQ4NGU2MWFiMTA3YzQ1MGE3MWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhZDNmYTdlNjY2MjZiMGViYzM2OTY4ZDU2ZTI0ODFjNWYyNDY3MjY3ZWY5NDMzMjYzNTNkMzVlMGU5YjU2MTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2adb4160d6b04ec78bd432c9e859022b",
+      "statement": "The app renders pending, ready, refused and failed views; pending shows only the threshold control and skeleton rows, and failed offers a retry that resets to pending and reloads.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/App.tsx#L161-L205",
+          "version": "repo-lines-v1:sha256:71dd05a60103a1a5d6538d2558e060fc98f5e9bb5f6ef9a276435162ab569ee8:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgyNmI4MDUzY2YwMjU4MWIzZjg2MTFhZGQwM2NlOGNkZjE2NTY2NjA0NTM1MjE4ZjBjMGVkMzkxZTA1NmYzMzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVmZDk1MDU0Y2JkYzg1YWZkZWUzZGU5M2MwNGFiNTVlYTUzYjFhMmM4ZGEzOTNiYWEzODliOTM4M2JkMmI5ZjcifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/App.tsx#L28-L115",
+          "version": "repo-lines-v1:sha256:6a894cae50ef986cf4a4df63c6eb3a63a7749d2c9d2df887e509e7757eaeae8c:eyJzZWxlY3RlZExpbmVDb3VudCI6ODgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE2ZTE5YWFkNjlmNDE5YTNmMDMyOTFiMWUxZDNkMzk0ZGIyZmJmMmZjNTFmZWFhODJmZDAwMDkwNWE2YThmMTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwN2Y4NDIzNzUyYjQ5ZjM0ZmM1Y2MwYmJlMmM5YzZhMTc3NjE3NTZhNDU5NmZhMDU1MDhmOTg0YmI4ODI1N2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzYjNkMjljNTk3OWNiYjg4ODNlMjJmNmVhMGVlMGUxOTA0ZDQ5YTM4ODc0YWI1MjdjNDRiODYzM2MxMGIyOGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_27a59de86bb746bc8b8e7a944ec99e36",
+      "statement": "PageProvider applies the Mantine theme with forceColorScheme dark, and inter.css binds the bundled @fontsource-variable/inter files to the Inter family so no third-party font is fetched.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/theme/PageProvider.tsx#L1-L13",
+          "version": "repo-lines-v1:sha256:ff00ac98a64db8bc61f42b049bef2ae42ff0195cfe8309e6d383bbb2a43d8310:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwNWE0NmYxYzY4NzQyNDE4MTg4ZTQyZjczYzU1NWZkMGEyYzBhYTA3YWNlMWNlZjcwNDJkMzlmMTRhNzU2N2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/theme/inter.css",
+          "version": "repo-file-v1:sha256:5ebcbd07f8b27a2371611fd8df21f6f49b80ae4f41c79eeadc197dbc8206c7a4"
+        }
+      ]
+    },
+    {
+      "id": "claim_570e11670be74d11a6ed58ee682c882d",
+      "statement": "The header bar is a sticky 64px region with the league eyebrow, the title, and recipe, threshold and sync slots that keep reserved widths when empty, the sync slot always.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/frame/HeaderBar.tsx#L1-L94",
+          "version": "repo-lines-v1:sha256:db5af72eb7de06756f1fe530fdd20ad2c32a17adf7e72bd30b85b12d4b8a3ac6:eyJzZWxlY3RlZExpbmVDb3VudCI6OTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0YWIxOGM1MzRkN2RkZWFkMTJmMzZlOTc0NGRlMzE2Yjg3ODRiZjk2Njc0NWI0MjQ4NWYzNTdjNmIyMWMyNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/theme/tokens.ts#L38-L55",
+          "version": "repo-lines-v1:sha256:32e81058a796d389822a7d89313533113e8356d1cb2f4062257f44c2d1351007:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkMDA4N2UyN2U0ZDM3Y2ViZDY0MDQyYTAxMWM5OWI2ZTc0ODUwZGU4ZTZjNTIzOWUyODJiZDUwN2Y0ODY1ODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU1NjJmMzFlZGNlNjllMGI3MmRiNDM2MzdjYTdhZmEzNjhhNzcyYjhlN2M0YmM2NTA2NTEwNjc4NzQ4ZGQ1YzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI2NDExNjk0MjBmYjUyZWMxZTk1NjczNTIxYjk0N2JhYTlhYWRkNjUxOTQyNDk2YTkyNDNmOWQyZWI5YTZjMWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f834df1ea2794932a78132d9963686e0",
+      "statement": "The Payout Threshold ranges 0 to 3 in steps of 0.05, commits slider moves at once and typed values after a 150 ms debounce, and persists under localStorage key poe-cbpc.payoutThreshold with any invalid stored value reading as the default.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/threshold/PayoutThreshold.tsx#L19-L130",
+          "version": "repo-lines-v1:sha256:610425c3a7e7f3f24e67081753a527c6341b7921c16dc2f97ce0cee73911f020:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJhN2Q2OWVkYzlmNGNiNzZlZjJlMWYwZGY0MzU0ZGYxMzI1ZjE3ODdjNDYzMzUyODRlYzI3ZDQzNTQ5NjQ5MTlmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJmYzM2MDIwMTk3YTZiYTA0NzAxZjQwYmRhY2U3ZmNjYmM1NzQzOGIzMzZmNWQzMTA3YjZiYTU4YzdjNTNiMDdjIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI2MTZhMGI5NjQ3MzU5ODgyOTY1MTE0MzIyMTRiMTI4ODAyYThiZDNmNDdlZTA0NWZiZmFhNTlmNjViN2ZiM2U0IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJkNmMzOWNhMGU4MTU1MWJiYzU5NTU5YTk5NTY3NjZmM2YxYjFhOWE5ODhhMDRjY2QwODI2MjY1MGI3MzcyNDU3In0"
+        },
+        {
+          "resource": "repo://packages/web/src/threshold/threshold-storage.ts#L1-L52",
+          "version": "repo-lines-v1:sha256:71aeecaec1b697c856f8f4b33dfd9d82c67c16544085eabc379236f23bec8dd3:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxYTg0NzNlZDJkMTcyNmVjYzM5NWJiOWEwNjIzYzczOTMzNDlmMmJiMTZhNGVjYWQ2YTYxMDY5MDE5ZTc4ZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_14f7f1a6aa284abf8e6533391bbbd794",
+      "statement": "The active recipe id persists under poe-cbpc.craftRecipe and falls back to the first published recipe when the stored id is no longer declared; the cost line shows core's craft cost or the uncostable phrase.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/recipe/recipe-storage.ts#L1-L36",
+          "version": "repo-lines-v1:sha256:2457df7e2c364df2e60294a7efaf725f3778197fc0e52cd0bae88a012eb8823c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyYmE1YWViNmVhNGYzOGViNWQ3MThhZGU5Y2E4OTEzZTI1Y2NkNzkzODFlOWFhMTM4ODc5NTllYjJlNmU1YTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/recipe/recipe-view.ts#L1-L43",
+          "version": "repo-lines-v1:sha256:faa5f0345704562344b8b7a46891d8cb095f2e37fb1f6bfa9b0864ec2ebe8f8b:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4ZTcxN2ViZGE4ODdiNjEyMDJmZTIxMGFhYmM1Y2VhY2I3ZWU4ZDU1MzQ4YWIxNjFhYzBkZDgzOTliNDczOGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2829506b3eea4ea8979872a52127acea",
+      "statement": "The sync report panel starts closed on every load and never persists; the sync button shows the problem count with its mark instead of the synced age, counting non-pruned unresolvable dataset entries and a pinned-starvation record only when it matches the loaded pinned count and minChunkSearches.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/frame/header-controls.tsx#L17-L106",
+          "version": "repo-lines-v1:sha256:9f2d6f1cf5def0fd19fa93a37cdca8f45b8947ce489ea7d4ed9b525e2743d0b1:eyJzZWxlY3RlZExpbmVDb3VudCI6OTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwNDM3YjRhZjdhZWEwMzBjYmFmZDUxMzMwMzUyNjg1MTI0NjY5NjEwNzY2OGYyYTFlM2FhOTMxNGIyZmM0MjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM3MTAzYzVjZTc5Mjg3YzYyYTZjZWZlMmYxNGRkNWFlZjEwZDljOTJmNGYwMDJkZDA0N2JkZjAwMzZmOWE4MDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/frame/problem-summary.ts#L1-L75",
+          "version": "repo-lines-v1:sha256:273bb5acc8f98e1c5d53553e275848243d897ec207ab10869a028f8d35a564a0:eyJzZWxlY3RlZExpbmVDb3VudCI6NzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiNjMwY2VhNjBjNWIyYjViNTI0N2M4ZTUzN2E5NGYwMjY5MmY3ODIwNTdhYjE4OWNkYzY1NzYzN2QzNTdmNDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/frame/sync-button-face.ts#L1-L23",
+          "version": "repo-lines-v1:sha256:a7e7cea9534bb70c0b6fb46219224a70833b0eda266cee6aae9b5e2696de3f25:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkMTk1N2RmNDNlZWVkMDliMTU4NjljNDIxYzEyNWZiMDZkY2RjZWVmNTgwOGI2ZDYxZGM1YzliMDUxNmIzN2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_238e3ec6d2d34c96b0c70061fe2b2f80",
+      "statement": "The sync report panel renders four columns headed Problems, Sync run, Weights coverage and Built from, built by panelColumns from the published report, weights header, absent files, load time, problems and cross-file failures.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/frame/SyncReportPanel.tsx#L59-L100",
+          "version": "repo-lines-v1:sha256:d6c716547629177a257392e8487dafbe56d7b265d6855a06f348945fb70328d4:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2ZTA2ZDFiZDE4OGUxN2QzMDA1ODc4ZmNkNDhhOGJiZTYxMDBiNzllNjA1NDY0MjM2ZmY0YjM4MjliMTA4NjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/frame/panel-columns.ts#L119-L139",
+          "version": "repo-lines-v1:sha256:e0495698c0803e067289719602ded03cd60f2b29cdb57e448561040ec6f51c3b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyOGY0ODkwZGFlNmNjZGJmYmYxMTFhNWQ2MWE5ZmE0MjUwMjBiNDMwYjc5NTliMGZkMTFlZDkyMmIzZGUwM2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyMjk1NjQxNzZmMDFmMzBkOTdiOWJmZTFkYjJmZDBiNDZmZDMyOTZjYTI4ZGUyY2JkZWEwYTc5YWU4YjRjNDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/frame/trust-copy.ts#L13-L14",
+          "version": "repo-lines-v1:sha256:b86988ac6a4747256b89d90866d976438f7d27511857c8fed39109da1e8dc960:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWM3MWFkNTg1ZGUxNmViNDhmOTJmYWNjMTBlODVjMWZlNThjYzA4N2FmNjk0ODQwNDAyMDkyNDdhMDAxN2ExYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzkxNzQ3MGFkNWIzODQ5NTExNTI3ZWUxZGIyMjRiNGE4MzY1NTBjZWUwZGE1YTJjMzU5NWJmZTcyMjM4MjVlYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGUwZTEyMWYwMTZlMzU2NTI0NDlmYjU5MzVhZjU4YWM0MDI4MDQzNDVjYzQ0ODJhMTg1YjI2MGUwYmI3MGViMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODdjNjdkZWIyNmRkYmNkYmVhMTYyM2U0MjllYTg2N2U1ZjdhM2JjYmRiMTU5NDQ2OTcwOTMzYmY0NDBkMWZhNCJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-10-17T13:54:42.734Z"
+  }
+}

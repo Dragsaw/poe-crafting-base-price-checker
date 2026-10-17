@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:0ca4162c82e00672dd419f2f15937aa0ea000b9bf49bed01099d11777888d0cf",
+  "pageVersion": "sha256:94c20a46e6378c104819041b7a667c643ec4395ec9cc9fb7e74f82d82dd06076",
   "claims": [
     {
       "id": "claim_9dc10a77881f4ebfb83dbb267d87a397",
       "statement": "The declared workspace graph allows contracts no sibling dependency, core only contracts, and sync and web each only contracts and core; a package missing from ALLOWED_EDGES fails the isolation test.",
       "evidence": [
         {
-          "resource": "repo://test/contracts-isolation.test.ts#L16-L94",
-          "version": "repo-lines-v1:sha256:bbdb4214daddd5b45f6eb55a7e8db2f78fcf8c256311a272f2e5aa028e72864e:eyJzZWxlY3RlZExpbmVDb3VudCI6NzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiY2M1MjA4YjVkOWY2NmUyMTJhMTJiNmJiYjlhNjBiOWIwZjAwNmFlMDgzZmE5N2ZkZjNjZDBjYTZkOTJhOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIxODEzMzk3ZjljNzQ3OTIxYjI2ZWYwYzg3NWYyNjkyYzI1ODRlMDY2OWU2YmI5YWMyZDFjZTg4OWZiZDBiZDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://test/contracts-isolation.test.ts#L11-L83",
+          "version": "repo-lines-v1:sha256:01b355e92c53ffb08587843a6c30cf20c950db6e00205a0f7f2f8aaaaeb08636:eyJzZWxlY3RlZExpbmVDb3VudCI6NzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiY2M1MjA4YjVkOWY2NmUyMTJhMTJiNmJiYjlhNjBiOWIwZjAwNmFlMDgzZmE5N2ZkZjNjZDBjYTZkOTJhOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI5YTllYmM2NDI3MjI4Njc0ZmMyNDczZWE0OGI5NmE5ZWQ5ZDkxZGFlZjk1OWJlMTNiMTM5ZTIxYTQzNWQ0ZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -17,8 +17,8 @@
       "statement": "dependency-cruiser rules forbid core->sync, core->web, sync->web, web->sync and contracts->sibling edges, and forbid non-test core modules from importing Node builtins or npm packages.",
       "evidence": [
         {
-          "resource": "repo://depcruise.rules.mjs#L20-L77",
-          "version": "repo-lines-v1:sha256:9d1f40e92945e1f9adea589b5923760930a8f57c87f83af70668da3d3b6d8d3d:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkN2RkYTE4YjNkNTgxZjlkNDlmZWYwYTI5MWY4ZDFiZWI3OWMxYWEyYWIwYWE0YTQ5NjYwODUxYjdhZDNlYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5YmM1YjY0ODRhOGYzMjRhNTI5YjZkMTQ2NzRjYzJjMTFmOTc5OWE1MzNlYWIyZjZhYTU1MmYxNzM5NTg4YjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQzMTUxOTNiZTNmNWFlOGJiZWE5Mzc1YzZmMDY0MjYxMzA2ZjU4MjlhZDc3ZDAzOGY3MjFmYmM2NTZhMDU5Y2YifQ"
+          "resource": "repo://depcruise.rules.mjs#L6-L63",
+          "version": "repo-lines-v1:sha256:311e7b1d894d7650c6eec31f07c35f27b70d19ac29547ff7f72b17f81e57d972:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkN2RkYTE4YjNkNTgxZjlkNDlmZWYwYTI5MWY4ZDFiZWI3OWMxYWEyYWIwYWE0YTQ5NjYwODUxYjdhZDNlYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1NzRjMDEyYjdlMDNhYjE1MTJhZjJkOGU0ODVhNWExNDAzMTBlYzVmMWRjZmU5MGYzMzJmZWQzMTg3OGUxMTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -41,8 +41,8 @@
       "statement": "The boundary test cruises fixture trees with the shipped dependency-cruiser config rather than a local copy, so a disarmed shipped config fails the test.",
       "evidence": [
         {
-          "resource": "repo://tools/boundary-check/boundary.test.ts#L1-L40",
-          "version": "repo-lines-v1:sha256:5657b70ea4822921ae2e0c975d23b7880a4d03a41320a7fa422e21a6c4307542:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyZDU2YjdjZTk4YTY1NDQyZTJhNTY1ZWEwN2QyNjljM2Q5ZGM4OWMxNDkwOGMxZGFiOTBiM2IyMWU0ZjVhZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJiMjJmYWIwMzBiYWNlZmE2NWZiYTJmZTM4YWJmYjg2ODYxOTRiYjM4ZjVlNGZiOTg3ZWFhMTEwOTU5MzY0ZjIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ4M2YwOTc5OTQzZWNkMTY0NzVkNWIxZmZmMTE1YzMxMjBlZGYxNzhlZjM0M2JiOGVjM2MzOWE1Yjg2ZTFmOGEifQ"
+          "resource": "repo://tools/boundary-check/boundary.test.ts#L1-L32",
+          "version": "repo-lines-v1:sha256:642572747dfebf09c1bb49625c15b0fc7af2f6280a91fa353308ced1992e6091:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyZDU2YjdjZTk4YTY1NDQyZTJhNTY1ZWEwN2QyNjljM2Q5ZGM4OWMxNDkwOGMxZGFiOTBiM2IyMWU0ZjVhZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImExMWIzNjY5NGFkODJjNjkxZDA2NjIwZDljYWFhZjMzMDE0MWIwMDE5NGZmMDM5Yjk5MzczYmU0NjNjMWNjMTIifQ"
         }
       ]
     },
@@ -51,20 +51,20 @@
       "statement": "HttpPort, FilesystemPort, ClockPort and GitPort are interfaces in contracts; the real HTTP, filesystem and clock adapters live in sync's shell.ts, with the filesystem port resolving paths against a root and createExclusive using the wx flag so only one concurrent creator succeeds.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/src/ports/filesystem.ts#L6-L40",
-          "version": "repo-lines-v1:sha256:90ead87090e3398df1043578191ab97c5f529a93b509a8ca9e0401f9a14375d6:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwZjg3ZjU4MTg4NTYxODcxYjVmYWM5Njg0ZWI0OTA5MmM2YWJhYTQwZGRiODY4OTA5MjRlMjhmZTFmODE5MTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU4YmMxZWI3NmM2NzgzZTNlOTM1OTdlYTQyYTk2NDEyMjYyZTAyOTI3YzhhM2ZlZjg3MGJhNTBmOGVjOWZhNTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/contracts/src/ports/filesystem.ts#L1-L20",
+          "version": "repo-lines-v1:sha256:0029f0c8a81f2e23a246dfcf1b26b7ce2f7561ea7911a357c8659918d22420de:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxMjc4ZWY3ZGNiYzBiYTY3MWQ4YzgyZTE3ZjkxN2Q5NmE3MWI4NWFjZDc1ZTExNzQ0NWUwYmIwMGM5MjI0OGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/contracts/src/ports/http.ts#L12-L34",
-          "version": "repo-lines-v1:sha256:6849e2f8e3933f7225df6e3141450a8a80eec602add05daa8e499d9f25ed2b18:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY3MGE0NWMwNzZmZDc2OTUwMzM3Y2Y0NTRlZDk1NWQ3NzVkZDBkZDdiYTI2ZDQ2YjViNWNmNmRhY2IxYWRiMTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyYzQxMmE0MDgwYzJiYTgzYmRkNzY4NDM5ZjVjZjZiNmM0YmVlMTg1MWRkNzFhZDNkZmVhOTJkOGRlNDY2NmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/contracts/src/ports/http.ts#L1-L20",
+          "version": "repo-lines-v1:sha256:5b5006f60d4141990dc7128856dafb150537b08b38c2e3a6f3244dcda7dac7ea:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhNjExYTc2NDc3YTM4NzhiNGY3MTk3MzllZWFjMzYxNDkxMTYzNmU5NzA5OWU2ZGEyMWMxZGJlYTUwMjk4MzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/sync/src/shell.ts#L50-L79",
-          "version": "repo-lines-v1:sha256:516582af4f3e09734432056f217fb3fbf27e3216140cfe013379227ad5a55ede:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZGI3OGQ2ODYyZDdjOWRmNzNiNTY2NGM5YzQ4YjljODU1YzQwODY4NjRlMzU1OGY2YjA1YTQxZmFhZTM1MDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhmZDVjN2IxYTZhMTRlZGE0NTA3NWM1OTNmZWZlNTFkNGE5NmExNWFhODkzMWYyNzgzMjRjZmNkMDQ3YmY3ZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRlYWNmN2RiNDYwYzM0MGY5MDdjNjE3MWZiZGM1YTM1OTRlNjc0MWY0ZWJmNzgzNDUwY2NiOWE3ZDZlNDRmMjMifQ"
+          "resource": "repo://packages/sync/src/shell.ts#L21-L45",
+          "version": "repo-lines-v1:sha256:9d585fdae5c646bbc72fa8aa7f94be97bbad76e6d6e929656f930466142f560f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZGI3OGQ2ODYyZDdjOWRmNzNiNTY2NGM5YzQ4YjljODU1YzQwODY4NjRlMzU1OGY2YjA1YTQxZmFhZTM1MDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMwMmFiYTRiMjI0ZGMyZTQwYjRkYmQzODM4MGQ3OTkwYjNjNTA0ZmFiYmM2ZDY0NjA1OGEyMWZiZTZhZDgxODQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmZjY3YmU2MDVkOWRmYTYxNTU1NTI1MjQ0MmVhOWY3MDNjNGMzNmI2ZTEzMzdlZDk3NmMwZWViMzgwNGVlNTgifQ"
         },
         {
-          "resource": "repo://packages/sync/src/shell.ts#L99-L143",
-          "version": "repo-lines-v1:sha256:bb332e4fa82e1cd469dfe98daf896564579af2283b53f16aa8747b49def986d8:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2YjRlY2FiNGQ1ZTNkMmZhZjk0ZGRmMGM5NWI0NDM3MDI3MTMwY2RiY2IwYjYzZmIzMWVlY2U4YmJlYmVjODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyN2IzOGFhNDE5YWY1ZTdiZTIyN2UwOWM0YTQ3NDFkMzRlMGU1ZDY4YmE2OWJlNDE5ODRkMWZhYTcwNTU1YWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1NjYyNmRjYjAyOTRmYTNkOTVmZWFlMmNhZDQwODU0NTU1NzM3ZTk3NmM0ZmIzYjZhY2Q3YTQ4YjhhMDc4OTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUwNjZmODhiYzI2NjIzNTExZTVkMGY3ZDk1YWE1MmFlNmYxY2Y1NGI0ZDY2MjAxYzZmNTdlMTQxY2M1NmExNDIifQ"
+          "resource": "repo://packages/sync/src/shell.ts#L78-L145",
+          "version": "repo-lines-v1:sha256:3d0f1b4d88eb09fa90dd6347baa9d98089870c87789e1353abd461605ccbdf47:eyJzZWxlY3RlZExpbmVDb3VudCI6NjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhMDc3Nzg3YzZkMTgwOWI1MjlkZGUyM2QzYjliZTg1YTU2YjMwMzAwN2M1MDhhYzgwZWYzNTY0MTc5NjhlMTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmMGNkYjk3MmE3YmZiN2VkMjQ2ZjlmZjY3MjM4NWU1NWY0OTY4ZmMxMTA0M2RjNWI2ODRkNTFkZmEzMWRiY2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFhOWQxNWI0NjliM2U0YjFlMWU5OWNmNWZhNGViNTk4MjJiZTA3OWVlOWM2ZTBjMWQ2Yjk3NjM1ZDI3NzMwNzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiNDQ2MmQwNzIyZmRmYzA2YmE3YmZlNWMyMTA5ZThhM2RlZDY0N2U3MGNjYTY4MTU1NzBhOWU4MzE1ZDBkM2IifQ"
         }
       ]
     },
@@ -73,8 +73,12 @@
       "statement": "The real GitPort is the only sync module that starts a child process and runs a fixed read-only git log invocation for the author date of a path.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/git/read-only-git-port.ts#L1-L30",
-          "version": "repo-lines-v1:sha256:87ab3dacdca697efc0b4dcb3cb40fdf0c555f6a2ee532cb310d3973b9220a00c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA3ZWQ2OTI5YmZjMjViMTYyNzAwNDE5MWJhMjFjYjgwMWFkNWFiZjYwODdhMGM2MTlmMzdiMTc5OTdkNDQzNWYifQ"
+          "resource": "repo://packages/sync/src/git/read-only-git-port.ts#L1-L57",
+          "version": "repo-lines-v1:sha256:5ac29296bd589599cdbb6163268be2cce88656f619ea52878992bbc5bda859a1:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQzMDgxODkxOTQ1ODMxZTRhMTUwMWYwNzhkNzllMjBlNDdiODI1OTAzZWI5OTg1OTcxY2Q3YmZlOGZkMDJlZDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/no-git-write.test.ts",
+          "version": "repo-file-v1:sha256:ed4e6ede31070d70be80266e41f68380e229ec60642614e5776c73998db4e778"
         }
       ]
     },
@@ -97,24 +101,24 @@
       "statement": "abortableSleep in the sync shell resolves rather than rejects when its AbortSignal aborts, so the pnpm sync session can check signal.aborted and exit cleanly.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/shell.ts#L81-L98",
-          "version": "repo-lines-v1:sha256:c3ec53bfef27c340a7d2c386ab9952d36136143227ed071cd688ce2edf4f3f5e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMwOTFiZWI0Y2I3MTZkZjUwOGZmNWNiYjQzODUxMjFmYzlhMGQ4OGI3YzdmM2FkMGNmODAwZTYzOWE4MmJhYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFjM2ZlMTMxM2Y2YzdmNjkzNzdhOWIwMTY2NzFhODNmYWRmMTUwN2YzZmMwODg4ZDA2YTU5ODE3ZjM0YWIwMWQifQ"
+          "resource": "repo://packages/sync/src/shell.ts#L51-L67",
+          "version": "repo-lines-v1:sha256:c3724c18c7b3af9daa0e56ab4483663a455068abce54dc37f9a62bd01b826596:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhOTE3OGRlMDA3NTE4ZTE4MjJkNjMwMTRkYzNkMTZmOGQ0OGMxM2IwYmFlMGZiZjk5NjY0NjkzNGUzMjI4NTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4YzFjMzQ3ZTVkOTc1ZmQ4NmIxNWNkZTUzMTdjYjE2YmUxYWQxNWRjZmNhNjA3OGFlNDJkMWNmMGIzODE5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMwOTFiZWI0Y2I3MTZkZjUwOGZmNWNiYjQzODUxMjFmYzlhMGQ4OGI3YzdmM2FkMGNmODAwZTYzOWE4MmJhYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEyY2YyOGRmNDViOTViNWJkOTg1ZWI0YmU0NmVhODJlZmQ3ZWE1ODIzNWU2Y2M2YmMwYzEyMDMxMWYwY2EyNjYifQ"
         }
       ]
     },
     {
       "id": "claim_f127f0fc24424b15bec384d766ae8258",
-      "statement": "@poe/core exports the ranking, probability term, craft cost, provenance folding and the five cross-file checks besides the chunk order, and stays pure.",
+      "statement": "@poe/core exports the ranking, probability term, craft cost, provenance folding, pool coverage and the six cross-file checks besides the chunk order, and stays pure.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/index.ts#L1-L60",
-          "version": "repo-lines-v1:sha256:5048b06460954428e4ee0b38ce2eae029b89d63db1869a70ec5c318a112dfa13:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkYzE1NGI2YmNhOGQ1ODhhOGM1MmFiODcwZWY2OGRlODM1MThkZmExZTAwZDhiOGRkYmYxMTcyNjk3NjAyNzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1OGI2ZjFiNWI5NWY3MjE1OWM1N2NlMWJjMDVmM2I3MzU0Y2MzNjllNjVhYTkzNTg5ODlhMDRhNjRhMWY4ZDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVlYmMzNTZiM2VlZWZhMDkxMWU5OWIzOWQyZDk5NzY1N2NlMmRmNWI2NWVhYWFiZDM1M2E3OTdkNzVlNTlkZmMifQ"
+          "resource": "repo://packages/core/src/index.ts#L1-L80",
+          "version": "repo-lines-v1:sha256:1790be524f7cb87dc1b5325ed573a909ba21547323e9878a7f7072c9227386d7:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkYzE1NGI2YmNhOGQ1ODhhOGM1MmFiODcwZWY2OGRlODM1MThkZmExZTAwZDhiOGRkYmYxMTcyNjk3NjAyNzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiOGJhZmZlNThhNDdhNDIxOGEyOTZmM2YxMWQwYzc2MzgyMjg2Y2NhYjJiZTQ3YzE2Y2YzMGE2YjhmNzc5ZTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-10-03T11:56:06.252Z"
+    "at": "2026-10-17T13:54:42.734Z"
   }
 }

@@ -1,14 +1,18 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:2523df69faad9ae6aaf5b296a40bb7beff73fd315ae4a011583d2fdb64ca3cf5",
+  "pageVersion": "sha256:395dbcc7b7f64f1138a626a542a59be62b98c2498e16681e3837599773419a74",
   "claims": [
     {
       "id": "claim_784eac0f3ce64d41999cc0d37c1d7742",
-      "statement": "buildSearchBody sends a raw entry as query.type of its baseTypeId with rarity normal, and a crafted entry with its category filter, rarity magic and one stat filter per affix (banded edges sent exactly, valueless as {}), all with securable status, exalted_divine price option and ascending price sort.",
+      "statement": "buildSearchBody sends a raw entry as query.type of its baseTypeId with rarity normal and an ilvl minimum, and a crafted entry with its category filter, rarity magic, no item-level filter and one stat filter per reference line (banded edges sent exactly, valueless as {}), all with securable status, exalted_divine price option and ascending price sort.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/pricing/search-body.ts#L172-L284",
-          "version": "repo-lines-v1:sha256:439e555144404151191809a40a666e0067de2ec83f0d71040a20e8d53c1d5f64:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiYzJkOTVlN2E2NTUxYTc3ZjdlMDRhNWI3ZjhkMjcwZGVlMGQzZjY4YjY3MGRmZjI5Y2U3MmU0NjQ1ZGY0YmIxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/sync/src/pricing/search-body.ts#L107-L221",
+          "version": "repo-lines-v1:sha256:a40ccc0230d603039f4c713ac6e0a300af5e94b3e8f39433a6782d19e8271165:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIxYmEzOWIzODcwYTk4OTJlNjczM2Y3ZDgxNWY3NWFjZDgwNjA4Yzk1MjdlMGJlZTViMjNkMjRjNWVlOGZlMjc0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiYzJkOTVlN2E2NTUxYTc3ZjdlMDRhNWI3ZjhkMjcwZGVlMGQzZjY4YjY3MGRmZjI5Y2U3MmU0NjQ1ZGY0YmIxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://packages/sync/src/pricing/search-body.ts#L55-L83",
+          "version": "repo-lines-v1:sha256:d98bf7f7e86a7bf60f4a8bf6c06634e551dc72853e956aa4e9217fb4af2320f7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNhZTJkYjA2MDI5OTY2YjcyYWFiZGYxMTExYTJjOGMwYTg3YmRlOWVjMzcxMWJmZjZlNGYxZjQ1NmVkMWYyNDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE1N2M2ZGYyOTllOGZiNzExNTllOTEzMjRmYzdmZjQzNTRmNmY5N2U5MmEzN2UwY2FmODM1MmY3NzU3YzhlYmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhlMjRhNDYyNDUzZTc0ZDdkMjVkNGVhOGE1NTgzZWI1NDNlNjY4MjgyMGVkN2QxZjMyYjM0ZjU3NTRkNDJhOWUifQ"
         }
       ]
     },
@@ -17,12 +21,12 @@
       "statement": "A crafted class discriminator is chosen in order: a trailing str/dex/int run (split by defenceLettersOf from contracts) sends all three defence filters as min 1 or max 0, a categoryId naming an items.json group sends the underscore-to-space class as query.type and throws UnknownClassBaseTypeError before any request when that base type is absent, and otherwise nothing more is sent.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/pricing/search-body.ts#L112-L160",
-          "version": "repo-lines-v1:sha256:e8823b8888de973fa8ea0de5a949073eeb294bf4fa75993c8138ba7eb9049b9c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiMTViYjQ0MTBkYWFmMzI5YjZmM2U3NGNkMjhmYzZhMzcyMzQyN2QxYjBmMzdmM2YzMDIxN2MzZWM2YWNkODgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3YmNjNDU4NWRmOGYwNWE2NjhmZmI3OGNhNmI4MWE1ZTE4YjA5ZDViNDdhZGU4ZTM4NGI3NzMzNGM4Y2JhYWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQwMzNjNjUxMTdmMDRmZDUxZmIxMGVhODZlNTI4MzJiZmRlY2M2NmEyYTNmNjRiNGI5ZTIxNGVjMzNkY2JhY2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU0YzQzYjM4NTQwYmVjNjZlYmZmZmEzMmQ5ZWJkYTVhYmJmN2NhNDI1YTA0Y2QyZjVmMWI2MTg0ZGI5MWVmOWEifQ"
+          "resource": "repo://packages/sync/src/pricing/search-body.ts#L140-L152",
+          "version": "repo-lines-v1:sha256:2666aabe61638fd42ee4fae3158addd90ce20d0b620ea080110d61f62477c306:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0YTA2YjY0OWMwZWRkY2M4NWU2MzBlZTc5YzgxYWFhYzkwNmJiNWNhZDk5MzVhMjlkMTJjYjBlNGVhNzc0OWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3N2E5NzdjZWQ2NWU5OWQ5ODY1ZTI2NDkxZDA4ZTViMWQ1MGI4NjU5M2Y0Yzg5MzBmMTdlOWMyZWUwNjUxM2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc4ZDRiZmRlN2U2OWE1YTQ1M2ZmODg3MDBiYWFiMjZiMzJmYjMzYTZkOTNkMDA5NmEwZmIwZmM2M2UzZTMxNTgifQ"
         },
         {
-          "resource": "repo://packages/sync/src/pricing/search-body.ts#L47-L67",
-          "version": "repo-lines-v1:sha256:6bfbb18a1b41f5432ed24f300340944bc87a3d36ba5d3e37eb07258259b71a80:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdkNjBjZWE3MGI0ODljOTQyZWFhNzYwZmFkNTYzY2MwNzllODk4OGY3Yjk1NTUwNjkzZWZhNTllNWYxNjA5YWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAxMzBhMmJkMDNlOTFmNzY2NTdjZDlkOGRiMjFlMDc4ZmMzNmNiZWRiMWM5NWZlZDY1ZjQ0NGI4ZTYzZGUyN2UifQ"
+          "resource": "repo://packages/sync/src/pricing/search-body.ts#L85-L105",
+          "version": "repo-lines-v1:sha256:33e9d1ad7675b77524606d20c2c31d919c5694e0dfb9dbc77cd98ae057b7f7e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiMTViYjQ0MTBkYWFmMzI5YjZmM2U3NGNkMjhmYzZhMzcyMzQyN2QxYjBmMzdmM2YzMDIxN2MzZWM2YWNkODgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQwMzNjNjUxMTdmMDRmZDUxZmIxMGVhODZlNTI4MzJiZmRlY2M2NmEyYTNmNjRiNGI5ZTIxNGVjMzNkY2JhY2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBmMjhiYmJmODM4YjU5ZTZkZmYxZDc0ZTViODc1MTAzNzc1ODQxMTIyMGU0MGQxNGNlYzJlYmFkZTBjMzRlMDcifQ"
         }
       ]
     },
@@ -31,26 +35,26 @@
       "statement": "The pricing step stamps lastAttemptedAt, sends one search, sets lastSearchId and lastSearchLeague from an answered search, returns no-listings for an empty result, and otherwise fetches at most the first 10 result ids.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/pricing/price-entry.ts#L299-L358",
-          "version": "repo-lines-v1:sha256:4a315f84dc329b09164551403a25835b2d49190e28d21761352343d747c04519:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5NjBjNTBlYmNiOThhZDYzMjJjNjMyNTgyZTZiZDljZDc3NmQ1NmEzZmNjNmJiYzUyZDg1MDQ5ZjdhNDc5ODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOWUxMjU0NjQyNTU3NmQzZGVhZThjOWI5ZGJmMTI4ZDVkNmRkYWY1ZDdmZTg1NzkzNDkyN2RlZmZhM2I5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlYzU0YmE2MGYzZjNmNDcyNDI5OWI2ZGUzZjU1MTQxMTUyMmFmZDBiN2M2ZTEyZjU2MzQ4MzBlZmY5MzA4MmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiNDQ2MmQwNzIyZmRmYzA2YmE3YmZlNWMyMTA5ZThhM2RlZDY0N2U3MGNjYTY4MTU1NzBhOWU4MzE1ZDBkM2IifQ"
+          "resource": "repo://packages/sync/src/pricing/price-entry.ts#L219-L318",
+          "version": "repo-lines-v1:sha256:1aab9512080c3372987c7fd81684599af21b7f66e06fec110b4b49eed53018b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJiY2MwODNhNDExMGQ2NmUwMDQ2NTdjYjc5ODg1Zjc0NWFlMDE2ODRlYTc4MGNjOGQ2OTZiYWY2YzE5YzFiMjEzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MmEyY2IyNWExMjJiNDQyMjFhNjIzNGVjNjYwYTdiNWZiN2Y5YmRlN2IzYjllMmIzYzU1OWEwZDk2ZmFjNzM5IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5MjA0MGUwOTVhOTRlMmFkYTc0ZTQyMWYzNzE4NzUxYTkxYTgxMGJmZDY2ZjQ4ZjRlOTM5YzdiNzQ4MGViNjcwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MiwiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4MzYwMzZhMjAzMjYyZDk5MjMyM2JjYjBkYzU5YjcwMDZlYTI0OTgxMzNjZGVhNGY4NzczNjc0NTZhNDVkODM2In0"
         },
         {
-          "resource": "repo://packages/sync/src/pricing/price-entry.ts#L45-L46",
-          "version": "repo-lines-v1:sha256:4818018fb60cb28bec7f06d912dd3dd532464eafe90fded8018d2b6455cec2b9:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RkZDVjNDAxNDg2NzI3ODNhNWE2ZTBkMzBiMjZmOWVhOGQxYzUwMGNhYTMwNGU3NGU2NTcyZTQxNDJiN2JmYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZmQyMmIyN2RmMTk2Y2RkODA5MzU2YTFmZmI2YTc3ZmE0MjVhZjAxMzE5MGVlOTZmMmM0OGQ3NzI0ZmE4NjIyNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2FhOWEyMmM0YjExN2Q3NGMzZGMwYTQxMjI2ZGQzNzhiZGNjYTJmZTQ0ZDNkMTQ2NWI5OGMwNzIzZmJhY2JmMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjcwMjMzMjE4MzM2ZTMxMzc5YTYwM2QxZTFhYjc3MmVmMWJmY2UwYWY0ZjczMmU4ZGRhNWU2NWZiZTQ5Y2RhZiJ9"
+          "resource": "repo://packages/sync/src/pricing/price-entry.ts#L27-L28",
+          "version": "repo-lines-v1:sha256:4818018fb60cb28bec7f06d912dd3dd532464eafe90fded8018d2b6455cec2b9:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RkZDVjNDAxNDg2NzI3ODNhNWE2ZTBkMzBiMjZmOWVhOGQxYzUwMGNhYTMwNGU3NGU2NTcyZTQxNDJiN2JmYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZmQyMmIyN2RmMTk2Y2RkODA5MzU2YTFmZmI2YTc3ZmE0MjVhZjAxMzE5MGVlOTZmMmM0OGQ3NzI0ZmE4NjIyNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDU2Y2VjNWVmNGJmMzhiOWRiM2M2YWFkM2ZiZWU3NWE5ZDY5MmEzOGQyODBkODk1ODBmYTVjNDdjYTk2ZTMxZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjcwMjMzMjE4MzM2ZTMxMzc5YTYwM2QxZTFhYjc3MmVmMWJmY2UwYWY0ZjczMmU4ZGRhNWU2NWZiZTQ5Y2RhZiJ9"
         }
       ]
     },
     {
       "id": "claim_a7eec7170b3f48e096a3ba4f3157ee98",
-      "statement": "A 429, 5xx, timeout or network failure on either request yields the chunk keeping the price state; any other non-2xx throws MalformedRequestError; a 2xx body of the wrong shape throws UnexpectedTradeResponseError carrying the entry with lastAttemptedAt stamped, with the search fields set only when the failure was on the fetch.",
+      "statement": "A 429, 5xx, timeout, network failure or session-cookie downgrade on either request yields the chunk keeping the price state; any other non-2xx throws MalformedRequestError; a 2xx body of the wrong shape throws UnexpectedTradeResponseError carrying the entry with lastAttemptedAt stamped, with the search fields set only when the failure was on the fetch.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/pricing/price-entry.ts#L199-L227",
-          "version": "repo-lines-v1:sha256:4d8a00e7cdb9453dd7fab8a43b53c7f15fa57599b069fd93810bf633fe29235b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllNjY1NDNlYWJjZDQ1OWQxMjU1NGQyOTgzOGJiMGVjNTM2YjU4M2UwYTg4ZjVkZjg3M2Q4OWMxOGE1NjRiMmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUyZWY2MjcxNTMxNjkzYWU1NzZlZTQyNWMwZmFhYjFkOGIzOWQzOGQxMTUzNjYwM2MyZGY5OTdkNzQ5M2E2MzIifQ"
+          "resource": "repo://packages/sync/src/pricing/price-entry-leg.ts#L1-L58",
+          "version": "repo-lines-v1:sha256:0f978a2f785fd3e5954dd4c631953a248f47ac97a28bc0126b1edf676de4e27e:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiNjMwY2VhNjBjNWIyYjViNTI0N2M4ZTUzN2E5NGYwMjY5MmY3ODIwNTdhYjE4OWNkYzY1NzYzN2QzNTdmNDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/sync/src/pricing/price-entry.ts#L304-L350",
-          "version": "repo-lines-v1:sha256:4998f03a3d65f5bafb2a6d8d9e2bca74a11fc3435368fc651e74ae3689665103:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0N2UxNThmZDNkZjYxNTAyNzBiODE5NzIyNTFjOWE3NjAyYmY0ZTE0NWU5ZmIxZjc1ODM3NjEzZmQzOTExOGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI1NDMwOWZkMDI1M2Y5YWEzMWI2Yzg4ZDdkZWE1NWUzMzZmMTk5N2VjMGMzNzBjNjRiOTQyNWUxMDU1NjFmZmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjMTRlNmMxYzE3M2EzYTdkYWEwZDE0NTAyOTFmNDE0MWMxZTdmNzNmMTRkMzQ2MWUwZDA4ODczZTI2OTcwMzIifQ"
+          "resource": "repo://packages/sync/src/pricing/price-entry.ts#L219-L268",
+          "version": "repo-lines-v1:sha256:7f600446cc3c6bbcba75ba725e9e0125fc21f039173629afed01dd9ddad0da1d:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjYzA4M2E0MTEwZDY2ZTAwNDY1N2NiNzk4ODVmNzQ1YWUwMTY4NGVhNzgwY2M4ZDY5NmJhZjZjMTljMWIyMTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZhNGFjNzg0YmNjNjQ0MGEzMjQ5OWJmZWEyNTA5NWE1OWMwY2UwYjRmYWU0MTZmMGM0MmQ4ZmM4NTFhMzg3MzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2MzE2ODNhYTgzNDVhZGY1MGQ4MTYwM2QxMTQ4MjBlYTU3ZDcwZmJhMmFkMGY3ZTRhY2QwOTM2MjE0MzI1ZTIifQ"
         }
       ]
     },
@@ -59,28 +63,28 @@
       "statement": "A jewel-arm base type missing from the catalogue makes the step return a completed unresolvable entry with an unresolvable baseTypeId record and no request.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/pricing/price-entry.ts#L276-L298",
-          "version": "repo-lines-v1:sha256:0866d1b3d32d0490bd2e8084b6162892c7ebdf2240e4dc982920785576d4a9b9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1ZTEyZGQyMWFiMGRhZTBjODNhMTA2MWEwMDliNmMwZWE4ZWU4M2EzNzNmODljYjk3NzNmYWU5MDZkMTg5ZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIxMTc2YTk2MGJiMzFlNDNlNWE0ZWIxOGRiNjc3YmVhNTIxMjJmZGE3NzY0NjFlMTUzYzQ2M2JlMGE5M2Y4Y2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVlY2E0ZjQ1ZGFmMTgzMWU3YmJkMGU2NWRjZTU5MmQzZWQzOTI4MmU1MzBjOGI0NTM4MjIxMDg0YzMxMmFlYjMifQ"
+          "resource": "repo://packages/sync/src/pricing/price-entry.ts#L185-L217",
+          "version": "repo-lines-v1:sha256:776d01d593b82abdf3c5137278760a22a1a4f036a2b022622b0138a4f1edb565:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3MzZiMDRkOWNjMTEwYzcyYWI2ZTcyYzU4YzJhMjNhNjE0ZTRhOGU1ZGQwMmQ2MWYxMzEyMGQ5NTI4ZGI3MDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4ODIzMGU5ZmI4OTllNDBlNDA2ODA2ZGFlM2Y3Zjc2MGQxODIwOTY1ZWM1ZDEwMzM4OTNmMjI5MThjMGE2NTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0N2FkYmRiMDk5YmE0MTY4MDlmYjIwMDUwNGYxZmY2OGI3MThjMGEwN2Y5YzUzNGExZjUwZjNjNmM0MTFkYzEifQ"
         }
       ]
     },
     {
       "id": "claim_e58d1a6205794bb1ba9da19957e8d1ad",
-      "statement": "The price is no-listings with no priced listings, not-yet-synced no-exchange-rate when any listing currency lacks a current rate, and otherwise priced at the lower median of listings normalised to divine, with the median listing's rate as the exchange observation.",
+      "statement": "The price is no-listings with no priced listings, not-yet-synced no-exchange-rate when any listing currency lacks a current rate, and otherwise priced at the mean of the first two listings normalised to divine and rounded once, with sampleSize counting every readable listing and the first non-divine rate of the two as the exchange observation.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/pricing/price-entry.ts#L229-L267",
-          "version": "repo-lines-v1:sha256:5863daf866891a1a6763622147a695d3ffa0fa2ccb5288052022ced60deea5a8:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiN2VkZDJhYTgzM2Q4MzJiOTYzNDQ2ZTlhZDRlMzE2MzEzNDUwYjQ3ZjMwNTY4MDkwNDA5Y2Q1MzAwOWU0MzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhkZmJhZDVmYTZjMDdhYjQwM2E1YjIzOTk1YWZlNDYxY2ZjNjY4YmY0M2NkZjYyNjVmZWRiMGIwMTdmNjczMTAifQ"
+          "resource": "repo://packages/sync/src/pricing/price-entry.ts#L123-L157",
+          "version": "repo-lines-v1:sha256:bf13a7fbfedf59dc46a97fc2d3826b38f836de2915c464955a4763d3de0a10bf:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiODdhMzA0NWYzZTA5ODQzYzk3MjU1MTIwMjRkYjA2ZmIzNzgzNmUwY2E1MmQ3YWY0ZmIwOWEzODVhZTEzYzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjViYjc4M2ZkYjg2OGJmMGEzMDEzNzlmNzdmNzkyZGVjODcxNzU3Zjg2ZTIzYzliOWFjMTliYjE5YzRhMTQzN2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM4MWI0MTUxY2ZmZWM1MWY5MmM4ZWJlYWM4MjdhMTNkYTY4MWQ2MTljMDdjNDdiZjQ4ZDZjNWE0M2FjZGRhZDYifQ"
         }
       ]
     },
     {
       "id": "claim_9e7aabadb7b245f2a90c0fdd653f32e1",
-      "statement": "Only rates whose league equals the active league are current, the first duplicate wins, divine is fixed at 1, each listing is amount times rate rounded once to 4 decimals, and the lower median takes the lower middle value.",
+      "statement": "Only rates whose league equals the active league are current, the first duplicate wins, divine is fixed at 1, toDivine multiplies without rounding, meanOfFirstTwo averages the first two values in given order, and roundDivine rounds once to 4 decimals.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/pricing/normalise.ts#L9-L69",
-          "version": "repo-lines-v1:sha256:85693846a490492b7a04cc0e179736f5c6e12fdaa87b25da3fcc933f559be6fe:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkMzk5ZTRhOTE4ZTgxNzg1MTBiMWYyNzA2ODhlMmY5MTA0OThhN2ZhMGU1MGJmNGQ0YTFlNGU2ZDk2YWQ1NWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNlYTYzYWNmZGRlZDNjZmFiY2M4NDAzODI3OGY3NTM3MWQ2ZjljZmUzZjI1Y2YxMjNmMjgwYTBiM2MzMGFlMzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0YjBiODMzNjc0ODhiYzdlNDFhMWMzMTljNmVhMGE1NWNkNzMxMmY2NmM1YmU1ZmIyOWE5NzE4ZDQ1MWI1MjEifQ"
+          "resource": "repo://packages/sync/src/pricing/normalise.ts#L8-L46",
+          "version": "repo-lines-v1:sha256:2c28fe328ad46c1c5a8dbac08e67bbf3d97345ed2bba1afe9337be18ff2974f0:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxNTJmYzM2MDgyNDgxN2ZkZjg4MDMzOTk1OWEyYjk0OTAwNTFjN2ZmYTVkYjY3ODZjYTlhNzUyZTMzZDIwZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhlMjMzZGNjNWRjYTMwNGNlYzg2NWVjZDQ2NDQxMzkzZTU5MDVjZjEyOTJkMjM0ZjhjNzc0NmRkMTJmNDc4OGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI3N2YwMzM4MmU2MmY3MjhlMDZiM2RlODQ4MTc5ZTA3M2ZmOTk5ZjY5NWNmOTkyYjE2MzM3ZTg1ZmM3YjgyNTIifQ"
         }
       ]
     },
@@ -89,12 +93,12 @@
       "statement": "The league gate sends one GET to the trade leagues endpoint and passes only when the configured league is among the returned ids by exact comparison; an absent league throws LeagueMismatchError, a bad body throws UnexpectedLeaguesResponseError, 429/5xx/transport failures yield, and other non-2xx throw LeagueRequestRejectedError.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/league/league-gate.ts#L117-L150",
-          "version": "repo-lines-v1:sha256:9af773f188bdc6ec4205b5d646beffb6762a2f0d5bb32a3b0d2c9a95d79f7c82:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiNjFmMzNjNzc5MTU3OGExYThiNGRmNGUyZWIwNmRiYzg1N2ViZmU4MjI5NGJmMjA2YzM2NGNhOTAwNDQ0OWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY5MDdiNTU1MTQ2OTU5ZmZkZWFjYzc4MmExZjhlMDcyYTdkYTUyZDk3ODM0ZTFkMTYyODNhNzVhZWFmM2Q4NDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/sync/src/league/league-gate.ts#L22-L92",
+          "version": "repo-lines-v1:sha256:8b83d1373dcb4da3bd3dafbe7e84abde80891268b8812d37790b8e251296fdf3:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllMTNhN2UxYzlhYzY0NzQ0ZGQ1MTI0OTU3ZDY3MWJhMjYxZjE4N2JiOWEyYTMzZGI1MGFhOGE3NzhjOGEwNWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY1YTE2MjFhMjEwMmQ3MmQ1ODU0MWIyYWZjMTkzMTBmZGE5MTA3ZjQ5MjY3YTA5YzFjN2JhOGIyNDA0NTAzNjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/sync/src/trade/endpoints.ts#L1-L60",
-          "version": "repo-lines-v1:sha256:1d16324ef52029500bdba60c9d32d8f7f82383efa6f0f682cd520434c2f9a415:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjczMDM1OGRjNDBmNTkyMDNkMzM2NzVlN2MzMTYzZmFmMDJlMWIzZjQwMDkzYmM5NzFmMTViMTVmNzc5ZTA5MWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJhZGQ4MGZhNzlkN2MzZTIxYmJmY2IyYzdhYTNjZTc5MDI5MGU3N2U0ODg1ZDYxYWQ3N2M0YWFhODcxZjViYmIifQ"
+          "resource": "repo://packages/sync/src/trade/endpoints.ts#L5-L12",
+          "version": "repo-lines-v1:sha256:87f8b3ae2e8c791dcae76ef36a93d1ae67b0bd933e1093b22541d1eecfce439c:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2U3Mzc4Y2Q2YWE4ODJhNTEzNzM1MzMzYjQ0MDk1MzAxNDU0MWY1YWMyNzQ1M2UxODQwMzI1YWU1NDNmNzZhNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDM2ODhmZTdjMTg3NjcxNGU3ZTVkYTE5YmI0Nzk2MThhMDM4MmI4M2MwN2E3MjljMjM1MWJiYTA0MTUwNWFiZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzU2MDM2MzYwYmFkMzE0ZGFlNGE1ZDNjNzIyYzdkOTdkNzc2ZGFjNzJlOWNjNzIxMjQ5MjU1N2NkZjYzOTkxNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTY3N2EzZTkwZTM3NzFiYTc5ZTQ3MzdlYTlhODU2NTA1NWRlMzQ1OTE3MDQ4NGRiNGM3NTVhYjhhODZhNTFhMCJ9"
         }
       ]
     },
@@ -103,8 +107,8 @@
       "statement": "readWeightsIds parses data/weights.json with the contracts WeightsFileSchema via parseEnvelope, refuses a non-JSON, unknown-major, malformed-version or non-conforming file as a whole with a DataFileError naming the file (an invalid refusal names the first issue), and otherwise collects the bases categoryIds and every non-null line statId, returning the parsed file for the cross-file gate.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/catalogue/weights-ids.ts#L1-L90",
-          "version": "repo-lines-v1:sha256:bf0a6cd8686c31599483d5738e40f50a4d239fb0f48b645bc266cfaa511d8187:eyJzZWxlY3RlZExpbmVDb3VudCI6OTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwZGIzMmQ4MjQ3MDIyYjc1MzhmMzQ0MjZhMjZjYjk4OTNmNjFhMTdmNTRhOTVjY2VmMzA1ZDY2YWQxNjI4NTMifQ"
+          "resource": "repo://packages/sync/src/catalogue/weights-ids.ts#L1-L118",
+          "version": "repo-lines-v1:sha256:788a319b29bd30f107b43166130682b90118724ee2110cb6caf4ca136b1a0b3c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmOGJhNDc1NTdiYTNjYWM2MjUzNDBmYmY1YWRjMGZmYTExZGI4NTBhYWU5ZjhjOTZiMjZkMDVlMTU2NzYxZTkzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
@@ -113,18 +117,28 @@
       "statement": "runChunk raises DataFileError (with path and reason) for envelope refusals it reads under the lock, the same typed error the shell loaders raise, so the sync session can distinguish file refusals from transient faults.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L377-L417",
-          "version": "repo-lines-v1:sha256:f4d9fd609954d88a6672553eaaac407cead057c2ae05669ae874091f7531f943:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5ZjlmZjgzNjE1OWU0YTk3NTQzZWVhOTgxYmI5NzNhOTg0MDA5NmYzZjRiNDljZGViMjUyMWU2MjM0YWNlMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNjNjUzMWM5ZWZjMmVlYjAzYzYxYjIwMDg5M2U4MDU5YmYzM2Q5NmQ2MDNhNjk3MTk3ZTEzYzg4OTk4M2MxM2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ4MzFlZTI4Y2M4YWY5ZTgwNTk1MzgwNzY5OTU4Mjk0NDNjNzhmYTM2ZTY4NjhiZTMyNDBlYTQ0NWE5MGMwYjkifQ"
+          "resource": "repo://packages/sync/src/chunk/run-chunk/load-envelope.ts#L1-L49",
+          "version": "repo-lines-v1:sha256:810f030099ae8995b041107ffd49611893608daf0c33b6393a0d235a177b16bc:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhMmVhMjNjODRlYzc4OGNhNWNiMjI2MjVjYTc0N2MzYTUyODE2ZWJmNmY4YmJmNWZlN2EwMTg0ZDAzMDgxZDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/sync/src/load-data-file.ts#L1-L31",
-          "version": "repo-lines-v1:sha256:8587ccba2362e7ae35f88b2a63ff51cdc8c5272df321c66e814fa25fc3614e28:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5ZTY4YTZmNTIyMDczNjg1Nzg5OGVhY2U4YTM2OTk5NzVmMzJmYThiZTJmMzRiM2E0OTM4ZjY1YjIyMjMzZGUifQ"
+          "resource": "repo://packages/sync/src/load-data-file.ts#L15-L31",
+          "version": "repo-lines-v1:sha256:e8d1d38b3a0a54aacd15386f4a661e6587a0e574f6b2d96656419182d7d50fcb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQwNTYzNDcyYTk5OThjYTE4ODAzZWQ2NDY0MzA5NjE5MDUwMzBjODliZTliMjQ5ZTE4ZjEwZDYwN2Q2ZjQ3NzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExYTcyNTk4NmRmZDQ2YThlNmY0ODk5MzRlMmUwNTAwMzkxNGJjNDAzOGMzNzg3MTMxNTk1MzFlNGVhZTQzN2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlYjlhMDhjMzc3YWY0NWUzNjIyNmExZDQxNmUxZmQyMjBkMDJkMGZlZDMxMjQ0NGQwOGFjOWFjYjg0NzQwY2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ1ODgzOGIxMWNkZWJkMzFiNGJkNjgxYmI2ZmE0ZjMzNDI4YmU4MTk0NzIyZjM5ZDkyNDlkOTU0ZGIwZmI2ZmUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_62484e4d0b904a6aa713860c745c5563",
+      "statement": "A summed statId named by both slots of a crafted entry is sent as one stat filter at the prefix position with the summed band, and a hybrid reference sends one filter per line.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/pricing/search-body.ts#L116-L138",
+          "version": "repo-lines-v1:sha256:01c96deb69fe45ad1d5ed436900827681fc2c8142e5fb686e41924be3a71f495:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3NjI4OWM3OTMzYjljYWNkYzRmMGNmMjk0Y2EwZThlYTc0OWQ2NTQ1YjRmMGZlYjQwNWQ0OTk0ZjVlNTY1ZGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjNDhjYmE5ODA1MmI4NzE5YzRjYmE3MTYzZGE4NzhiNzYyZjY2ZTE3Y2Q1MjcxODdjZGNmZDg1NGM3MWRiOTkifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-10-03T11:56:06.252Z"
+    "at": "2026-10-17T13:54:42.734Z"
   }
 }

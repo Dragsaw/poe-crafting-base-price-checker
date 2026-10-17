@@ -10,14 +10,18 @@ sources:
     resource: repo://test/deferred-ledger.test.ts
   - id: openwiki-source-3e2aef2fec6b7b220f8848ea
     resource: repo://tools/deferred-issues/deferred-issues.ts
+  - id: openwiki-source-adf15b30ce051bde33ad2baf
+    resource: repo://tools/deferred-issues/ledger-rules.test.ts
+  - id: openwiki-source-94d73dea3476c8594eb8a2fc
+    resource: repo://tools/deferred-issues/ledger-rules.ts
   - id: openwiki-source-35fc39371e862378ce3a0288
     resource: repo://tools/deferred-issues/ledger.ts
   - id: openwiki-source-f849e96ae83af663ea7ea757
     resource: repo://tools/deferred-issues/plan.ts
-generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
+generated: { by: "claude-code", at: "2026-10-17T13:54:42.734Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-10-03T11:56:06.252Z
+    at: 2026-10-17T13:54:42.734Z
 ---
 
 # Deferred work as GitHub issues
@@ -29,7 +33,7 @@ Work that a story or review carves out goes into one ledger, `docs/stories/defer
 `tools/deferred-issues/ledger.ts` (`parseLedger`) defines what an entry is:
 
 - An **entry** is a top-level `- source_spec:` bullet that also has `summary:` and `evidence:` fields. A field key line is two spaces of indent, then `[a-z_]+:`. A line with more indent continues the field above it. A blank line, a new top-level bullet or any other unindented line ends the entry. Each value is its lines trimmed and joined with single spaces.
-- An optional human-written **`retry_when:`** field is a precondition. The sweep skips the entry until it is true.
+- An optional **`retry_when:`** field is a precondition. The sweep skips the entry until it is true. It must take one of three forms a sweep can test: `Story <n.n> is done in sprint-status.yaml` (naming a story that `sprint-status.yaml` lists), `master has moved past <sha>` (7 to 40 hex characters), or `never — needs a human`. A future planning event is not a valid form. `tools/deferred-issues/ledger-rules.ts` (`retryWhenProblem`, `storyIds`) holds the rule, and `ledger-rules.test.ts` checks every committed entry against it.
 - Any other bullet is a **note** and gets no id.
 
 The **id** is a content id: `dw-` plus the first 10 hex characters of `sha256(source_spec + "\n" + summary)`. No ledger line stores it, so an entry keeps its id until its source spec or summary text changes. The issue **title** is the summary with `"` removed, cut at a word boundary to at most 70 characters.
@@ -69,7 +73,7 @@ Several runs can work at once on different issues, because the claim ref seriali
 
 ## The ledger guard
 
-`test/deferred-ledger.test.ts` parses the committed ledger with the same `parseLedger`. It fails `pnpm test` when a `- source_spec:` bullet does not parse as an entry (a missing or mis-indented field), when two entries share an id (two parallel branches appended the same entry), or when an `auto_attempt:` or `integrate_branch:` line brings sweep run state back into the ledger. `tools/deferred-issues/{ledger,plan,deferred-issues}.test.ts` cover the parser, the pure plan and the command with a recorded runner (see [Test strategy and network guards](../testing/test-strategy-and-guards.md)).
+`test/deferred-ledger.test.ts` parses the committed ledger with the same `parseLedger`. It fails `pnpm test` when a `- source_spec:` bullet does not parse as an entry (a missing or mis-indented field), when two entries share an id (two parallel branches appended the same entry), or when an `auto_attempt:` or `integrate_branch:` line brings sweep run state back into the ledger. `tools/deferred-issues/{ledger,ledger-rules,plan,deferred-issues}.test.ts` cover the parser, the `retry_when` forms, the pure plan and the command with a recorded runner (see [Test strategy and network guards](../testing/test-strategy-and-guards.md)).
 
 ## Related
 

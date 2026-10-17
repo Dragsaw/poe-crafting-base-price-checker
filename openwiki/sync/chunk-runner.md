@@ -1,9 +1,14 @@
 ---
-type: subsystem
+type: architecture
 title: The sync chunk runner
-description: How one pnpm sync invocation runs one bounded, resumable, single-instance chunk — the shared composition, the on-disk lock and stale-lock breaking, the run-start cost order, the stop conditions and pinned cap, and the ordered writes of dataset.json, sync-progress.json and sync-report.json on success and on failure.
-tags: [sync, chunk, lock, rotation, sync-report, dataset, resumable]
+description: How one sync chunk works end to end — composition, the exclusive lock, the notBefore pause and auth hold-off, the run-start loads and gates, the rotation loop and its bounds, the three files it writes, and what a throw leaves behind.
+tags: [sync, chunk, lock, sync-progress, sync-report, dataset, failure-handling]
+verified:
+  - by: openwiki/0.6.0
+    at: 2026-10-17T13:54:42.734Z
 sources:
+  - id: openwiki-source-a995781442d1d869e85fc736
+    resource: repo://packages/sync/src/chunk/catalogue-check.ts
   - id: openwiki-source-5d4e33bdeec908a7878da940
     resource: repo://packages/sync/src/chunk/cross-file-gate.ts
   - id: openwiki-source-dbf0a5200ba812db3f3b5319
@@ -12,6 +17,24 @@ sources:
     resource: repo://packages/sync/src/chunk/publish-dataset.ts
   - id: openwiki-source-674c962be00b9b26529f4d45
     resource: repo://packages/sync/src/chunk/run-chunk.ts
+  - id: openwiki-source-9c6fbd41a8c2a4f89c759455
+    resource: repo://packages/sync/src/chunk/run-chunk/chunk-ending.ts
+  - id: openwiki-source-00344a187723098b535c0d27
+    resource: repo://packages/sync/src/chunk/run-chunk/failure-path.ts
+  - id: openwiki-source-abf10f38fed545190d9430b7
+    resource: repo://packages/sync/src/chunk/run-chunk/failure-records.ts
+  - id: openwiki-source-551c2b420e8b3627f979e107
+    resource: repo://packages/sync/src/chunk/run-chunk/not-before.ts
+  - id: openwiki-source-331fd410747f6d9539e37f50
+    resource: repo://packages/sync/src/chunk/run-chunk/pause-deferral.ts
+  - id: openwiki-source-0d9a279bef1e1d147b0742a8
+    resource: repo://packages/sync/src/chunk/run-chunk/publish-artifacts.ts
+  - id: openwiki-source-60b11e281e26b57d38a69469
+    resource: repo://packages/sync/src/chunk/run-chunk/run-start.ts
+  - id: openwiki-source-46218b0a78cdd4b8bc1b0766
+    resource: repo://packages/sync/src/chunk/run-chunk/run-state.ts
+  - id: openwiki-source-58d4a59d3976bcc01e21c261
+    resource: repo://packages/sync/src/chunk/run-chunk/step-loop.ts
   - id: openwiki-source-8128ba1419ce8d780ba3511f
     resource: repo://packages/sync/src/chunk/sync-report.ts
   - id: openwiki-source-46c0c66948769af343dff03d
@@ -20,15 +43,24 @@ sources:
     resource: repo://packages/sync/src/pinned-cap.ts
   - id: openwiki-source-999659a0385fcbff008d129d
     resource: repo://packages/sync/src/sync-batch.ts
-generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
-verified:
-  - by: openwiki/0.6.0
-    at: 2026-10-03T11:56:06.252Z
+generated: { by: "claude-code", at: "2026-10-17T13:54:42.734Z" }
 ---
 
 # The sync chunk runner
 
-A **chunk** is one bounded, locked unit of sync work: take the lock, load, price entries until a bound, publish, release. The trade API's rate limits cap how much one chunk can do, and the next chunk continues where the previous one stopped. The runner is `runChunk` in `packages/sync/src/chunk/run-chunk.ts`.
+A **chunk** is one bounded, locked unit of sync work: take the lock, load, price entries until a bound, publish, release. The trade API's rate limits cap how much one chunk can do, and the next chunk continues where the previous one stopped. The runner is `runChunk` in `packages/sync/src/chunk/run-chunk.ts`. That file holds the types and the top-level flow; each phase lives in `packages/sync/src/chunk/run-chunk/`:
+
+| Module | Phase |
+| --- | --- |
+| `pause-deferral.ts` | read `sync-progress.json` first, defer while `notBefore` is ahead |
+| `run-start.ts` | loads, offline checks, cross-file gate, order, league gate |
+| `step-loop.ts` | the rotation loop, its bounds and the pinned cap |
+| `chunk-ending.ts` | the normal ending and the gate-yield ending |
+| `publish-artifacts.ts` | dataset and progress writes, including the auth hold-off |
+| `write-report.ts` | the sync report write |
+| `failure-path.ts`, `failure-records.ts` | what a throw writes, and its records |
+| `not-before.ts` | the two `notBefore` formulas |
+| `run-state.ts` | the mutable state of one run |
 
 Three commands run chunks:
 
@@ -40,15 +72,16 @@ Three commands run chunks:
 
 `composeChunk` (`packages/sync/src/compose-chunk.ts`) is the one composition that `pnpm sync`, `pnpm sync:batch` and `pnpm sync:dry` use. From the shell's ports it builds:
 
-- one request counter (or the session's shared one) and **one fresh governor** (`createTradeGovernor`) of two sibling trade clients over one `HttpPort`. One client is counted as `league-validation` (the gate) and the other as `tracked-list` (the pricing step). See [Governed trade client and rate limits](trade-client-and-rate-limits.md).
+- one request counter (or the session's shared one) and **one fresh governor** (`createTradeGovernor`) of two sibling trade clients over one `HttpPort`. One client is counted as `league-validation` (the gate) and the other as `tracked-list` (the pricing step). When the shell passes an `auth` holder, the governor also gets a third counted port, `session-probe`, for the session-cookie probe. See [Governed trade client and rate limits](trade-client-and-rate-limits.md) and [POESESSID session auth](poesessid-session-auth.md).
 - the runner's `load` hook. The runner calls it under the lock. It reads `data/config.json`, checks the load-time pinned cap, reads `data/currencies.json` and the committed item types, and returns the publication (league plus output rate set), the starvation-record builder, the league gate and the pricing step. The step is built on the dataset the runner loaded.
 - the `catalogue` hook, which loads the committed catalogue id sets.
+- `latchedRetryAfterMs`, which reads a 429 the probe latched, and the runner's two narrow auth ports (`settleHeldOffIfDue`, `pendingHoldOff`/`holdOffApplied`). The runner never sees the cookie.
 
 `ComposeChunkPorts` has one optional seam, `wrapStep(step, context)`. When it is given, the load hook passes the pricing step it built through it, with a `StepContext` of the load-time `league` and `itemTypes`, and the runner uses the wrapped step. When it is absent, the runner uses the step unchanged. Only the dry run passes `wrapStep`: it skips an entry whose search has no recorded fixture.
 
-Four more options are passed **only by the `pnpm sync` session**: `pacing` (the pacing state every chunk of the session shares, so the fresh governor starts warm rather than cold), `spread` (pace with the even spread), `requests` (the shared request counter) and `session` (the `ChunkSession` options below). Without them the batch and dry chunks behave as before.
+Four more options are passed **only by the `pnpm sync` session**: `pacing` (the pacing state every chunk of the session shares, so the fresh governor starts warm rather than cold), `spread` (pace with the even spread), `requests` (the shared request counter) and `session` (the `ChunkSession` options below).
 
-The live commands pass the real filesystem, clock, `fetch` port and read-only git port. The dry run passes in-memory fakes, a fixture-backed HTTP port and `wrapStep`. See [Operator commands and curation workflow](../workflows/operator-commands.md).
+The live commands pass the real filesystem, clock, `fetch` port, read-only git port and the auth holder. The dry run passes in-memory fakes, a fixture-backed HTTP port and `wrapStep`. See [Operator commands and curation workflow](../workflows/operator-commands.md).
 
 ## The lock
 
@@ -58,57 +91,62 @@ The live commands pass the real filesystem, clock, `fetch` port and read-only gi
 - **Stale**: a lock is stale when `now − startedAt > STALE_LOCK_AFTER_MS` (6 hours). Staleness is judged by time only, never by pid, because the operating system reuses pids. A lock file that cannot be parsed counts as **held**, because the file can be empty for an instant just after its create. Its file modification time is then used for the staleness test.
 - **Break**: breaking is serialised by a second exclusive file, `data/sync.break.lock`. The breaker re-reads the lock and deletes it only if its text is still the stale text it judged. Then it takes the lock with another exclusive create. So of several concurrent breakers exactly one wins, and the others are `busy`. A broken lock adds a `stale-lock-broken` record to the report.
 - **Shared staleness rule**: `isStaleState` is exported so the `pnpm sync` session waits for a held lock by this same rule rather than a copy.
-- **Verify / release**: before it commits, the runner re-reads the lock (`holdsLock`). If another run has taken it over, the chunk is `dispossessed` and writes nothing. `releaseLockIfOwn` runs in a `finally` block and deletes the lock only while it is still this run's lock.
+- **Verify / release**: before it commits, the runner re-reads the lock (`isLockHeld`). If another run has taken it over, the chunk is `dispossessed` and writes nothing. `isOwnLockReleased` runs in a `finally` block and deletes the lock only while it is still this run's lock.
 
 ## The run-start sequence
 
 Under the lock, the checks run in order from free to costly:
 
-1. **`notBefore` check.** `data/sync-progress.json` is read first. If its `notBefore` is in the future (set by an earlier 429, malformed-request abort or gate 4xx), the run is `deferred`: it sends nothing and writes nothing. The one exception is that a broken stale lock is recorded in the report.
-2. **Loads**, each through `parseEnvelope`. A refusal throws a `DataFileError` that carries the path and reason (`unknown-major`, `malformed-version`, `invalid` or `not-json`) and names the file:
+1. **`notBefore` check** (`pause-deferral.ts`). `data/sync-progress.json` is read first. If its `notBefore` is in the future (set by an earlier 429, malformed-request abort or gate 4xx), the run is `deferred`: it sends nothing and writes nothing. The one exception is that a broken stale lock is recorded in the report, with the previous coverage figures carried. An unreadable progress file does not stop this step; its error is thrown later, inside the normal path, so the run still writes a report.
+2. **Auth hold-off.** The runner passes the progress file's `authHoldOffUntil` to the auth holder. While the hold-off is ahead, a valid cookie settles `held-off` and no probe is sent this run.
+3. **Loads**, each through `parseEnvelope`. A refusal throws a `DataFileError` that carries the path and reason (`unknown-major`, `malformed-version`, `invalid` or `not-json`) and names the file:
    - the previous `data/sync-report.json`. It is read outside the failure path, so a report this build cannot read is refused **before** anything is written, and the player's records are never lost.
-   - `data/tracked.json`. An absent file is an empty workload.
+   - `data/tracked.json`. An absent file is an empty workload. An earlier-major tracked file gets the re-author message.
    - `data/dataset.json`. An absent file means no entry was ever attempted.
    - the shell's `load` hook: config, pinned cap, rates, item types.
-   - the committed catalogue, then `data/weights.json`.
-3. **Offline checks**:
-   - the weights records: an absent file gives a `weights-absent` record, and a present file has its ids checked against the catalogue, report-only.
-   - the **cross-file gate** (`chunk/cross-file-gate.ts`): `core`'s five `crossFileChecks` over the tracked list and a present weights file. Any failure throws `CrossFileGateError` before the order exists, so the chunk spends no budget, publishes nothing, leaves `sync-progress.json` untouched and writes the report alone with one `cross-file-gate-failure` record per failing check and entry. An absent weights file skips the gate. The run exits non-zero.
-   - the run-start catalogue check (`chunk/catalogue-check.ts`). For each non-pruned entry it checks the `categoryId` or `baseTypeId`, then the prefix and suffix `statId`s, against the catalogue. An entry with any miss is marked `unresolvable`, gets one `unresolvable` record per miss, and is left out of this chunk's order. An entry published as `unresolvable` whose ids all resolve again is recovered into the order as an ordinary entry. Nothing here stamps `lastAttemptedAt`.
-4. **The order**: `chunkOrder` from `core` over the tracked list (without the excluded keys), the adjusted dataset, the completed keys, the clock and, under a session, `pinnedMaxAgeMs`. It is recomputed on every run (see [Core: ranking and refresh rotation](../core/ranking-and-refresh-rotation.md)).
-5. **The league gate**: the only run-start check that sends a request (see [Pricing step and league gate](pricing-step-and-league-gate.md)). A gate `yield` ends the chunk as an ordinary `yielded` chunk with no entry attempted. Under a session the gate is skipped when `session.confirmedLeague` equals the configured league and the order is not a new pass.
-6. **The rotation**: the steps.
+   - the committed catalogue.
+4. **Offline checks** (`checkRunStart`):
+   - `data/weights.json` is read. A present file gives the pool `coverage` figures (`poolCoverage` from `core`) and has its ids checked against the catalogue, report-only. An absent file gives a `weights-absent` record.
+   - the run-start catalogue check (`chunk/catalogue-check.ts`). For each non-pruned entry it checks the `baseTypeId` (raw), the `categoryId`, then every `statId` of the prefix and suffix (each line of a hybrid) against the catalogue. An entry with any miss is marked `unresolvable`, gets one `unresolvable` record per miss, and is left out of this chunk's order. An entry published as `unresolvable` whose ids all resolve again is recovered into the order as an ordinary entry, except a crafted `jewel` entry, whose resolution only the pricing step can decide. Nothing here stamps `lastAttemptedAt`.
+   - the **cross-file gate** (`chunk/cross-file-gate.ts`): `core`'s six `crossFileChecks` over the tracked list and a present weights file. Any failure throws `CrossFileGateError` before the order exists, so the chunk spends no budget, publishes nothing, leaves `sync-progress.json` untouched and writes the report alone with one `cross-file-gate-failure` record per failing check and entry. Unvalidated marks never fail it, and an absent weights file skips it. The run exits non-zero.
+5. **The order** (`planOrder`): `chunkOrder` from `core` over the tracked list (without the excluded keys), the adjusted dataset, the completed keys, the clock and, under a session, `pinnedMaxAgeMs`. It is recomputed on every run (see [Core: ranking and refresh rotation](../core/ranking-and-refresh-rotation.md)).
+6. **The league gate** (`runLeagueGate`): the only run-start check that sends a request (see [Pricing step and league gate](pricing-step-and-league-gate.md)). A gate `yield` ends the chunk as an ordinary `yielded` chunk with no entry attempted. Under a session the gate is skipped when `session.confirmedLeague` equals the configured league and the order is not a new pass.
+7. **The rotation**: the steps.
 
 ## The rotation loop and stop conditions
 
-The loop visits the pinned row first, then the rotation rows, and calls the pricing step once per entry. The chunk stops at the first of these:
+`runSteps` (`step-loop.ts`) visits the pinned row first, then the rotation rows, and calls the pricing step once per entry, sequentially. The chunk stops at the first of these:
 
 - the step reports a search allowance below 1, or a fetch allowance below 1, while more work remains. The outcome is `bounded`, with bound `search` or `fetch`. The allowances come from live response headers. The runner holds no rate of its own.
-- the step yields (429, 5xx, timeout, or the client's invalid-request refusal). The outcome is `yielded`.
+- the step yields (429, 5xx, timeout, the client's invalid-request refusal, or a session-cookie downgrade). The outcome is `yielded`. A downgrade sets `sessionExpired` on the outcome and writes no `notBefore`.
 - under a session, `session.maxEntries` entries were attempted and another remains. The outcome is `bounded`, with bound `entries`.
 - the order runs out. The outcome is `completed`.
 
-**Pinned cap, runtime half.** After each pinned step that reports a search allowance, `pinnedToKeep` may cut the rest of the pinned row so that at least one search is kept for the rotation. A cut, or a shortfall even with nothing left to cut, sets `pinnedStarvation` on the outcome. The shell's `starvationRecord` turns it into a `pinned-starvation` record with the declared `minChunkSearches` beside it.
+A 429 that the session-cookie probe latched during the chunk turns any ending into a 429 yield with that retry delay, even when no later request was sent.
+
+A step may also return report records for its entry, for example when a crafted `jewel` entry cannot be resolved. They join the chunk's records.
+
+**Pinned cap, runtime half.** After each pinned step that reports a search allowance, the loop checks whether rotation work is waiting. If it is, `pinnedToKeep(left, remaining)` may cut the rest of the pinned row so that at least one search is kept for the rotation. A shortfall (`remaining < left + 1` with rotation work waiting) sets `pinnedStarvation` on the outcome even when nothing is left to cut. The shell's `starvationRecord` turns it into a `pinned-starvation` record with the declared `minChunkSearches` beside it.
 
 **Pinned cap, load-time half** (`packages/sync/src/pinned-cap.ts`). When `count(pinned) > 0.5 × minChunkSearches`, the load throws `PinnedCapExceededError` before any request. The runner reports it as a `run-failure` whose message names `data/tracked.json`. This is the only place that reads `minChunkSearches`. It is a validation yardstick and never a chunk bound.
 
 ## What a chunk writes
 
-On `completed`, `bounded` or `yielded`, the chunk writes three files, in this order, through `writeArtifact`:
+On `completed`, `bounded` or `yielded`, the chunk first re-checks that it still holds the lock, then writes three files, in this order, through `writeArtifact`:
 
 1. **`data/dataset.json`** (`chunk/publish-dataset.ts`): exactly one entry per tracked entry, pruned entries included, sorted by canonical key. Each entry is this chunk's step entry, else the catalogue mark, else the previous entry unchanged, else `not-yet-synced`/`never-synced` with no timestamps. Previous entries whose key is no longer tracked are dropped. There is no league filter on entries. The top-level `league` is the configured league only once the gate has passed. Before that, the previously published label stays.
-2. **`data/sync-progress.json`**: the rows 2–3 completed keys only (pinned entries are exempt), sorted. `notBefore` is set to `now + min(retryAfter, 6h)` after a 429 (a step's or the gate's) and to `now + 6h` after a malformed-request abort or a gate 4xx. Every other ending clears it.
-3. **`data/sync-report.json`** (`chunk/sync-report.ts`): this chunk's **figures** replace the previous ones. They are requests per chunk source (under a session, counted from `session.requestsSince`, the start of the session's current pass, unless this chunk started a new pass), the not-reached count (eligible entries not attempted), the pool `coverage` and `rankableClassCount` figures computed from the tracked list and the weights file (a deferred run keeps the previous ones)  and the tracked-list edit date from git (`git-author-date`, with a `file-modified` fallback). **Records** are carried forward from the previous file in order. A new record that is `sameRecord` with an existing one replaces it at its index, and any other record is appended. Records stay until the player deletes them by hand. `runFinishedAt` is set.
+2. **`data/sync-progress.json`**: the rows 2–3 completed keys only (pinned entries are exempt), sorted. `notBefore` is set to `now + min(retryAfter, 6h)` after a 429 (a step's, the gate's or a latched probe's) and to `now + 6h` after a malformed-request abort or a gate 4xx. Every other ending clears it. `authHoldOffUntil` follows the auth holder's pending action: `write` sets it to `now + 24h`, `clear` removes it, and with no action the previous value is carried.
+3. **`data/sync-report.json`** (`write-report.ts`, `chunk/sync-report.ts`): this chunk's **figures** replace the previous ones. They are requests per chunk source (under a session, counted from `session.requestsSince`, the start of the session's current pass, unless this chunk started a new pass), the not-reached count (eligible entries not attempted), the pool `coverage` and `rankableClassCount`, and the tracked-list edit date from git (`git-author-date`, with a `file-modified` fallback). **Records** are carried forward from the previous file in order. A new record that is the same record (`isSameRecord`) as an existing one replaces it at its index, and any other record is appended. Records stay until the player deletes them by hand. `runFinishedAt` is set.
 
 The dataset is written before progress, so progress never records a completion that the dataset does not publish. `busy`, `deferred` and `dispossessed` write nothing, except the deferred stale-lock case described above.
 
 ### On a throw
 
-The report is written with a failure record and without `runFinishedAt`, the error is rethrown, and the command exits 1. What else is written depends on where the throw came from:
+`failRun` (`failure-path.ts`) writes what the throw leaves, then rethrows the error, and the command exits 1. The report gets a failure record and no `runFinishedAt`. If the lock was lost, nothing is written. What else is written depends on where the throw came from:
 
-- **Before the order exists** (load refusal, pinned-cap excess, catalogue or weights refusal, cross-file gate failure): the report only.
+- **Before the order exists** (load refusal, pinned-cap excess, catalogue or weights refusal, cross-file gate failure): the report only. A cross-file failure gives one record per failing check and entry; every other throw gives one `run-failure` record.
 - **League mismatch**: the report only, with the lock record and a `league-mismatch` record that lists the available leagues. The catalogue marks and check records are discarded.
-- **Any other throw after the order exists**: the dataset and progress for the step entries so far plus the marks, then the report. The failing entry is also published for a `MalformedRequestError` (a non-429 4xx) and for an `UnexpectedTradeResponseError` that carries one, from a search or a fetch body. `MalformedRequestError` and the gate's `LeagueRequestRejectedError` (a non-429 4xx on the leagues request) write the abort `notBefore`, because the same request would be refused again. Every other throw clears it.
+- **Any other throw after the order exists**: the dataset and progress for the step entries so far plus the marks, then the report. The failing entry is also published for a `MalformedRequestError` (a non-429 4xx) and for an `UnexpectedTradeResponseError` that carries one. `MalformedRequestError` and the gate's `LeagueRequestRejectedError` (a non-429 4xx on the leagues request) write the abort `notBefore`, because the same request would be refused again; their record reason is `trade-request-rejected`. Otherwise a latched probe 429 still writes its `notBefore`, and with none the field is cleared. Any other error is an `unrecoverable-error` record naming the current entry.
 
 Errors in writes on the failure path are logged. The original error is always the one rethrown, and a write already attempted is not attempted again.
 
@@ -118,4 +156,4 @@ A session chunk's outcome carries two extra fields once the order exists: `newPa
 
 ## Tests
 
-`packages/sync/src/chunk/run-chunk.test.ts` is the largest test file in the repository. It drives `runChunk` against the fake filesystem, clock and git ports. `lock.test.ts`, `catalogue-check.test.ts`, `publish-dataset.test.ts` and `sync-report.test.ts` cover the pure helpers. `run-chunk.test.ts` also covers the session options. `sync-batch.test.ts` drives `syncCommand` and `sync.test.ts` drives `syncSessionCommand`, both with injected ports. No test runs `main`.
+`packages/sync/src/chunk/run-chunk.test.ts` and its siblings drive `runChunk` against the fake filesystem, clock and git ports. `lock.test.ts`, `catalogue-check.test.ts`, `publish-dataset.test.ts` and `sync-report.test.ts` cover the pure helpers. `sync-batch.test.ts` drives `syncCommand` and `sync.test.ts` drives `syncSessionCommand`, both with injected ports. No test runs `main`.

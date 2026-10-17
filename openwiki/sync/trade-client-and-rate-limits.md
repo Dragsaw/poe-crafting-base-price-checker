@@ -12,6 +12,20 @@ sources:
     resource: repo://packages/sync/src/shell.ts
   - id: openwiki-source-b3be66a69069961cf317f20c
     resource: repo://packages/sync/src/trade/client.ts
+  - id: openwiki-source-03cda04272132b886e075b7c
+    resource: repo://packages/sync/src/trade/client/describe-429.ts
+  - id: openwiki-source-9728b2c47c3bfb260a78a2b8
+    resource: repo://packages/sync/src/trade/client/exchange.ts
+  - id: openwiki-source-d1374fb24500b334d6c59f1f
+    resource: repo://packages/sync/src/trade/client/pacing-state.ts
+  - id: openwiki-source-ffced81b61d970798d77aa8e
+    resource: repo://packages/sync/src/trade/client/remaining-allowance.ts
+  - id: openwiki-source-589d50654d35f2ba4801c7a4
+    resource: repo://packages/sync/src/trade/client/request-shape.ts
+  - id: openwiki-source-448041850d249d42d0692aa1
+    resource: repo://packages/sync/src/trade/client/serial-sender.ts
+  - id: openwiki-source-ee667029a15b39c81c171453
+    resource: repo://packages/sync/src/trade/client/yield-penalty.ts
   - id: openwiki-source-a3675307379799bec7583b7d
     resource: repo://packages/sync/src/trade/invalid-requests.ts
   - id: openwiki-source-71ca1c1a9324e2fb9c9eb03f
@@ -24,31 +38,33 @@ sources:
     resource: repo://packages/sync/src/trade/user-agent.ts
   - id: openwiki-source-6c1728bcce531bca96d02755
     resource: repo://test/no-hardcoded-rate-limits.test.ts
-generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
+generated: { by: "claude-code", at: "2026-10-17T13:54:42.734Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-10-03T11:56:06.252Z
+    at: 2026-10-17T13:54:42.734Z
 ---
 
 # Governed trade client and rate limits
 
-**Exactly one module in `sync` sends trade requests**: `packages/sync/src/trade/client.ts`. The pricing step, the league gate, `pnpm catalogue:refresh` and `pnpm fixtures:record` all send through it. If a second call site built its own requests, it would pace independently against the same shared budget of the trade API. That is the failure this module prevents.
+**Exactly one module in `sync` sends trade requests**: the governor in `packages/sync/src/trade/client.ts`. Its parts live in `packages/sync/src/trade/client/`: `exchange.ts` (one send), `serial-sender.ts` (the queue), `governor-context.ts` (pacing and header folding), `pacing-state.ts`, `request-shape.ts` (lanes and standing headers), `yield-penalty.ts` (429 delays), `remaining-allowance.ts`, `describe-429.ts` (the operator line) and `session-cookie.ts` (the session-cookie probe and downgrade). The pricing step, the league gate, `pnpm catalogue:refresh` and `pnpm fixtures:record` all send through it. If a second call site built its own requests, it would pace independently against the same shared budget of the trade API. That is the failure this module prevents.
 
 The client transports and nothing more. It does not build search bodies, parse results, compute medians, convert currency, retry, queue work across runs, or persist anything.
 
 ## What one send does
 
-For each `TradeRequest` (`method`, `url`, optional `body` and `headers`, and an opaque `lane` label), the exchange does this:
+For each `TradeRequest` (`method`, `url`, optional `body` and `headers`, an opaque `lane` label, and an optional `cookieEligible` flag), `runExchange` does this:
 
-1. **Threshold check.** If the policy this lane last used has reached the invalid-request threshold, the client refuses without sending. It returns a `yield` with reason `invalid-request-threshold` and `retryAfterMs: 0`, because waiting does not fix this condition.
+1. **Refusal check.** If a session-cookie probe latched a 429 earlier in this governor, the client refuses without sending and yields with that penalty. If the policy this lane last used has reached the invalid-request threshold, it refuses with reason `invalid-request-threshold` and `retryAfterMs: 0`, because waiting does not fix this condition. The threshold is checked before the wait.
 2. **Pace.** `laneDelayMs(pacing, lane, now, spread)` computes the delay for the lane's known policy, rounded up to whole milliseconds. The batch pacer, `paceBeforeNext`, gives the tightest unsatisfied delay: an active penalty, or a full bucket's remaining window, aged by the time since each rule was observed. With `spread` the governor uses `spreadBeforeNext` instead (see below). A lane with no known policy waits nothing. The client waits that long **once**, using the injected `wait`.
-3. **Send** through `HttpPort` with the **standing headers**, which are applied last so a caller cannot remove them: `User-Agent` (the configured contact string), `X-Requested-With: XMLHttpRequest`, and `Content-Type: application/json` on POST.
+3. **Send** through `HttpPort` with the **standing headers**, which are applied last so a caller cannot remove them: `User-Agent` (the configured contact string), `X-Requested-With: XMLHttpRequest`, and `Content-Type: application/json` on POST. Once the session cookie is live, a `cookieEligible` request also carries it (see [POESESSID session auth](poesessid-session-auth.md)).
 4. **Fold** the response's `X-Rate-Limit-*` headers back into the ledger and remember the lane's policy (`X-Rate-Limit-Policy`). The lane memo is capped at 64 lanes, and the least recently used lane is evicted first.
-5. **Count** every 4xx against the policy. A response that names no policy counts under `(no policy named)`.
-6. **Answer**:
+5. **Downgrade check.** A cookie request that shows the session is no longer elevated drops the cookie, resets pacing to cold and yields with reason `session-expired`; the answer is not counted.
+6. **Count** every 4xx against the policy. A response that names no policy counts under `(no policy named)`.
+7. **Answer**:
    - `429` gives a **yield**. `retryAfterMs` comes from a `Retry-After` value in integer seconds. When that is absent, zero or an HTTP date, it is derived from the ledger's penalties, with a floor of the widest window or penalty the response declared and at least 1 s.
    - when the optional `log` callback is given, a 429 also writes one operator line: the instant, the lane, the policy, the wait spent, the raw `Retry-After` and `X-Rate-Limit-*` headers and the ledger reading the wait was paced on. A threshold refusal sends nothing and logs nothing. `composeChunk` points `log` at the chunk's own sink, stderr by default.
    - any other status, including 5xx and non-429 4xx, is returned unchanged as a `response`. The caller decides what it means.
+8. **Probe.** After the first 2xx `cookieEligible` answer while the session holder is unsettled, the governor sends the session-cookie probe once on the `session-probe` port.
 
 Every result carries `invalidRequests` (the running 4xx count on the policy) and, where the headers declared a rule, `remaining`. `remaining` is the smallest `hits − state.hits` over all buckets and is never below 0. The chunk runner stops when it drops below 1 (see [The sync chunk runner](chunk-runner.md)).
 
@@ -56,7 +72,7 @@ Every result carries `invalidRequests` (the running 4xx count on the policy) and
 
 ### One governor, several sources
 
-`createTradeGovernor({ http: { sourceA: port, sourceB: port }, ... })` builds sibling clients that share one ledger, one set of invalid-request counts, one lane memo and **one serial queue**. It returns `{clients, pacing, delayBeforeMs(lane)}`. `createTradeClients` is the same governor returning only `clients`. Requests are chained one at a time. The pacing logic assumes the ledger is at most one response out of date, and that holds only when nothing else is in flight. The queue survives a rejected exchange. `composeChunk` uses this to count `league-validation` and `tracked-list` requests separately while pacing them together.
+`createTradeGovernor({ http: { sourceA: port, sourceB: port }, ... })` builds sibling clients that share one ledger, one set of invalid-request counts, one lane memo and **one serial queue**. It returns `{clients, pacing, delayBeforeMs(lane), latchedRetryAfterMs()}`. With an `auth` option (the holder and the probe port) every throw from an exchange is redacted in place before it leaves the queue. `createTradeClients` is the same governor returning only `clients`. Requests are chained one at a time. The pacing logic assumes the ledger is at most one response out of date, and that holds only when nothing else is in flight. The queue survives a rejected exchange. `composeChunk` uses this to count `league-validation`, `tracked-list` and `session-probe` requests separately while pacing them together.
 
 ### Shared pacing memory and the even spread
 
@@ -86,13 +102,13 @@ The trade API revokes access after too many 4xx responses, and waiting does not 
 
 ## The User-Agent contact
 
-Every request must identify the tool and a contact address. `user-agent.ts` reads **`POE_SYNC_USER_AGENT`**, which holds the whole header value verbatim. It is the only `process.env` read in `sync`, and it runs at the shell edge. If the variable is unset or blank, `resolveUserAgent` returns a typed refusal: `pnpm sync` prints it and exits 1 before any request. The client factories also throw `MissingUserAgentError` on a blank value, so no request can go out without a contact. The live commands load `.env` with `node --env-file-if-exists=.env`.
+Every request must identify the tool and a contact address. `user-agent.ts` reads **`POE_SYNC_USER_AGENT`**, which holds the whole header value verbatim. It is read at the shell edge: the commands pass `process.env` in, and the only other value they read from it is the optional `POESESSID`. If the variable is unset or blank, `resolveUserAgent` returns a typed refusal: `pnpm sync` prints it and exits 1 before any request. The client factories also throw `MissingUserAgentError` on a blank value, so no request can go out without a contact. The live commands load `.env` with `node --env-file-if-exists=.env`.
 
 ## The real HTTP port and request counting
 
 `createFetchHttpPort` in `packages/sync/src/shell.ts` is the only real `HttpPort`. It calls `fetch` with `AbortSignal.timeout(REQUEST_TIMEOUT_MS)` (30 s), so a stalled connection cannot hang the command. It lowercases response header names. Only `shell-fetch.test.ts` runs it, against a loopback server.
 
-`request-counter.ts` wraps an `HttpPort` per source (`tracked-list`, `league-validation`, `catalogue-refresh`). It counts each request **before** it is answered, so a timeout still counts. `requestsBetween` gives the per-chunk difference. The Sync Report narrows this to the two chunk sources.
+`request-counter.ts` wraps an `HttpPort` per source (`tracked-list`, `league-validation`, `catalogue-refresh`, `session-probe`). It counts each request **before** it is answered, so a timeout still counts. `requestsBetween` gives the per-chunk difference. The Sync Report narrows this to the three chunk sources, and the page hides `session-probe`.
 
 ## Related
 

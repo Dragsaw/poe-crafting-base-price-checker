@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:982b01fbbbffc169efaf0f128ea2240d2b3f0fec155e596e23116c4df635ee70",
+  "claims": [
+    {
+      "id": "claim_6b081459d97b469ea333774520449a01",
+      "statement": "A PriceTrust is a verdict of current, rough, pending or broken plus typed reasons, and its reasons list is empty exactly when the verdict is current.",
+      "evidence": [
+        {
+          "resource": "repo://packages/contracts/src/ranked-row/price-trust.ts#L1-L52",
+          "version": "repo-lines-v1:sha256:beaf180254df6b2ce85774ccd61830d37a60678b89ce7b33c460c2c7cf969133:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkYmQzZTgyYTAwZWJjNDY5OGMyZTQzODY3YTAxOTg3YTNkYjcxN2NkMTFmNzhhMTE5ZTJlZjBkMjY0ZmRlNWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhODdhMDE5NTkyMTIzMTc1NjBlMzVjZDAwYmNhYjEyMzE4NGQ0NjA2M2M0OTdkM2M4ZjJkNzZkMTQ0YWVkMWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c936fcf20c6f4b828099d7780d72a0e8",
+      "statement": "entryTrust resolves a missing dataset entry as never-synced and an other-league priced observation as league-mismatch, then gives priced entries current or rough (old at 72 hours or more, thin below 3 listings), no-listings and not-yet-synced entries pending, and unresolvable entries broken; it throws for a pruned entry.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/price-trust.ts#L5-L84",
+          "version": "repo-lines-v1:sha256:1cdf4d2d7656f2ee34e16a0607aa29aceded8977fdf390c8d3f3ca79dd82b96b:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1ZDI4N2M2ZWUyYjZiYmU0YzI5ZmQ3YTE4MWQwYWJlZTk1ODhiMDYwYTMzNWY1ZTBmZGM2NDhlMjdlMmZlZGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM5M2MyNWUzNTdlZmY2ZDE0ZWY5MDZhODJiOTFlNTA5MzgwYTI2ZWFjM2NlYmNiZmQ5ZjhmZjkxMjgwYWU5ZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMzZmUxZDZlOThiYTYzZjA3MDBlMTYxODc1ODhhZjQzZGIzYzE2Mjg4MzI0ZjQzOGM3MWM3NDE1YWE0NTM2ZGIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0b1724fad33348be964f596ebda7cada",
+      "statement": "craftedTrust applies ordered rules where the first match wins: uncostable is pending, all entries broken is broken, no priced entry is pending no-prices, and an unreliable rough share of gross at or above 70 percent (with a 1e-9 tolerance) is rough; otherwise current.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/price-trust.ts#L86-L129",
+          "version": "repo-lines-v1:sha256:6566e00bff76f54215bea66bf3b9626df9b1855a975b60b57e385424e02b0612:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjczNTJlNjk2ZTE4MWJkNWZiNGI4OWM5MGIxOGMyMDA3MjBlZTFmMTEzYjRlNDhmNmY0ZWY3MGU2YzBhYmJiMWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ef50b8c0793a46fc9c4ba7750e8decd7",
+      "statement": "rank refuses an unparseable now instant with RangeError, and with no costed recipe it lists every crafted class as recipeless with the pending no-recipe verdict.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/price-trust.ts#L17-L22",
+          "version": "repo-lines-v1:sha256:093297f06fa22131f1cd71f188d5be1d5119e18be6b1221ea64178b200d0d0a9:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWQ2YjY1OTg1NDg5ZGQyMzdjZWMyMWNlNDczYzY4OWNkODAyZDQwNTA0MzBiNjc3ZjRkZGJjNzM4ZjljNjczNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODdmMjE1M2EzNGYwYjA5ZTNjM2U1YTlmYzY3YWI0M2UxZmVmNjA2Y2Y0YTU3N2JkZWEwZTEyMzlmNjU2NzI4YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjI2YjMwN2IzZDJhZDIyOWJlYmNlZmY5MzdlMGI5YWZhOGI3MjUzMzRmOWI4YTE5ZTBlMGNmNTdkNTBlNTRmOSJ9"
+        },
+        {
+          "resource": "repo://packages/core/src/rank.ts#L229-L249",
+          "version": "repo-lines-v1:sha256:a05afafad050984c77dbd24267fe4b3a48f94ec01aebcb9808150076b0d8cd42:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyZmIzNDYxOWM5MGExYmI5N2UzOGYwMjEzN2FkYmZiYzk2MTAwNmNmMGQwYWQ4ODAwZDliN2NjNzc3MDdhNjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljNWUzYmZhMjNkNDdkODExOTVjMTIxMGIyZDFhNDBmNGEyMmU0MDY2NTc5YTczZmYwYzNmMmZhYTZjMjExZjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkxNWNjYTAwYzRjMjY5MWMyN2U1NDc3MTVkMjhiNzMyNWE0MDI0ODZmMWQ3YmM3NzUyYWE3MTljODRlYWZjOWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEzODMzNzQxMTc2Njk3N2Y4ZGVkZGVkNDYyZjc0MDNkYjJhNzhmMmQxZjZjN2RiZjYxNDExZmYxODQxMDYyMDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9b8d6b7effd6432b8424397aaaf5f71b",
+      "statement": "A costable crafted row whose verdict is pending or broken is moved into the unpriced crafted group instead of the surviving ranked rows.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/rank.ts#L215-L265",
+          "version": "repo-lines-v1:sha256:6776aed90d8f6ae79961bd793705d42b2be22b2ae11cd54ace2d9a64f33cc541:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmNDlkZjM4NmQ4MmU2ODY3Y2E4OTg0N2E0MzAyYjA4M2ExNmZhNjFmNDdlZDY2MzFmM2YxNTM0ZDQxNTA0ZjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmZTdiNTJkMWIxNDk3ODI4YTQwZmE2MWU2OTEzYjM1YzFjNzM3NzU4NWY1YzMyZjM1Nzg1MzJjYzA4MDgxYjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcwZGQ2NDkzYjc1NmE4NmQ1OTFkZGZjMDhiZjM0OGU2Yjk2MTBmYzY0MTNjMDJhYjMzMGVjNjM4MDY3YWU4ZWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1c0e3c10331b497aaf6042bd5700bdc7",
+      "statement": "Expansion combinations sort priced (current or rough) first, then pending, then broken, then by canonical key.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/rank-crafted-row.ts#L44-L52",
+          "version": "repo-lines-v1:sha256:ee9720db4bf87ce8121f92aba79911a41e5d9db95277dc8afd5560fbec772661:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWIzNjI3ZTYwM2VlNTBiODRkNDc0NzFkZjdiMDBhNDlhMjJiMzZiOTU2YTA1YTc1MjQ4NDFjMmNmZjU0M2Y0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjI2NjNjN2UwYzFjZWIzMDQxMmYzZmZlZmE5ZDIxZDA3N2JjNTY0NmIxZWY5Y2M1OTFhZjgwYjYyMGI1ZTQ1NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTFhMzI4NDVkMzRkNmE4NGQyNDVjMzIyOTY2ZTk1MzM0NGVhOTljN2ViYjUyNjNjYjA5YWQ0MWJjOGZmNDY4YiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_b95bffb4686f4c47b6d6d15d9b651f64",
+      "statement": "The web page maps verdicts and reasons to words in trust-words.ts and prints a pending or broken row's EV as a missing figure rather than a number.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/list/display-rows.ts#L29-L32",
+          "version": "repo-lines-v1:sha256:c67de2574cea39f6cc570659261b034b218dcdbccb0f944d668e0a79affaea6e:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2EzYjg1OTliZmY1ZWU3YmU3OGFiZTFjZjFjNDljY2JiNzljNzhiNDc3YWU1Y2ZhZTU1NmQxMTAxMTUwMTJkNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWFmMWU1MzM1ZjhiNDFiMWJjY2FkNTg1ZDAwOTA5YjNmYjExZDBjYWQzMjM2MjJjYzM0NTBhNWMwMDVlZGZjOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGJlM2FmOWUzMTMxOGVmYzYwODI4NzAxMDk2ZWU1MWUxMTE3ZGI0YWQxZGY3ODc5NjdhMDUxZmU4NjIyNTJkOCJ9"
+        },
+        {
+          "resource": "repo://packages/web/src/list/row/trust-words.ts#L9-L77",
+          "version": "repo-lines-v1:sha256:3e26dc933a1496045b8ffcfa5c838b668b028d7d05173054d22e81b557d346e4:eyJzZWxlY3RlZExpbmVDb3VudCI6NjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjYzBiNzlhZjkzODQzMmY1MGJiZmI3OTk1Mjc5MjE1OGUzZDhmMmMxZWJiMTQxYTczYjA3MjkyMDU1ZGY5OWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMzNWI4ZTNhOThkOTIzZTA2NTk4OGE2NTQ4OTQ2YjMzZjY0MTNlMjVjZTFiNTI5ODBmNzYyMzQxMjZhMmEwMjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-10-17T13:54:42.734Z"
+  }
+}
