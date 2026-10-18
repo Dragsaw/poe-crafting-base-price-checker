@@ -25,11 +25,6 @@ const ADVANCE_EM = 0.6;
 // Pairings over the 27-character budget: pruning candidates (EXPERIENCE.md, *Escape valve*).
 // Listed in `docs/stories/deferred-work.md` (story 3.5); a change here must follow in that entry.
 const PRUNING_CANDIDATES = [
-  'T1 % Evasion · T1 Crit Chance',
-  'T1 % Evasion · T1 Mana Regen',
-  'T1 % Evasion · T1 Melee Skills',
-  'T1 % Evasion · T1 Minion Skills',
-  'T1 % Evasion · T1 Proj Skills',
   'T1 % Life · T1 Minion Skills',
   'T1 % Mana · T1 Minion Skills',
   'T1 Elem Atk Dmg · T1 +Crit Chance',

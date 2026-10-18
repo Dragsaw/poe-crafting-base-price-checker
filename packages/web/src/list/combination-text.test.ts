@@ -122,7 +122,7 @@ function line(statId: string, valueMin: number, valueMax: number): object {
 describe('affixText: a hybrid reference', () => {
   it('prints the tier, then the short forms, comma-joined, in the curated register', () => {
     expect(affixText(hybrid([line(EVASION, 10, 20), line(ES, 30, 40)], 'T1'), STATS)).toEqual({
-      text: 'T1 % ES, % Evasion',
+      text: 'T1 % ES, % EV',
       verbatim: false,
     });
   });
@@ -176,9 +176,9 @@ describe('affixText: a hybrid reference', () => {
   it('joins a hybrid prefix and a single suffix with the middle dot', () => {
     const parts = combinationText(entry(hybrid([line(ES, 1, 2), line(EVASION, 3, 4)], 'T1'), banded(MANA, 150, 180, 'T1')), STATS);
     expect(parts).toEqual([
-      { text: 'T1 % ES, % Evasion', verbatim: false },
+      { text: 'T1 % ES, % EV', verbatim: false },
       { text: 'T1 Mana', verbatim: false },
     ]);
-    expect(combinationString(parts)).toBe('T1 % ES, % Evasion · T1 Mana');
+    expect(combinationString(parts)).toBe('T1 % ES, % EV · T1 Mana');
   });
 });

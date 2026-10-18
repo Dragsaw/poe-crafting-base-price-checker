@@ -5,14 +5,14 @@ import { spacing } from '../../theme/tokens';
 import { CHASE_CELLS } from '../display-rows';
 
 /** The widest chase text of at most 27 characters that the short-form table builds (spec Q1). */
-export const CHASE_BUDGET_TEXT = `T1 % Armour${JOINER}T1 Mana Regen`;
+export const CHASE_BUDGET_TEXT = `T1 Mana Regen${JOINER}T1 Xbow Dmg`;
 
 /**
  * The chase-cell budget *B* in px: {@link CHASE_BUDGET_TEXT} at `typography.chase` in bundled Inter, its tiers at
- * `typography.tier`, 176.09px in Chromium, rounded up (DESIGN.md *Measure at build*). `chase-count.test.ts` fails when
+ * `typography.tier`, 181.08px in Chromium, rounded up (DESIGN.md *Measure at build*). `chase-count.test.ts` fails when
  * the table outgrows it.
  */
-export const CHASE_CELL_BUDGET = 177;
+export const CHASE_CELL_BUDGET = 182;
 
 const pixels = (value: string): number => Number(value.replace(/px$/u, ''));
 
