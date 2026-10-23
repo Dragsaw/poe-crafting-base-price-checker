@@ -25,6 +25,7 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
       makes a new entry and a new issue.
 -->
 
+
 ## Deferred from: spec-retro-4-2 review (2026-10-10)
 
 - source_spec: `docs/stories/spec-retro-4-2-state-23-verdict-and-recipeless-order.md`
@@ -59,16 +60,4 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `data/tracked.json`
   summary: Track more normal (raw) bases.
   evidence: `data/tracked.json` on master holds only four raw entries (two Amulets, two Belts, one of them pruned) beside 1,255 crafted entries. The player did not name the bases to add.
-  retry_when: never — needs a human
-
-## Deferred from: spec-jewel-craft-cost-zero review (2026-10-23)
-
-- source_spec: `docs/stories/spec-jewel-craft-cost-zero.md`
-  summary: [NOTE FOR UX] The Accessibility Floor names only the minus sign and `< 0.00` as the cue of a dimmed figure, but state 21 now dims a jewel's `0.00`, which has neither.
-  evidence: EXPERIENCE.md *Accessibility Floor* (line ~1027, "never by tone alone") against state 21 rev 31 (memlog 294). `packages/web/src/list/display-rows.ts` `figure()` dims a jewel's `0.00` by tone; the exact `0.00` beside empty chase cells is the only other cue. UX decides whether the Floor names that cue or the dim changes. Review finding from three layers.
-  retry_when: never — needs a human
-
-- source_spec: `docs/stories/spec-jewel-craft-cost-zero.md`
-  summary: [NOTE FOR UX] UJ-2 says "Jewel rows do not move" across `greater` and `perfect`, but only a jewel's EV stays the same; its rank position can change as non-jewel EVs move.
-  evidence: EXPERIENCE.md UJ-2 rev 31. `compareOrdering` (`packages/core/src/rank-order.ts`) orders by EV, and every non-jewel crafted EV changes with the recipe's Craft Cost, so a jewel row can change rank between recipes. Blind review finding.
   retry_when: never — needs a human

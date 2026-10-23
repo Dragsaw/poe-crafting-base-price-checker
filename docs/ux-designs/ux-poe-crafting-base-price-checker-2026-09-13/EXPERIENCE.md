@@ -1124,8 +1124,9 @@ Second turn, the same shape: **richer also means a different recipe.** They clic
 `perfect` in `{components.recipe-toggle}`, and the list reorders again. This time a
 different set of outcomes is reachable (FR-26). The Craft Cost beside the toggle
 tells them what the better orbs cost per attempt. That figure makes the two
-orderings comparable. Jewel rows do not move, because a jewel subtracts no Craft
-Cost; an opened jewel row says so (memlog 294).
+orderings comparable. A jewel row keeps its EV, because a jewel subtracts no Craft
+Cost, and an opened jewel row says so (memlog 294). Its rank can still change as
+the other rows move.
 
 Failure path: they set a value that nothing clears (**state 25**). The page does
 not look like a data outage. The list statement names the condition and the live
