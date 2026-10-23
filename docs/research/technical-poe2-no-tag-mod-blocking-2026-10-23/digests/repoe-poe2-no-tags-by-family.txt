@@ -1,0 +1,751 @@
+source: https://repoe-fork.github.io/poe2/mods.json (version 0.5.5.4.2, Last-Modified Mon, 19 Oct 2026 04:57:15 GMT, accessed 2026-10-23)
+mods total: 16784; mods adding or weighted on a no_* tag: 324
+
+=== groups=Bloodlines | 
+  domain=monster gen=bloodlines stats=bloodlines_force_drop_of_pack_item_type_rarity
+    adds_no: -
+    spawn_weights (ordered): no_forced_item_drops:0
+    mods (1): MonsterBloodlinesDropRareItem
+
+=== groups=FreezeDamageIncrease | 
+  domain=monster gen=unique stats=hit_damage_freeze_multiplier_+%
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): -
+    mods (1): EndgameBossFreezeBuildup
+
+=== groups=FreezeDamageIncrease | #% increased [Freeze|Freeze] Buildup
+  domain=item gen=corrupted stats=hit_damage_freeze_multiplier_+%
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): wand:1 staff:1 default:0
+    mods (1): CorruptionFreezeDamageIncrease1
+  domain=item gen=suffix stats=hit_damage_freeze_multiplier_+%
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): no_cold_spell_mods:0 wand:1 staff:1 trap:1 default:0
+    mods (5): FreezeDamageIncrease1 FreezeDamageIncrease2 FreezeDamageIncrease3 FreezeDamageIncrease4 FreezeDamageIncrease5
+  domain=item gen=unique stats=hit_damage_freeze_multiplier_+%
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): -
+    mods (5): TwistedEmpyreanVerisiumImplicitFreezeBuildup1 UniqueFreezeDamageIncrease1 UniqueFreezeDamageIncrease2 UniqueFreezeDamageIncrease3 UniqueFreezeDamageIncrease4
+  domain=item gen=unique stats=hit_damage_freeze_multiplier_+%
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): wand:1 staff:1 default:0
+    mods (1): CorruptionUpgradeFreezeDamageIncrease1
+  domain=misc gen=suffix stats=hit_damage_freeze_multiplier_+%
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): int_radius_jewel:1 default:0
+    mods (1): JewelRadiusFreezeAmount
+  domain=misc gen=suffix stats=hit_damage_freeze_multiplier_+%
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): intjewel:1 default:0
+    mods (1): JewelFreezeAmount
+
+=== groups=IgniteChanceIncrease | #% increased [Flammability] [BuffMagnitude|Magnitude]
+  domain=item gen=corrupted stats=ignite_chance_+%
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): wand:1 staff:1 default:0
+    mods (1): CorruptionIgniteChanceIncrease1
+  domain=item gen=suffix stats=ignite_chance_+%
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): no_fire_spell_mods:0 wand:1 staff:1 trap:1 default:0
+    mods (5): IgniteChanceIncrease1 IgniteChanceIncrease2 IgniteChanceIncrease3 IgniteChanceIncrease4 IgniteChanceIncrease5
+  domain=item gen=unique stats=ignite_chance_+%
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): -
+    mods (6): UniqueIgniteChanceIncrease1 UniqueIgniteChanceIncrease2 UniqueIgniteChanceIncrease3 UniqueIgniteChanceIncrease4 UniqueMutatedVaalIgniteChanceIncrease UniqueMutatedVaalIgniteChanceIncrease1
+  domain=misc gen=suffix stats=ignite_chance_+%
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): str_radius_jewel:1 int_radius_jewel:1 default:0
+    mods (1): JewelRadiusIgniteChance
+  domain=misc gen=suffix stats=ignite_chance_+%
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): strjewel:1 intjewel:1 default:0
+    mods (1): JewelIgniteChance
+
+=== groups=IncreaseSocketedGemLevel | +# to Level of all [Chaos|Chaos] [Spell|Spell] Skills
+  domain=item gen=corrupted stats=chaos_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): wand:1 staff:1 default:0
+    mods (1): CorruptionGlobalChaosSpellGemsLevel1
+  domain=item gen=suffix stats=chaos_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): default:0
+    mods (3): GlobalChaosSpellGemsLevel1 GlobalChaosSpellGemsLevel2 GlobalChaosSpellGemsLevel3
+  domain=item gen=suffix stats=chaos_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_chaos_spell_mods:0 staff:1 default:0
+    mods (5): GlobalChaosSpellGemsLevelTwoHandWeapon1 GlobalChaosSpellGemsLevelTwoHandWeapon2 GlobalChaosSpellGemsLevelTwoHandWeapon3 GlobalChaosSpellGemsLevelTwoHandWeapon4 GlobalChaosSpellGemsLevelTwoHandWeapon5
+  domain=item gen=suffix stats=chaos_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_chaos_spell_mods:0 wand:1 default:0
+    mods (5): GlobalChaosSpellGemsLevelWeapon1 GlobalChaosSpellGemsLevelWeapon2 GlobalChaosSpellGemsLevelWeapon3 GlobalChaosSpellGemsLevelWeapon4 GlobalChaosSpellGemsLevelWeapon5
+  domain=item gen=unique stats=chaos_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): wand:1 staff:1 default:0
+    mods (1): CorruptionUpgradeGlobalChaosSpellGemsLevel1
+
+=== groups=IncreaseSocketedGemLevel | +# to Level of all [Cold|Cold] [Spell|Spell] Skills
+  domain=item gen=corrupted stats=cold_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): wand:1 staff:1 default:0
+    mods (1): CorruptionGlobalColdSpellGemsLevel1
+  domain=item gen=suffix stats=cold_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): default:0
+    mods (3): GlobalColdSpellGemsLevel1_ GlobalColdSpellGemsLevel2 GlobalColdSpellGemsLevel3
+  domain=item gen=suffix stats=cold_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_cold_spell_mods:0 staff:1 default:0
+    mods (5): GlobalColdSpellGemsLevelTwoHandWeapon1 GlobalColdSpellGemsLevelTwoHandWeapon2 GlobalColdSpellGemsLevelTwoHandWeapon3 GlobalColdSpellGemsLevelTwoHandWeapon4 GlobalColdSpellGemsLevelTwoHandWeapon5
+  domain=item gen=suffix stats=cold_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_cold_spell_mods:0 wand:1 default:0
+    mods (5): GlobalColdSpellGemsLevelWeapon1 GlobalColdSpellGemsLevelWeapon2 GlobalColdSpellGemsLevelWeapon3 GlobalColdSpellGemsLevelWeapon4 GlobalColdSpellGemsLevelWeapon5
+  domain=item gen=unique stats=cold_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): -
+    mods (2): CorruptionUpgradeGlobalIncreaseColdSpellSkillGemLevel UniqueGlobalColdSpellGemsLevel1
+  domain=item gen=unique stats=cold_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): wand:1 staff:1 default:0
+    mods (1): CorruptionUpgradeGlobalColdSpellGemsLevel1
+
+=== groups=IncreaseSocketedGemLevel | +# to Level of all [Fire|Fire] [Spell|Spell] Skills
+  domain=item gen=corrupted stats=fire_spell_skill_gem_level_+
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): wand:1 staff:1 default:0
+    mods (1): CorruptionGlobalFireSpellGemsLevel1
+  domain=item gen=suffix stats=fire_spell_skill_gem_level_+
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): default:0
+    mods (3): GlobalFireSpellGemsLevel1_ GlobalFireSpellGemsLevel2 GlobalFireSpellGemsLevel3
+  domain=item gen=suffix stats=fire_spell_skill_gem_level_+
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_fire_spell_mods:0 staff:1 default:0
+    mods (5): GlobalFireSpellGemsLevelTwoHandWeapon1 GlobalFireSpellGemsLevelTwoHandWeapon2 GlobalFireSpellGemsLevelTwoHandWeapon3 GlobalFireSpellGemsLevelTwoHandWeapon4 GlobalFireSpellGemsLevelTwoHandWeapon5
+  domain=item gen=suffix stats=fire_spell_skill_gem_level_+
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_fire_spell_mods:0 wand:1 default:0
+    mods (5): GlobalFireSpellGemsLevelWeapon1 GlobalFireSpellGemsLevelWeapon2 GlobalFireSpellGemsLevelWeapon3 GlobalFireSpellGemsLevelWeapon4 GlobalFireSpellGemsLevelWeapon5
+  domain=item gen=unique stats=fire_spell_skill_gem_level_+
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): -
+    mods (1): CorruptionUpgradeGlobalIncreaseFireSpellSkillGemLevel
+  domain=item gen=unique stats=fire_spell_skill_gem_level_+
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): wand:1 staff:1 default:0
+    mods (1): CorruptionUpgradeGlobalFireSpellGemsLevel1
+
+=== groups=IncreaseSocketedGemLevel | +# to Level of all [Lightning|Lightning] [Spell|Spell] Skills
+  domain=item gen=corrupted stats=lightning_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): wand:1 staff:1 default:0
+    mods (1): CorruptionGlobalLightningSpellGemsLevel1
+  domain=item gen=suffix stats=lightning_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): default:0
+    mods (3): GlobalLightningSpellGemsLevel1 GlobalLightningSpellGemsLevel2 GlobalLightningSpellGemsLevel3
+  domain=item gen=suffix stats=lightning_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_lightning_spell_mods:0 staff:1 default:0
+    mods (5): GlobalLightningSpellGemsLevelTwoHandWeapon1 GlobalLightningSpellGemsLevelTwoHandWeapon2 GlobalLightningSpellGemsLevelTwoHandWeapon3 GlobalLightningSpellGemsLevelTwoHandWeapon4 GlobalLightningSpellGemsLevelTwoHandWeapon5
+  domain=item gen=suffix stats=lightning_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_lightning_spell_mods:0 wand:1 default:0
+    mods (5): GlobalLightningSpellGemsLevelWeapon1 GlobalLightningSpellGemsLevelWeapon2 GlobalLightningSpellGemsLevelWeapon3 GlobalLightningSpellGemsLevelWeapon4 GlobalLightningSpellGemsLevelWeapon5
+  domain=item gen=unique stats=lightning_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): -
+    mods (1): CorruptionUpgradeGlobalIncreaseLightningSpellSkillGemLevel
+  domain=item gen=unique stats=lightning_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): wand:1 staff:1 default:0
+    mods (1): CorruptionUpgradeGlobalLightningSpellGemsLevel1
+
+=== groups=IncreaseSocketedGemLevel | +# to Level of all [Physical|Physical] [Spell|Spell] Skills
+  domain=item gen=corrupted stats=physical_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): wand:1 staff:1 default:0
+    mods (1): CorruptionGlobalPhysicalSpellGemsLevel1
+  domain=item gen=suffix stats=physical_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): default:0
+    mods (3): GlobalPhysicalSpellGemsLevel1 GlobalPhysicalSpellGemsLevel2 GlobalPhysicalSpellGemsLevel3
+  domain=item gen=suffix stats=physical_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): no_physical_spell_mods:0 staff:1 default:0
+    mods (5): GlobalPhysicalSpellGemsLevelTwoHandWeapon1 GlobalPhysicalSpellGemsLevelTwoHandWeapon2 GlobalPhysicalSpellGemsLevelTwoHandWeapon3 GlobalPhysicalSpellGemsLevelTwoHandWeapon4 GlobalPhysicalSpellGemsLevelTwoHandWeapon5
+  domain=item gen=suffix stats=physical_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): no_physical_spell_mods:0 wand:1 default:0
+    mods (5): GlobalPhysicalSpellGemsLevelWeapon1 GlobalPhysicalSpellGemsLevelWeapon2 GlobalPhysicalSpellGemsLevelWeapon3 GlobalPhysicalSpellGemsLevelWeapon4 GlobalPhysicalSpellGemsLevelWeapon5
+  domain=item gen=unique stats=physical_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): -
+    mods (1): CorruptionUpgradeGlobalIncreasePhysicalSpellSkillGemLevel
+  domain=item gen=unique stats=physical_spell_skill_gem_level_+
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): wand:1 staff:1 default:0
+    mods (1): CorruptionUpgradeGlobalPhysicalSpellGemsLevel1
+
+=== groups=MapAtlasAdditionalEssences | # uses remaining / Your Maps contain # additional [Essence|Essences] / Monsters Imprisoned by Essences have a #% chance to contain a Remnant of Corruption
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_extra_monoliths,map_essence_monolith_contains_essence_of_corruption_%,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (1): MapAtlasAdditionalEssencesAndRemnantChanceMaven
+
+=== groups=MapAtlasAdditionalEssences | # uses remaining / Your Maps contain an additional [Essence] / Monsters Imprisoned by Essences have a #% chance to contain a Remnant of Corruption
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_extra_monoliths,map_essence_monolith_contains_essence_of_corruption_%,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (1): MapAtlasAdditionalEssencesAndRemnantChance_
+
+=== groups=MapAtlasBetrayalIntelligence | # uses remaining / #% increased [Intelligence] gained from Immortal Syndicate targets encountered in your Maps
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_betrayal_intelligence_+%
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (2): MapAtlasBetrayalIntelligence MapAtlasBetrayalIntelligenceMaven
+
+=== groups=MapAtlasBlight | # uses remaining / Your Maps contain a Blight Encounter
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_blight_league,map_num_extra_blights_,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 unique_map:0 map_has_blight_encounter:0 default:1
+    mods (2): MapAtlasBlight MapAtlasBlightMaven
+
+=== groups=MapAtlasBlightOilsChanceToDropOneTierHigher | # uses remaining / Oils found in your Maps are # tier higher / Cost of Building and Upgrading Blight Towers in your Maps is doubled
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_blight_oils_chance_to_drop_a_tier_higher_%,map_blight_tower_cost_doubled
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (2): MapAtlasBlightOilsChanceToDropOneTierHigher MapAtlasBlightOilsChanceToDropOneTierHigherMaven
+
+=== groups=MapAtlasBodyguardsAndBossMapDrops | # uses remaining / Map Bosses are accompanied by Bodyguards / # additional Maps drop on Completing your Maps
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_boss_accompanied_by_bodyguards,map_on_complete_drop_x_additional_maps
+    adds_no: -
+    spawn_weights (ordered): no_boss:0 default:1
+    mods (1): MapAtlasBodyguardsAndBossMapDropsMaven__
+
+=== groups=MapAtlasBodyguardsAndBossMapDrops | # uses remaining / Map Bosses are accompanied by Bodyguards / An additional Map drops on Completing your Maps
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_boss_accompanied_by_bodyguards,map_on_complete_drop_x_additional_maps
+    adds_no: -
+    spawn_weights (ordered): no_boss:0 default:1
+    mods (1): MapAtlasBodyguardsAndBossMapDrops2
+
+=== groups=MapAtlasBossAdditionalUnique | # uses remaining / Map Bosses drop # additional Unique Item
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_boss_dropped_unique_items_+
+    adds_no: -
+    spawn_weights (ordered): no_boss:0 default:1
+    mods (1): MapAtlasBossAdditionalUnique
+
+=== groups=MapAtlasBossDropsGuardianMap | # uses remaining / Final Map Boss in each Map drops an additional Conqueror Map / Map Bosses have #% more Life / Map Bosses deal #% more Damage
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_boss_drops_additional_conqueror_map,map_boss_life_+%_final_from_boss_drops_guardian_map_sextant,map_boss_damage_+%_final_from_boss_drops_guardian_map_sextant
+    adds_no: -
+    spawn_weights (ordered): no_boss:0 default:1
+    mods (2): MapAtlasBossDropsConquerorMap MapAtlasBossDropsConquerorMapMaven
+
+=== groups=MapAtlasBossDropsGuardianMap | # uses remaining / Final Map Boss in each Map drops an additional Elder Guardian Map (Tier #+) / Map Bosses have #% more Life / Map Bosses deal #% more Damage
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_boss_drops_additional_elder_guardian_map,map_boss_life_+%_final_from_boss_drops_guardian_map_sextant,map_boss_damage_+%_final_from_boss_drops_guardian_map_sextant
+    adds_no: -
+    spawn_weights (ordered): no_boss:0 default:1
+    mods (2): MapAtlasBossDropsElderGuardianMap MapAtlasBossDropsElderGuardianMapMaven
+
+=== groups=MapAtlasBossDropsGuardianMap | # uses remaining / Final Map Boss in each Map drops an additional Shaper Guardian Map (Tier #+) / Map Bosses have #% more Life / Map Bosses deal #% more Damage
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_boss_drops_additional_shaper_guardian_map,map_boss_life_+%_final_from_boss_drops_guardian_map_sextant,map_boss_damage_+%_final_from_boss_drops_guardian_map_sextant
+    adds_no: -
+    spawn_weights (ordered): no_boss:0 default:1
+    mods (2): MapAtlasBossDropsShaperGuardianMap MapAtlasBossDropsShaperGuardianMapMaven
+
+=== groups=MapAtlasCapturedBeastsDuplicateChance | # uses remaining / Create a copy of Beasts Captured in your Maps
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_duplicate_captured_beasts_chance_%
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (2): MapAtlasCapturedBeastsDuplicateChance MapAtlasCapturedBeastsDuplicateChanceMaven
+
+=== groups=MapAtlasChaosDamageAndPacks | # uses remaining / Your Maps contain # additional packs of Monsters that deal Chaos Damage / Players and Monsters take #% increased Chaos Damage
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_contains_additional_packs_of_chaos_monsters,map_players_and_monsters_chaos_damage_taken_+%
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 default:1
+    mods (2): MapAtlasChaosDamageAndPacks3 MapAtlasChaosDamageAndPacksMaven
+
+=== groups=MapAtlasColdDamageAndPacks | # uses remaining / Your Maps contain # additional packs of Monsters that deal Cold Damage / Players and Monsters take #% increased Cold Damage
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_contains_additional_packs_of_cold_monsters,map_players_and_monsters_cold_damage_taken_+%
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 default:1
+    mods (2): MapAtlasColdDamageAndPacks3 MapAtlasColdDamageAndPacksMaven_
+
+=== groups=MapAtlasDelirium | # uses remaining / Your Maps contain a Mirror of Delirium
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_affliction_league,map_spawn_affliction_mirror
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 unique_map:0 default:1
+    mods (2): MapAtlasDelirium MapAtlasDeliriumMaven
+
+=== groups=MapAtlasDeliriumRewardsFillFaster | # uses remaining / Delirium Reward Bars fill #% faster in your Maps
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_affliction_reward_kills_+%
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (2): MapAtlasDeliriumRewardsFillFaster MapAtlasDeliriumRewardsFillFasterMaven
+
+=== groups=MapAtlasDomination | # uses remaining / #% increased Duration of [Shrine] Effects on Players in your Maps / Your Maps contain an additional Gloom Shrine
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_player_shrine_effect_duration_+%,map_num_extra_shrines,map_num_extra_gloom_shrines,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (1): MapAtlasGloomShrineEffectAndDuration2
+
+=== groups=MapAtlasDomination | # uses remaining / #% increased Duration of [Shrine] Effects on Players in your Maps / Your Maps contain an additional Resonating Shrine
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_player_shrine_effect_duration_+%,map_num_extra_shrines,map_num_extra_resonating_shrines,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (1): MapAtlasResonatingShrineEffectAndDuration2
+
+=== groups=MapAtlasDomination | # uses remaining / #% increased Duration of [Shrine] Effects on Players in your Maps / Your Maps contain an additional [Shrine] / Your Maps contain an additional Gloom Shrine
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_player_shrine_effect_duration_+%,map_num_extra_shrines,map_num_extra_gloom_shrines,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (1): MapAtlasGloomShrineEffectAndDurationMaven_
+
+=== groups=MapAtlasDomination | # uses remaining / #% increased Duration of [Shrine] Effects on Players in your Maps / Your Maps contain an additional [Shrine] / Your Maps contain an additional Resonating Shrine
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_player_shrine_effect_duration_+%,map_num_extra_shrines,map_num_extra_resonating_shrines,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (1): MapAtlasResonatingShrineEffectAndDurationMaven_____
+
+=== groups=MapAtlasExpeditionAdditionalRunicMonsterMarkers | # uses remaining / #% increased number of [Runic] Monster Markers
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_expedition_elite_marker_count_+%
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (2): MapAtlasExpeditionAdditionalRunicMonsterMarkers MapAtlasExpeditionAdditionalRunicMonsterMarkersMaven
+
+=== groups=MapAtlasFireDamageAndPacks | # uses remaining / Your Maps contain # additional packs of Monsters that deal Fire Damage / Players and Monsters take #% increased Fire Damage
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_contains_additional_packs_of_fire_monsters,map_players_and_monsters_fire_damage_taken_+%
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 default:1
+    mods (2): MapAtlasFireDamageAndPacks3 MapAtlasFireDamageAndPacksMaven
+
+=== groups=MapAtlasHarbinger | # uses remaining / Map Bosses drop additional Currency Shards / Harbingers in your Maps drop additional Currency Shards / Map Bosses are accompanied by a mysterious Harbinger
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_boss_drops_additional_currency_shards,map_harbingers_drops_additional_currency_shards,map_boss_accompanied_by_harbinger,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): no_boss:0 default:1
+    mods (2): MapAtlasHarbingerAndBossAdditionalCurrencyShards MapAtlasHarbingerAndBossAdditionalCurrencyShardsMaven
+
+=== groups=MapAtlasHarvest | # uses remaining / Your Maps contain The Sacred Grove
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_harvest_league,map_chance_for_area_%_to_contain_harvest,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 unique_map:0 default:1
+    mods (2): MapAtlasHarvest MapAtlasHarvestMaven__
+
+=== groups=MapAtlasHarvestSeedsOneTierHigher | # uses remaining / Harvests in your Maps contain at least one Crop of Blue Plants / Lifeforce dropped by Harvest Monsters in your Maps is Duplicated / Harvest Monsters in your Maps have #% more Life
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_harvest_seeds_1_of_every_2_plot_type_override,map_harvest_double_lifeforce_dropped,map_harvest_monster_life_+%_final_from_sextant
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (2): MapAtlasHarvestPlotSeedsContainBlueSeeds MapAtlasHarvestPlotSeedsContainBlueSeedsMaven
+
+=== groups=MapAtlasHarvestSeedsOneTierHigher | # uses remaining / Harvests in your Maps contain at least one Crop of Purple Plants / Lifeforce dropped by Harvest Monsters in your Maps is Duplicated / Harvest Monsters in your Maps have #% more Life
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_harvest_seeds_1_of_every_2_plot_type_override,map_harvest_double_lifeforce_dropped,map_harvest_monster_life_+%_final_from_sextant
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (2): MapAtlasHarvestPlotSeedsContainPurpleSeeds MapAtlasHarvestPlotSeedsContainPurpleSeedsMaven
+
+=== groups=MapAtlasHarvestSeedsOneTierHigher | # uses remaining / Harvests in your Maps contain at least one Crop of Yellow Plants / Lifeforce dropped by Harvest Monsters in your Maps is Duplicated / Harvest Monsters in your Maps have #% more Life
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_harvest_seeds_1_of_every_2_plot_type_override,map_harvest_double_lifeforce_dropped,map_harvest_monster_life_+%_final_from_sextant
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (2): MapAtlasHarvestPlotSeedsContainYellowSeeds MapAtlasHarvestPlotSeedsContainYellowSeedsMaven
+
+=== groups=MapAtlasHeist | # uses remaining / Area contains a Smuggler's Cache
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_spawn_heist_smugglers_cache
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 unique_map:0 default:1
+    mods (2): MapAtlasHeist MapAtlasHeistMaven_
+
+=== groups=MapAtlasHeistContractsHaveImplicitModifier | # uses remaining / Non-Unique Heist Contracts found in your Maps have an additional Implicit Modifier
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_contracts_drop_with_additional_special_implicit_%_chance
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (2): MapAtlasHeistContractsHaveImplicitModifier MapAtlasHeistContractsHaveImplicitModifierMaven
+
+=== groups=MapAtlasHighValueEnemiesOnOwnTeam | # uses remaining / Your Maps contain hunted traitors
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_contains_x_additional_packs_on_their_own_team
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 default:1
+    mods (2): MapAtlasHighValueEnemiesOnOwnTeam MapAtlasHighValueEnemiesOnOwnTeamMaven
+
+=== groups=MapAtlasLegion | # uses remaining / Your Maps contain an additional Legion Encounter
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_legion_league,map_legion_league_extra_spawns,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 unique_map:0 default:1
+    mods (2): MapAtlasLegion MapAtlasLegionMaven_
+
+=== groups=MapAtlasLegionSplintersEmblemsDuplicated | # uses remaining / Splinters and Emblems dropped by Legion Monsters in your Maps are duplicated / Legion Monsters in your Maps have #% more Life
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_legion_monster_splinter_emblem_drops_duplicated,map_legion_monster_life_+%_final_from_sextant
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (2): MapAtlasLegionSplintersEmblemsDuplicated MapAtlasLegionSplintersEmblemsDuplicatedMaven
+
+=== groups=MapAtlasLightningDamageAndPacks | # uses remaining / Your Maps contain # additional packs of Monsters that deal Lightning Damage / Players and Monsters take #% increased Lightning Damage
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_contains_additional_packs_of_lightning_monsters,map_players_and_monsters_lightning_damage_taken_+%
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 default:1
+    mods (2): MapAtlasLightningDamageAndPacks3 MapAtlasLightningDamageAndPacksMaven
+
+=== groups=MapAtlasMagicAndRareMapsHaveAdditionalPacks | # uses remaining / Your Magic Maps contain # additional packs of Magic Monsters / Your Rare Maps contain # additional Rare Monster packs / Your Normal Maps contain # additional packs of Normal Monsters
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_contains_x_additional_magic_packs_if_magic,map_contains_x_additional_rare_packs_if_rare,map_contains_x_additional_normal_packs_if_normal
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (2): MapAtlasMagicAndRareMapsHaveAdditionalPacks3 MapAtlasMagicAndRareMapsHaveAdditionalPacksMaven
+
+=== groups=MapAtlasMagicPackSize | # uses remaining / #% increased [Rarity|Magic] Pack Size
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_magic_pack_size_+%
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 default:1
+    mods (2): MapAtlasMagicPackSize3 MapAtlasMagicPackSizeMaven
+
+=== groups=MapAtlasMetamorph | # uses remaining / Area contains Metamorph Monsters
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_area_contains_metamorphs,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 unique_map:0 default:1
+    mods (2): MapAtlasMetamorph MapAtlasMetamorphMaven
+
+=== groups=MapAtlasMetamorphCatalystsDuplicated | # uses remaining / Catalysts dropped by Metamorphs in your Maps are Duplicated / Metamorphs in your Maps have #% more Life
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_metamorph_catalyst_drops_duplicated,map_metamorph_life_+%_final_from_sextant
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (2): MapAtlasMetamorphCatalystsDuplicated MapAtlasMetamorphCatalystsDuplicatedMaven
+
+=== groups=MapAtlasMontersThatConvertOnDeath | # uses remaining / Your Maps contain # additional packs of Monsters that Convert when killed
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_contains_x_additional_packs_that_convert_on_death
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 default:1
+    mods (2): MapAtlasMontersThatConvertOnDeath3 MapAtlasMontersThatConvertOnDeathMaven__
+
+=== groups=MapAtlasPhysicalDamageAndPacks | # uses remaining / Your Maps contain # additional packs of Monsters that deal Physical Damage / Players and Monsters take #% increased Physical Damage
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_contains_additional_packs_of_physical_monsters,map_players_and_monsters_physical_damage_taken_+%
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 default:1
+    mods (2): MapAtlasPhysicalDamageAndPacks3_ MapAtlasPhysicalDamageAndPacksMaven
+
+=== groups=MapAtlasRitual | # uses remaining / Your Maps contain Ritual Altars
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_area_contains_rituals
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 unique_map:0 default:1
+    mods (2): MapAtlasRitual MapAtlasRitualMaven
+
+=== groups=MapAtlasRitualsInAreasCanBeRerolledOnceAtNoCost | # uses remaining / Rerolling Favours at [ContainsRitual|Ritual Altars] in your Maps has no Cost the first # time
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_ritual_number_of_free_rerolls
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (2): MapAtlasRitualsInAreasCanBeRerolledOnceAtNoCost MapAtlasRitualsInAreasCanBeRerolledOnceAtNoCostMaven
+
+=== groups=MapAtlasRogueExilesDamageAndDropAdditionalJewels | # uses remaining / Rogue Exiles deal #% increased Damage / Rogue Exiles in your Maps have #% increased Life / Rogue Exiles drop # additional Jewels / Your Maps are inhabited by # additional Rogue Exiles
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_rogue_exiles_damage_+%,map_rogue_exiles_maximum_life_+%,map_rogue_exiles_drop_x_additional_jewels,map_spawn_extra_exiles,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 default:1
+    mods (1): MapAtlasRogueExilesDamageAndDropAdditionalJewels
+
+=== groups=MapAtlasStrongboxMonstersEnrageAndDrops | # uses remaining / Strongbox Monsters have #% increased Item Quantity / Strongbox Monsters are Enraged / Your Maps contain an additional [Strongbox]
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_strongbox_monsters_item_quantity_+%,map_strongbox_monsters_attack_speed_+%,map_strongbox_monsters_movement_velocity_+%,map_num_extra_strongboxes,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): hall_of_grandmasters:0 no_strongboxes:0 default:1
+    mods (2): MapAtlasStrongboxMonstersEnrageAndDrops MapAtlasStrongboxMonstersEnrageAndDropsMaven___
+
+=== groups=MapAtlasStrongboxesAreCorruptedAndUnided | # uses remaining / [Strongbox|Strongboxes] in your Maps are [Corrupted] / Your Maps contain # additional [Strongbox|Strongboxes] / Strongboxes in your Maps are at least Rare
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_strongboxes_are_corrupted,map_num_extra_strongboxes,map_strongboxes_minimum_rarity,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): no_strongboxes:0 default:1
+    mods (2): MapAtlasStrongboxesAreCorruptedAndUnided2_ MapAtlasStrongboxesAreCorruptedAndUnidedMaven_
+
+=== groups=MapAtlasVaalPacks | # uses remaining / Your Maps contain # additional packs of Corrupted Vaal Monsters / Items dropped by Corrupted Vaal Monsters in your Maps have #% chance to be [Corrupted]
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_contains_additional_packs_of_vaal_monsters,map_vaal_monster_items_drop_corrupted_%
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 default:1
+    mods (2): MapAtlasCorruptedDropWithExtraVaalPacks3____ MapAtlasCorruptedDropWithExtraVaalPacksMaven
+
+=== groups=MapAtlasVaalPacks | # uses remaining / Your Maps contain # additional packs of Corrupted Vaal Monsters / Players gain an additional Vaal Soul on Kill
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_contains_additional_packs_of_vaal_monsters,map_player_chance_to_gain_vaal_soul_on_kill_%
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 default:1
+    mods (2): MapAtlasVaalSoulsOnKillAndExtraVaalPacks3 MapAtlasVaalSoulsOnKillAndExtraVaalPacksMaven
+
+=== groups=MapAtlasVaalPacks | # uses remaining / Your Maps contain # additional packs of Corrupted Vaal Monsters / Players' Vaal Skills do not apply Soul Gain Prevention
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_contains_additional_packs_of_vaal_monsters,map_player_disable_soul_gain_prevention
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 default:1
+    mods (2): MapAtlasNoSoulGainPreventionWithExtraVaalPacks3 MapAtlasNoSoulGainPreventionWithExtraVaalPacksMaven
+
+=== groups=MapAtlasVaalPacks | # uses remaining / Your Maps contain # additional packs of Corrupted Vaal Monsters / Your Maps have a #% chance to contain Gifts of the Sacrificed per Sacrifice Fragment used / Your Maps have a #% chance to contain Gifts of the Red Queen per Mortal Fragment used
+  domain=atlas gen=prefix stats=sextant_uses_remaining,map_contains_additional_packs_of_vaal_monsters,map_vaal_sacrifice_strongbox_chance_per_fragment_%,map_vaal_mortal_strongbox_chance_per_fragment_%,map_extra_content_weighting
+    adds_no: -
+    spawn_weights (ordered): no_monster_packs:0 default:1
+    mods (2): MapAtlasUniqueStrongboxChanceWithExtraVaalPacks3_ MapAtlasUniqueStrongboxChanceWithExtraVaalPacksMaven
+
+=== groups=MapBossMod | #% increased Quantity of Items found in this Area / #% increased [Rarity] of Items found in this Area / #% increased Pack size / Unique Boss deals #% increased Damage / Unique Boss has #% increased [Attack] and Cast Speed
+  domain=area gen=unique stats=map_item_drop_quantity_+%,map_item_drop_rarity_+%,map_pack_size_+%,map_boss_damage_+%,map_boss_attack_and_cast_speed_+%
+    adds_no: -
+    spawn_weights (ordered): low_tier_map:1 no_boss:0 expedition_logbook:0 primordial_map:0 default:0
+    mods (1): MapDangerousBoss1MapWorlds
+
+=== groups=MapBossMod | #% increased Quantity of Items found in this Area / #% increased [Rarity] of Items found in this Area / #% increased Pack size / Unique Boss has #% increased Life / Unique Boss has #% increased Area of Effect
+  domain=area gen=unique stats=map_item_drop_quantity_+%,map_item_drop_rarity_+%,map_pack_size_+%,map_boss_maximum_life_+%,map_boss_area_of_effect_+%
+    adds_no: -
+    spawn_weights (ordered): low_tier_map:1 no_boss:0 expedition_logbook:0 primordial_map:0 default:0
+    mods (1): MapMassiveBoss1MapWorlds
+
+=== groups=MapBossMod | #% increased Quantity of Items found in this Area / #% increased [Rarity] of Items found in this Area / Unique Boss deals #% increased Damage / Unique Boss has #% increased [Attack] and Cast Speed
+  domain=area gen=unique stats=map_item_drop_quantity_+%,map_item_drop_rarity_+%,map_boss_damage_+%,map_boss_attack_and_cast_speed_+%
+    adds_no: -
+    spawn_weights (ordered): low_tier_map:0 no_boss:0 default:0
+    mods (1): MapDangerousBoss1Map2Tier_
+
+=== groups=MapBossMod | #% increased Quantity of Items found in this Area / #% increased [Rarity] of Items found in this Area / Unique Boss has #% increased Life / Unique Boss has #% increased Area of Effect
+  domain=area gen=unique stats=map_item_drop_quantity_+%,map_item_drop_rarity_+%,map_boss_maximum_life_+%,map_boss_area_of_effect_+%
+    adds_no: -
+    spawn_weights (ordered): low_tier_map:0 no_boss:0 default:0
+    mods (1): MapMassiveBoss1Map2Tier
+
+=== groups=MapDangerousBoss | #% increased Quantity of Items found in this Area / #% increased [Rarity] of Items found in this Area / #% increased Pack size / Unique Boss deals #% increased Damage / Unique Boss has #% increased [Attack] and Cast Speed
+  domain=area gen=unique stats=map_item_drop_quantity_+%,map_item_drop_rarity_+%,map_pack_size_+%,map_boss_damage_+%,map_boss_attack_and_cast_speed_+%
+    adds_no: -
+    spawn_weights (ordered): mid_tier_map:1 no_boss:0 expedition_logbook:0 primordial_map:0 default:0
+    mods (1): MapDangerousBoss2MapWorlds
+  domain=area gen=unique stats=map_item_drop_quantity_+%,map_item_drop_rarity_+%,map_pack_size_+%,map_boss_damage_+%,map_boss_attack_and_cast_speed_+%
+    adds_no: -
+    spawn_weights (ordered): top_tier_map:1 no_boss:0 maven_map:0 expedition_logbook:0 primordial_map:0 default:0
+    mods (1): MapDangerousBoss3MapWorlds
+
+=== groups=MapDangerousBoss | #% increased Quantity of Items found in this Area / #% increased [Rarity] of Items found in this Area / Unique Boss deals #% increased Damage / Unique Boss has #% increased [Attack] and Cast Speed
+  domain=area gen=unique stats=map_item_drop_quantity_+%,map_item_drop_rarity_+%,map_boss_damage_+%,map_boss_attack_and_cast_speed_+%
+    adds_no: -
+    spawn_weights (ordered): mid_tier_map:0 no_boss:0 default:0
+    mods (1): MapDangerousBoss2Map2Tier
+  domain=area gen=unique stats=map_item_drop_quantity_+%,map_item_drop_rarity_+%,map_boss_damage_+%,map_boss_attack_and_cast_speed_+%
+    adds_no: -
+    spawn_weights (ordered): top_tier_map:0 no_boss:0 default:0
+    mods (1): MapDangerousBoss3Map2Tier
+  domain=area gen=unique stats=map_item_drop_quantity_+%,map_item_drop_rarity_+%,map_pack_size_+%,map_boss_damage_+%,map_boss_attack_and_cast_speed_+%
+    adds_no: -
+    spawn_weights (ordered): top_tier_map:0 no_boss:0 maven_map:1 primordial_map:1 default:0
+    mods (1): MapDangerousBoss3MapWorldsMaven
+
+=== groups=MapMassiveBoss | #% increased Quantity of Items found in this Area / #% increased [Rarity] of Items found in this Area / #% increased Pack size / Unique Boss has #% increased Life / Unique Boss has #% increased Area of Effect
+  domain=area gen=unique stats=map_item_drop_quantity_+%,map_item_drop_rarity_+%,map_pack_size_+%,map_boss_maximum_life_+%,map_boss_area_of_effect_+%
+    adds_no: -
+    spawn_weights (ordered): mid_tier_map:1 no_boss:0 expedition_logbook:0 primordial_map:0 default:0
+    mods (1): MapMassiveBoss2MapWorlds
+  domain=area gen=unique stats=map_item_drop_quantity_+%,map_item_drop_rarity_+%,map_pack_size_+%,map_boss_maximum_life_+%,map_boss_area_of_effect_+%
+    adds_no: -
+    spawn_weights (ordered): top_tier_map:1 no_boss:0 maven_map:0 expedition_logbook:0 primordial_map:0 default:0
+    mods (1): MapMassiveBoss3MapWorlds
+
+=== groups=MapMassiveBoss | #% increased Quantity of Items found in this Area / #% increased [Rarity] of Items found in this Area / Unique Boss has #% increased Life / Unique Boss has #% increased Area of Effect
+  domain=area gen=unique stats=map_item_drop_quantity_+%,map_item_drop_rarity_+%,map_boss_maximum_life_+%,map_boss_area_of_effect_+%
+    adds_no: -
+    spawn_weights (ordered): mid_tier_map:0 no_boss:0 default:0
+    mods (1): MapMassiveBoss2Map2Tier
+  domain=area gen=unique stats=map_item_drop_quantity_+%,map_item_drop_rarity_+%,map_boss_maximum_life_+%,map_boss_area_of_effect_+%
+    adds_no: -
+    spawn_weights (ordered): top_tier_map:0 no_boss:0 default:0
+    mods (1): MapMassiveBoss3Map2Tier
+  domain=area gen=unique stats=map_item_drop_quantity_+%,map_item_drop_rarity_+%,map_pack_size_+%,map_boss_maximum_life_+%,map_boss_area_of_effect_+%
+    adds_no: -
+    spawn_weights (ordered): top_tier_map:0 no_boss:0 maven_map:1 primordial_map:1 default:0
+    mods (1): MapMassiveBoss3MapWorldsMaven
+
+=== groups=MonsterAura | 
+  domain=monster gen=unique stats=cannot_die
+    adds_no: -
+    spawn_weights (ordered): no_cannot_die_aura:0 abyssal:0 immobile:0 breach_commander:0 magic:0 legion_monster:0 default:0
+    mods (1): MonsterAuraCannotDie1
+
+=== groups=MonsterGrantsCharges | 
+  domain=monster gen=unique stats=monster_grants_frenzy_charges_to_allies_within_distance_on_death
+    adds_no: -
+    spawn_weights (ordered): no_frenzy_charge_on_death:0 default:1
+    mods (1): MonsterGrantsFrenzyChargesToAlliesOnDeath1
+
+=== groups=MonsterModRevivesMinions | 
+  domain=monster gen=prefix stats=-
+    adds_no: -
+    spawn_weights (ordered): quest_null_monster_mods:0 boss:0 no_minion_revival:0 magic:0 default:1
+    mods (2): MonsterRevivesMinions1 MonsterRevivesMinions2
+
+=== groups=MonsterModShroudWalker | 
+  domain=monster gen=prefix stats=-
+    adds_no: -
+    spawn_weights (ordered): sanctum_monster:0 immobile:0 no_shroud_walker:0 boss:0 default:1
+    mods (2): MonsterShroudWalker1 MonsterShroudWalker2
+
+=== groups=MonsterModSoulConduit | 
+  domain=monster gen=corrupted stats=monster_raises_after_death,corpse_cannot_be_destroyed,cannot_be_dominated
+    adds_no: -
+    spawn_weights (ordered): no_soul_conduit:0 boss:0 rogue_exile:0 default:1
+    mods (1): MonsterCorruptionModReviveOnDeath
+
+=== groups=MonsterNemesis | 
+  domain=monster gen=nemesis stats=level
+    adds_no: -
+    spawn_weights (ordered): no_proximity_shield:0 rare_minion:0 rare:1 default:0
+    mods (1): MonsterNemesisProximityShield
+  domain=monster gen=nemesis stats=level
+    adds_no: -
+    spawn_weights (ordered): no_shroud_walker:0 rare_minion:0 devourer:0 rare:1 default:0
+    mods (1): MonsterNemesisSmokeDaemon
+  domain=monster gen=nemesis stats=monster_allies_cannot_take_damage_pulse_owner
+    adds_no: -
+    spawn_weights (ordered): no_cannot_die_aura:0 abyssal:0 immobile:0 breach_commander:0 legion_monster:0 rare:1 default:0
+    mods (1): NemesisAlliesTakeNoDamagePulse_
+  domain=monster gen=nemesis stats=monster_drop_additional_unique_items
+    adds_no: -
+    spawn_weights (ordered): no_forced_item_drops:0 rare:1 default:0
+    mods (1): MonsterNemesisUniqueDrop
+  domain=monster gen=nemesis stats=monster_raises_after_death,corpse_cannot_be_destroyed,cannot_be_dominated
+    adds_no: -
+    spawn_weights (ordered): no_soul_conduit:0 incursion_monster:0 abyssal:0 rare_minion:0 unusable_corpse:0 legion_monster:0 rare:1 default:0
+    mods (1): MonsterNemesisRaisesAfterDeath
+  domain=monster gen=nemesis stats=monster_spawns_X_monsters_on_death
+    adds_no: -
+    spawn_weights (ordered): no_fractured:0 bestiary_beast_boss:0 abyssal:0 hidden_monster:0 rare_minion:0 legion_monster:0 rare:1 default:0
+    mods (1): MonsterNemesisSpawnsMonsters
+  domain=monster gen=nemesis stats=retaliation_godmode_ghost_duration_ms,corpse_cannot_be_destroyed,cannot_be_dominated
+    adds_no: -
+    spawn_weights (ordered): abyssal:0 rare_minion:0 unusable_corpse:0 undeletable_corpse:0 legion_monster:0 no_final_gasp:0 rare:1 default:0
+    mods (1): MonsterNemesisImmortalGhost
+
+=== groups=MonsterProximalTangibility | 
+  domain=monster gen=prefix stats=ignore_cannot_be_damaged_by_enemies
+    adds_no: -
+    spawn_weights (ordered): no_proximity_shield:0 boss:0 default:1
+    mods (2): MonsterProximalTangibility1 MonsterProximalTangibilityHidden1
+
+=== groups=ShockChanceIncrease | 
+  domain=monster gen=unique stats=shock_chance_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): -
+    mods (1): EndgameBossShockChance
+
+=== groups=ShockChanceIncrease | #% increased chance to [Shock]
+  domain=item gen=corrupted stats=shock_chance_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): wand:1 staff:1 default:0
+    mods (1): CorruptionShockChanceIncrease1
+  domain=item gen=suffix stats=shock_chance_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): no_lightning_spell_mods:0 wand:1 staff:1 trap:1 default:0
+    mods (5): ShockChanceIncrease1 ShockChanceIncrease2 ShockChanceIncrease3 ShockChanceIncrease4 ShockChanceIncrease5
+  domain=item gen=unique stats=shock_chance_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): -
+    mods (4): UniqueShockChanceIncrease1 UniqueShockChanceIncrease2 UniqueShockChanceIncrease3UNUSED UniqueShockChanceIncrease4
+  domain=misc gen=suffix stats=shock_chance_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): dex_radius_jewel:1 int_radius_jewel:1 default:0
+    mods (1): JewelRadiusShockChance
+  domain=misc gen=suffix stats=shock_chance_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): dexjewel:1 intjewel:1 default:0
+    mods (1): JewelShockChance
+
+=== groups=UniqueWatchstoneAdditionalElderMonsters | Area contains # additional packs of Elder Fiends
+  domain=area gen=unique stats=map_watchstone_additional_packs_of_elder_monsters
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (1): AtlasTreeAdditionalElderMonsters_
+
+=== groups=UniqueWatchstoneAdditionalShaperMonsters | Area contains # additional packs of Shaper Creations
+  domain=area gen=unique stats=map_watchstone_additional_packs_of_shaper_monsters
+    adds_no: -
+    spawn_weights (ordered): unique_map:0 no_monster_packs:0 default:1
+    mods (1): AtlasTreeAdditionalShaperMonsters
+
+=== groups=WeaponDamageTypePrefix | #% increased [Chaos] Damage
+  domain=item gen=prefix stats=chaos_damage_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): focus:1 no_chaos_spell_mods:0 wand:1 trap:1 default:0
+    mods (6): ChaosDamagePrefixOnWeapon1 ChaosDamagePrefixOnWeapon2 ChaosDamagePrefixOnWeapon3 ChaosDamagePrefixOnWeapon4 ChaosDamagePrefixOnWeapon5 ChaosDamagePrefixOnWeapon6
+  domain=item gen=prefix stats=chaos_damage_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_chaos_spell_mods:0 staff:1 default:0
+    mods (8): ChaosDamagePrefixOnTwoHandWeapon1 ChaosDamagePrefixOnTwoHandWeapon2 ChaosDamagePrefixOnTwoHandWeapon3 ChaosDamagePrefixOnTwoHandWeapon4 ChaosDamagePrefixOnTwoHandWeapon5 ChaosDamagePrefixOnTwoHandWeapon6 ChaosDamagePrefixOnTwoHandWeapon7 ChaosDamagePrefixOnTwoHandWeapon8
+  domain=item gen=prefix stats=chaos_damage_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_chaos_spell_mods:0 wand:1 trap:1 default:0
+    mods (2): ChaosDamagePrefixOnWeapon7 ChaosDamagePrefixOnWeapon8
+
+=== groups=WeaponDamageTypePrefix | #% increased [Cold] Damage
+  domain=item gen=prefix stats=cold_damage_+%
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): focus:1 no_cold_spell_mods:0 wand:1 trap:1 default:0
+    mods (6): ColdDamagePrefixOnWeapon1 ColdDamagePrefixOnWeapon2 ColdDamagePrefixOnWeapon3_ ColdDamagePrefixOnWeapon4 ColdDamagePrefixOnWeapon5_ ColdDamagePrefixOnWeapon6
+  domain=item gen=prefix stats=cold_damage_+%
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_cold_spell_mods:0 staff:1 default:0
+    mods (8): ColdDamagePrefixOnTwoHandWeapon1 ColdDamagePrefixOnTwoHandWeapon2 ColdDamagePrefixOnTwoHandWeapon3 ColdDamagePrefixOnTwoHandWeapon4_ ColdDamagePrefixOnTwoHandWeapon5_ ColdDamagePrefixOnTwoHandWeapon6 ColdDamagePrefixOnTwoHandWeapon7 ColdDamagePrefixOnTwoHandWeapon8
+  domain=item gen=prefix stats=cold_damage_+%
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_cold_spell_mods:0 wand:1 trap:1 default:0
+    mods (2): ColdDamagePrefixOnWeapon7 ColdDamagePrefixOnWeapon8
+  domain=item gen=unique stats=cold_damage_+%
+    adds_no: no_fire_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): -
+    mods (1): UniqueColdDamageOnWeapon1
+
+=== groups=WeaponDamageTypePrefix | #% increased [Fire] Damage
+  domain=item gen=prefix stats=fire_damage_+%
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): focus:1 no_fire_spell_mods:0 wand:1 trap:1 default:0
+    mods (6): FireDamagePrefixOnWeapon1 FireDamagePrefixOnWeapon2 FireDamagePrefixOnWeapon3 FireDamagePrefixOnWeapon4 FireDamagePrefixOnWeapon5_ FireDamagePrefixOnWeapon6
+  domain=item gen=prefix stats=fire_damage_+%
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_fire_spell_mods:0 staff:1 default:0
+    mods (8): FireDamagePrefixOnTwoHandWeapon1 FireDamagePrefixOnTwoHandWeapon2___ FireDamagePrefixOnTwoHandWeapon3 FireDamagePrefixOnTwoHandWeapon4 FireDamagePrefixOnTwoHandWeapon5 FireDamagePrefixOnTwoHandWeapon6 FireDamagePrefixOnTwoHandWeapon7 FireDamagePrefixOnTwoHandWeapon8_
+  domain=item gen=prefix stats=fire_damage_+%
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_fire_spell_mods:0 wand:1 trap:1 default:0
+    mods (2): FireDamagePrefixOnWeapon7_ FireDamagePrefixOnWeapon8_
+  domain=item gen=unique stats=fire_damage_+%
+    adds_no: no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): -
+    mods (1): UniqueFireDamageOnWeapon1
+
+=== groups=WeaponDamageTypePrefix | #% increased [Lightning] Damage
+  domain=item gen=prefix stats=lightning_damage_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): focus:1 no_lightning_spell_mods:0 wand:1 trap:1 default:0
+    mods (6): LightningDamagePrefixOnWeapon1_ LightningDamagePrefixOnWeapon2 LightningDamagePrefixOnWeapon3 LightningDamagePrefixOnWeapon4 LightningDamagePrefixOnWeapon5 LightningDamagePrefixOnWeapon6
+  domain=item gen=prefix stats=lightning_damage_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_lightning_spell_mods:0 staff:1 default:0
+    mods (8): LightningDamagePrefixOnTwoHandWeapon1 LightningDamagePrefixOnTwoHandWeapon2 LightningDamagePrefixOnTwoHandWeapon3 LightningDamagePrefixOnTwoHandWeapon4 LightningDamagePrefixOnTwoHandWeapon5 LightningDamagePrefixOnTwoHandWeapon6 LightningDamagePrefixOnTwoHandWeapon7 LightningDamagePrefixOnTwoHandWeapon8
+  domain=item gen=prefix stats=lightning_damage_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): no_lightning_spell_mods:0 wand:1 trap:1 default:0
+    mods (2): LightningDamagePrefixOnWeapon7 LightningDamagePrefixOnWeapon8
+  domain=item gen=unique stats=lightning_damage_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_chaos_spell_mods,no_physical_spell_mods
+    spawn_weights (ordered): -
+    mods (1): UniqueLightningDamageOnWeapon1
+
+=== groups=WeaponDamageTypePrefix | #% increased [Spell] [Physical] Damage
+  domain=item gen=prefix stats=spell_physical_damage_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): focus:1 no_physical_spell_mods:0 wand:1 trap:1 default:0
+    mods (6): PhysicalDamagePrefixOnWeapon1 PhysicalDamagePrefixOnWeapon2 PhysicalDamagePrefixOnWeapon3 PhysicalDamagePrefixOnWeapon4 PhysicalDamagePrefixOnWeapon5 PhysicalDamagePrefixOnWeapon6
+  domain=item gen=prefix stats=spell_physical_damage_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): no_physical_spell_mods:0 staff:1 default:0
+    mods (8): PhysicalDamagePrefixOnTwoHandWeapon1 PhysicalDamagePrefixOnTwoHandWeapon2 PhysicalDamagePrefixOnTwoHandWeapon3 PhysicalDamagePrefixOnTwoHandWeapon4 PhysicalDamagePrefixOnTwoHandWeapon5 PhysicalDamagePrefixOnTwoHandWeapon6 PhysicalDamagePrefixOnTwoHandWeapon7 PhysicalDamagePrefixOnTwoHandWeapon8
+  domain=item gen=prefix stats=spell_physical_damage_+%
+    adds_no: no_fire_spell_mods,no_cold_spell_mods,no_lightning_spell_mods,no_chaos_spell_mods
+    spawn_weights (ordered): no_physical_spell_mods:0 wand:1 trap:1 default:0
+    mods (2): PhysicalDamagePrefixOnWeapon7 PhysicalDamagePrefixOnWeapon8
+
+=== no_* tags by domain
+  area: adds=[]
+  area: spawn=['no_boss', 'no_monster_packs']
+  atlas: adds=[]
+  atlas: spawn=['no_boss', 'no_monster_packs', 'no_strongboxes']
+  item: adds=['no_chaos_spell_mods', 'no_cold_spell_mods', 'no_fire_spell_mods', 'no_lightning_spell_mods', 'no_physical_spell_mods']
+  item: spawn=['no_chaos_spell_mods', 'no_cold_spell_mods', 'no_fire_spell_mods', 'no_lightning_spell_mods', 'no_physical_spell_mods']
+  misc: adds=['no_chaos_spell_mods', 'no_cold_spell_mods', 'no_fire_spell_mods', 'no_lightning_spell_mods']
+  misc: spawn=[]
+  monster: adds=['no_chaos_spell_mods', 'no_cold_spell_mods', 'no_fire_spell_mods', 'no_lightning_spell_mods']
+  monster: spawn=['no_cannot_die_aura', 'no_final_gasp', 'no_forced_item_drops', 'no_fractured', 'no_frenzy_charge_on_death', 'no_minion_revival', 'no_proximity_shield', 'no_shroud_walker', 'no_soul_conduit']
+  item-domain no_* tags (5): ['no_chaos_spell_mods', 'no_cold_spell_mods', 'no_fire_spell_mods', 'no_lightning_spell_mods', 'no_physical_spell_mods']
+  other-domain no_* tags (16): ['no_boss', 'no_cannot_die_aura', 'no_chaos_spell_mods', 'no_cold_spell_mods', 'no_final_gasp', 'no_fire_spell_mods', 'no_forced_item_drops', 'no_fractured', 'no_frenzy_charge_on_death', 'no_lightning_spell_mods', 'no_minion_revival', 'no_monster_packs', 'no_proximity_shield', 'no_shroud_walker', 'no_soul_conduit', 'no_strongboxes']
+  in both: ['no_chaos_spell_mods', 'no_cold_spell_mods', 'no_fire_spell_mods', 'no_lightning_spell_mods']

@@ -6,9 +6,9 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 38
+revision: 39
 created: '2026-09-12'
-updated: '2026-10-11'
+updated: '2026-10-23'
 binds: []
 sources:
   - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
@@ -18,6 +18,7 @@ sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/curl-creater-trade-search.txt
   - docs/stories/archive/spec-poesessid-sync/SPEC.md
   - docs/research/technical-poesessid-vs-oauth-for-trade-api-rate-li-2026-10-02/research.md
+  - docs/research/technical-poe2-no-tag-mod-blocking-2026-10-23/research.md
   - .memlog.md
 companions:
   - WEIGHTS-FILE-SCHEMA.md
@@ -640,7 +641,7 @@ never import each other.
   producer can satisfy; a pool denominator that double-counts a multi-stat modifier; and
   the permanent loss of the fact that two stats always roll together, which nobody can
   reconstruct once the source row is split.
-- **Rule:** The app consumes a file conforming to `WEIGHTS-FILE-SCHEMA.md` **`6.1.0`**,
+- **Rule:** The app consumes a file conforming to `WEIGHTS-FILE-SCHEMA.md` **`7.0.0`**,
   and never produces one. Any producer
   that satisfies the contract is acceptable, and the app does not depend on which one
   wrote the file.
@@ -652,13 +653,13 @@ never import each other.
   discriminator from that key (`buildSearchBody`).
 
   **One entry is one tier of one modifier, and an entry and a source row are the same
-  thing.** An entry carries `sourceModifierId`, `modGroup`, `itemLevelMin`, `weight`, `weightSource`,
-  and **`lines[]`** — that tier's stat lines nested inside it, each line carrying its own
+  thing.** An entry carries `sourceModifierId`, `modGroup`, `addsTags`, `blockedByTags`, `itemLevelMin`,
+  `weight`, `weightSource`, and **`lines[]`** — that tier's stat lines nested inside it, each line carrying its own
   `statId` (or **`null`**, where the producer resolved none) and its `ranges` **verbatim**,
   exactly as the source published them. The tier's weight is carried **once**, on the
   entry. **The producer performs no split, no aggregation, no normalisation and no value
   derivation.** A `null` `statId` is data and never a file error. The producer declares a
-  pool's completeness under its own rule (`WEIGHTS-FILE-SCHEMA.md` `6.1.0`), and `core`
+  pool's completeness under its own rule (`WEIGHTS-FILE-SCHEMA.md` `7.0.0`), and `core`
   never infers `partial` from a `null` line.
 
   **All of one entry's lines roll together as a single draw**, because the game draws the
@@ -666,7 +667,7 @@ never import each other.
   once it is lost, and it is why the lines are nested rather than flattened. `core` reads
   co-occurrence directly off one entry's `lines` (AD-17). In valuation `core` never reads
   `sourceModifierId` at all; it reads it at load, for the duplicate-entry check. **`core`
-  reads `modGroup` for AD-17's exclusion only, and never parses `sourceModifierId` to
+  reads `modGroup`, `addsTags` and `blockedByTags` for AD-17's exclusion only, and never parses `sourceModifierId` to
   recover it.**
 
   **Tiers overlap in value space, and the file reports the overlap rather than resolving
@@ -771,7 +772,7 @@ never import each other.
   differ by design. `sync` validates every tracked id against the catalogue (AD-9) — a
   per-entry condition, so the entry is marked `unresolvable` and the run continues.
   `sync` runs `core`'s cross-file validation of `data/tracked.json` against the weights
-  file — **all six checks** (AD-17) — as one gate. `sync` validates the configured league
+  file — **every cross-file check** (AD-17) — as one gate. `sync` validates the configured league
   (AD-19). A league mismatch or a cross-file failure invalidates the run's premise, so the
   run **aborts**, and **a cross-file failure is recorded in `sync-report.json`** with the
   failing check's payload (AD-17), so the abort is visible on the surface `web` already
@@ -1172,20 +1173,20 @@ never import each other.
   the entry's floor and the weights entry's `itemLevelMin`, and from no third source.
   `P(combination)` is the probability that one crafting act lands both references: a
   transmute rolls one affix and an augment adds the other, **and the second draw is
-  conditioned on the first by mod-group exclusion** (`WEIGHTS-FILE-SCHEMA.md` *The
+  conditioned on the first by mod-group and blocking-tag exclusion** (`WEIGHTS-FILE-SCHEMA.md` *The
   exclusivity rule*). **The transmute draws from the prefix and suffix pools combined, by
   weight**, so the first affix is a prefix with probability `W_prefix / (W_prefix +
   W_suffix)` over the eligible pools — a game fact. The
-  augment draws from the other slot's pool with every entry sharing the first affix's
-  `modGroup` removed, and renormalises the rest. **A hybrid reference is one modifier in
+  augment draws from the other slot's pool with every entry that shares the first affix's
+  `modGroup`, or whose `blockedByTags` meets its `addsTags`, removed, and renormalises the rest. **A hybrid reference is one modifier in
   this formula**: its probability is the weight of the tiers it contains, never a product
   across its lines. The formula,
   and its order with the recipe floor below (floor over the unscoped pool, then scope, renormalise, exclude, renormalise; the scope can drop a group the floor kept), are `affixProbability` and `combinationProbability` in
   `packages/core/src/probability.ts`, binding under AD-0.
 
-  **Where no `modGroup` spans both slots of a class, the result is exactly `P(prefix) ×
-  P(suffix)`**; the exclusion exists so a patch that shares a group across slots is valued
-  correctly rather than overstated. **An augment left with no eligible entry makes that `(itemClass,
+  **Where no `modGroup` spans both slots of a class and no entry's `addsTags` meets an
+  entry of the other slot's `blockedByTags`, the result is exactly `P(prefix) × P(suffix)`**;
+  the exclusion exists so such a class is valued correctly rather than overstated. **An augment left with no eligible entry makes that `(itemClass,
   recipe)` pair unrankable with a reason, never a zero**, on the same ruling as an entry a
   recipe cannot reach below.
 
@@ -1193,7 +1194,7 @@ never import each other.
   floor. The crafted search sends no item-level filter and prices every item level by
   choice, not by an API limit (`prd.md` FR-1).
 
-  **Six cross-file checks are defined once in `core`, and every shell holding both files
+  **The cross-file checks are defined once in `core`, and every shell holding both files
   runs them** — `web` at load, and **`sync` as a run-start gate before any priced entry
   consumes budget** (AD-12), a failure aborting the run non-zero and leaving
   `sync-progress.json` untouched. The development tool `pnpm tracked:check` calls the same
@@ -1206,10 +1207,10 @@ never import each other.
   the `coOccur` paragraph above gives for a pool that cannot answer — `[ADOPTED]` from PRD
   FR-33 and `EXPERIENCE.md`'s *Cross-file policy check failure* state. **The affected
   class is
-  well-defined for all six checks**: each evaluates something belonging to a `crafted`
-  tracked entry — a reference for five of them, the entry's own `className` for class
-  discriminability — and **every payload names that entry by its canonical key**, whose
-  first elements are the `(categoryId, className)` pair. **All six checks are crafted-only**
+  well-defined for every check**: each evaluates something belonging to a `crafted`
+  tracked entry — a reference, or for class discriminability the entry's own
+  `className` — and **every payload names that entry by its canonical key**, whose
+  first elements are the `(categoryId, className)` pair. **Every cross-file check is crafted-only**
   — a `raw` entry carries no reference to check, and needs no discriminator because
   `query.type` already names exactly one base type — which under AD-5's split is now a
   property of the key rather than a condition each check restates.
@@ -1221,7 +1222,7 @@ never import each other.
   can depend on the weights file; it is the cross-file check in the table below and takes
   the per-class consequence. **`contracts` never refuses a pair that `core` would load.**
   `sync` imports `core`, so this adds no edge and no second implementation; a check
-  re-implemented in a shell would be the divergence this rule prevents. The six:
+  re-implemented in a shell would be the divergence this rule prevents. The checks:
 
   | Check | Fails when | Mechanics |
   | --- | --- | --- |
@@ -1231,6 +1232,7 @@ never import each other.
   | **Line-set completeness** | a reference names fewer lines than a tier its search reaches — a hybrid naming a subset of a tier's lines, or a single-line band reaching into a hybrid tier — or a hybrid's contained tiers span more than one `modGroup` | `lineSetCompleteness` in `packages/core/src/cross-file.ts` |
   | **Class discriminability** | the entry's `categoryId` carries **more than one** `className` in `weights.json`, and the entry's own `className` yields no class discriminator under `WEIGHTS-FILE-SCHEMA.md`'s `className` grammar — so AD-16 would price the entry across sibling classes while FR-1 guarantees it does not. **This is the only check that reads the weights file for something other than a pool** | `packages/core/src/cross-file/class-discriminability.ts` |
   | **Kind agreement** | **per line**: a **valueless** reference line has a **banded** scoped line on its `statId` — a line's kind is read from **whether its `ranges` is empty**, since the weights contract has no `kind` field. **A banded reference line never disagrees**, because a tier that rolls no number reads as the value 1, the band `[1, 1]`: one `statId` may carry a valueless tier beside a banded one (*"Loads an additional bolt"* is 1 beside the `[2, 2]` tier). The quantifier stays **universal, not existential** for that case: one banded line is a defect however many valueless lines agree. `contracts` separately owns the **within-file** half, which a per-file schema sees on its own | `kindAgreement` in `packages/core/src/cross-file.ts` |
+  | **Co-rollable combination** | no prefix tier and suffix tier of the entry's containment sets under the scope can be on one item in either draw order: in each order the two share a `modGroup`, or the first's `addsTags` meets the second's `blockedByTags`. This is a validation error, never a `P = 0` | `packages/core/src/cross-file/co-rollable.ts` |
 
   **One null-line rule, reading only the weights file, decides every `statId: null` line**,
   and `tracked:lookup`, `core` and the `sync` gate all call the one `core` implementation,
@@ -1320,7 +1322,7 @@ never import each other.
   other tiers are below the floor, contributes nothing under that recipe.
 
   **An entry that a recipe cannot reach is a curation defect, not a ranking input.** `core`
-  exposes the reach verdict for each `(entry, recipe)` pair. `pnpm tracked:check` fails
+  exposes the reach verdict for each `(entry, recipe)` pair. A pair whose probability is `0` is unreachable. `pnpm tracked:check` fails
   while any entry is unreachable under any recipe in `data/recipes.json`
   (`AGENT-WORKFLOW.md`). Ranking keeps the backstop: an unreachable entry makes its
   `(itemClass, recipe)` pair unrankable.
@@ -1761,7 +1763,7 @@ graph TB
   sync --> dataset
   sync --> report
   sync --> progress
-  producer -.->|schema-conformant 6.1.0<br/>tiers + lines + modGroup + itemLevelMin| weights
+  producer -.->|schema-conformant 7.0.0<br/>tiers + lines + modGroup + blocking tags + itemLevelMin| weights
   dataset -->|player commits + pushes| pages
   pages --> web
   weights --> web
@@ -1850,7 +1852,7 @@ poe-crafting-base-price-checker/
     currencies.json # hand-maintained rates in divine, each with league + asOf (AD-20)
     recipes.json    # CraftRecipe definitions (AD-3)
     config.json     # active league (AD-19) + minChunkSearches (AD-7) + schemaVersion
-    weights.json    # consumed weights file, contract 6.1.0 — external producer (AD-11)
+    weights.json    # consumed weights file, contract 7.0.0 — external producer (AD-11)
     catalogue/      # sync-owned trade catalogue, patch cadence (AD-25)
       items.json
       stats.json

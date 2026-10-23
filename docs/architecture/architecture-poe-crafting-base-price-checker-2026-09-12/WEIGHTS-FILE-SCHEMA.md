@@ -2,16 +2,16 @@
 title: 'Weights File Contract'
 status: final
 governed_by: AD-17
-schemaVersion: '6.1.0'
+schemaVersion: '7.0.0'
 created: '2026-09-12'
-updated: '2026-09-27'
+updated: '2026-10-23'
 ---
 
 # Weights File Contract
 
 > **This is the authoritative contract**, owned by this repo (`poe-crafting-base-price-checker`)
 > and binding under the spine's AD-0 ("the weights contract itself"). `6.0.0` is adopted, as
-> of spine revision 19, and `6.1.0` (the `not-in-game` value) as of spine revision 23: `modGroup`, the per-stat `tierLabel` rule, the exclusivity rule and
+> of spine revision 19, and `6.1.0` (the `not-in-game` value) as of spine revision 23, and `7.0.0` (blocking tags) as of spine revision 39: `modGroup`, the per-stat `tierLabel` rule, the exclusivity rule and
 > the `className` grammar below are normative, enforced rules, not pending proposals. A
 > separate working copy may still exist inside the external `poe-mod-weights-producer` scraper
 > project for that project's own iteration, but that copy
@@ -28,6 +28,18 @@ wrote the file.
 carries. See *Why this file has to exist* below. The app therefore cannot rank any base
 type until a conforming file is present. The intended producer is a separate scraper
 project. This document is the contract that the scraper project must satisfy.
+
+## 7.0.0 — blocking tags
+
+**Breaking.** Every entry gains two required fields. `core` implements `7` and refuses a `6.x` file as an unknown major (spine AD-11).
+
+| Change | Reason |
+| --- | --- |
+| New required **`addsTags`** on every entry: the `no_*` tags its modifier adds to an item, from poe2db's `adds_no`, verbatim, sorted by code unit | A modifier on an item can stop modifiers of *other* groups from rolling. `modGroup` cannot express that, because the effect crosses groups and slots. |
+| New required **`blockedByTags`** on every entry: the `no_*` tags that set its modifier's weight to `0` **on this class**, sorted by code unit | The game reads a modifier's spawn tags in order, and the first tag the item has decides the weight. The producer resolves that order against the class, as it already does for `weight`. A `no_*` tag that comes after the class's own tag never decides, so it is not emitted. |
+| Nothing else | Weights, `modGroup`, `lines`, the `className` grammar and every `6.x` hard error are unchanged. |
+
+The tag set and which families carry it are game data, not contract terms: `docs/research/technical-poe2-no-tag-mod-blocking-2026-10-23/research.md` records them for patch 0.5.5.4.2.
 
 ## 6.1.0 — not-in-game tiers and internal lines
 
@@ -184,6 +196,7 @@ the producer computes from cell coverage — there are no cells to compute it fr
 - `modGroup` is published verbatim and nothing is derived from it: the file carries no
   group totals, per-group probabilities or adjusted weights. Pools stay flat entry lists;
   entries are not nested under groups.
+- **A modifier can also block by tag.** An item's tags are the union of the `addsTags` of the modifiers on it. A consumer predicting the next roll also removes every entry whose `blockedByTags` meets the item's tags, before normalising.
 
 How `core` applies this rule to a crafting act is spine AD-17 and
 `combinationProbability` in `packages/core/src/probability.ts`.
@@ -192,7 +205,7 @@ How `core` applies this rule to a crafting act is spine AD-17 and
 
 ```jsonc
 {
-  "schemaVersion": "6.1.0",           // semver; core refuses a major it does not know
+  "schemaVersion": "7.0.0",           // semver; core refuses a major it does not know
   "gamePatch": "0.5.5",               // operator-asserted at run time; never defaulted
   "producer": {
     "id": "poe2-weights-scraper",     // stable producer identifier
@@ -209,6 +222,8 @@ How `core` applies this rule to a crafting act is spine AD-17 and
             {
               "sourceModifierId": "prefix\u0000BaseLightningDamage\u000060\u0000...",
               "modGroup": "BaseLightningDamage",   // mutual-exclusion group, verbatim
+              "addsTags": [],
+              "blockedByTags": [],
               "itemLevelMin": 60,        // this tier's own item level
               "tierLabel": "T7",         // display only; never a matching key
               "weight": 40,              // raw spawn weight as published, unnormalised
@@ -223,6 +238,8 @@ How `core` applies this rule to a crafting act is spine AD-17 and
             {
               "sourceModifierId": "prefix\u0000BaseEvasionHybrid\u00008\u0000...",
               "modGroup": "BaseEvasionHybrid",
+              "addsTags": [],
+              "blockedByTags": [],
               "itemLevelMin": 8,
               "tierLabel": "T1",
               "weight": 1000,
@@ -235,6 +252,8 @@ How `core` applies this rule to a crafting act is spine AD-17 and
             {
               "sourceModifierId": "prefix\u0000ExtraBolt\u000045\u0000...",
               "modGroup": "ExtraBolt",
+              "addsTags": [],
+              "blockedByTags": [],
               "itemLevelMin": 45,
               "tierLabel": "T1",
               "weight": 300,
@@ -246,12 +265,37 @@ How `core` applies this rule to a crafting act is spine AD-17 and
             {
               "sourceModifierId": "prefix\u0000UnmatchedMod\u000030\u0000...",
               "modGroup": "UnmatchedMod",
+              "addsTags": [],
+              "blockedByTags": [],
               "itemLevelMin": 30,
               "tierLabel": "T4",
               "weight": 500,
               "weightSource": "published",
               "lines": [
                 { "statId": null, "ranges": [[10, 20]] }   // no trade statId matched
+              ]
+            }
+          ]
+        },
+        "suffix": { "poolCoverage": "complete", "entries": [] }
+      }
+    },
+    "weapon.wand": {
+      "Wands": {
+        "prefix": {
+          "poolCoverage": "complete",
+          "entries": [
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000081\u0000...",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": ["no_chaos_spell_mods", "no_cold_spell_mods", "no_fire_spell_mods", "no_physical_spell_mods"],
+              "blockedByTags": ["no_lightning_spell_mods"],   // resolved for this class
+              "itemLevelMin": 81,
+              "tierLabel": "T1",
+              "weight": 50,
+              "weightSource": "published",
+              "lines": [
+                { "statId": "explicit.stat_2231156303", "ranges": [[105, 119]] }   // #% increased Lightning Damage
               ]
             }
           ]
@@ -276,6 +320,8 @@ How `core` applies this rule to a crafting act is spine AD-17 and
 | `poolCoverage` | See *The pool-completeness rule*. Required, with no default. |
 | `sourceModifierId` | **Required on every entry.** Names the poe2db tier this entry came from. One entry per tier — never split, never merged. Opaque to the app. |
 | `modGroup` (`6.0.0`) | **Required on every entry**, a non-empty string: poe2db's `ModFamilyList` value for this tier, verbatim (a producer refuses a row whose list is not exactly one string). The game's mutual-exclusion group — see *The exclusivity rule*. Nothing is derived from it, and a consumer never recovers it by parsing `sourceModifierId`. |
+| `addsTags` (`7.0.0`) | **Required**, possibly empty. Each element matches `^no_[a-z0-9_]+$`; no duplicates. Nothing is derived from it. |
+| `blockedByTags` (`7.0.0`) | **Required**, possibly empty. Same element rule. Resolved per class as above. A `no_*` spawn tag with a non-zero weight before the class tag cannot be represented, so the producer refuses that row. |
 | `itemLevelMin` | **Required.** The lowest item level at which this tier's mass can roll, taken verbatim from poe2db. |
 | `tierLabel` | Display only. Never a matching key. **Since `6.0.0`**, numbered per stat within `(slot, modGroup)`, T1 = highest `itemLevelMin`: one `T1..Tn` run per distinct stat template in a group, an `itemLevelMin` tie broken by poe2db's page order. No label repeats within a run. |
 | `weight` | Raw spawn weight as poe2db published it (`DropChance`), unnormalised, non-negative. `0` is meaningful ("cannot roll on this base") and must still be emitted. **Sole exception (`6.1.0`):** a `weightSource: "not-in-game"` entry carries `0` whatever poe2db published. |
@@ -294,6 +340,7 @@ source of truth; the shape above documents it and is not a parallel definition.
 - unknown `schemaVersion` major
 - a missing `sourceModifierId`, `itemLevelMin`, `weight`, `weightSource`, or `lines`
 - **(`6.0.0`)** a missing, non-string or empty `modGroup`
+- **(`7.0.0`)** a missing `addsTags` or `blockedByTags`, an element that is not a `no_*` tag, or a duplicate tag within one array
 - a negative `weight`
 - `weightSource` not one of `"published"` / `"absent"` / `"not-in-game"`
 - **(`6.1.0`)** `weightSource: "not-in-game"` with a `weight` other than `0`
