@@ -25,6 +25,7 @@ function craftedRow(overrides: Partial<ClassDisplayRow> = {}): ClassDisplayRow {
     label: 'Bows',
     itemLevel: 82,
     ev: { kind: 'figure', text: '1.25', negative: false },
+    isJewel: false,
     trust: CURRENT,
     provenance: 'measured',
     chase: [[{ text: 'T1 Mana', verbatim: false }]],

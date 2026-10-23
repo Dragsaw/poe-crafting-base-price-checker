@@ -10,7 +10,7 @@ import { PageProvider } from '../theme/PageProvider';
 import type { AffixPart } from './combination-text';
 import type { ClassDisplayRow, CraftedCombination, PrunedCombination } from './display-rows';
 import { ClassExpansionPanel } from './ExpansionPanel';
-import { BELOW_THRESHOLD_NOTE, CURATION_MARKS, ESTIMATED_ODDS_CONTEXT, FEWER_LINES_COPY, moreLinesCopy, prunedCopy } from './format';
+import { BELOW_THRESHOLD_NOTE, CURATION_MARKS, ESTIMATED_ODDS_CONTEXT, FEWER_LINES_COPY, JEWEL_CONTEXT, moreLinesCopy, prunedCopy } from './format';
 import { RankedList } from './RankedList';
 import { NAME_COLORS } from './RankedRow';
 import { MISSING_FIGURE } from './row/ExpectedValueCell';
@@ -47,6 +47,7 @@ function classRow(lines: number, prunedCount: number, overrides: Partial<ClassDi
     label: 'Rings',
     itemLevel: 82,
     ev: { kind: 'figure', text: '1.00', negative: false },
+    isJewel: false,
     trust: CURRENT,
     provenance: 'measured',
     chase: [],
@@ -117,6 +118,24 @@ describe('the expansion panel', () => {
     const view = mount(panel(classRow(1, 0, { provenance: 'uniform-prior', ev: { kind: 'missing' }, trust: pending })));
     expect(view.querySelector('[data-context-line]')?.textContent).toBe('Rings');
     expect(view.querySelector('[data-context-estimate]')).toBeNull();
+  });
+
+  it('ends a jewel row’s context line with the jewel clause, after the ≈ sentence when both apply', () => {
+    const jewel = { label: 'Emerald', isJewel: true };
+    expect(mount(panel(classRow(1, 0, jewel))).querySelector('[data-context-line]')?.textContent).toBe(
+      `Emerald${JOINER}${JEWEL_CONTEXT}`,
+    );
+    unmount();
+    expect(
+      mount(panel(classRow(1, 0, { ...jewel, provenance: 'uniform-prior' }))).querySelector('[data-context-line]')?.textContent,
+    ).toBe(`Emerald${JOINER} ${ESTIMATED_ODDS_CONTEXT}${JOINER}${JEWEL_CONTEXT}`);
+  });
+
+  it('gives a jewel row with EV `—` no jewel clause', () => {
+    const uncostable = { label: 'Emerald', isJewel: true, ev: { kind: 'missing' } } as const;
+    const view = mount(panel(classRow(1, 0, uncostable)));
+    expect(view.querySelector('[data-context-line]')?.textContent).toBe('Emerald');
+    expect(view.querySelector('[data-context-jewel]')).toBeNull();
   });
 
   it('gives each line the expansion-line grid, one line high', () => {

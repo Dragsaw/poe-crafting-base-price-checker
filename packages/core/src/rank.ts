@@ -14,7 +14,7 @@ import type {
   WeightsFile,
 } from '@poe/contracts';
 
-import { craftCost, type CraftCostResult } from './craft-cost.ts';
+import { craftCost, type CraftCostResult, isJewelCategory, JEWEL_CRAFT_COST } from './craft-cost.ts';
 import { classKeyOf, craftedClassesOf } from './crafted-classes.ts';
 import type { CrossFileFailure } from './cross-file.ts';
 import { assertClock, entryTrust, NO_RECIPE_TRUST, resolvedPrice } from './price-trust.ts';
@@ -248,7 +248,9 @@ function rankCraftedClass(
     });
     return;
   }
-  for (const { recipe, cost } of costed) {
+  const isJewel = isJewelCategory(first.categoryId);
+  for (const { recipe, cost: recipeCost } of costed) {
+    const cost = isJewel && recipeCost.ok ? JEWEL_CRAFT_COST : recipeCost;
     const row = craftedRow({ first, recipe, cost, pools, keyed, byKey, activeLeague: input.activeLeague, threshold: input.threshold, now: input.now });
     if (row === undefined) {
       out.unrankable.set(JSON.stringify([classKeyOf(first.categoryId, first.className), recipe.id]), {

@@ -8,7 +8,7 @@ import {
   type PriceTrust,
   type TrackedEntry,
 } from '@poe/contracts';
-import { classKeyOf, type Ranking, type UnrankedEntry } from '@poe/core';
+import { classKeyOf, isJewelCategory, type Ranking, type UnrankedEntry } from '@poe/core';
 
 import { formatDivine, LOSS_BELOW_PRINTABLE, MINUS } from '../shared/money';
 import { combinationText, type AffixPart, type StatTexts } from './combination-text';
@@ -31,10 +31,13 @@ function hasNoFigure(trust: PriceTrust): boolean {
   return trust.verdict === 'pending' || trust.verdict === 'broken';
 }
 
-/** The dim rides the printed minus sign or `< 0.00`, never tone alone (EXPERIENCE.md Accessibility Floor, NFR-10). */
-function figure(expectedValue: number): ExpectedValueCell {
+/**
+ * The dim rides the printed minus sign or `< 0.00`, never tone alone (EXPERIENCE.md Accessibility Floor, NFR-10),
+ * or a jewel's exact `0.00` with nothing cleared (`isNothingCleared`; state 21, memlog 294).
+ */
+function figure(expectedValue: number, isNothingCleared = false): ExpectedValueCell {
   const text = formatDivine(expectedValue);
-  return { kind: 'figure', text, negative: text.startsWith(MINUS) || text === LOSS_BELOW_PRINTABLE };
+  return { kind: 'figure', text, negative: isNothingCleared || text.startsWith(MINUS) || text === LOSS_BELOW_PRINTABLE };
 }
 
 /** One Raw Base row as the view prints it. Nothing here is a ranking term: `core` ordered it. */
@@ -70,6 +73,8 @@ export interface ClassDisplayRow {
   readonly itemLevel: number;
   /** The EV at 2dp — negative is a real figure — or missing when the recipe is uncostable. */
   readonly ev: ExpectedValueCell;
+  /** A jewel subtracts no Craft Cost (FR-26); its context line says so. */
+  readonly isJewel: boolean;
   /** `core`'s first matching crafted rule (AD-17). */
   readonly trust: PriceTrust;
   /** `core`'s label of the pair, unset on a recipeless class. Only `uniform-prior` prints ≈ (FR-11). */
@@ -218,6 +223,7 @@ function recipelessRows(ranking: Ranking, byKey: ReadonlyMap<string, DatasetEntr
       label: unitLabel(item.className),
       itemLevel: item.itemLevelMin,
       ev: MISSING,
+      isJewel: isJewelCategory(item.categoryId),
       trust: item.trust,
       chase: [],
       combinations: item.combinations.flatMap(({ entryKey, trust, priceDivine }) =>
@@ -239,7 +245,8 @@ function classRow(
     unit: 'class',
     label: unitLabel(row.className),
     itemLevel: row.itemLevelMin,
-    ev: row.ev === null || hasNoFigure(row.trust) ? MISSING : figure(row.ev),
+    ev: row.ev === null || hasNoFigure(row.trust) ? MISSING : figure(row.ev, row.summands.length === 0),
+    isJewel: isJewelCategory(row.categoryId),
     trust: row.trust,
     provenance: row.provenance,
     ...craftedDetail(row, source),

@@ -458,6 +458,7 @@ A sync problem is visible without going to look for it.
 - A recipe whose currency has no current rate for the active league is reported as uncostable, never costed at zero (AD-20).
 - An uncostable recipe removes no row from the list and makes no Item Class Unrankable. FR-4's reason enum is not extended for it, because such a class's Eligible Pool is complete and agrees with the Weights File, so none of FR-4's three strings is true of it *(PRD-owned)* (FR-4, AD-17).
 - While the active recipe is uncostable the player still sees each of FR-3's two ranked units in its own order, and no ordering between them. The page states that limit and never implies an order across the two that it cannot compute *(PRD-owned)* (FR-1, FR-3, FR-5).
+- A jewel's Craft Cost is 0 under every recipe: greater and perfect currency does not affect jewel mods, so jewels are crafted with basic currency *(PRD-owned)*.
 - A Craft Recipe changes which outcomes are reachable, not only what an attempt costs. Two recipes over the same Tracked List therefore produce genuinely different orderings — not one ordering shifted by a constant — and an Item Class's Chase Combinations can differ between them (AD-17).
 - Craft Cost is shown in Divine, the unit of every price and the Payout Threshold (AD-20).
 
