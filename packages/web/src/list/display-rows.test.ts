@@ -311,6 +311,8 @@ describe('the summands in web', () => {
     const allowed = new Set([
       './display-rows.ts: summands.slice(0, CHASE_CELLS).map((summand) => text(summand.entryKey)),',
       './display-rows.ts: summands.flatMap((summand) => line(summand.entryKey, { trust: summand.trust, price: summand.priceDivine, isBelowThreshold: false })),',
+      // State 21 dims a crafted EV with no summand, a jewel's `0.00` included (FR-26).
+      './display-rows.ts: summands.length === 0),',
       // State 25 reads whether any summand survives (Story 3.4).
       './list-statement.ts: summands.length > 0);',
     ]);

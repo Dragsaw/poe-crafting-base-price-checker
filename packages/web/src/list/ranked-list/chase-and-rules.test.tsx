@@ -77,6 +77,7 @@ function craftedRow(index: number): ClassDisplayRow {
     label: `Rings ${String(index)}`,
     itemLevel: 82,
     ev: { kind: 'figure', text: '1.00', negative: false },
+    isJewel: false,
     trust: CURRENT,
     provenance: 'measured',
     chase: [parts('T1 Mana', 'T1 Cold Res'), parts('T1 Life', 'T1 Cold Res'), parts('T1 ES', 'T1 Cold Res')],

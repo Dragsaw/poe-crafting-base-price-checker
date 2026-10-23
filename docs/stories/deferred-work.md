@@ -57,10 +57,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   evidence: In the `Dragsaw/sync-4` worktree, 18 Emerald entries use `explicit.stat_1200678966` (quiver bonuses) and 18 use `explicit.stat_712554801` (Mark effect). The catalogue also has the radius forms `explicit.stat_4180952808` and `explicit.stat_179541474`; jewels may roll those instead. The player plans to check the market.
   retry_when: never — needs a human
 
-- source_spec: `docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md`
-  summary: Make the Craft Cost of every jewel recipe 0: greater and perfect currency does not affect jewel mods, so jewels are always crafted with basic currency.
-  evidence: `data/recipes.json` has only the `greater` and `perfect` recipes, and `craftCost` in `packages/core/src/craft-cost.ts` sums their currency rates for every class, the Emerald jewel class included (AD-20, FR-26). Player report: the jewel cost per craft must always be 0.
-
 - source_spec: `data/tracked.json`
   summary: Track more normal (raw) bases.
   evidence: `data/tracked.json` on master holds only four raw entries (two Amulets, two Belts, one of them pruned) beside 1,255 crafted entries. The player did not name the bases to add.

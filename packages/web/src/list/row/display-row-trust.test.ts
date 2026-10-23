@@ -28,7 +28,11 @@ function craftedRow(trust: PriceTrust, expectedValue: number | undefined): Craft
     craftCost: expectedValue === undefined ? { kind: 'uncostable', currencyId: 'chaos' } : 0.03,
     // eslint-disable-next-line unicorn/no-null -- boundary: `CraftedRankedRow.ev` is null exactly when the recipe is uncostable (AD-20).
     ev: expectedValue ?? null,
-    summands: [],
+    // A positive EV needs a summand: with none, `core` ranks a row at −craftCost (state 21).
+    summands:
+      expectedValue !== undefined && expectedValue > 0
+        ? [{ entryKey: 'bows-target', probability: 0.5, priceDivine: 3.06, contribution: 1.53, trust }]
+        : [],
     combinations: [],
     provenance: 'measured',
     trust,
