@@ -33,7 +33,7 @@ User decisions, taken 2026-10-23:
 | `ARCHITECTURE-SPINE.md` | Revision 38 → 39: AD-11 version pin and field list; AD-17 draw model and reach rule; a new cross-file check; check counts removed; Structural Seed labels |
 | `AGENT-WORKFLOW.md` | Copies of the contract version, field list and check list removed |
 | `.claude/skills/tracked-json/SKILL.md` | Check count removed |
-| `docs/stories/deferred-work.md` | Jewel entry removed (no effect); main entry stays until the story lands |
+| `docs/stories/deferred-work.md` | Jewel entry removed (no effect); main entry removed once Epic 5 plans the work |
 | `prd.md` | None. `P(combo)` belongs to the spine; FR-4's third cause already covers the failure |
 | `EXPERIENCE.md`, `DESIGN.md` | None. No new state or string |
 | External producer | Must emit `7.0.0` |
@@ -197,7 +197,7 @@ NEW: … catalogue resolvability and the cross-file checks against `data/weights
 
 ### 4.4 `docs/stories/deferred-work.md`
 
-Remove the jewel entry (*"Check whether jewel mods carry the `no_*` blocking tags…"*) in the commit that holds this proposal; the commit message names the decision: the research found no jewel mod with a `no_*` spawn tag. No GitHub issue was opened for it, so none is closed. The main entry (*"Model blocking mod tags…"*) stays until the last commit of the branch that lands the work.
+Remove the jewel entry (*"Check whether jewel mods carry the `no_*` blocking tags…"*) in the commit that holds this proposal; the commit message names the decision: the research found no jewel mod with a `no_*` spawn tag. No GitHub issue was opened for it, so none is closed. The main entry (*"Model blocking mod tags…"*) is removed once Epic 5 is written, because the epic then owns the work.
 
 ### 4.5 The research doc
 
@@ -225,4 +225,3 @@ One story suggested, *Blocking mod tags in the second draw*, covering: the `7.0.
 - `WEIGHTS-FILE-SCHEMA.md` is `7.0.0` and the spine is revision 39 with the edits above.
 - On the `7.0.0` file, the Wand cold-damage second-draw suffix pool omits the six blocked families and keeps Freeze Buildup and `+Level of all Cold Spell Skills`.
 - `pnpm tracked:check` reports no co-rollable failure after the deletion, and Foci and jewel probabilities are unchanged.
-- The main deferred entry is removed in the last commit of the landing branch.

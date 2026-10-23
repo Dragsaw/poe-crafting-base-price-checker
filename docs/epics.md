@@ -1,9 +1,9 @@
 ---
 stepsCompleted: ['step-01-validate-prerequisites', 'step-02-design-epics', 'step-03-create-stories', 'step-04-final-validation']
-storiesWrittenForEpics: [1, 2, 3, 4]
+storiesWrittenForEpics: [1, 2, 3, 4, 5]
 storiesPendingForEpics: []
 blockedStories: []
-revisionPass: 'Targeted revision 2026-10-09 for PRD revision 27 and the Rarity Dark redesign (UX revision 24, DESIGN revision 19): FR inventory to 34, thirteen FR titles retitled, retired-direction UX-DRs marked superseded, Epic 4 appended. Epics 1 to 3 are unedited records. Before it, targeted revision 2026-09-27 of Story 3.6 and the weights-contract citations for spine revision 23 (AD-10 folds Provenance per (itemClass, recipe) pair; contract 6.1.0) and PRD revision 23. Before it, targeted revision 2026-09-27 of Epic 2 and Stories 2.7 and 2.8 (epic 2 retro item 19) for the committed weights.json 6.0.0 with recipes.json published with no recipe, which the masthead dek explains. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
+revisionPass: 'Targeted revision 2026-10-23 for weights contract 7.0.0 and spine revision 39 (blocking mod tags): Epic 5 appended with one story. Epics 1 to 4 are unedited records. Before it, targeted revision 2026-10-09 for PRD revision 27 and the Rarity Dark redesign (UX revision 24, DESIGN revision 19): FR inventory to 34, thirteen FR titles retitled, retired-direction UX-DRs marked superseded, Epic 4 appended. Epics 1 to 3 are unedited records. Before it, targeted revision 2026-09-27 of Story 3.6 and the weights-contract citations for spine revision 23 (AD-10 folds Provenance per (itemClass, recipe) pair; contract 6.1.0) and PRD revision 23. Before it, targeted revision 2026-09-27 of Epic 2 and Stories 2.7 and 2.8 (epic 2 retro item 19) for the committed weights.json 6.0.0 with recipes.json published with no recipe, which the masthead dek explains. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
 inputDocuments:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md
@@ -329,6 +329,8 @@ FR-34: Epic 3 — Hybrid Modifier and summed Stat Line pricing, built
 
 Epic 4 restyles and re-words the treatment of FR-3, FR-6 to FR-13, FR-18, FR-24, FR-25 and NFR-10 for the Rarity Dark redesign. It adds no FR and changes no ownership above. A story inside Epic 4 owns the changed treatment, and the owning epic above keeps the FR.
 
+Epic 5 corrects the probability term behind FR-1 and adds a cross-file failure under FR-4's third cause. It adds no FR and changes no ownership above.
+
 ## Epic List
 
 ### Epic 1: Foundations and the Background Sync
@@ -407,6 +409,24 @@ The player reads the same ranked list on a dark, rarity-coloured page. Silence m
 **NFRs addressed:** NFR-10
 
 **Standalone:** yes. It builds on Epics 1 to 3 and changes no sync behaviour.
+
+### Epic 5: Weights fidelity
+
+The player reads Wand and Staff rows valued on the modifiers the game can really roll together. A combination the game cannot roll is never ranked.
+
+**FRs retouched:** FR-1, FR-4 (ownership stays with Epic 3)
+
+**Also delivers:**
+  - weights contract `7.0.0` in `contracts`, and the refusal of a `6.x` file
+  - the blocking-tag exclusion in the second draw
+  - the co-rollable cross-file check, run by every shell
+  - the deletion of the tracked combinations the game cannot roll
+
+**NFRs addressed:** NFR-1, NFR-3, NFR-8
+
+**Depends on:** the external producer emitting `7.0.0`. The epic's story merges only together with a committed `7.0.0` `data/weights.json`.
+
+**Standalone:** yes. It builds on Epics 1 to 4 and adds no state, string or control to the page.
 
 ## Epic 1: Foundations and the Background Sync
 
@@ -2750,3 +2770,65 @@ So that I know the class is not wholly out of the list.
 **Given** the change is done
 **When** `pnpm check` runs
 **Then** it passes.
+
+## Epic 5: Weights fidelity
+
+The player reads Wand and Staff rows valued on the modifiers the game can really roll together. A combination the game cannot roll is never ranked. The epic builds on Epics 1 to 4 and adds no state, string or control to the page.
+
+**Source of truth.** `WEIGHTS-FILE-SCHEMA.md` `7.0.0` holds the contract: the two blocking-tag fields, the exclusivity rule and the hard errors. `ARCHITECTURE-SPINE.md` revision 39 holds the decisions: the draw model and the reach rule of AD-17, and the *Co-rollable combination* cross-file check. PRD revision 30 holds FR-1 and FR-4 unchanged. `EXPERIENCE.md` states 15a and 27 already cover the failure. `docs/research/technical-poe2-no-tag-mod-blocking-2026-10-23/research.md` records which modifiers carry the tags. Every acceptance criterion cites these documents and copies no rule.
+
+**Dependency.** The external producer must emit `7.0.0`. Once `contracts` refuses a `6.x` file, every crafted Item Class is unrankable until a `7.0.0` `data/weights.json` is committed. Story 5.1 builds against fixtures and merges only together with that file.
+
+**Order.** 5.1 is the only story. `pnpm check` is green after it.
+
+### Story 5.1: Blocking mod tags in the second draw
+
+As the player,
+I want a Wand or Staff row valued only on the modifier pairs the game can roll together,
+So that a blocked modifier never inflates the odds behind a row, and a combination the game cannot roll is never ranked.
+
+**Acceptance Criteria:**
+
+**Given** a weights file
+**When** `contracts` loads it
+**Then** a `7.0.0` file loads, and every entry carries `addsTags` and `blockedByTags` under the contract's field rules
+**And** a `6.x` file is refused as an unknown major, and each `7.0.0` hard error refuses the file (`WEIGHTS-FILE-SCHEMA.md` *7.0.0* and *Validation*; NFR-8).
+
+**Given** a first affix on an item
+**When** `core` computes the second draw
+**Then** it removes the entries that the spine's draw model excludes, by blocking tag as well as by mod group, before it renormalises (AD-17; FR-1)
+**And** `core` reads the two tag fields for that exclusion only, and never parses `sourceModifierId`.
+
+**Given** a `7.0.0` Wand fixture with `increased Cold Damage` as the first affix
+**When** `core` builds the second-draw suffix pool
+**Then** the pool omits the four other-element `+# to Level of all … Spell Skills` families, Flammability and Shock
+**And** it keeps Freeze Buildup and `+# to Level of all Cold Spell Skills`
+**And** a fixture covers the other draw order of a blocked pair (FR-1).
+
+**Given** Focus and jewel fixtures in `7.0.0` shape
+**When** `core` computes their probabilities
+**Then** each result equals the result before this story, because no blocking tag decides on those classes (research doc; FR-1).
+
+**Given** a crafted Tracked Entry whose prefix and suffix tiers cannot be on one item in either draw order
+**When** any shell runs the cross-file checks
+**Then** the *Co-rollable combination* check fails the entry as a validation error, never as a probability of `0`
+**And** the check is one exported pure function in `core`, at the module the spine names, that every shell calls (FR-4).
+
+**Given** a co-rollable failure
+**When** `pnpm tracked:check`, the sync gate or the page meets it
+**Then** `pnpm tracked:check` names the entry and exits non-zero, the sync gate aborts the run before any search and records the failure in `sync-report.json`, and the page shows the Item Class Unrankable under FR-4's cross-file reason with the diagnosis listed (`EXPERIENCE.md` states 15a and 27; FR-4).
+
+**Given** an `(entry, recipe)` pair whose probability is `0`
+**When** a caller asks for the reach verdict
+**Then** the verdict is unreachable, and `pnpm tracked:check` lists the pair under `unreachable` (spine reach rule).
+
+**Given** the committed `data/tracked.json` and the `7.0.0` `data/weights.json`
+**When** `pnpm tracked:check` runs before the data edit
+**Then** the entries it fails under the co-rollable check are the entries the story removes, and the story re-derives that list from the command and copies no fixed list or count
+**And** the story deletes those entries from `data/tracked.json` with the `tracked-json` skill, and does not prune them
+**And** the commit message names the deletion as an exception to the prune tombstone (FR-15)
+**And** `pnpm tracked:check` then exits 0.
+
+**Given** the change is done
+**When** `pnpm check` runs
+**Then** it passes, and no test makes a network call (NFR-1).

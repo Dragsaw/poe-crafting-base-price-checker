@@ -40,11 +40,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 
 ## Deferred from: player feedback on tracked data and weights (2026-10-18)
 
-- source_spec: `docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/WEIGHTS-FILE-SCHEMA.md`
-  summary: [NOTE FOR ARCHITECT] Model blocking mod tags: some mods add a `no_*` tag (e.g. `no_cold_spell_mods`) that blocks other mods, so the producer must emit them in weights.json and core must drop blocked mods from the pool when it computes weights.
-  evidence: Player report: on Wands and Staves, "increased Cold Damage" adds `no_cold_spell_mods`, so the item can then roll only "+# to Level of all Cold Spell Skills" and no non-matching elemental or chaos mods. The weights contract has no tag field, so every pool on such a class over-counts the blocked mods and the EV of those entries is wrong. Which classes and mods carry these tags is not known yet. Critical: wrong weights change the ranking. Wands (100) and Staves (60) carry the most crafted entries in `data/tracked.json`.
-  retry_when: never — needs a human
-
 - source_spec: `data/tracked.json`
   summary: Fix the Spirit stat id on body armour entries: `explicit.stat_2704225257` gets no listings on any armour; find the stat id the trade site uses for Spirit on body armours.
   evidence: The body armour entries (`armour.chest`, `Body_Armours_*`) are uncommitted in the `Dragsaw/sync-4` worktree and use `explicit.stat_2704225257` ("# to Spirit"). Amulets use `explicit.stat_3981240776` for the same text. Player report: no listing on any armour matches the tracked id.
