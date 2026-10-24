@@ -11742,90 +11742,6 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_2254480358",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_736967255",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_591105508",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_736967255",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1545858329",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_736967255",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1600707273",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_736967255",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
         "statId": "explicit.stat_789117908",
         "valueMin": 60,
         "valueMax": 69,
@@ -11931,91 +11847,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_4226189338",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_3291658075",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
         "statId": "explicit.stat_2254480358",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_3291658075",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_591105508",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_3291658075",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1545858329",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_3291658075",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1600707273",
         "valueMin": 4,
         "valueMax": 5,
         "acceptedTier": "T1-T2"
@@ -12141,91 +11973,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_4226189338",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_3962278098",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2254480358",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_3962278098",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
         "statId": "explicit.stat_591105508",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_3962278098",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1545858329",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_3962278098",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1600707273",
         "valueMin": 4,
         "valueMax": 5,
         "acceptedTier": "T1-T2"
@@ -12351,91 +12099,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_4226189338",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2231156303",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2254480358",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2231156303",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_591105508",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2231156303",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
         "statId": "explicit.stat_1545858329",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2231156303",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1600707273",
         "valueMin": 4,
         "valueMax": 5,
         "acceptedTier": "T1-T2"
@@ -12544,90 +12208,6 @@
         "valueMin": 4,
         "valueMax": 4,
         "acceptedTier": "T1"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2768835289",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_4226189338",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2768835289",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2254480358",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2768835289",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_591105508",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.wand",
-      "className": "Wands",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2768835289",
-        "valueMin": 90,
-        "valueMax": 119,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1545858329",
-        "valueMin": 4,
-        "valueMax": 5,
-        "acceptedTier": "T1-T2"
       },
       "status": "active"
     },
@@ -15009,91 +14589,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_4226189338",
-        "valueMin": 7,
-        "valueMax": 7,
-        "acceptedTier": "T1"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.staff",
-      "className": "Staves",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_3291658075",
-        "valueMin": 209,
-        "valueMax": 238,
-        "acceptedTier": "T1"
-      },
-      "suffix": {
-        "kind": "banded",
         "statId": "explicit.stat_2254480358",
-        "valueMin": 7,
-        "valueMax": 7,
-        "acceptedTier": "T1"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.staff",
-      "className": "Staves",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_3291658075",
-        "valueMin": 209,
-        "valueMax": 238,
-        "acceptedTier": "T1"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_591105508",
-        "valueMin": 7,
-        "valueMax": 7,
-        "acceptedTier": "T1"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.staff",
-      "className": "Staves",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_3291658075",
-        "valueMin": 209,
-        "valueMax": 238,
-        "acceptedTier": "T1"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1545858329",
-        "valueMin": 7,
-        "valueMax": 7,
-        "acceptedTier": "T1"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.staff",
-      "className": "Staves",
-      "itemLevelMin": 81,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_3291658075",
-        "valueMin": 209,
-        "valueMax": 238,
-        "acceptedTier": "T1"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1600707273",
         "valueMin": 7,
         "valueMax": 7,
         "acceptedTier": "T1"
@@ -16392,7 +15888,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_2897413282",
+        "statId": "explicit.stat_1379411836",
         "valueMin": 11,
         "valueMax": 13,
         "acceptedTier": "T1"
@@ -16581,7 +16077,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_2897413282",
+        "statId": "explicit.stat_1379411836",
         "valueMin": 11,
         "valueMax": 13,
         "acceptedTier": "T1"
@@ -16770,7 +16266,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_2897413282",
+        "statId": "explicit.stat_1379411836",
         "valueMin": 11,
         "valueMax": 13,
         "acceptedTier": "T1"
@@ -16959,7 +16455,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_2897413282",
+        "statId": "explicit.stat_1379411836",
         "valueMin": 11,
         "valueMax": 13,
         "acceptedTier": "T1"
@@ -17148,7 +16644,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_2897413282",
+        "statId": "explicit.stat_1379411836",
         "valueMin": 11,
         "valueMax": 13,
         "acceptedTier": "T1"
@@ -17337,7 +16833,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_2897413282",
+        "statId": "explicit.stat_1379411836",
         "valueMin": 11,
         "valueMax": 13,
         "acceptedTier": "T1"
@@ -17526,7 +17022,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_2897413282",
+        "statId": "explicit.stat_1379411836",
         "valueMin": 11,
         "valueMax": 13,
         "acceptedTier": "T1"
@@ -35348,7 +34844,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -35369,7 +34865,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -35390,7 +34886,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -35627,7 +35123,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -35648,7 +35144,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -35669,7 +35165,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -35906,7 +35402,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -35927,7 +35423,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -35948,7 +35444,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -36292,7 +35788,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -36313,7 +35809,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -36334,7 +35830,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -36355,7 +35851,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -36720,7 +36216,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -36741,7 +36237,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -36762,7 +36258,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -36783,7 +36279,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -37148,7 +36644,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -37169,7 +36665,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -37190,7 +36686,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -37211,7 +36707,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -37676,7 +37172,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -37697,7 +37193,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -37718,7 +37214,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -37739,7 +37235,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
@@ -37760,7 +37256,7 @@
       "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
-        "statId": "explicit.stat_2704225257",
+        "statId": "explicit.stat_3981240776",
         "valueMin": 57,
         "valueMax": 61,
         "acceptedTier": "T1"
