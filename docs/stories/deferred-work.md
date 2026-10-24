@@ -53,15 +53,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 ## Deferred from: spec-track-all-elemental-resistances review (2026-10-24)
 
 - source_spec: `docs/stories/spec-track-all-elemental-resistances.md`
-  summary: Add a live-data check that lists every chase pairing in `data/tracked.json` over the 27-character budget, as `combination-fit.test.ts` does for the frozen fixture.
-  evidence: `packages/web/src/list/combination-fit.test.ts` (`PRUNING_CANDIDATES`) reads the frozen fixture only. `packages/web/src/list/tracked.data.test.ts` checks only the expansion-line cell (464px). So overruns in the live list, including the Fire Res hybrid pairings already at HEAD, are not reported. Design review finding.
-
-- source_spec: `docs/stories/spec-track-all-elemental-resistances.md`
   summary: [NOTE FOR PM] A full refresh now costs about 2,030 searches against SM-C1's ~1,500 ceiling, and the PRD does not record that the player accepted this.
   evidence: The spec's frozen Decision (search budget) accepts 2,030 searches. The list was already at 1,728 before this change. PRD SM-C1 and R-4 still state ~1,500 as the held ceiling. The PM decides whether SM-C1 changes or a prune follows. Blind review finding.
-  retry_when: never — needs a human
-
-- source_spec: `docs/stories/spec-track-all-elemental-resistances.md`
-  summary: State in the `tracked-json` skill that a resistance pairing is tracked for Fire, Cold and Lightning together, so a new single-element entry does not reopen the gap.
-  evidence: `.claude/skills/tracked-json/SKILL.md` has no rule on elemental siblings. This spec completed the 151 groups once, and no check enforces completeness. The player's rule: if one element of a pairing is valuable, the other two are too. Blind review finding.
   retry_when: never — needs a human
