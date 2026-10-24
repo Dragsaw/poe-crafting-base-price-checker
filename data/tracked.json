@@ -5339,6 +5339,606 @@
       "status": "active"
     },
     {
+      "kind": "raw",
+      "baseTypeId": "Slipstrike Vest",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_dex",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Death Mail",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_str_dex",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Death Mantle",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_str_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Falconer's Jacket",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_dex_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Sacramental Robe",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Utzaal Cuirass",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_str",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Wyrmscale Coat",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_dex",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Austere Garb",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_dex_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Corsair Coat",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_dex",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Feathered Raiment",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Seastorm Mantle",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_str_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Thane Mail",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_str_dex",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Warlord Cuirass",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_str",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Blacksteel Sabatons",
+      "categoryId": "armour.boots",
+      "className": "Boots_str_dex",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Cryptic Leggings",
+      "categoryId": "armour.boots",
+      "className": "Boots_str_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Daggerfoot Shoes",
+      "categoryId": "armour.boots",
+      "className": "Boots_dex_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Drakeskin Boots",
+      "categoryId": "armour.boots",
+      "className": "Boots_dex",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Sekhema Sandals",
+      "categoryId": "armour.boots",
+      "className": "Boots_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Tasalian Greaves",
+      "categoryId": "armour.boots",
+      "className": "Boots_str",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Adherent Cuffs",
+      "categoryId": "armour.gloves",
+      "className": "Gloves_str_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Blacksteel Gauntlets",
+      "categoryId": "armour.gloves",
+      "className": "Gloves_str_dex",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Massive Mitts",
+      "categoryId": "armour.gloves",
+      "className": "Gloves_str",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Polished Bracers",
+      "categoryId": "armour.gloves",
+      "className": "Gloves_dex",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Secured Wraps",
+      "categoryId": "armour.gloves",
+      "className": "Gloves_dex_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Sirenscale Gloves",
+      "categoryId": "armour.gloves",
+      "className": "Gloves_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Ancestral Tiara",
+      "categoryId": "armour.helmet",
+      "className": "Helmets_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Cryptic Crown",
+      "categoryId": "armour.helmet",
+      "className": "Helmets_str_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Freebooter Cap",
+      "categoryId": "armour.helmet",
+      "className": "Helmets_dex",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Gladiatorial Helm",
+      "categoryId": "armour.helmet",
+      "className": "Helmets_str_dex",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Grinning Mask",
+      "categoryId": "armour.helmet",
+      "className": "Helmets_dex_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Imperial Greathelm",
+      "categoryId": "armour.helmet",
+      "className": "Helmets_str",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Blacksteel Crest Shield",
+      "categoryId": "armour.shield",
+      "className": "Shields_str_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Golden Targe",
+      "categoryId": "armour.shield",
+      "className": "Shields_str_dex",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Tawhoan Tower Shield",
+      "categoryId": "armour.shield",
+      "className": "Shields_str",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Desert Buckler",
+      "categoryId": "armour.buckler",
+      "className": "Bucklers",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Tasalian Focus",
+      "categoryId": "armour.focus",
+      "className": "Foci",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Guardian Bow",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Warmonger Bow",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Gemini Bow",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Obliterator Bow",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Fanatic Bow",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Desolate Crossbow",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Flexed Crossbow",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Elegant Crossbow",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Gemini Crossbow",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Siege Crossbow",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Fanatic Greathammer",
+      "categoryId": "weapon.twomace",
+      "className": "Two_Hand_Maces",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Tawhoan Greatclub",
+      "categoryId": "weapon.twomace",
+      "className": "Two_Hand_Maces",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Ruination Maul",
+      "categoryId": "weapon.twomace",
+      "className": "Two_Hand_Maces",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Akoyan Spear",
+      "categoryId": "weapon.spear",
+      "className": "Spears",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Flying Spear",
+      "categoryId": "weapon.spear",
+      "className": "Spears",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Grand Spear",
+      "categoryId": "weapon.spear",
+      "className": "Spears",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Razor Quarterstaff",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Striking Quarterstaff",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Bolting Quarterstaff",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Dreaming Quarterstaff",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Fang Talisman",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Thunder Talisman",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Fungal Talisman",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Jade Talisman",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Maji Talisman",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Dueling Wand",
+      "categoryId": "weapon.wand",
+      "className": "Wands",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Chiming Staff",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Reaping Staff",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Sanctified Staff",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Rattling Sceptre",
+      "categoryId": "weapon.sceptre",
+      "className": "Sceptres",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Stoic Sceptre",
+      "categoryId": "weapon.sceptre",
+      "className": "Sceptres",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Omen Sceptre",
+      "categoryId": "weapon.sceptre",
+      "className": "Sceptres",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Lunar Amulet",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Amethyst Ring",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Pearl Ring",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Prismatic Ring",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Gold Ring",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Visceral Quiver",
+      "categoryId": "armour.quiver",
+      "className": "Quivers",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Primed Quiver",
+      "categoryId": "armour.quiver",
+      "className": "Quivers",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
       "kind": "crafted",
       "categoryId": "weapon.bow",
       "className": "Bows",
