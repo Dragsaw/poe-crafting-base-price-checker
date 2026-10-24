@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 30
+revision: 32
 created: 2026-09-12
-updated: 2026-10-11
+updated: 2026-10-24
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -172,7 +172,7 @@ Item Classes that `core` cannot rank honestly appear in a separate group, each w
   - the producer published the class, and the tracked entries contradict it
 
   FR-9's rule against collapsing distinct causes into one state applies here too. `EXPERIENCE.md` owns the words.
-- **One reason covers all five cross-file checks** *(PRD-owned)*. The failed check and the failed entry are diagnosis, not a player-facing reason. The player asks which classes he cannot rank. He does not ask why each one broke. `EXPERIENCE.md` decides where the diagnosis shows.
+- **One reason covers every cross-file check** *(PRD-owned; the checks: AD-17)*. The failed check and the failed entry are diagnosis, not a player-facing reason. The player asks which classes he cannot rank. He does not ask why each one broke. `EXPERIENCE.md` decides where the diagnosis shows.
 - The count of Unrankable Item Classes is visible without expanding the group *(PRD-owned)*.
 - A probability derived from a `partial` pool renders as unknown, not as a number, because it carries Provenance `absent` (AD-17, AD-10, FR-10).
 - Coverage — the share of tracked Item Classes with a complete pool — is measured before any view work, re-measured on every Weights File regeneration, and published in the Sync Report with its denominator (AD-27, FR-25). It is **reported, not a gate**: no threshold and no layout binds to it, and how prominently the Unrankable group sits beside the ranking is UX's (`EXPERIENCE.md`) *(PRD-owned)*.
@@ -536,7 +536,7 @@ The ranking treats a Price Observation from any league but the active one as abs
 
 ### 4.10 Dataset Delivery
 
-**Description.** How data reaches the view looks like an implementation detail and is not one. The delivery method decides whether a data commit refreshes the site on its own or needs an application rebuild, and so whether the daily refresh is a background fact or a chore. Realises UJ-1, UJ-6.
+**Description.** How data reaches the view looks like an implementation detail and is not one. The delivery method decides whether a data commit refreshes the site on its own or needs an application rebuild, and so whether fresh prices reaching the site is a background fact or a chore. Realises UJ-1, UJ-6.
 
 **Functional Requirements:**
 
@@ -637,8 +637,7 @@ Behavioural, not numeric. There is one user, and instrumenting the tool would be
 - **SM-6: Agents ship without a human unblocking them.** Development proceeds with tests passing offline and no live API in the loop. Validates NFR-1, NFR-2, NFR-4.
 
 **Counter-metrics (do not optimise)**
-- **SM-C1: Searches per full refresh.** A larger Tracked List makes the tool appear comprehensive and makes a daily refresh impossible. Held at roughly 1,500 **searches**, the quantity the rate limit actually constrains, because an entry count would miss a curator who splits one entry into two bands (AD-12). Counterbalances SM-4.
-- **SM-C2: Refresh frequency.** A faster refresh spends budget that retries, currency rates and a second recipe need, and prices are stable at daily resolution. Counterbalances SM-1.
+- **SM-C1: Searches per full refresh.** A larger Tracked List makes the tool appear comprehensive and makes every entry's price older, because the rate limit refreshes the list one entry at a time. Held at about 2,100 **searches**, the quantity the rate limit actually constrains, because an entry count would miss a curator who splits one entry into two bands (AD-12). Counterbalances SM-4.
 - **SM-C3: Number of ranked rows shown.** A longer list is not a better one. Bounded by FR-5. Counterbalances SM-2.
 - **SM-C4: Apparent confidence.** Suppose the view presents a figure on estimated odds or an old price as cleanly as a measured, current one. That would make the tool feel more authoritative and make it more dangerous. Counterbalances SM-4, and is why FR-10 to FR-12 exist.
 

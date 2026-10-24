@@ -155,7 +155,7 @@ export type RecipeReach = { readonly reached: true } | { readonly reached: false
 export function recipeReach(pools: WeightsClassPools, entry: CombinationInput, modifierLevelMin: number): RecipeReach {
   const result = combinationProbability(pools, entry, modifierLevelMin);
   if (result.ok) {
-    return { reached: true };
+    return result.p > 0 ? { reached: true } : { reached: false, slots: SLOTS };
   }
   const empty = SLOTS.filter((slot) => containedIn(entry[slot], eligible(pools[slot], entry.itemLevelMin, modifierLevelMin)).length === 0);
   // Both contained sets are non-empty only when a first draw exhausts the other slot.
@@ -210,19 +210,30 @@ interface SlotSets {
   readonly total: number;
 }
 
-/** Sums of `E_X ∖ G` and `C_X ∖ G`, computed once per `modGroup`. */
-function exclusionSums(sets: SlotSets): (group: string) => { readonly eligible: number; readonly contained: number } {
+/** Whether the first affix `first` excludes `candidate` from the second draw: one `modGroup`, or a blocking tag met (AD-17). */
+export function isExcludedBy(candidate: ModifierWeight, first: ModifierWeight): boolean {
+  return candidate.modGroup === first.modGroup || candidate.blockedByTags.some((tag) => first.addsTags.includes(tag));
+}
+
+/** The second draw: the other slot's eligible `entries` without those `first` excludes (AD-17). */
+export function secondDraw(first: ModifierWeight, entries: readonly ModifierWeight[]): readonly ModifierWeight[] {
+  return entries.filter((entry) => !isExcludedBy(entry, first));
+}
+
+/** Sums of the second draw over `E_X` and `C_X`, computed once per exclusion input of the first affix. */
+function exclusionSums(sets: SlotSets): (first: ModifierWeight) => { readonly eligible: number; readonly contained: number } {
   const cache = new Map<string, { readonly eligible: number; readonly contained: number }>();
-  return (group) => {
-    const cached = cache.get(group);
+  return (first) => {
+    const key = JSON.stringify([first.modGroup, first.addsTags]);
+    const cached = cache.get(key);
     if (cached !== undefined) {
       return cached;
     }
     const sums = {
-      eligible: totalWeight(sets.eligibleSet.filter((entry) => entry.modGroup !== group)),
-      contained: totalWeight(sets.contained.filter((entry) => entry.modGroup !== group)),
+      eligible: totalWeight(secondDraw(first, sets.eligibleSet)),
+      contained: totalWeight(secondDraw(first, sets.contained)),
     };
-    cache.set(group, sums);
+    cache.set(key, sums);
     return sums;
   };
 }
@@ -238,7 +249,7 @@ function orderedTerm(
   let sum = 0;
   // `contains` never admits a weight-0 tier, so every first draw here is positive-weight.
   for (const entry of first.contained) {
-    const rest = without(entry.modGroup);
+    const rest = without(entry);
     if (rest.eligible === 0) {
       return {
         ok: false,

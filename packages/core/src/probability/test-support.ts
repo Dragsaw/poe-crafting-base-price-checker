@@ -17,12 +17,24 @@ const nextSerial = ((): (() => number) => {
 export function tier(
   lines: readonly WeightsLine[],
   weight: number,
-  { itemLevelMin = 1, modGroup }: { readonly itemLevelMin?: number; readonly modGroup?: string } = {},
+  {
+    itemLevelMin = 1,
+    modGroup,
+    addsTags = [],
+    blockedByTags = [],
+  }: {
+    readonly itemLevelMin?: number;
+    readonly modGroup?: string;
+    readonly addsTags?: readonly string[];
+    readonly blockedByTags?: readonly string[];
+  } = {},
 ): ModifierWeight {
   const serial = nextSerial();
   return {
     sourceModifierId: `m${String(serial)}`,
     modGroup: modGroup ?? `g${String(serial)}`,
+    addsTags: [...addsTags],
+    blockedByTags: [...blockedByTags],
     itemLevelMin,
     weight,
     weightSource: 'published',

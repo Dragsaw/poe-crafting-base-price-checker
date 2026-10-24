@@ -34,6 +34,8 @@ type Coverage = WeightsPool['poolCoverage'];
 const SLOT_FILLER: ModifierWeight = {
   sourceModifierId: 'slot-filler',
   modGroup: 'slot-filler',
+  addsTags: [],
+  blockedByTags: [],
   itemLevelMin: 1,
   weight: 1,
   weightSource: 'published',
@@ -55,7 +57,7 @@ export function weightsWith(...classes: readonly (readonly [string, string, Cove
     };
   }
   return {
-    schemaVersion: '6.0.0',
+    schemaVersion: '7.0.0',
     gamePatch: '0.5.5',
     producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
     bases,
@@ -165,6 +167,8 @@ export function tierOf(statId: string, weight: number, itemLevelMin = 1, moduleG
   return {
     sourceModifierId: `t${String(tierSerial)}`,
     modGroup: moduleGroup ?? `g${String(tierSerial)}`,
+    addsTags: [],
+    blockedByTags: [],
     itemLevelMin,
     weight,
     weightSource: 'published',

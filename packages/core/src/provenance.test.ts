@@ -7,6 +7,8 @@ function tier(weightSource: ModifierWeight['weightSource'], itemLevelMin: number
   return {
     sourceModifierId: `m-${weightSource}-${String(itemLevelMin)}`,
     modGroup: `g-${weightSource}-${String(itemLevelMin)}`,
+    addsTags: [],
+    blockedByTags: [],
     itemLevelMin,
     weight: weightSource === 'not-in-game' ? 0 : 10,
     weightSource,

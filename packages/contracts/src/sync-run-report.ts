@@ -47,8 +47,8 @@ export const RequestsBySourceSchema = z
   .describe('Requests the chunk consumed per chunk source, so budget drift is attributable (AD-12, FR-14).');
 
 
-/** 1.2.0 adds `session-probe`; an older build refuses a newer report. */
-export const SYNC_REPORT_SCHEMA_VERSION = '1.2.0';
+/** 1.2.0 adds `session-probe`, 1.3.0 the `co-rollable-combination` check; an older build refuses a newer report. */
+export const SYNC_REPORT_SCHEMA_VERSION = '1.3.0';
 
 export const SyncRunFiguresSchema = z
   .strictObject({
@@ -128,7 +128,7 @@ export const UncataloguedWeightsIdRecordSchema = z.strictObject({
   identifierKind: z.enum(['statId', 'categoryId']),
 });
 
-/** The six cross-file checks AD-17 defines once in `core`. */
+/** The cross-file checks AD-17 defines once in `core`. */
 export const CrossFileCheckSchema = z.enum([
   'edge-alignment',
   'empty-containment-set',
@@ -136,6 +136,7 @@ export const CrossFileCheckSchema = z.enum([
   'class-discriminability',
   'kind-agreement',
   'line-set-completeness',
+  'co-rollable-combination',
 ]);
 
 export type CrossFileCheck = z.infer<typeof CrossFileCheckSchema>;

@@ -1,4 +1,4 @@
-// Run-start cross-file gate (AD-12, AD-17, FR-33): `core`'s `crossFileChecks` owns the six checks.
+// Run-start cross-file gate (AD-12, AD-17, FR-33): `core`'s `crossFileChecks` owns the checks.
 // A failure throws before the order exists, so no budget is spent and nothing is published.
 // Unvalidated marks never fail it; no weights file is skipped (AD-24).
 

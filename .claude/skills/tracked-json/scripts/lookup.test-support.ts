@@ -21,6 +21,8 @@ function tier(
   return {
     sourceModifierId: `${slot}\0${moduleGroup}\0${String(itemLevelMin)}\0${text}`,
     modGroup: moduleGroup,
+    addsTags: [],
+    blockedByTags: [],
     itemLevelMin,
     tierLabel,
     weight: 500,
@@ -36,7 +38,7 @@ export const SPELL = 'explicit.stat_spell';
 export const MELEE = 'explicit.stat_melee';
 
 export const WEIGHTS = WeightsFileSchema.parse({
-  schemaVersion: '6.0.0',
+  schemaVersion: '7.0.0',
   gamePatch: '0.4.0',
   producer: { id: 'test', generatedAt: '2026-10-02T00:00:00Z' },
   bases: {
@@ -101,7 +103,7 @@ export function nullLineWeights(poolCoverage: 'complete' | 'partial'): WeightsFi
     weightSource: 'not-in-game',
   };
   return WeightsFileSchema.parse({
-    schemaVersion: '6.0.0',
+    schemaVersion: '7.0.0',
     gamePatch: '0.4.0',
     producer: { id: 'test', generatedAt: '2026-10-02T00:00:00Z' },
     bases: {

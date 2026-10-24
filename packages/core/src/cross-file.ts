@@ -22,6 +22,7 @@ import type {
 
 import { craftedClassesOf } from './crafted-classes.ts';
 import { classDiscriminability } from './cross-file/class-discriminability.ts';
+import { coRollable } from './cross-file/co-rollable.ts';
 import { COMPLETE } from './cross-file/complete-pool.ts';
 import { edgeAlignment } from './cross-file/edge-alignment.ts';
 import { emptyContainment } from './cross-file/empty-containment.ts';
@@ -30,10 +31,11 @@ import { containedIn, isContaining, eligible, interval, lineSet, poolOf, statIds
 import type { ReferenceLine, Slot } from './probability.ts';
 
 export { classDiscriminability } from './cross-file/class-discriminability.ts';
+export { coRollable } from './cross-file/co-rollable.ts';
 export { edgeAlignment } from './cross-file/edge-alignment.ts';
 export { emptyContainment } from './cross-file/empty-containment.ts';
 
-/** The six cross-file checks and the unvalidated marks (AD-17). Pure (AD-1). */
+/** The cross-file checks and the unvalidated marks (AD-17). Pure (AD-1). */
 
 export interface CrossFileFailure {
   readonly check: CrossFileCheck;
@@ -266,6 +268,8 @@ function referenceFailures(keyed: readonly Keyed[], scopeOf: ScopeOf): CrossFile
       );
       failures.push(...failureOf(item, check, parts));
     }
+    const pair = coRollable(entry, scoped, entry.itemLevelMin);
+    failures.push(...failureOf(item, 'co-rollable-combination', pair === undefined ? [] : [pair]));
   }
   return failures;
 }
@@ -331,7 +335,7 @@ function checkClass(members: readonly CraftedTrackedEntry[], weights: WeightsFil
   };
 }
 
-/** Every failure of the six checks and every unvalidated mark, by canonical key. */
+/** Every failure of the checks and every unvalidated mark, by canonical key. */
 export function crossFileChecks(entries: readonly TrackedEntry[], weights: WeightsFile | undefined): CrossFileResult {
   const failures: CrossFileFailure[] = [];
   const unvalidated: UnvalidatedMark[] = [];

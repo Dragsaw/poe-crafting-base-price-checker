@@ -31,11 +31,14 @@ const ABSENT_REASON = 'class absent from weights file';
 const tierOf = (statId: string, ranges: number[][]) => ({
   sourceModifierId: statId,
   modGroup: statId,
+  addsTags: [],
+  blockedByTags: [],
   itemLevelMin: 1,
   weight: 100,
   weightSource: 'published',
   lines: [{ statId, ranges }],
 });
+const tagged = (statId: string, addsTags: string[], blockedByTags: string[]) => ({ ...tierOf(statId, []), addsTags, blockedByTags });
 const poolsOf = (statId: string, ranges: number[][]) => ({
   prefix: { poolCoverage: 'complete', entries: [tierOf(statId, ranges)] },
   // The valueless suffix every `craftedEntry` carries.
@@ -184,6 +187,36 @@ describe('the Unrankable appendix', () => {
     const lines = Array.from(problems?.querySelectorAll('[data-verbatim]') ?? [], (node) => node.textContent);
     expect(lines).toHaveLength(1);
     expect(lines[0]).toMatch(/^edge-alignment · \["crafted","weapon\.bow","Bows",82,/);
+  });
+
+  // Matrix: a Wands pair the game cannot roll in either draw order (AD-17 co-rollable combination).
+  it('shows a class with a never-co-rollable entry as Unrankable, with the co-rollable diagnosis in the panel', async () => {
+    const wands = craftedEntry('Wands', 'weapon.wand');
+    const weights = {
+      ...(VALID_BODIES.weights as object),
+      bases: {
+        'weapon.wand': {
+          Wands: {
+            prefix: { poolCoverage: 'complete', entries: [tagged('explicit.stat_3299347043', ['no_cold_spell_mods'], ['no_fire_spell_mods'])] },
+            suffix: { poolCoverage: 'complete', entries: [tagged('explicit.stat_1967051901', ['no_fire_spell_mods'], ['no_cold_spell_mods'])] },
+          },
+        },
+      },
+    };
+    const bodies = bodiesWith([wands], []);
+    serveArtifacts(server, { tracked: { kind: 'json', body: bodies.tracked }, dataset: { kind: 'json', body: bodies.dataset }, weights: { kind: 'json', body: weights } });
+    mount();
+    await settleTo('ready');
+
+    const rows = appendixRows();
+    expect(rows.map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual(['Wands']);
+    expect(rows[0]?.querySelector('[data-cell="reason"]')?.textContent).toBe('class disagrees with weights file');
+    expect(appendix().textContent).not.toContain('co-rollable-combination');
+    toggleReport();
+    const problems = reportPanel()?.querySelectorAll('[data-panel-column]')[0];
+    const lines = Array.from(problems?.querySelectorAll('[data-verbatim]') ?? [], (node) => node.textContent);
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatch(/^co-rollable-combination · \["crafted","weapon\.wand","Wands",82,/);
   });
 
   // State 43 and state 37: no recipe served.
