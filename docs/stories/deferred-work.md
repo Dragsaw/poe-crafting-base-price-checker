@@ -53,11 +53,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 ## Deferred from: spec-track-all-elemental-resistances review (2026-10-24)
 
 - source_spec: `docs/stories/spec-track-all-elemental-resistances.md`
-  summary: Decide whether to prune the new Lightning Res chase pairings that overrun the 27-character chase budget; their Fire and Cold siblings fit.
-  evidence: `Lightning Res` (13 characters, `packages/web/src/list/short-forms.ts`) is 5 longer than `Fire Res` and `Cold Res`. About 68 new combination texts run over the budget, for example `T1 Mov Spd · T1 Lightning Res` (29) and `T1 Spell Dmg · T1 Lightning Res` (31). In `T1 Added Lightning · T1-T2 <element> Res` the first 27 characters stop before the element, so the three siblings can read the same in the chase cell. EXPERIENCE.md *Escape valve* makes an overrun a pruning candidate, not a shorter coinage. Design review finding.
-  retry_when: never — needs a human
-
-- source_spec: `docs/stories/spec-track-all-elemental-resistances.md`
   summary: Add a live-data check that lists every chase pairing in `data/tracked.json` over the 27-character budget, as `combination-fit.test.ts` does for the frozen fixture.
   evidence: `packages/web/src/list/combination-fit.test.ts` (`PRUNING_CANDIDATES`) reads the frozen fixture only. `packages/web/src/list/tracked.data.test.ts` checks only the expansion-line cell (464px). So overruns in the live list, including the Fire Res hybrid pairings already at HEAD, are not reported. Design review finding.
 

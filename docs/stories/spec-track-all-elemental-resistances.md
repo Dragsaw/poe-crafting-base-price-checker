@@ -68,6 +68,7 @@ context:
 - `pnpm test:data`: 7/7 passed. `pnpm check`: 8 passed, 0 failed (dup, depcruise, knip, typecheck, lint, build, test:data, test).
 
 - After review: the staged state alone (HEAD 0596909 + 302) failed `tracked:check`, as HEAD did alone, because the Spirit and Rings re-key was uncommitted; its extra 14 issues and 28 unreachable pairs were all on the 14 siblings with the old Spirit id. By the player's choice, the story 5.1 data edit was committed first (6f32d36, green alone), and this change was committed on top. On that tree: `tracked:check` passed all five checks, `test:data` 7/7, `pnpm check` 8/8.
+- Follow-up (2026-10-24): the player accepts the ellipsis on the Lightning Res chase pairings that overrun the 27-character budget, and keeps `Lightning Res`. Triage row 1 is closed and its deferred entry removed.
 
 ### Agent browser checks (before review)
 
