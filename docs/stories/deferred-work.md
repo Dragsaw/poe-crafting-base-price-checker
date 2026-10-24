@@ -32,3 +32,8 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Guard against CRLF in edited files: Serena `replace_content` writes CRLF on Windows, so add a CR check to lint-on-edit or a Known pitfalls line in AGENTS.md.
   evidence: Every Serena edit on this branch left CRLF in the working copy despite `.gitattributes` `eol=lf`; `packages/web/src/list/display-rows.test.ts`'s raw-source scan of `summands` uses then failed on a trailing `\r` until the files were normalised (Blind Hunter finding).
   
+## Deferred from: spec-tablet-condition-filter review (2026-10-24)
+
+- source_spec: `docs/stories/spec-tablet-condition-filter.md`
+  summary: [NOTE FOR ARCHITECT] ARCHITECTURE-SPINE.md still calls a raw entry a white ilvl-82 base, which the PRD no longer says and tracked tablets (itemLevelMin 1) contradict.
+  evidence: ARCHITECTURE-SPINE.md:227 AD-5 raw row reads "a white ilvl-82 base, priced as it comes" and :1890 Scope map reads "White ilvl-82 bases"; prd.md rev 33 (FR-3, glossary, §7.1) dropped the item level for a Raw Base. Blind Hunter finding; the Review brief bars a review fix from editing the owner document.

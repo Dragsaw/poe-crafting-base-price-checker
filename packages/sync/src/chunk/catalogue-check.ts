@@ -7,6 +7,7 @@ import type { DatasetEntry, TrackedEntry, UnresolvableRecord } from '@poe/contra
 import { statIds } from '@poe/core';
 
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
+import { conditionFiltersOf } from '../pricing/condition-filters.ts';
 
 export interface CatalogueCheck {
   /** The offline marks, one per entry with a miss, in tracked-list order. */
@@ -42,6 +43,11 @@ function missesOf(entry: TrackedEntry, ids: CatalogueIds): Miss[] {
   }
   if (!ids.categoryIds.has(entry.categoryId)) {
     misses.push({ identifier: entry.categoryId, identifierKind: 'categoryId' });
+  }
+  for (const condition of conditionFiltersOf(entry.categoryId)) {
+    if (!ids.statIds.has(condition.id)) {
+      misses.push({ identifier: condition.id, identifierKind: 'statId' });
+    }
   }
   if (entry.kind === 'raw') {
     return misses;

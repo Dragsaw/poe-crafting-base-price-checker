@@ -5,6 +5,9 @@
 import { canonicalKey, defenceLettersOf, linesOf, summedInterval, summedStatIds } from '@poe/contracts';
 import type { CraftedTrackedEntry, DefenceLetter, ItemCatalogue, NamedLine, TrackedEntry } from '@poe/contracts';
 
+import { conditionFiltersOf } from './condition-filters.ts';
+import type { FilterEdge, StatFilter } from './condition-filters.ts';
+
 /** The `items.json` groups as the builder reads them: group id to base type names. */
 export type ItemTypes = ReadonlyMap<string, ReadonlySet<string>>;
 
@@ -37,19 +40,6 @@ export class UnknownClassBaseTypeError extends Error {
     this.className = entry.className;
     this.baseTypeId = baseTypeId;
   }
-}
-
-/** A `{min}` / `{max}` edge as the trade site's filters spell it. */
-interface FilterEdge {
-  readonly min?: number;
-  readonly max?: number;
-}
-
-interface StatFilter {
-  readonly id: string;
-  /** A banded stat carries both edges; a valueless stat carries `{}` (OQ-12). */
-  readonly value: FilterEdge;
-  readonly disabled: false;
 }
 
 export interface SearchBody {
@@ -137,6 +127,20 @@ function statFiltersOf(entry: TrackedEntry): StatFilter[] {
   return [...prefix, ...suffix];
 }
 
+/** The entry's own filters, then its category's condition filters (AD-16); a condition the entry names itself would send one id twice. */
+function filtersOf(entry: TrackedEntry): StatFilter[] {
+  const own = statFiltersOf(entry);
+  const conditions = conditionFiltersOf(entry.categoryId);
+  for (const condition of conditions) {
+    if (own.some((filter) => filter.id === condition.id)) {
+      throw new Error(
+        `entry ${canonicalKey(entry)} names statId ${condition.id}, which is a condition filter of category ${entry.categoryId}; no request was issued`,
+      );
+    }
+  }
+  return [...own, ...conditions];
+}
+
 function edgeFor(letters: ReadonlySet<DefenceLetter>, letter: DefenceLetter): FilterEdge {
   return letters.has(letter) ? { min: 1 } : { max: 0 };
 }
@@ -158,7 +162,7 @@ const SORT = { price: 'asc' } as const;
 
 /** The AD-16 body for one entry; `acceptedTier` is never read. @throws UnknownClassBaseTypeError */
 export function buildSearchBody(entry: TrackedEntry, itemTypes: ItemTypes): SearchBody {
-  const stats = [{ type: 'and', filters: statFiltersOf(entry) }] as const;
+  const stats = [{ type: 'and', filters: filtersOf(entry) }] as const;
   if (entry.kind === 'raw') {
     const ilvl = { min: entry.itemLevelMin };
     return {

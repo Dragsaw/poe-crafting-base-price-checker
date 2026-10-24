@@ -76,6 +76,19 @@ describe('checkCatalogue', () => {
     expect(check.excludedKeys).toEqual(new Set([canonicalKey(entry)]));
   });
 
+  it('marks a raw tablet whose condition stat is absent from the catalogue, with one statId record', () => {
+    const tablet: TrackedEntry = { kind: 'raw', baseTypeId: 'Abyss Tablet', categoryId: 'map.tablet', className: 'Tablet', itemLevelMin: 1, status: 'active' };
+    const ids: CatalogueIds = { ...IDS, baseTypeIds: new Set(['Abyss Tablet']), categoryIds: new Set(['map.tablet']) };
+    const check = checkCatalogue([tablet], [], ids);
+    expect(check.records).toEqual([
+      { kind: 'unresolvable', entryKey: canonicalKey(tablet), identifier: 'pseudo.pseudo_number_of_uses_remaining', identifierKind: 'statId' },
+    ]);
+    expect(check.excludedKeys).toEqual(new Set([canonicalKey(tablet)]));
+
+    const resolved = { ...ids, statIds: new Set([...ids.statIds, 'pseudo.pseudo_number_of_uses_remaining']) };
+    expect(checkCatalogue([tablet], [], resolved).records).toEqual([]);
+  });
+
   it('checks each line of a hybrid reference, one record per missing statId, in line order', () => {
     const base = crafted('weapon.bow', 'explicit.a', 'explicit.b');
     if (base.kind !== 'crafted') {

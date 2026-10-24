@@ -1,7 +1,7 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 32
+revision: 33
 created: 2026-09-12
 updated: 2026-10-24
 sources:
@@ -81,11 +81,11 @@ Downstream readers and workflows use these terms exactly. A synonym introduced a
   - a **raw** entry names a Base Type and no affixes.
 
   The two kinds are told apart by **what the entry names**, never by craftedness inferred from absent fields, so a crafted entry and a Raw Base are never confused (AD-5). Each Modifier Reference carries a hand-written, display-only **Accepted Tier** label (FR-22).
-- **Raw Base** — a raw Tracked Entry: an uncrafted white base at item level 82, the one case where selling the base may beat crafting on it.
+- **Raw Base** — a raw Tracked Entry: an uncrafted white base, the one case where selling the base may beat crafting on it.
 - **Combination** — the outcome a Tracked Entry describes: this Item Class carrying this prefix and this suffix. A Raw Base describes the degenerate Combination of an uncrafted base, and the Payout Threshold applies to it exactly as to any other (FR-3, AD-17).
 - **Chase Combination** — one of the Combinations on an Item Class that contribute most to its EV. The collapsed ranked row shows it, so the player knows what to look for without expanding the row (FR-2).
 - **Tracked List** — the complete curated set of Tracked Entries, held in `data/tracked.json`. It is at once what the tool watches and the tool's entire request budget (AD-12).
-- **Item Level Floor** — the item level a Tracked Entry is valued at, which scopes the modifiers that can roll on it, declared per entry by the curator from the tier worth chasing (FR-22). Crafted entries on one Item Class share one floor; a Raw Base at 82 is exempt (AD-17).
+- **Item Level Floor** — the item level a Tracked Entry is valued at, which scopes the modifiers that can roll on it, declared per entry by the curator from the tier worth chasing (FR-22). Crafted entries on one Item Class share one floor; a Raw Base is exempt (AD-17).
 - **Accepted Tier** — for a modifier, the tier or run of adjacent tiers worth chasing, expressed as the Modifier Reference's band and labelled beside it as a string such as `T1` or `T1–T2` (AD-5, AD-11). The label is display-only: nothing derives it, validates it, joins it to the Weights File, or keys on it (FR-22).
 - **Curation Status** — exactly one of `active`, `pinned` or `pruned` (AD-12). A `pinned` entry is refreshed ahead of the rotation as AD-7 orders it, within the cap AD-7 sets; a `pruned` entry is a tombstone carrying its reason, excluded from sync and from the ranking (AD-7, FR-15).
 - **Refresh Rotation** — the deterministic order in which Chunks refresh the Tracked List over many runs (AD-7, FR-17).
@@ -149,14 +149,14 @@ Each crafted row names the Combinations most worth chasing on that Item Class, w
 
 #### FR-3: Rank Raw Bases on a separate branch, visibly labelled
 
-Uncrafted item-level-82 white Base Types rank in the same list, valued as a sale rather than a craft, and labelled as uncrafted.
+Uncrafted white Base Types rank in the same list, valued as a sale rather than a craft, and labelled as uncrafted.
 
 **Consequences (testable):**
 - The two branches rank **different units**: the crafted branch ranks Item Classes and the raw branch ranks Base Types. The rest of the document cites this statement. The list is therefore mixed. Each row tells the player whether to craft on it or to sell the base uncrafted. That way a reader never takes a class for a base or a base for a class *(PRD-owned; treatment in `EXPERIENCE.md`)*.
 - A Raw Base's EV is its observed price with zero Craft Cost. A Raw Base is never a summand in any Item Class's EV sum (AD-17).
 - The Payout Threshold applies to a Raw Base as to any Combination: a Raw Base priced below it leaves the ordering, and is not ranked at its price (AD-17).
 - Colour alone never carries the distinction between a Raw Base row and a crafted row (NFR-10).
-- A Raw Base is priced as a white base at item level 82. That level is the effective item level cap for these bases (AD-5, AD-16).
+- A Raw Base is priced as a white base in its as-dropped condition (AD-16).
 
 #### FR-4: Surface Unrankable Item Classes outside the ordering
 
@@ -398,7 +398,7 @@ Each Tracked Entry declares the item level that scopes the modifiers it can roll
 - The Accepted Tier of a modifier is tier 1, except where tier 1 first appears at item level 81 or 82 and is too rare to chase; the curator then accepts tier 2 *(PRD-owned)*.
 - Curators track only tier 1, or the run of tiers 1 and 2. This is a curation rule, not a check: the tool does not enforce it *(PRD-owned)*.
 - For a Hybrid Modifier, the Accepted Tier and its label apply to the modifier as a whole, never to one of its Stat Lines (FR-34).
-- Every crafted entry on an Item Class shares one floor, which AD-17 derives from the accepted bands *(PRD-owned)*. The tool enforces the shared floor at load. A Raw Base, pinned at item level 82, is exempt (AD-17, FR-16, FR-3).
+- Every crafted entry on an Item Class shares one floor, which AD-17 derives from the accepted bands *(PRD-owned)*. The tool enforces the shared floor at load. A Raw Base is exempt (AD-17, FR-16, FR-3).
 - Choosing the Accepted Tier and writing the Modifier Reference's band are one act. A band never contains one tier and clips another (AD-5, AD-17).
 - Spanning a tier boundary is legitimate. The tool prices the span at its cheap end, and the span carries the mass of both tiers. Below the Payout Threshold, the span can zero a jackpot (AD-17).
 - The Accepted Tier is also a hand-written, display-only label. It lets a ranked row read as tiers rather than value spreads. A missing label still loads and ranks, with a visibly marked fallback (AD-5).
@@ -589,7 +589,7 @@ These are engineering and workflow requirements. The cited owner states each one
 
 - Magic items — one prefix, one suffix — tracked per Item Class, at per-entry Item Level Floors derived by the Accepted Tier rule (FR-22). A tracked crafted entry names both affixes (FR-34).
 - Hybrid Modifiers, and one stat summed across both affixes, priced as the player reads them (FR-34).
-- Raw Bases at item level 82, threshold-truncated like any other outcome.
+- Raw Bases, threshold-truncated like any other outcome.
 - One ranked list of Item Classes and raw Base Types (FR-3), bounded for readability, with Chase Combinations, expandable to the full tracked Combination list including tombstones.
 - Player-set Payout Threshold, re-ranking at read time.
 - Background sync: unauthenticated by default, with an optional operator session cookie (FR-20), rate-limit adaptive, bounded, resumable, with a defined Refresh Rotation.

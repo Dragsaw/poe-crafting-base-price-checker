@@ -19,6 +19,7 @@ import { DataFileError, describeVersionRefusal, explainTrackedVersion, loadDataF
 import type { DataFileResult } from '../load-data-file.ts';
 import { checkPinnedCap } from '../pinned-cap.ts';
 import { createNodeFilesystemPort } from '../shell.ts';
+import { catalogueMissMessage } from './catalogue-miss-message.ts';
 
 export type CheckName = 'schema' | 'pinned-cap' | 'catalogue' | 'cross-file' | 'recipe-reach';
 
@@ -166,14 +167,13 @@ function catalogueOutcome(
     return { status: 'skipped', issues: [] };
   }
   const { records } = checkCatalogue(entries, [], catalogue.value);
+  const entryByKey = new Map(entries.map((entry) => [canonicalKey(entry), entry]));
   return {
     status: records.length === 0 ? 'passed' : 'failed',
     issues: records.map((record) => ({
       check: 'catalogue',
       ...pathOf(record.entryKey),
-      message:
-        `${record.identifierKind} ${record.identifier} is absent from the committed catalogue ` +
-        `(entry ${record.entryKey})`,
+      message: catalogueMissMessage(record, entryByKey.get(record.entryKey)),
     })),
   };
 }

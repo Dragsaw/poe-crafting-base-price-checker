@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 40
+revision: 41
 created: '2026-09-12'
 updated: '2026-10-24'
 binds: []
@@ -224,7 +224,7 @@ never import each other.
   | Kind | Key | For |
   | --- | --- | --- |
   | `crafted` | `(categoryId, className, itemLevelMin, prefix, suffix)`, **both affixes required** | the modifier combinations the product ranks |
-  | `raw` | `(baseTypeId, itemLevelMin)`, no affix members at all; it also names its item class pair `(categoryId, className)`, outside the key and never sent (FR-4 state 16) | a white ilvl-82 base, priced as it comes |
+  | `raw` | `(baseTypeId, itemLevelMin)`, no affix members at all; it also names its item class pair `(categoryId, className)`, outside the key and never sent, but read: `categoryId` selects AD-16's condition filter (FR-4 state 16) | a white ilvl-82 base, priced as it comes |
 
   **A crafted entry names both affixes, and no component handles an absent one.** The
   same-`statId` sum of AD-16 assumes each slot contributes exactly one reference, and a
@@ -263,8 +263,9 @@ never import each other.
   a **class discriminator** from it — a defence signature, or a base type for `jewel` — and
   emits *that*, never the name itself. The derivation is **local to the one `className`**,
   which is what preserves the guarantee above: a crafted search is still built from the
-  tracked entry and the catalogue alone, and consults `weights.json` for nothing. `sync`
-  owns it because `sync` owns search construction (`buildSearchBody` in `packages/sync/src/pricing/search-body.ts`, binding under AD-0).
+  tracked entry, the catalogue and AD-16's condition table alone, and consults `weights.json`
+  for nothing. `sync` owns it because `sync` owns search construction (`buildSearchBody` in
+  `packages/sync/src/pricing/search-body.ts`, binding under AD-0).
 
   `baseTypeId` is the trade API's base type `type` string exactly as `data/items` spells it;
   `categoryId` is spelled exactly as the trade category filter list spells it (AD-25). **No
@@ -511,11 +512,12 @@ never import each other.
   never `unresolvable`.**
 
   **Detection is catalogue validation, owned by the component that holds the catalogue.**
-  Both checks are `sync`'s, and they differ in consequence:
+  Every check is `sync`'s, and they differ in consequence:
 
   | Check | When | Surfaced as |
   | --- | --- | --- |
   | every `statId` / `baseTypeId` / `categoryId` in `data/tracked.json` exists in the catalogue | before issuing any request | the entry's `unresolvable` state + `sync-report.json` |
+  | every condition stat id that applies to a tracked entry (AD-16) exists in the catalogue | before issuing any request | the entry's `unresolvable` state + `sync-report.json` |
   | every `statId` / `categoryId` in `data/weights.json` exists in the catalogue | reading the file (`sync` is a reader, not its writer) | `sync-report.json` only; the file is never rewritten and never refused |
 
   **A tracked entry's `className` has no row here**, and its absence is the point: no
@@ -897,7 +899,8 @@ never import each other.
   whichever agent writes the syncer. The brief calls this *"the product; everything else
   is presentation."*
 - **Rule:** For each tracked entry, `sync` issues **one search and one fetch of the
-  cheapest 10 result ids**, building the search from the entry alone:
+  cheapest 10 result ids**, building the search from the entry, the catalogue and the
+  condition table:
 
   | Query field | Value |
   | --- | --- |
@@ -906,6 +909,7 @@ never import each other.
   | `type_filters.rarity` | `magic` for a `crafted` entry, `normal` for a `raw` entry |
   | `type_filters.ilvl` | **`raw` entry only:** `min` = the entry's `itemLevelMin`. A `crafted` entry emits no item-level filter |
   | stat filters | **one per distinct `statId`** across both affixes, in one `and` group: a `banded` line carries **both `min` and `max`**; a `valueless` line carries the stat id and **no edges at all**. A `hybrid` reference contributes one filter per line, and a **summed `statId`** is **one** filter, below |
+  | **the condition filter** | **every entry**, either kind: `conditionFiltersOf` keyed by the entry's `categoryId`, a hand-kept `sync` constant (`packages/sync/src/pricing/condition-filters.ts`, binding under AD-0), appended to the stat filters' `and` group. A category with no row adds nothing. It prices a base in the condition `prd.md` FR-3 names. An entry whose own line names a condition stat id is refused before any request |
   | `query.status` | `{"option": "securable"}`, **always emitted** — the option `/api/trade2/data/filters` labels **"Instant Buyout"** |
   | `trade_filters.filters.price` | `{"option": "exalted_divine"}`, **always emitted** — see below |
   | `sort` | price **ascending** |
@@ -920,8 +924,10 @@ never import each other.
   the results to listings asking exalted or divine. Without it a result set carries vaal,
   chaos and every other denomination, and AD-20 would need a hand-maintained rate for each
   before the median could be taken — a per-currency maintenance burden on the player for
-  listings this product does not need. **This is the one narrowing in this AD that is a
-  choice**; its cost is stated below.
+  listings this product does not need. **This is one of the two narrowings in this AD that
+  are a choice**; its cost is stated below. **The other is the condition filter**: it drops
+  every listing not in the condition FR-3 prices, so a rarely listed base type, such as a
+  rare tablet type, shows `no-listings` more often.
 
   Three traps make this costly to get right in code, and all three are recorded with their
   evidence in `buildSearchBody` (`packages/sync/src/pricing/search-body.ts`) and its tests, binding
