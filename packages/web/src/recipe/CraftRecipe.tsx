@@ -6,7 +6,7 @@ import { DIV_UNIT } from '../shared/product';
 import { colors, headerControls, px, rounded, typeStyle } from '../theme/tokens';
 
 /** EXPERIENCE.md, Copy Deck: *Recipe* and *Craft Cost*. */
-export const RECIPE_LABEL = 'Recipe';
+export const RECIPE_LABEL = 'Orbs';
 export const RECIPE_COST_UNIT = `${DIV_UNIT} / craft`;
 
 /** `{components.recipe-toggle}.segment`: its padding and radius. */

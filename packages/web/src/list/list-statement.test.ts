@@ -198,7 +198,7 @@ describe('listStatement with crafted rows (Story 3.4)', () => {
     const active = forRecipe(ranking, greater);
     expect(active.split).toBe(true);
     expect(listStatement(active, 0.5, TEST_LEAGUE)).toEqual({ kind: 'uncostable', text: uncostableCopy('greater') });
-    expect(uncostableCopy('greater')).toContain('greater Craft Recipe');
+    expect(uncostableCopy('greater')).toContain('greater orbs');
   });
 
   it('forRecipe keeps raw rows, the active recipe’s pairs, and the class-level and active-pair Unrankables', () => {

@@ -114,7 +114,7 @@ export const headerControls = {
   figurePadY: 3,
   figurePadX: 8,
   figureMinWidth: 64,
-  sliderWidth: 100,
+  sliderWidth: 75,
   sliderHeight: 4,
   sliderRadius: 2,
   thumbSize: 12,

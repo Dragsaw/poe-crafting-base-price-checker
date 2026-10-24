@@ -23,7 +23,7 @@ export function nothingClearsCopy(threshold: number): string {
 
 /** State 35's copy (EXPERIENCE.md Copy Deck). */
 export function uncostableCopy(recipeWord: string): string {
-  return `The ${recipeWord} Craft Recipe has no Craft Cost figure yet: Item Classes and Raw Bases are ordered apart, not ranked against each other.`;
+  return `The ${recipeWord} orbs have no Craft Cost figure yet: Item Classes and Raw Bases are ordered apart, not ranked against each other.`;
 }
 
 /** State 23's predicate, shared with `toDisplayRows`; it outranks states 35 and 25. */

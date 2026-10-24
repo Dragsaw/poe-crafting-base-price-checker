@@ -17,7 +17,7 @@ import {
 } from './threshold-storage';
 
 /** EXPERIENCE.md, Copy Deck: the threshold label's word; its ≥ is drawn. */
-export const THRESHOLD_WORD = 'Worth';
+export const THRESHOLD_WORD = 'Items worth';
 /** A no-break space joins the figure and the unit. */
 export const THRESHOLD_UNIT = `\u{A0}${DIV_UNIT}`;
 /** About 150ms between a valid typed parse and the re-rank (Interaction 1). */

@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 31
+revision: 32
 created: 2026-09-13
-updated: 2026-10-23
+updated: 2026-10-24
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
@@ -424,9 +424,9 @@ Braces in this document always mean a DESIGN.md token, never a placeholder.
 |---|---|
 | Header eyebrow | `<league>` alone, e.g. `Forbidden Rites` (memlog 243). A control never sits in the eyebrow (memlog 181) |
 | Header title | `What's worth picking up` |
-| Recipe | `Recipe` · the option word (`greater`, `perfect`, `regular`). One recipe published: `Recipe` · its word, as plain text (state 42). None published: nothing (state 43) |
+| Recipe | `Orbs` · the option word (`greater`, `perfect`, `regular`) (memlog 295). One recipe published: `Orbs` · its word, as plain text (state 42). None published: nothing (state 43) |
 | Craft Cost | `N.NN div / craft`; uncostable: `no figure yet` (state 35) |
-| Threshold | `Worth ≥` · `N.NN div` (memlog 270) |
+| Threshold | `Items worth ≥` · `N.NN div` (memlog 270, 296) |
 | Sync button, healthy | `Synced <age> ▾` |
 | Sync button, sync time unknown | `Not synced yet ▾` (memlog 265) |
 | Sync button, a problem holds | `✕ N problems ▾` (`✕ 1 problem ▾`) or `◐ N problems ▾` (`◐ 1 problem ▾`), in place of the age (Epistemics, *Loud when wrong*) |
@@ -444,7 +444,7 @@ Braces in this document always mean a DESIGN.md token, never a placeholder.
 | Footer legend | Nine items, in this order: (1) `■ craft this class` (2) `■ sell this base as is` (3) `no mark = current price` (memlog 275) (4) `◐ rough unreliable price (a row: 70%+ of its EV)` (5) `○ pending no price yet` (6) `✕ broken can no longer be priced` (7) `† pruned · * pinned` (8) `≈ some roll odds estimated` (9) `Prices are live asking prices, not sales. Read-only. Curation lives in data/tracked.json.` |
 | List statement, state 23 | `In canonical order, not ranked: no tracked unit has a price from <league> yet.` (without `yet` when every listed row is broken) |
 | List statement, state 25 | `Nothing clears your Payout Threshold of N.NN div.` |
-| List statement, state 35 (`<recipe>`: the active recipe's option word) | `The <recipe> Craft Recipe has no Craft Cost figure yet: Item Classes and Raw Bases are ordered apart, not ranked against each other.` |
+| List statement, state 35 (`<recipe>`: the active recipe's option word) | `The <recipe> orbs have no Craft Cost figure yet: Item Classes and Raw Bases are ordered apart, not ranked against each other.` |
 
 ### Sync report
 

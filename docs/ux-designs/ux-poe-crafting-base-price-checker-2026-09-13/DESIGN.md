@@ -6,9 +6,9 @@ description: >-
   The game's rarity colours say what each row is, bronze marks what the player
   can operate, and every other colour appears only when a price needs attention.
 status: final
-revision: 21
+revision: 22
 created: 2026-09-13
-updated: 2026-10-10
+updated: 2026-10-24
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
@@ -197,7 +197,7 @@ components:
     unit: '{typography.label} in {colors.text-secondary}, inside the box after the figure, outside the editable region'
     figureHover: 'border goes to {colors.accent}; cursor text'
     figureEditing: 'border {colors.accent}, caret {colors.text}, selection {colors.accent-soft}'
-    slider: '100px track, 4px tall, {colors.line-strong}, 2px radius; the filled part {colors.accent}; cursor pointer on the track'
+    slider: '75px track, 4px tall, {colors.line-strong}, 2px radius; the filled part {colors.accent}; cursor pointer on the track'
     sliderThumb: '12px circle in {colors.accent} with a 3px {colors.ground} ring; cursor grab, grabbing while dragged'
     sliderEndpoints: 'none drawn'
   sync-button:
@@ -606,22 +606,21 @@ switch does.
 - The header bar against its width budget, below.
 - Each mark's drawing against its line: ◐ and ○ at one diameter.
 
-**The header's width budget** (memlog 270, 277, 279). At `{spacing.content-min}`
+**The header's width budget** (memlog 270, 277, 279, 296). At `{spacing.content-min}`
 the bar has 952px inside its gutters. It never wraps or shrinks. These figures
-come from the browser at 1000px (memlog 277):
+come from the browser at 1000px, with `Orbs`, `Items worth ≥` and a 75px slider
+(memlog 296):
 
-| Header content | Bar |
+| Craft Cost slot | Bar |
 |---|---|
-| `Synced 23h ago` | 928.5px |
-| `✕ 999 problems` at 600, the longest problem form | 930.3px |
-| `Synced 59 min ago`, the retired minutes form | 945.1px |
-| `Synced 59 min ago` with a `10.00 div / craft` cost, the retired minutes form | 953.6px, the only overflow |
+| `no figure yet` | 921.1px |
+| `0.42 div / craft` | 934.5px |
+| `10.00 div / craft` | 942.9px |
+| `< 0.01 div / craft`, the widest form | 946.4px |
 
-The minutes age prints as `Synced 59m ago` (memlog 279). That form is about 15px
-shorter than `Synced 59 min ago`, so it removes the only overflow. With a
-`10.00 div / craft` cost, the bar needs about 939px against 952px. The problem
-state replaces the age and does not add to it, so it is never wider than the
-healthy state. Re-measure the bar at build against these forms.
+The sync button keeps one width across its age and problem forms, so the Craft
+Cost slot is the only text that moves the bar. A cost of 100 div or more would
+overflow by about 2px. Re-measure the bar at build against these forms.
 
 **The expansion-line grid** gives the longest reason room to clear the trade link
 (memlog 261). At `{spacing.content-min}` the combination cell is about 464px.

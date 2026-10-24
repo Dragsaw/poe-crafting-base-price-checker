@@ -84,7 +84,7 @@ describe('the threshold control at rest', () => {
     expect(box.style.justifyContent).toBe('flex-end');
   });
 
-  it('lays label, figure and slider in one row, 10px apart, with a 100px slider and no floating label', () => {
+  it('lays label, figure and slider in one row, 10px apart, with a 75px slider and no floating label', () => {
     mountControl(0.25);
     const control = part('[data-payout-threshold]');
     expect(control.style.gap).toBe(px(headerControls.labelGap));
