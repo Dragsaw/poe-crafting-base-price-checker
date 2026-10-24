@@ -52,7 +52,7 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 
 ## Deferred from: spec-track-all-elemental-resistances review (2026-10-24)
 
-- source_spec: `docs/stories/spec-track-all-elemental-resistances.md`
-  summary: [NOTE FOR PM] A full refresh now costs about 2,030 searches against SM-C1's ~1,500 ceiling, and the PRD does not record that the player accepted this.
-  evidence: The spec's frozen Decision (search budget) accepts 2,030 searches. The list was already at 1,728 before this change. PRD SM-C1 and R-4 still state ~1,500 as the held ceiling. The PM decides whether SM-C1 changes or a prune follows. Blind review finding.
+- source_spec: `docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md`
+  summary: [NOTE FOR PM] SM-C2 says a faster refresh spends budget that currency rates and a second recipe need, but neither costs a search at sync time.
+  evidence: PRD SM-C2 (prd.md line 641): "A faster refresh spends budget that retries, currency rates and a second recipe need". AD-12 (ARCHITECTURE-SPINE.md, about lines 835-838) and AGENT-WORKFLOW.md:85: currency rates are hand-maintained (AD-20) and a recipe changes only read-time computation, so neither costs a request. A faster refresh competes only with retries and AD-12's other request sources. The PM drops "currency rates and a second recipe" or cites AD-12. Found by the architecture update for AD-12 rev 40.
   retry_when: never — needs a human

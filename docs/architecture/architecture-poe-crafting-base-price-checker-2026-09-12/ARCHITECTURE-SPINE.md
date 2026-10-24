@@ -6,9 +6,9 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 39
+revision: 40
 created: '2026-09-12'
-updated: '2026-10-23'
+updated: '2026-10-24'
 binds: []
 sources:
   - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
@@ -827,8 +827,8 @@ never import each other.
   placeholder (AD-9's rule for absence). `web`
   surfaces the tracked list's age, so a list running unattended is visible as such.
 
-  **The ceiling is denominated in searches, not in entries.** Against the measured 2,400
-  searches per day, a full refresh is held to **~1,500 searches**; the remainder serves
+  **The ceiling is denominated in searches, not in entries.** A full refresh is held to
+  SM-C1's figure; the remainder of the measured 2,400 searches per day (about 300) serves
   retries, the catalogue refresh, the per-run leagues check and the session probe — the only
   other three of AD-12's four request sources. The ceiling stays denominated against the
   unauthenticated budget: AD-30's cookie is opt-in and may drop mid-run, so a refresh must fit
