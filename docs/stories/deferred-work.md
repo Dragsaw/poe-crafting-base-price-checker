@@ -49,10 +49,3 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Track more normal (raw) bases.
   evidence: `data/tracked.json` on master holds only four raw entries (two Amulets, two Belts, one of them pruned) beside 1,255 crafted entries. The player did not name the bases to add.
   retry_when: never — needs a human
-
-## Deferred from: spec-track-all-elemental-resistances review (2026-10-24)
-
-- source_spec: `docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md`
-  summary: [NOTE FOR PM] SM-C2 says a faster refresh spends budget that currency rates and a second recipe need, but neither costs a search at sync time.
-  evidence: PRD SM-C2 (prd.md line 641): "A faster refresh spends budget that retries, currency rates and a second recipe need". AD-12 (ARCHITECTURE-SPINE.md, about lines 835-838) and AGENT-WORKFLOW.md:85: currency rates are hand-maintained (AD-20) and a recipe changes only read-time computation, so neither costs a request. A faster refresh competes only with retries and AD-12's other request sources. The PM drops "currency rates and a second recipe" or cites AD-12. Found by the architecture update for AD-12 rev 40.
-  retry_when: never — needs a human
