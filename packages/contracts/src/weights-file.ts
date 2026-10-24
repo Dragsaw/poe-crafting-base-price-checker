@@ -7,11 +7,39 @@ import { IsoTimestampSchema } from './primitives.ts';
 import { SchemaVersionSchema } from './schema-version.ts';
 
 // The weights contract (WEIGHTS-FILE-SCHEMA.md, AD-11); enforces its *Validation* section. Objects
-// are loose so a later additive `6.x` file loads; only the major is compared (`parseEnvelope`).
+// are loose so a later additive `7.x` file loads; only the major is compared (`parseEnvelope`).
 // `producer.generatedAt` is ISO-8601 UTC because the trust strip prints it as a date.
 
 /** The weights contract this build reads. Only the major is compared. */
-export const WEIGHTS_SCHEMA_VERSION = '6.1.0';
+export const WEIGHTS_SCHEMA_VERSION = '7.0.0';
+
+const NO_TAG_PATTERN = /^no_[a-z0-9_]+$/;
+
+/** `addsTags` / `blockedByTags` (`7.0.0`): required, possibly empty, `no_*` tags, no duplicates. */
+function tagListSchema(field: 'addsTags' | 'blockedByTags') {
+  return z
+    .array(
+      z
+        .string({ error: `${field} holds a non-string; each element is a no_* tag` })
+        .regex(NO_TAG_PATTERN, { message: `${field} holds a tag that is not a no_* tag (^no_[a-z0-9_]+$)` }),
+      { error: `${field} is missing or not an array; every entry carries it, possibly empty` },
+    )
+    .superRefine((tags, context) => {
+      const firstIndexByTag = new Map<string, number>();
+      for (const [index, tag] of tags.entries()) {
+        const first = firstIndexByTag.get(tag);
+        if (first === undefined) {
+          firstIndexByTag.set(tag, index);
+          continue;
+        }
+        context.addIssue({
+          code: 'custom',
+          path: [index],
+          message: `${field} tag ${tag} repeats ${field}.${String(first)}; a tag may appear once in one array`,
+        });
+      }
+    });
+}
 
 /** One verbatim `[min, max]` pair; `min > max` is a hard error. */
 const RangePairSchema = z
@@ -37,6 +65,8 @@ export const ModifierWeightSchema = z
     modGroup: z
       .string({ error: 'modGroup is missing or not a string; every entry names its mutual-exclusion group' })
       .min(1, { message: 'modGroup is empty; every entry names its mutual-exclusion group' }),
+    addsTags: tagListSchema('addsTags'),
+    blockedByTags: tagListSchema('blockedByTags'),
     itemLevelMin: z.number(),
     tierLabel: z.string().optional(),
     weight: z.number().min(0, { message: 'weight is negative; a raw spawn weight is >= 0' }),

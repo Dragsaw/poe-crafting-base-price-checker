@@ -19,9 +19,13 @@ export const SUFFIX_STAT = 'explicit.stat_9';
 /** One weights tier with the cross-file defaults: weight 100, floor 1. */
 export function tier(
   lines: readonly WeightsLine[],
-  { itemLevelMin = 1, weight = 100, modGroup }: { itemLevelMin?: number; weight?: number; modGroup?: string } = {},
+  {
+    itemLevelMin = 1,
+    weight = 100,
+    ...tags
+  }: { itemLevelMin?: number; weight?: number; modGroup?: string; addsTags?: readonly string[]; blockedByTags?: readonly string[] } = {},
 ): ModifierWeight {
-  return weightTier(lines, weight, modGroup === undefined ? { itemLevelMin } : { itemLevelMin, modGroup });
+  return weightTier(lines, weight, { itemLevelMin, ...tags });
 }
 
 export const valueless = (statId = STAT): ModifierReference => ({ kind: 'valueless', statId });

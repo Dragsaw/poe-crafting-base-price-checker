@@ -27,6 +27,8 @@ const BANDED_STAT = 'explicit.stat_1';
 const tier = (statId: string, itemLevelMin: number, ranges: number[][]) => ({
   sourceModifierId: `${statId}.${String(itemLevelMin)}`,
   modGroup: statId,
+  addsTags: [],
+  blockedByTags: [],
   itemLevelMin,
   weight: 100,
   weightSource: 'published',

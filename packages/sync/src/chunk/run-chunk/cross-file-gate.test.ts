@@ -42,6 +42,8 @@ describe('runChunk: the cross-file gate (AD-12, AD-17)', () => {
               {
                 sourceModifierId: 'p1',
                 modGroup: 'P',
+                addsTags: [],
+                blockedByTags: [],
                 itemLevelMin: 60,
                 weight: 100,
                 weightSource: 'published',
@@ -55,6 +57,8 @@ describe('runChunk: the cross-file gate (AD-12, AD-17)', () => {
               {
                 sourceModifierId: 's1',
                 modGroup: 'S',
+                addsTags: [],
+                blockedByTags: [],
                 itemLevelMin: 1,
                 weight: 100,
                 weightSource: 'published',
@@ -86,6 +90,27 @@ describe('runChunk: the cross-file gate (AD-12, AD-17)', () => {
     const records = report?.records ?? [];
     expect(records).toHaveLength(1);
     expect(records[0]).toMatchObject({ kind: 'cross-file-gate-failure', check: 'edge-alignment', entryKey: key(sentinel) });
+  });
+
+  it('records a co-rollable failure and aborts before any search', async () => {
+    const blockedWeights = BOWS_WEIGHTS.replace(
+      '"modGroup":"P","addsTags":[],"blockedByTags":[]',
+      '"modGroup":"P","addsTags":["no_cold_spell_mods"],"blockedByTags":["no_fire_spell_mods"]',
+    ).replace(
+      '"modGroup":"S","addsTags":[],"blockedByTags":[]',
+      '"modGroup":"S","addsTags":["no_fire_spell_mods"],"blockedByTags":["no_cold_spell_mods"]',
+    );
+    const blocked = bow(43, 56.5);
+    const { fs, ports } = harness([A, blocked], { [WEIGHTS_PATH]: { contents: blockedWeights } });
+    const { visited, step } = scriptedStep();
+
+    await expect(run(ports, step)).rejects.toBeInstanceOf(CrossFileGateError);
+
+    expect(visited).toEqual([]);
+    const report = await reportOf(fs);
+    expect(report?.records).toEqual([
+      expect.objectContaining({ kind: 'cross-file-gate-failure', check: 'co-rollable-combination', entryKey: key(blocked) }),
+    ]);
   });
 
   it('keeps the run-start records and puts the gate records after them', async () => {

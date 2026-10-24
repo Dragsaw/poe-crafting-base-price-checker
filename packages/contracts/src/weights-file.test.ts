@@ -14,6 +14,8 @@ function entryOf(overrides: Json = {}): Json {
   return {
     sourceModifierId: 'prefix\0BaseSpirit\u{0}16\0+# to Spirit',
     modGroup: 'BaseSpirit',
+    addsTags: [],
+    blockedByTags: [],
     itemLevelMin: 16,
     tierLabel: 'T5',
     weight: 500,
@@ -35,7 +37,7 @@ const DEFAULT_BASES: Json = { 'accessory.amulet': { Amulets: classOf() } };
 
 function fileOf(bases: Json = DEFAULT_BASES, overrides: Json = {}): Json {
   return {
-    schemaVersion: '6.0.0',
+    schemaVersion: '7.0.0',
     gamePatch: '0.5.5',
     producer: { id: 'poe-mod-weights-producer', version: '6.0.0', generatedAt: '2026-09-26T10:52:22.504Z' },
     bases,
@@ -95,14 +97,16 @@ describe('WeightsFileSchema — conforming files', () => {
     ['a null statId', fileWithEntries(entryOf({ lines: [{ statId: JSON_NULL, ranges: [[10, 20]] }] }))],
     ['two null statIds in one entry', fileWithEntries(entryOf({ lines: [{ statId: JSON_NULL, ranges: [] }, { statId: JSON_NULL, ranges: [] }] }))],
     ['weightSource absent', fileWithEntries(entryOf({ weightSource: 'absent' }))],
+    ['blocking tags (7.0.0)', fileWithEntries(entryOf({ addsTags: ['no_cold_spell_mods', 'no_fire_spell_mods'], blockedByTags: ['no_lightning_spell_mods'] }))],
+    ['the same tag in addsTags and blockedByTags', fileWithEntries(entryOf({ addsTags: ['no_fire_spell_mods'], blockedByTags: ['no_fire_spell_mods'] }))],
     ['a not-in-game entry with weight 0 and a null statId (6.1.0)', fileWithEntries(entryOf({ weight: 0, weightSource: 'not-in-game', lines: [{ statId: JSON_NULL, ranges: [[5, 10]] }] }))],
     ['no tierLabel, producer.version or producer.sourceUrl', fileOf(
       { 'accessory.amulet': { Amulets: classOf(poolOf([{ ...entryOf(), tierLabel: undefined }])) } },
       { producer: { id: 'p', generatedAt: '2026-09-26T10:52:22.504Z' } },
     )],
-    ['unknown keys at every level (a later additive 6.x)', {
+    ['unknown keys at every level (a later additive 7.x)', {
       ...fileOf({ jewel: { Emerald: { ...classOf(poolOf([{ ...entryOf(), extra: 1 }])), extra: 1 }, } }),
-      schemaVersion: '6.3.0',
+      schemaVersion: '7.3.0',
       extra: { any: 'thing' },
     }],
     ['a full armour lattice', fileOf({
@@ -117,12 +121,12 @@ describe('WeightsFileSchema — conforming files', () => {
 });
 
 describe('WeightsFileSchema — refusals', () => {
-  it('refuses an old major as unknown-major, before the body is parsed', () => {
-    expect(parse({ schemaVersion: '5.1.0', bases: 'not even an object' })).toEqual({
+  it.each(['6.1.0', '5.1.0'])('refuses a %s file as unknown-major, before the body is parsed', (found) => {
+    expect(parse({ schemaVersion: found, bases: 'not even an object' })).toEqual({
       ok: false,
       reason: 'unknown-major',
-      expected: '6.1.0',
-      found: '5.1.0',
+      expected: '7.0.0',
+      found,
     });
   });
 
@@ -139,6 +143,18 @@ describe('WeightsFileSchema — refusals', () => {
     ),
     ['a missing modGroup', fileWithEntries(noModuleGroup), [...ENTRY_PATH, 'modGroup'], 'modGroup is missing'],
     ['an empty modGroup', fileWithEntries(entryOf({ modGroup: '' })), [...ENTRY_PATH, 'modGroup'], 'modGroup'],
+    ...(['addsTags', 'blockedByTags'] as const).flatMap((key) => [
+      [`a missing ${key}`, fileWithEntries(entryWithout(key)), [...ENTRY_PATH, key], 'is missing or not an array'],
+      [`${key} with a non-no_* element`, fileWithEntries(entryOf({ [key]: ['fire'] })), [...ENTRY_PATH, key, 0], 'not a no_* tag'],
+      [`${key} with a capitalised tag`, fileWithEntries(entryOf({ [key]: ['no_Fire_spell_mods'] })), [...ENTRY_PATH, key, 0], 'not a no_* tag'],
+      [`${key} as a string`, fileWithEntries(entryOf({ [key]: 'no_fire_spell_mods' })), [...ENTRY_PATH, key], 'is missing or not an array'],
+      [
+        `a duplicate tag in ${key}`,
+        fileWithEntries(entryOf({ [key]: ['no_cold_spell_mods', 'no_cold_spell_mods'] })),
+        [...ENTRY_PATH, key, 1],
+        'repeats',
+      ],
+    ] as const),
     ['a non-string modGroup', fileWithEntries(entryOf({ modGroup: 7 })), [...ENTRY_PATH, 'modGroup'], 'not a string'],
     ['a negative weight', fileWithEntries(entryOf({ weight: -1 })), [...ENTRY_PATH, 'weight'], 'weight'],
     ['a bad weightSource', fileWithEntries(entryOf({ weightSource: 'measured' })), [...ENTRY_PATH, 'weightSource'], 'weightSource is not'],
@@ -234,7 +250,7 @@ describe('the className grammar', () => {
   it('is exported once, from the contracts barrel', () => {
     expect(contracts.defenceLettersOf).toBe(defenceLettersOf);
     expect(contracts.DEFENCE_OF_LETTER).toEqual({ str: 'ar', dex: 'ev', int: 'es' });
-    expect(contracts.WEIGHTS_SCHEMA_VERSION).toBe('6.1.0');
+    expect(contracts.WEIGHTS_SCHEMA_VERSION).toBe('7.0.0');
     expect(contracts.WeightsFileSchema).toBe(WeightsFileSchema);
   });
 });

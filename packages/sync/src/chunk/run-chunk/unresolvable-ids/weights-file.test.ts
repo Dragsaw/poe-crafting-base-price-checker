@@ -23,6 +23,8 @@ const weightsPoolOf = (...entries: unknown[]): unknown => ({ poolCoverage: 'comp
 const weightsEntryOf = (id: string, ...lines: unknown[]): unknown => ({
   sourceModifierId: id,
   modGroup: id,
+  addsTags: [],
+  blockedByTags: [],
   itemLevelMin: 1,
   weight: 1,
   weightSource: 'published',
@@ -46,7 +48,7 @@ const coveredWeights = (suffixCoverage: 'complete' | 'partial'): string =>
   });
 
 const coverageTier = (id: string, statId: string): unknown => ({
-  sourceModifierId: id, modGroup: id, itemLevelMin: 1, weight: 1,
+  sourceModifierId: id, modGroup: id, addsTags: [], blockedByTags: [], itemLevelMin: 1, weight: 1,
   weightSource: 'published',
   lines: [{ statId, ranges: [] }],
 });

@@ -42,9 +42,9 @@ export const VALID_BODIES: Readonly<Record<ArtifactKey, unknown>> = {
     records: [],
   },
   weights: {
-    schemaVersion: '6.0.0',
+    schemaVersion: '7.0.0',
     gamePatch: '0.5.5',
-    producer: { id: 'poe-mod-weights-producer', version: '6.0.0', generatedAt: '2026-09-26T10:52:22.504Z' },
+    producer: { id: 'poe-mod-weights-producer', version: '7.0.0', generatedAt: '2026-09-26T10:52:22.504Z' },
     bases: {},
   },
   recipes: { schemaVersion: '1.0.0', recipes: [] },

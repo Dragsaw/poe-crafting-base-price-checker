@@ -75,8 +75,8 @@ describe('RequestsBySourceSchema', () => {
     );
   });
 
-  it('stamps a minor version, so a 1.0.0 or 1.1.0 report keeps its major', () => {
-    expect(SYNC_REPORT_SCHEMA_VERSION).toBe('1.2.0');
+  it('stamps a minor version, so a 1.0.0, 1.1.0 or 1.2.0 report keeps its major', () => {
+    expect(SYNC_REPORT_SCHEMA_VERSION).toBe('1.3.0');
   });
 });
 

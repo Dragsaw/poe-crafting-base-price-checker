@@ -46,6 +46,8 @@ export function tier(statId: string, weight: number, itemLevelMin: number, group
   return {
     sourceModifierId: `m${String(serial)}`,
     modGroup: group ?? `g${String(serial)}`,
+    addsTags: [],
+    blockedByTags: [],
     itemLevelMin,
     weight,
     weightSource: 'published',
@@ -59,6 +61,8 @@ export function hybridTier(statIds: readonly string[], weight: number, itemLevel
   return {
     sourceModifierId: `m${String(serial)}`,
     modGroup: `g${String(serial)}`,
+    addsTags: [],
+    blockedByTags: [],
     itemLevelMin,
     weight,
     weightSource: 'published',

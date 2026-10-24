@@ -31,10 +31,11 @@ export type { CraftCostResult } from './craft-cost.ts';
 /** Provenance of a crafted pair (AD-10). */
 export { foldPair, oldestOf, provenanceOfTier, weakest } from './provenance.ts';
 
-/** The six cross-file checks and the unvalidated marks (AD-17). */
+/** The cross-file checks and the unvalidated marks (AD-17). */
 export {
   classDiscriminability,
   coOccur,
+  coRollable,
   crossFileChecks,
   edgeAlignment,
   emptyContainment,
@@ -55,10 +56,12 @@ export {
   floored,
   interval,
   isEmptyPool,
+  isExcludedBy,
   lineSet,
   needs,
   poolOf,
   recipeReach,
+  secondDraw,
   statIds,
   isUntrackable as untrackable,
   untrackableReason,

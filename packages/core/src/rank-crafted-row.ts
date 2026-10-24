@@ -60,7 +60,7 @@ function scanSummands({ recipe, pools, keyed, byKey, activeLeague, threshold, no
   const stamps: string[] = [];
   for (const { entry, entryKey } of keyed) {
     const probability = combinationProbability(pools, entry, recipe.modifierLevelMin);
-    if (!probability.ok) {
+    if (!probability.ok || probability.p === 0) {
       return undefined;
     }
     const published = byKey.get(entryKey);

@@ -25,13 +25,15 @@ const solar = { kind: 'raw', baseTypeId: 'Solar Amulet', categoryId: 'accessory.
 const tier = (statId: string, min: number, max: number): ModifierWeight => ({
   sourceModifierId: statId,
   modGroup: statId,
+  addsTags: [],
+  blockedByTags: [],
   itemLevelMin: 70,
   weight: 100,
   weightSource: 'published',
   lines: [{ statId, ranges: [[min, max]] }],
 });
 
-/** A weights file on which `crafted` passes all six cross-file checks. */
+/** A weights file on which `crafted` passes every cross-file check. */
 const WEIGHTS: WeightsFile = {
   schemaVersion: WEIGHTS_SCHEMA_VERSION,
   gamePatch: '0.5.5',

@@ -152,6 +152,8 @@ function rarityTier(sourceModifierId: string, min: number, max: number): Modifie
   return {
     sourceModifierId,
     modGroup: sourceModifierId.replace(/(?<!\d)\d+$/, ''),
+    addsTags: [],
+    blockedByTags: [],
     itemLevelMin: 1,
     weight: 1000,
     weightSource: 'published',

@@ -20,12 +20,12 @@ function pool(...lines: unknown[]): unknown {
     entries:
       lines.length === 0
         ? []
-        : [{ sourceModifierId: 'x', modGroup: 'X', itemLevelMin: 1, weight: 1, weightSource: 'published', lines }],
+        : [{ sourceModifierId: 'x', modGroup: 'X', addsTags: [], blockedByTags: [], itemLevelMin: 1, weight: 1, weightSource: 'published', lines }],
   };
 }
 
 const WEIGHTS = {
-  schemaVersion: '6.1.0',
+  schemaVersion: '7.0.0',
   gamePatch: '0.5.5',
   producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
   bases: {
@@ -64,7 +64,7 @@ describe('readWeightsIds', () => {
     ['an unknown major', JSON.stringify({ ...WEIGHTS, schemaVersion: '5.1.0' }), 'unknown-major'],
     ['a malformed version', JSON.stringify({ ...WEIGHTS, schemaVersion: 'six' }), 'malformed-version'],
     ['no version', JSON.stringify({ bases: {} }), 'invalid'],
-    ['no bases', JSON.stringify({ ...WEIGHTS, schemaVersion: '6.0.0', bases: undefined }), 'invalid'],
+    ['no bases', JSON.stringify({ ...WEIGHTS, schemaVersion: '7.0.0', bases: undefined }), 'invalid'],
   ])('refuses %s loudly, naming the file', async (_label, contents, reason) => {
     const read = readWeightsIds(fsWith(contents));
     await expect(read).rejects.toBeInstanceOf(DataFileError);
@@ -80,8 +80,8 @@ describe('readWeightsIds', () => {
 
   it('names the failing rule of a within-file hard error', async () => {
     const twice = { ...WEIGHTS, bases: { 'weapon.bow': { Bows: { prefix: { poolCoverage: 'complete', entries: [
-      { sourceModifierId: 'x', modGroup: 'X', itemLevelMin: 1, weight: 1, weightSource: 'published', lines: [line('explicit.a')] },
-      { sourceModifierId: 'x', modGroup: 'X', itemLevelMin: 2, weight: 1, weightSource: 'published', lines: [line('explicit.a')] },
+      { sourceModifierId: 'x', modGroup: 'X', addsTags: [], blockedByTags: [], itemLevelMin: 1, weight: 1, weightSource: 'published', lines: [line('explicit.a')] },
+      { sourceModifierId: 'x', modGroup: 'X', addsTags: [], blockedByTags: [], itemLevelMin: 2, weight: 1, weightSource: 'published', lines: [line('explicit.a')] },
     ] }, suffix: pool() } } } };
     await expect(readWeightsIds(fsWith(JSON.stringify(twice)))).rejects.toThrow(
       'data/weights.json: invalid: bases.weapon.bow.Bows.prefix.entries.1.sourceModifierId: sourceModifierId repeats entries.0; a sourceModifierId may appear once per slot',

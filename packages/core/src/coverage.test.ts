@@ -7,6 +7,8 @@ import { poolCoverage } from './coverage.ts';
 const tier = (weight: number): ModifierWeight => ({
   sourceModifierId: `m${String(weight)}`,
   modGroup: `g${String(weight)}`,
+  addsTags: [],
+  blockedByTags: [],
   itemLevelMin: 1,
   weight,
   weightSource: weight === 0 ? 'not-in-game' : 'published',
