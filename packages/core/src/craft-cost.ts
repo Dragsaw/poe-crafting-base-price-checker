@@ -31,3 +31,8 @@ export function craftCost(
   }
   return { ok: true, divine, asOf };
 }
+
+/** A jewel's Craft Cost is `0` under every costable recipe (FR-26). */
+export const isJewelCategory = (categoryId: string): boolean => categoryId === 'jewel';
+
+export const JEWEL_CRAFT_COST: CraftCostResult = { ok: true, divine: 0, asOf: [] };

@@ -7,7 +7,7 @@ import { colors, spacing, typeStyle } from '../theme/tokens';
 import { combinationString } from './combination-text';
 import { hasEstimate, type ClassDisplayRow, type CraftedCombination, type DisplayRow, type PrunedCombination } from './display-rows';
 import { ExpansionLine, PrunedLine, type LineView } from './expansion/ExpansionLine';
-import { ESTIMATED_ODDS_CONTEXT, FEWER_LINES_COPY, moreLinesCopy, prunedCopy } from './format';
+import { ESTIMATED_ODDS_CONTEXT, FEWER_LINES_COPY, JEWEL_CONTEXT, moreLinesCopy, prunedCopy } from './format';
 import { NAME_COLORS } from './RankedRow';
 import { tradeSearchHref } from './trade-link';
 import { JOINER } from '../shared/text';
@@ -39,9 +39,13 @@ function craftedLine(combination: CraftedCombination, className: string, activeL
   };
 }
 
-/** The name in the row's rarity colour, then the ≈ sentence when the row carries ≈ (state 12). */
+/**
+ * The name in the row's rarity colour, then the ≈ sentence when the row carries ≈ (state 12),
+ * then the jewel clause on a jewel row with a figure (memlog 294).
+ */
 function ContextLine({ row }: { readonly row: DisplayRow | ClassDisplayRow }): JSX.Element {
   const isEstimated = hasEstimate(row);
+  const isJewelFigure = row.unit === 'class' && row.isJewel && row.ev.kind === 'figure';
   return (
     <div data-context-line="" style={{ ...typeStyle('note'), padding: '4px 0 8px', color: colors['text-tertiary'] }}>
       <span data-context-name="" style={{ color: NAME_COLORS[row.unit] }}>
@@ -54,6 +58,12 @@ function ContextLine({ row }: { readonly row: DisplayRow | ClassDisplayRow }): J
             <EstimateMark />
           </span>{' '}
           {ESTIMATED_ODDS_CONTEXT}
+        </span>
+      ) : undefined}
+      {isJewelFigure ? (
+        <span data-context-jewel="">
+          {JOINER}
+          {JEWEL_CONTEXT}
         </span>
       ) : undefined}
     </div>

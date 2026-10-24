@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 30
+revision: 31
 created: 2026-09-13
-updated: 2026-10-10
+updated: 2026-10-23
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
@@ -149,7 +149,9 @@ coverage fraction with its denominator is one click down, in the sync report.
 - **Context line.** Every panel opens with a context line that leads with the
   row's full name. Thus a name that the row cut has a full-text home (memlog 265).
   When the row carries ≈, the line continues with the ≈ sentence (Copy Deck).
-  There is no title and no sub-line, because the sticky header always shows the
+  A jewel row with a figure then continues with the jewel clause (Copy Deck;
+  memlog 294). Where the jewel row's EV is `—`, it has no clause, as with ≈
+  (memlog 290). There is no title and no sub-line, because the sticky header always shows the
   threshold and the recipe that the figures depend on (memlog 258 N-11).
 - **Lines.** One line per Combination (memlog 258 N-3). The line holds the
   Combination (tier plus short form, led by `* pinned` when pinned), the price in
@@ -257,8 +259,10 @@ rounds to `0.00` prints **`< 0.00`**, dimmed: a loss too small to print (memlog
 289).
 
 **Craft Cost prints once**, beside the recipe (memlog 182, 258 N-16; FR-26). The
-player checks every crafted EV against it. Where the recipe is **uncostable**, the
-slot holds the uncostable phrase and never a number (FR-26, AD-20; state 35).
+player checks every crafted EV against it, except a jewel's. A jewel subtracts no
+Craft Cost (FR-26), and its expansion says so (memlog 294; *The expansion*). Where
+the recipe is **uncostable**, the slot holds the uncostable phrase and never a
+number (FR-26, AD-20; state 35).
 
 ### Combinations and short forms
 
@@ -433,7 +437,7 @@ Braces in this document always mean a DESIGN.md token, never a placeholder.
 | Raw Base row, chase slot | `Sell as is · item level 82+` |
 | Mark tooltip | `<word> · <reason>`, e.g. `rough · 74% of this EV rests on unreliable prices` |
 | Chase cell, cut | the cell's full Combination text on hover; no other string |
-| Expansion context line | `<name>`, e.g. `Body Armours (Str/Dex/Int)` (memlog 265). With ≈ it continues: `<name> · ≈ Some roll odds are estimated: no published weight for one mod tier. All prices below come from real listings.` |
+| Expansion context line | `<name>`, e.g. `Body Armours (Str/Dex/Int)` (memlog 265). With ≈ it continues: `<name> · ≈ Some roll odds are estimated: no published weight for one mod tier. All prices below come from real listings.` A jewel row with a figure ends with ` · No Craft Cost: jewels craft with basic orbs.`, after the ≈ sentence when both apply (memlog 294) |
 | Expansion line, below threshold | `below threshold` |
 | Curation marks | `* pinned` · `† pruned` |
 | `{components.show-more}` | `+ N more combinations` / `− show fewer` (memlog 264) · `+ N pruned` · `+ Read the remaining N rows` / `− Show only the top 20` · `+ Try again` |
@@ -813,11 +817,11 @@ number.
 | 18 | Pending row | Ranked row | ○ in the mark slot, EV `—`. Raw Base: its entry is pending, and the tooltip carries the entry's reason. Crafted: no combination is priced, reason `no prices yet`. This holds in every state, not only in state 23 (memlog 265). States 35 and 43 take their own reasons (*Price trust*). **Outside states 23, 35 and 43, a pending or broken row has no rank numeral and sits after every ranked row**, in tier 3 (FR-1; memlog 293). The trail order is pending crafted rows, pending Raw Bases (no listings, then not yet synced), broken crafted rows (state 41), broken Raw Bases (state 40). Each block keeps `core`'s key order |
 | 19 | Retired (memlog 256) | — | The global estimated-odds banner, its dismiss control and its copy are retired. ≈ is per row only (state 12) |
 | 20 | Below-threshold entry | Expansion line | **Dimmed**, with `below threshold` in the trust cell and no mark (memlog 258 N-3). Shown, never hidden (FR-8). **It prints only `below threshold`**, even when its price is also unreliable (memlog 265) |
-| 21 | Item Class whose priced Combinations all fall below the threshold | Ranked row | Chase cells empty. Its EV is negative by its Craft Cost and prints at 2 decimal places, **dimmed** (memlog 258 N-20), or `< 0.00` when it rounds to zero (*Money*). It is a known figure and bad news, not missing news. Thus it is never `—` and never a phrase. It is **ranked, not Unrankable** (FR-1) |
+| 21 | Item Class whose priced Combinations all fall below the threshold | Ranked row | Chase cells empty. Its EV is negative by its Craft Cost and prints at 2 decimal places, **dimmed** (memlog 258 N-20), or `< 0.00` when it rounds to zero (*Money*). A jewel subtracts no Craft Cost, so its EV is `0.00`, dimmed the same way (memlog 294). It is a known figure and bad news, not missing news. Thus it is never `—` and never a phrase. It is **ranked, not Unrankable** (FR-1) |
 | 22 | Cold load / skeleton | Whole page | `{components.header-bar}`, the column header with its final labels, and twenty skeleton rows paint at once in the final layout. The eyebrow stays blank until the league is known (memlog 211). The page never jumps (memlog 50). `[ASSUMPTION — memlog 51]` Every artifact resolves in a **single transition**, never row by row |
 | 23 | Honest empty: league reset | Whole list | (memlog 48) Every tracked unit, every Item Class and every Raw Base, renders in **canonical order**. The list refills over the following day. `[ASSUMPTION — memlog 49]` Rank numerals are **suppressed**, and the list statement says that the order is canonical (Copy Deck). Every row reads ○ pending, or ✕ broken for a broken entry, and every EV cell reads `—` (memlog 257). After a pure reset, the pending reason is `price from last league`. After a mixed reset, some rows carry a new-league reason such as `no listings found`. Each expansion keeps its entries' own reasons. The statement drops `yet` when every listed row is broken, and keeps it while one row is pending. It names no cause, because the sync button's count already carries broken entries |
 | 24 | Partially refreshed dataset | Whole list | Renders normally. Per-row price trust makes that honest. No global "stale" treatment |
-| 25 | Nothing clears the threshold | Whole list | **The one state the player typed** (memlog 204). Every crafted Item Class with a priced Combination is still ranked, at minus its Craft Cost (FR-1), and dimmed (state 21). One with none trails unnumbered (state 18). Raw Bases under the threshold leave the ranking. **Rank numerals stay.** The order is computed and the figures tie, so AD-17's declared tiebreak orders them. Thus the order is identical across loads. A plain list statement names the live threshold at 2 decimal places. It states the condition with no instruction, because the remedy is on screen in the header. It is not a missing figure, so it is not a phrase in any cell |
+| 25 | Nothing clears the threshold | Whole list | **The one state the player typed** (memlog 204). Every crafted Item Class with a priced Combination is still ranked, at minus its Craft Cost (FR-1), and dimmed (state 21). A jewel ranks at `0.00`, above the negative figures. One with none trails unnumbered (state 18). Raw Bases under the threshold leave the ranking. **Rank numerals stay.** The order is computed and the figures tie, so AD-17's declared tiebreak orders them. Thus the order is identical across loads. A plain list statement names the live threshold at 2 decimal places. It states the condition with no instruction, because the remedy is on screen in the header. It is not a missing figure, so it is not a phrase in any cell |
 | 26 | Refused artifact | Whole page | The refusal variant of `{components.failure-screen}` replaces everything (FR-33, NFR-8; memlog 221). The cause is one of three: a fetched artifact is schema-invalid, declares a version that the page does not read, or is required and not published. The title names no cause (memlog 220). The body names which artifact and why. No retry: the fix for a refusal is a valid published set, and the fixed sentence says so (Copy Deck). An invalid recipe set takes this treatment (*Recipe option words*) |
 | 27 | Cross-file policy check failure | Report, never refusal | The cross-file checks of AD-17 run at load. The page still renders. The affected Item Classes are Unrankable with `class disagrees with weights file` (state 15a). **The sync report's Problems column lists the diagnosis**, in the file's register, and **does not count it** (memlog 206, 275) |
 | 28 | Artifact fetch failure | Whole page | The fetch-failure variant of `{components.failure-screen}`, shown when an artifact does not arrive (AD-24). Its title and body name the file (Copy Deck). `+ Try again` re-attempts the whole set, never a partial one. **A partial set is never rendered** (FR-33) |
@@ -1120,7 +1124,9 @@ Second turn, the same shape: **richer also means a different recipe.** They clic
 `perfect` in `{components.recipe-toggle}`, and the list reorders again. This time a
 different set of outcomes is reachable (FR-26). The Craft Cost beside the toggle
 tells them what the better orbs cost per attempt. That figure makes the two
-orderings comparable.
+orderings comparable. A jewel row keeps its EV, because a jewel subtracts no Craft
+Cost, and an opened jewel row says so (memlog 294). Its rank can still change as
+the other rows move.
 
 Failure path: they set a value that nothing clears (**state 25**). The page does
 not look like a data outage. The list statement names the condition and the live

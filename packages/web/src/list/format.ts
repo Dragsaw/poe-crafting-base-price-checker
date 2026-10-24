@@ -44,6 +44,9 @@ export const CURATION_MARKS = { pinned: '* pinned', pruned: '† pruned' } as co
 /** The ≈ context sentence after the name of a `uniform-prior` row (EXPERIENCE.md Copy Deck, state 12). */
 export const ESTIMATED_ODDS_CONTEXT = 'Some roll odds are estimated: no published weight for one mod tier. All prices below come from real listings.';
 
+/** The context line's jewel clause, on a jewel row with a figure (FR-26). */
+export const JEWEL_CONTEXT = 'No Craft Cost: jewels craft with basic orbs.';
+
 /** The remainder affordance, closed: N counts the hidden lines without the pruned ones (state 39). */
 export function moreLinesCopy(hidden: number): string {
   return `${glyphs.open} ${String(hidden)} more ${plural(hidden, 'combination', 'combinations')}`;

@@ -24,8 +24,11 @@ export type {
 /** The one set of clock spans, for every age `core` and `web` read. */
 export { DAY_MS, HOUR_MS, MINUTE_MS } from './clock.ts';
 
-/** The Craft Cost of a recipe (AD-20): costed from the dataset's rates, or uncostable, never `0`. */
-export { craftCost } from './craft-cost.ts';
+/**
+ * `craftCost` is per recipe (AD-20): costed from the dataset's rates, or uncostable, never `0`.
+ * A jewel class's Craft Cost is `0` under a costable recipe (FR-26).
+ */
+export { craftCost, isJewelCategory } from './craft-cost.ts';
 export type { CraftCostResult } from './craft-cost.ts';
 
 /** Provenance of a crafted pair (AD-10). */
