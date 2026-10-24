@@ -1,12 +1,12 @@
 {
   "schemaVersion": "1.0.0",
   "rates": [
-    { "currencyId": "divine", "rate": 1, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-10-17T15:18:56Z" },
-    { "currencyId": "exalted", "rate": 0.00109, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-10-17T15:18:56Z" },
-    { "currencyId": "chaos", "rate": 0.0938, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-10-17T15:18:56Z" },
-    { "currencyId": "greater-orb-of-transmutation", "rate": 0.000577, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-10-17T15:18:56Z" },
-    { "currencyId": "greater-orb-of-augmentation", "rate": 0.00402, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-10-17T15:18:56Z" },
-    { "currencyId": "perfect-orb-of-transmutation", "rate": 0.0149, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-10-17T15:18:56Z" },
-    { "currencyId": "perfect-orb-of-augmentation", "rate": 0.259, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-10-17T15:18:56Z" }
+    { "currencyId": "divine", "rate": 1, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-10-24T18:28:50Z" },
+    { "currencyId": "exalted", "rate": 0.00133, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-10-24T18:28:50Z" },
+    { "currencyId": "chaos", "rate": 0.0967, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-10-24T18:28:50Z" },
+    { "currencyId": "greater-orb-of-transmutation", "rate": 0.000382, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-10-24T18:28:50Z" },
+    { "currencyId": "greater-orb-of-augmentation", "rate": 0.00338, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-10-24T18:28:50Z" },
+    { "currencyId": "perfect-orb-of-transmutation", "rate": 0.0176, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-10-24T18:28:50Z" },
+    { "currencyId": "perfect-orb-of-augmentation", "rate": 0.254, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-10-24T18:28:50Z" }
   ]
 }

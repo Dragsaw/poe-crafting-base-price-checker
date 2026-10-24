@@ -1175,7 +1175,8 @@
         "valueMax": 5,
         "acceptedTier": "T1"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "no listings"
     },
     {
       "kind": "crafted",
@@ -1196,7 +1197,8 @@
         "valueMax": 20,
         "acceptedTier": "T1"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "no listings"
     },
     {
       "kind": "crafted",
@@ -1343,7 +1345,8 @@
         "valueMax": 7,
         "acceptedTier": "T1"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "no listings"
     },
     {
       "kind": "crafted",
@@ -1364,7 +1367,8 @@
         "valueMax": 15,
         "acceptedTier": "T1"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "no listings"
     },
     {
       "kind": "crafted",
@@ -1406,7 +1410,8 @@
         "valueMax": 2,
         "acceptedTier": "T1"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "no listings"
     },
     {
       "kind": "crafted",
@@ -2309,7 +2314,8 @@
         "valueMax": 5,
         "acceptedTier": "T1"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "no listings"
     },
     {
       "kind": "crafted",
@@ -2330,7 +2336,8 @@
         "valueMax": 20,
         "acceptedTier": "T1"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "no listings"
     },
     {
       "kind": "crafted",
@@ -2393,7 +2400,8 @@
         "valueMax": 15,
         "acceptedTier": "T1"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "no listings"
     },
     {
       "kind": "crafted",
@@ -2435,7 +2443,8 @@
         "valueMax": 15,
         "acceptedTier": "T1"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "no listings"
     },
     {
       "kind": "crafted",
@@ -2456,7 +2465,8 @@
         "valueMax": 10,
         "acceptedTier": "T1"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "no listings"
     },
     {
       "kind": "crafted",
@@ -2477,7 +2487,8 @@
         "valueMax": 7,
         "acceptedTier": "T1"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "no listings"
     },
     {
       "kind": "crafted",
@@ -2498,7 +2509,8 @@
         "valueMax": 15,
         "acceptedTier": "T1"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "no listings"
     },
     {
       "kind": "crafted",
@@ -4199,7 +4211,8 @@
         "valueMax": 5,
         "acceptedTier": "T1"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "no listings"
     },
     {
       "kind": "crafted",
@@ -4745,7 +4758,8 @@
         "valueMax": 7,
         "acceptedTier": "T1"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "no listings"
     },
     {
       "kind": "crafted",
@@ -5936,6 +5950,70 @@
       "categoryId": "armour.quiver",
       "className": "Quivers",
       "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Abyss Tablet",
+      "categoryId": "map.tablet",
+      "className": "Tablet",
+      "itemLevelMin": 1,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Breach Tablet",
+      "categoryId": "map.tablet",
+      "className": "Tablet",
+      "itemLevelMin": 1,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Delirium Tablet",
+      "categoryId": "map.tablet",
+      "className": "Tablet",
+      "itemLevelMin": 1,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Expedition Tablet",
+      "categoryId": "map.tablet",
+      "className": "Tablet",
+      "itemLevelMin": 1,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Irradiated Tablet",
+      "categoryId": "map.tablet",
+      "className": "Tablet",
+      "itemLevelMin": 1,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Temple Tablet",
+      "categoryId": "map.tablet",
+      "className": "Tablet",
+      "itemLevelMin": 1,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Overseer Tablet",
+      "categoryId": "map.tablet",
+      "className": "Tablet",
+      "itemLevelMin": 1,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Ritual Tablet",
+      "categoryId": "map.tablet",
+      "className": "Tablet",
+      "itemLevelMin": 1,
       "status": "active"
     },
     {

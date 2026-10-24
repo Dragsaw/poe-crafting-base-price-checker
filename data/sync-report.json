@@ -1,18 +1,18 @@
 {
-  "runStartedAt": "2026-10-18T20:26:04.581Z",
-  "runFinishedAt": "2026-10-18T20:26:05.355Z",
+  "runStartedAt": "2026-10-24T20:46:01.088Z",
+  "runFinishedAt": "2026-10-24T20:46:01.848Z",
   "figures": {
     "requestsBySource": {
-      "tracked-list": 372,
+      "tracked-list": 788,
       "league-validation": 1,
-      "session-probe": 0
+      "session-probe": 1
     },
-    "notReachedCount": 1556,
+    "notReachedCount": 1481,
     "coverage": 1,
     "rankableClassCount": 39,
     "trackedListEditedAt": {
       "source": "git-author-date",
-      "at": "2026-10-11T16:21:58.000Z"
+      "at": "2026-10-24T16:36:57.000Z"
     }
   },
   "records": [
@@ -22,5 +22,5 @@
       "message": "UNKNOWN: unknown error, open 'C:\\Users\\ilyal\\orca\\workspaces\\poe-crafting-base-price-checker\\sync-4\\data\\dataset.json'"
     }
   ],
-  "schemaVersion": "1.2.0"
+  "schemaVersion": "1.3.0"
 }
