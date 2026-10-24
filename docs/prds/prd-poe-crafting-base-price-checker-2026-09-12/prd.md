@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 30
+revision: 31
 created: 2026-09-12
-updated: 2026-10-11
+updated: 2026-10-24
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -637,7 +637,7 @@ Behavioural, not numeric. There is one user, and instrumenting the tool would be
 - **SM-6: Agents ship without a human unblocking them.** Development proceeds with tests passing offline and no live API in the loop. Validates NFR-1, NFR-2, NFR-4.
 
 **Counter-metrics (do not optimise)**
-- **SM-C1: Searches per full refresh.** A larger Tracked List makes the tool appear comprehensive and makes a daily refresh impossible. Held at roughly 1,500 **searches**, the quantity the rate limit actually constrains, because an entry count would miss a curator who splits one entry into two bands (AD-12). Counterbalances SM-4.
+- **SM-C1: Searches per full refresh.** A larger Tracked List makes the tool appear comprehensive and makes a daily refresh impossible. Held at about 2,100 **searches**, the quantity the rate limit actually constrains, because an entry count would miss a curator who splits one entry into two bands (AD-12). Counterbalances SM-4.
 - **SM-C2: Refresh frequency.** A faster refresh spends budget that retries, currency rates and a second recipe need, and prices are stable at daily resolution. Counterbalances SM-1.
 - **SM-C3: Number of ranked rows shown.** A longer list is not a better one. Bounded by FR-5. Counterbalances SM-2.
 - **SM-C4: Apparent confidence.** Suppose the view presents a figure on estimated odds or an old price as cleanly as a measured, current one. That would make the tool feel more authoritative and make it more dangerous. Counterbalances SM-4, and is why FR-10 to FR-12 exist.
