@@ -41,11 +41,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 ## Deferred from: player feedback on tracked data and weights (2026-10-18)
 
 - source_spec: `data/tracked.json`
-  summary: Find out why the Emerald entries with "increased bonuses gained from Equipped Quiver" and "increased Effect of your Mark Skills" get no listings; check the stat ids against the trade site.
-  evidence: In the `Dragsaw/sync-4` worktree, 18 Emerald entries use `explicit.stat_1200678966` (quiver bonuses) and 18 use `explicit.stat_712554801` (Mark effect). The catalogue also has the radius forms `explicit.stat_4180952808` and `explicit.stat_179541474`; jewels may roll those instead. The player plans to check the market.
-  retry_when: never — needs a human
-
-- source_spec: `data/tracked.json`
   summary: Track more normal (raw) bases.
   evidence: `data/tracked.json` on master holds only four raw entries (two Amulets, two Belts, one of them pruned) beside 1,255 crafted entries. The player did not name the bases to add.
   retry_when: never — needs a human
