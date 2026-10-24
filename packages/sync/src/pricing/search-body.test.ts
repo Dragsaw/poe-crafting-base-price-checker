@@ -1,6 +1,7 @@
-import { defenceLettersOf } from '@poe/contracts';
+import { canonicalKey, defenceLettersOf } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
+import { CONDITION_FILTERS } from './condition-filters.ts';
 import { buildSearchBody, UnknownClassBaseTypeError } from './search-body.ts';
 import { crafted, itemTypes } from './search-body.test-support.ts';
 
@@ -27,6 +28,54 @@ describe('buildSearchBody: raw', () => {
       },
       sort: SORT,
     });
+  });
+});
+
+describe('buildSearchBody: condition filters', () => {
+  const USES = { id: 'pseudo.pseudo_number_of_uses_remaining', value: { min: 10 }, disabled: false };
+
+  it('keeps one row: map.tablet, uses remaining at min 10 and no max', () => {
+    expect([...CONDITION_FILTERS]).toEqual([['map.tablet', [USES]]]);
+  });
+
+  it('sends a raw tablet exactly the uses-remaining condition, min 10 and no max', () => {
+    const body = buildSearchBody(
+      { kind: 'raw', baseTypeId: 'Abyss Tablet', categoryId: 'map.tablet', className: 'Tablet', itemLevelMin: 1, status: 'active' },
+      itemTypes,
+    );
+    expect(body.query.stats[0].filters).toEqual([USES]);
+  });
+
+  it('leaves the bytes of a category with no row unchanged', () => {
+    const raw = buildSearchBody(
+      { kind: 'raw', baseTypeId: 'Gold Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' },
+      itemTypes,
+    );
+    expect(JSON.stringify(raw)).toBe(
+      '{"query":{"status":{"option":"securable"},"type":"Gold Amulet","stats":[{"type":"and","filters":[]}],"filters":{"type_filters":{"filters":{"ilvl":{"min":82},"rarity":{"option":"normal"}}},"trade_filters":{"filters":{"price":{"option":"exalted_divine"}}}}},"sort":{"price":"asc"}}',
+    );
+    const boots = buildSearchBody(crafted('armour.boots', 'Boots_str_int'), itemTypes);
+    expect(JSON.stringify(boots)).toBe(
+      '{"query":{"status":{"option":"securable"},"stats":[{"type":"and","filters":[{"id":"explicit.stat_1","value":{"min":47,"max":50.5},"disabled":false},{"id":"explicit.stat_2","value":{},"disabled":false}]}],"filters":{"type_filters":{"filters":{"category":{"option":"armour.boots"},"rarity":{"option":"magic"}}},"equipment_filters":{"filters":{"ar":{"min":1},"ev":{"max":0},"es":{"min":1}}},"trade_filters":{"filters":{"price":{"option":"exalted_divine"}}}}},"sort":{"price":"asc"}}',
+    );
+  });
+
+  it('puts a crafted tablet\'s affix filters first, then the condition', () => {
+    const body = buildSearchBody(crafted('map.tablet', 'Tablet'), itemTypes);
+    expect(body.query.stats[0].filters).toEqual([
+      { id: 'explicit.stat_1', value: { min: 47, max: 50.5 }, disabled: false },
+      { id: 'explicit.stat_2', value: {}, disabled: false },
+      USES,
+    ]);
+  });
+
+  it('refuses an entry that names a condition stat itself, naming the entry and the id', () => {
+    const entry = crafted('map.tablet', 'Tablet', {
+      prefix: { kind: 'banded', statId: USES.id, valueMin: 1, valueMax: 10 },
+      suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
+    });
+    expect(() => buildSearchBody(entry, itemTypes)).toThrow(USES.id);
+    expect(() => buildSearchBody(entry, itemTypes)).toThrow(canonicalKey(entry));
   });
 });
 

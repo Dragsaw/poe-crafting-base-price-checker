@@ -33,7 +33,7 @@ The ranking is expected value per craft, threshold-truncated at a player-adjusta
 
 ## Capabilities and Constraints
 
-- Magic items only (at most one prefix, one suffix), tracked per Item Class, plus Raw (uncrafted) Bases at item level 82 — rare items are explicitly out of scope (PRD §2.2, §7.1). A tracked crafted entry always names both a prefix and a suffix (FR-34).
+- Magic items only (at most one prefix, one suffix), tracked per Item Class, plus Raw (uncrafted) Bases priced in their as-dropped condition — rare items are explicitly out of scope (PRD §2.2, §7.1). A tracked crafted entry always names both a prefix and a suffix (FR-34).
 - A Hybrid Modifier is tracked and priced as one modifier, and a stat that rolls in both affixes (for example % increased Rarity of Items) is priced on its summed value. Conjunctions of separate modifiers stay out of scope (FR-34, PRD §7.2).
 - Two Craft Recipes in v1 (greater transmute + greater augment; perfect transmute + perfect augment). The active recipe changes the ordering, not just the cost, so the ranking is read under one recipe at a time. Provenance belongs to an Item Class under one recipe, so a recipe switch can change a row's Provenance mark (AD-10). An uncostable recipe shows each ranked unit in its own order and states that no order across them exists (FR-1, FR-26).
 - The ranked list is bounded to the top 20 rows by default, behind an expand control; collapsed crafted rows show at most three Chase Combinations (FR-2, FR-5).
