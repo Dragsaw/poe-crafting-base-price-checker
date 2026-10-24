@@ -50,7 +50,8 @@ function snapshot(directory: string): Record<string, string> {
 
 
 describe('pnpm sync:dry over the live data/', () => {
-  it('exits 0, prints the same parseable JSON twice, and writes nothing to disk', async () => {
+  // Two cold child processes over the live data/ outrun the 5 s default on CI runners.
+  it('exits 0, prints the same parseable JSON twice, and writes nothing to disk', { timeout: 30_000 }, async () => {
     const before = snapshot(DATA_DIR);
 
     const first = await runScript();
