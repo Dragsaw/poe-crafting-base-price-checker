@@ -44063,28 +44063,6 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"raw\",\"Abyss Tablet\",1]",
-      "price": {
-        "state": "priced",
-        "observation": {
-          "league": "Forbidden Rites",
-          "observedAt": "2026-10-24T19:41:14.233Z",
-          "priceDivine": 1,
-          "sampleSize": 10,
-          "exchangeObservation": {
-            "currencyId": "divine",
-            "rate": 1,
-            "source": "measured",
-            "league": "Forbidden Rites",
-            "asOf": "2026-10-24T18:28:50Z"
-          }
-        }
-      },
-      "lastAttemptedAt": "2026-10-24T19:41:14.233Z",
-      "lastSearchId": "H4sIAAAAAAAAA3VOOwrDMAy9StGcpWu23qFbCUGJVRA4tpGVUGN899otBWfoJOk9vU-GqKh7hDGDD8rewQiR1l1wsQRlAE2BKnZbUoyXe0MVho-qih75x6MzFX6yVZJGTGXqzu_b3N3dyvawbW5cw681UlBY06mS87KhhVJaI0HzzysIr3RS0gsra2bDBztqDqW8AZZFJRf2AAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
       "entryKey": "[\"raw\",\"Adherent Cuffs\",82]",
       "price": {
         "state": "priced",
@@ -44283,28 +44261,6 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"raw\",\"Breach Tablet\",1]",
-      "price": {
-        "state": "priced",
-        "observation": {
-          "league": "Forbidden Rites",
-          "observedAt": "2026-10-24T19:47:52.746Z",
-          "priceDivine": 0.1496,
-          "sampleSize": 10,
-          "exchangeObservation": {
-            "currencyId": "exalted",
-            "rate": 0.0013,
-            "source": "measured",
-            "league": "Forbidden Rites",
-            "asOf": "2026-10-24T18:28:50Z"
-          }
-        }
-      },
-      "lastAttemptedAt": "2026-10-24T19:47:52.746Z",
-      "lastSearchId": "H4sIAAAAAAAAA3VOMQrDMAz8StGcpWvGvqFbCUG1VSpwbCMrocH477VbCs7QSbrT3ekyJEVdE4wZQlQOHkZIZFbBuyMoA-geqXIXITTP07XRCsPHVl23_BOgt5V-sFOSdpjK1MGvbO5wt7LbXJsL1-_n-lNQWPdDJx9kQQeltEqC9l9WFDZ0cNIL69XOljf21BJKeQMbJn-W9wAAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
       "entryKey": "[\"raw\",\"Chiming Staff\",82]",
       "price": {
         "state": "priced",
@@ -44459,28 +44415,6 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"raw\",\"Delirium Tablet\",1]",
-      "price": {
-        "state": "priced",
-        "observation": {
-          "league": "Forbidden Rites",
-          "observedAt": "2026-10-24T19:53:22.131Z",
-          "priceDivine": 0.0266,
-          "sampleSize": 10,
-          "exchangeObservation": {
-            "currencyId": "exalted",
-            "rate": 0.0013,
-            "source": "measured",
-            "league": "Forbidden Rites",
-            "asOf": "2026-10-24T18:28:50Z"
-          }
-        }
-      },
-      "lastAttemptedAt": "2026-10-24T19:53:22.131Z",
-      "lastSearchId": "H4sIAAAAAAAAA3VOOwrDMAy9StGcpWvmHqFbCUGNVRD4hyyHhuC7x24pOEMn6en9tENS1Jxg3CFE5eBhhERLFnxagjKAbpHq7UaWhbO73BuhMHyM1ffYfxL0pp5fbJWkEVOZOviVzR3uVrarbdNx7b_WVkFh3U5f-SAOLZTSnhI0_7Ki8EInJ72xsmY2vLKnllDKAXS2Ht75AAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
       "entryKey": "[\"raw\",\"Desert Buckler\",82]",
       "price": {
         "state": "priced",
@@ -44610,28 +44544,6 @@
       },
       "lastAttemptedAt": "2026-10-24T19:57:36.603Z",
       "lastSearchId": "H4sIAAAAAAAAA3VOzQrCMAx-Fcl5J0-yq_gUMka2Rgl0bUmz6Rh997WK0B08Jfn-8m0QFXWO0G7gg7J30EKkcRYcLEFqQNdAGbtZeqLT01V8jIN_QfNxZuN9-2nQmQw_2CpJIbrUVedX1ld3tbJdbJkT5wKXc_4rKKzroZfzMqGFlEotQfMvLAiPdHDSGzNresMLOyoJKe36DFeo-wAAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
-      "entryKey": "[\"raw\",\"Expedition Tablet\",1]",
-      "price": {
-        "state": "priced",
-        "observation": {
-          "league": "Forbidden Rites",
-          "observedAt": "2026-10-24T19:58:19.434Z",
-          "priceDivine": 0.143,
-          "sampleSize": 10,
-          "exchangeObservation": {
-            "currencyId": "exalted",
-            "rate": 0.0013,
-            "source": "measured",
-            "league": "Forbidden Rites",
-            "asOf": "2026-10-24T18:28:50Z"
-          }
-        }
-      },
-      "lastAttemptedAt": "2026-10-24T19:58:19.434Z",
-      "lastSearchId": "H4sIAAAAAAAAA3VOOwrDMAy9StGcpWv23qBbCUGNVRA4tpGVkBB891otBWfoJOn99A7Iirpk6A-ISTkG6CHTtAg-PUHpQPdEFbttiRyb4HI3SqH7WKvzcfxEGFyFX-yVxIihDM35lY3N3azsV29z5trgWv8KCut-6hWizOihFKsl6P5lJeGJTk7asLJudLxyIEso5Q1UZQQv-wAAAA",
       "lastSearchLeague": "Forbidden Rites"
     },
     {
@@ -45053,28 +44965,6 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"raw\",\"Irradiated Tablet\",1]",
-      "price": {
-        "state": "priced",
-        "observation": {
-          "league": "Forbidden Rites",
-          "observedAt": "2026-10-24T20:08:40.494Z",
-          "priceDivine": 0.0725,
-          "sampleSize": 10,
-          "exchangeObservation": {
-            "currencyId": "exalted",
-            "rate": 0.0013,
-            "source": "measured",
-            "league": "Forbidden Rites",
-            "asOf": "2026-10-24T18:28:50Z"
-          }
-        }
-      },
-      "lastAttemptedAt": "2026-10-24T20:08:40.494Z",
-      "lastSearchId": "H4sIAAAAAAAAA3VOOwrDMAy9StGcpWtu0L1bCUGNVRA4tpGV0BB898gtBWfoJOn99HbIirpk6HeISTkG6CHTtAg-PUHpQLdEht1E0DEqucu9Ugrdx2rOx_4TYXAGv9grSSWGMjTnVzY2d7OyX32dM1uDq_0VFNbt1CtEmdFDKbWW1fmXlYQnOjnpjca60fHKgWpCKQf2Nv1Q-wAAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
       "entryKey": "[\"raw\",\"Jade Talisman\",82]",
       "price": {
         "state": "priced",
@@ -45204,28 +45094,6 @@
       },
       "lastAttemptedAt": "2026-10-24T20:11:50.984Z",
       "lastSearchId": "H4sIAAAAAAAAA3VOMQrDMAz8StGcqVPJJzp0LCGotgoCxzayEhqM_167peAMnaS7050uQ1LUNcGYIUTl4GGERGYVfDiCMoDukSp3XcifboaiCsHwcVXTPf909LbST3ZK0oSpTB38ns0d7lZ2m2tz4fr8cq4_BYV1P3TyQRZ0UEqrJGj_hUVhQwcnvbCqdra8saeWUMobcj3uTvcAAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
-      "entryKey": "[\"raw\",\"Overseer Tablet\",1]",
-      "price": {
-        "state": "priced",
-        "observation": {
-          "league": "Forbidden Rites",
-          "observedAt": "2026-10-24T20:12:23.030Z",
-          "priceDivine": 8,
-          "sampleSize": 2,
-          "exchangeObservation": {
-            "currencyId": "divine",
-            "rate": 1,
-            "source": "measured",
-            "league": "Forbidden Rites",
-            "asOf": "2026-10-24T18:28:50Z"
-          }
-        }
-      },
-      "lastAttemptedAt": "2026-10-24T20:12:23.030Z",
-      "lastSearchId": "H4sIAAAAAAAAA3VOOwrDMAy9StGcpWsu0aVbCUGNVRA4tpEV0xB898gthWToJD29nzbIirpk6DeISTkG6CHTtAg-PUHtQNdEdrsVkkwkl3sjFLqP0XyP7SfB4Oz8Yq8mNWKowwF-ZeMBH1b2xbc5s_VfrVVQWNfTVyHKjB5qbU8Jun9ZSXiik5PeaKwbHRcO1BJq3QGuNGWP-QAAAA",
       "lastSearchLeague": "Forbidden Rites"
     },
     {
@@ -45380,28 +45248,6 @@
       },
       "lastAttemptedAt": "2026-10-24T20:16:10.041Z",
       "lastSearchId": "H4sIAAAAAAAAA3VOzQrCMAx-Fcl5J0-yx9CjjBHXVAJdW7JsOErf3VYRuoOnJN9fvgSLoq4L9AlCVA4eelhoWgUfjiB3oHukgl0JI_vn6aZoLXQfW3Hd00-A3hTYslOSSgx5aM6vbGzuZmW3uTpnLt8v5_JUUFj3QykfZEYHOddOguZfWBSe6OCkFxbWjIY39lQTcn4DMaxczfgAAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
-      "entryKey": "[\"raw\",\"Ritual Tablet\",1]",
-      "price": {
-        "state": "priced",
-        "observation": {
-          "league": "Forbidden Rites",
-          "observedAt": "2026-10-24T20:16:42.862Z",
-          "priceDivine": 0.2354,
-          "sampleSize": 10,
-          "exchangeObservation": {
-            "currencyId": "exalted",
-            "rate": 0.0013,
-            "source": "measured",
-            "league": "Forbidden Rites",
-            "asOf": "2026-10-24T18:28:50Z"
-          }
-        }
-      },
-      "lastAttemptedAt": "2026-10-24T20:16:42.862Z",
-      "lastSearchId": "H4sIAAAAAAAAA3VOQQrDMAz7yvC5l137jLHbKMVrPDCkSXCcshLy9yYbg_Swky1ZkpUhKmqKMGbwQdk7GCHSkgSflqAMoHugyt1YE9rLvdEKw8dWXY_8E6AzlX6xVZJ2mMrUwa9s7nC3st1smyvX79f6U1BY91Mn52VFC6W0SoLmX1YQXujkpDfWq5kNb-yoJZRyAAFuKFn3AAAA",
       "lastSearchLeague": "Forbidden Rites"
     },
     {
@@ -45754,28 +45600,6 @@
       },
       "lastAttemptedAt": "2026-10-24T20:25:07.582Z",
       "lastSearchId": "H4sIAAAAAAAAA3VOzQqDMAx-FcnZ007D15i3IZLZDAO1LWnVSem7r90Y1MNOSb6_fBF8wLB66CJYF9ga6MDTtAo-NEFqIRyOMtbjPls0TW93kuY2M2kF7cedzff406Ep8JN1ICnEkIbq_MrG6q5W1psuc-Fc4nrJvwWFw3HqZqwsqCGlUk1Q_QtzwhOdnPTCzKpR8caGSkJKb9O1zp7_AAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
-      "entryKey": "[\"raw\",\"Temple Tablet\",1]",
-      "price": {
-        "state": "priced",
-        "observation": {
-          "league": "Forbidden Rites",
-          "observedAt": "2026-10-24T20:25:42.002Z",
-          "priceDivine": 1,
-          "sampleSize": 10,
-          "exchangeObservation": {
-            "currencyId": "divine",
-            "rate": 1,
-            "source": "measured",
-            "league": "Forbidden Rites",
-            "asOf": "2026-10-24T18:28:50Z"
-          }
-        }
-      },
-      "lastAttemptedAt": "2026-10-24T20:25:42.002Z",
-      "lastSearchId": "H4sIAAAAAAAAA3VOuwrDMAz8laI5S9d8R7YSghqrIPALWQkNxv9eO6XgDJ2kO92dLkNS1C3BmCFE5eBhhETrJvi0BGUAPSJVbiIXLd2mRisMp626HvknQG8q_WKrJO0wl7mDX9nS4W5lu9s2Hdfv9_pTUFiPSycfxKGFUlolQfMvKwqvdHHSG-vVLIZ39tQSSvkAGPGCKvcAAAA",
       "lastSearchLeague": "Forbidden Rites"
     },
     {
