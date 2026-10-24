@@ -32,7 +32,7 @@ describe('the seven artifacts', () => {
     ]);
   });
 
-  it('expects weights major 6 and version 1 elsewhere', () => {
+  it('expects weights major 7 and version 1 elsewhere', () => {
     expect(ARTIFACTS.weights.expected).toBe('7.0.0');
     expect(ARTIFACTS.dataset.expected).toBe('1.0.0');
     expect(ARTIFACTS.tracked.expected).toBe('3.0.0');

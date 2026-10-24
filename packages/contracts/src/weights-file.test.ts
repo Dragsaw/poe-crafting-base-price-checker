@@ -146,6 +146,7 @@ describe('WeightsFileSchema — refusals', () => {
     ...(['addsTags', 'blockedByTags'] as const).flatMap((key) => [
       [`a missing ${key}`, fileWithEntries(entryWithout(key)), [...ENTRY_PATH, key], 'is missing or not an array'],
       [`${key} with a non-no_* element`, fileWithEntries(entryOf({ [key]: ['fire'] })), [...ENTRY_PATH, key, 0], 'not a no_* tag'],
+      [`${key} with a non-string element`, fileWithEntries(entryOf({ [key]: [7] })), [...ENTRY_PATH, key, 0], `${key} holds a non-string`],
       [`${key} with a capitalised tag`, fileWithEntries(entryOf({ [key]: ['no_Fire_spell_mods'] })), [...ENTRY_PATH, key, 0], 'not a no_* tag'],
       [`${key} as a string`, fileWithEntries(entryOf({ [key]: 'no_fire_spell_mods' })), [...ENTRY_PATH, key], 'is missing or not an array'],
       [

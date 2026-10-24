@@ -2,7 +2,7 @@
 title: 'Story 5.1: Blocking mod tags in the second draw'
 type: 'feature'
 created: '2026-10-24'
-status: 'in-progress'
+status: 'done'
 baseline_commit: 'fe9dd45779d826fd9ee34af8cdaa4a564bcb3eca'
 route: 'dispatch'
 review_loop_iteration: 0
@@ -157,3 +157,46 @@ The frozen fixture moves to `7.0.0` by a mechanical change (empty tag arrays). E
 - Crafted classes rank again: PASS. Under `greater` and `perfect`, Wands, Staves and Foci are ranked, and so are Rings and all seven Body Armour classes (41 rows in all). The appendix reads `Unrankable — 0 Item Classes`, and the sync report panel lists 0 problem lines. Screenshots `final-greater-full.png`, `final-perfect-full.png`, `final-report.png`.
 - No blocked pair in a Wand row: PASS. All 80 Wands and 56 Staves combinations were expanded under both recipes. A script found no element damage prefix paired with another element's spell-level, Flammability or Shock suffix. Screenshots `final-greater-expanded.png`, `final-perfect-expanded.png`.
 - Health line: PASS. The trust strip shows `Synced 5d ago` with no problem count, and nothing reports the weights file as refused.
+
+**PM and UX notes overtaken.** The task to append a `[NOTE FOR PM]` and a `[NOTE FOR UX]` was done, and then overtaken. A separate subagent of the player's session edited PRD FR-4 and `EXPERIENCE.md` (15a, 27 and the appendix copy row) to cite AD-17 in place of the count, and removed both notes. Commit `38746be` holds that edit. This story's code did not touch those owner documents.
+
+**Shared working tree.** Another session builds `spec-track-all-elemental-resistances.md` in this checkout and edits `data/tracked.json`. On the player's instruction, `13cefdb` and `38746be` commit everything except `data/tracked.json`. The review diff took this story's `data/tracked.json` change from `HEAD` plus the 24 deletions and the 33 re-keys (1,728 entries), and excluded the other session's 302 additions. The data commit must stage only this story's hunks.
+
+## Spec Change Log
+
+## Review Triage Log
+
+| # | Layer | Finding | Verdict | Evidence / route |
+|---|---|---|---|---|
+| 1 | blind, edge, verif | `exclusionSums` cache key `join('\0')` is not injective, and it depends on order | low | No poe2db `modGroup` contains `\0`, and an unsorted tag list only misses the cache, so results stay correct. The fix is a direct correction (a structured key). Patch |
+| 2 | blind, verif | `load-artifacts.test.ts:35` title still says major 6 | low | The title reads "major 6" while the test asserts `7.0.0`. Patch |
+| 3 | blind | No test exercises the non-string tag message | low | `tagListSchema`'s non-string message has no case. One table row fixes it. Patch |
+| 4 | blind, edge, verif | `deferred-work.md` drops the "Track all three elemental resistances" and jewel Craft Cost entries | medium | Real, but not caused by this story. The resistance removal is the other session's uncommitted edit. The jewel removal came from another session and was committed in `38746be` on the player's "commit everything" instruction. Out of this story; reported to the player |
+| 5 | blind | The Spirit and Rings ledger removals land before the data commit | low | `38746be` is not the last commit of the branch. The fix means rewriting history before push. Reject; the data commit follows on the same branch |
+| 6 | blind, edge, verif | The PM/UX task is ticked, but `deferred-work.md` has no notes, and owner docs were edited | false | The notes were added, then overtaken by the player's separate subagent (see Implementation Notes). This story's diff makes no owner-document edit. The fix would edit this spec. Reject |
+| 7 | blind | *Never* "no fixed list" contradicts the listed keys in Implementation Notes | false | The rule covers the source of the deletion list. The notes record that command's output, as the task asks. Reject |
+| 8 | blind | The data AC cannot be checked: `tracked.json` is not committed | low | True for now, because of the shared tree. The data commit with the FR-15 message is still owed before acceptance. Not a code defect |
+| 9 | blind | Spec `in-review` vs sprint-status `in-progress` | false | The workflow moves the story key to `review` at step 05, after review. Reject |
+| 10 | blind | No shell-level test uses a `6.1.0` file | low | The major check lives in `contracts` (`parseEnvelope`) and is tested there with `6.1.0`. The shells reuse it. Reject |
+| 11 | blind | The Focus/jewel equality fixtures set no `blockedByTags` | low | In the live `7.0.0` file, Foci and every jewel class carry `addsTags` and 0 `blockedByTags`, so the fixtures model the real case of the matrix row. The Wand tests catch a swapped predicate. Reject |
+| 12 | blind | The reach verdict for a blocked pair gives no reason | false | The spec defines `{ reached: false, slots: ['prefix','suffix'] }`. The pair's reason is the co-rollable failure, under the scope. Reject |
+| 13 | blind | `coRollable` name and barrel export | false | It matches its siblings `emptyContainment` and `edgeAlignment`, which return the detail or `undefined` and are exported from the barrel. Reject |
+| 14 | blind | Records under the old keys stay in `dataset.json` | false | `publish-dataset.ts` rebuilds one dataset entry per tracked entry, so the next sync drops old keys. All 57 affected keys read `no-listings`. Reject |
+| 15 | blind | `epic-5-context.md` goes stale | low | A compiled cache, and 5.1 is the epic's only story. Reject |
+| 16 | blind | Browser screenshots sit in a session scratchpad | false | The established record practice (spec 4.1) names scratchpad paths. Reject |
+| 17 | blind | `cross-file-gate.test.ts` string `.replace` can silently no-op | low | A no-op fails the test, because it asserts the co-rollable record. Only the failure message would mislead. Reject |
+| 18 | edge, verif | `augment-exhausted` reports `modGroup` when tags caused it | low | Diagnosis only. Its one consumer, `recipeReach`, reads `firstDrawSlot`. Reject |
+| 19 | edge | Co-rollable passes while one order exhausts the other slot | false | AD-17 rules on that case: an exhausted augment makes the pair unrankable, and `recipeReach` reports it. The co-rollable predicate is pairwise by the spine's row. Reject |
+| 20 | edge | Reach slots differ between the exhausted and filler cases | low | The slot attribution of `augment-exhausted` predates this story. Reject |
+| 21 | edge | The Intent omits the 33 re-keys | false | The frozen *Always* holds the human decision that covers them. Reject |
+
+## Implementation Notes (after review)
+
+**Review patches** (triage rows 1 to 3): `exclusionSums` keys its cache by `JSON.stringify([first.modGroup, first.addsTags])`. The `load-artifacts.test.ts` title says major 7. `weights-file.test.ts` has a non-string tag case per field. `pnpm check` ran after the patches with all 8 steps passing, `test:data` included.
+
+### Agent browser checks (after review)
+
+Session `poe-79ae64f4395d`. Run from 14:28:11 to 14:29:35 (local, 2026-10-24) against `git rev-parse HEAD` `38746be99c1f6a19396b35ca213131ec1e051e60`. The tree was dirty: the three review patches were uncommitted, and `data/tracked.json` held this story's edit plus the other session's 302 resistance siblings. `pnpm dev` ran on :5173 and `pnpm dev:stop` freed the port. Screenshots are in `C:\Users\ilyal\AppData\Local\Temp\claude\E--Program-Files-Jetbrains-Projects-poe-crafting-base-price-checker\3661b789-2e9b-4b03-8e9a-0b2f109f5723\scratchpad\`.
+- **Crafted classes rank again: PASS.** Under `perfect` and `greater`, Staves, Wands, Foci, Rings and all seven Body Armour classes are ranked rows. The list has 41 rows, and the appendix reads `Unrankable — 0 Item Classes`. Screenshots: `after-review-perfect-full.png`, `after-review-greater-full.png`.
+- **No blocked pair in a Wand row: PASS.** The Staves and Wands rows were expanded in full, 56 and 80 combinations, under both recipes. A script over the page text matched each element damage prefix (`% Fire|Cold|Lightning|Chaos`, `Spell Phys Dmg`) against the element spell-level, Flammability, Shock and Freeze suffixes, and found 0 blocked pairs under each recipe. Screenshots: `after-review-greater-expanded.png`, `after-review-perfect-expanded.png`.
+- **Health line: PASS.** The sync button reads `Synced 5d ago` with no count. The report panel's Problems column is empty, and *Built from* shows the `7.0.0` weights file (producer `poe-mod-weights-producer`, gamePatch `0.5.5.4.2`), pool coverage 100% of 39 tracked Item Classes. Screenshot: `after-review-report.png`.

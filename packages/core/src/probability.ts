@@ -224,7 +224,7 @@ export function secondDraw(first: ModifierWeight, entries: readonly ModifierWeig
 function exclusionSums(sets: SlotSets): (first: ModifierWeight) => { readonly eligible: number; readonly contained: number } {
   const cache = new Map<string, { readonly eligible: number; readonly contained: number }>();
   return (first) => {
-    const key = [first.modGroup, ...first.addsTags].join('\0');
+    const key = JSON.stringify([first.modGroup, first.addsTags]);
     const cached = cache.get(key);
     if (cached !== undefined) {
       return cached;
