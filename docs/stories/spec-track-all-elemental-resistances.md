@@ -2,7 +2,7 @@
 title: 'Track all three elemental resistances wherever one is tracked'
 type: 'chore'
 created: '2026-10-24'
-status: 'in-progress'
+status: 'done'
 baseline_commit: 'fe9dd45779d826fd9ee34af8cdaa4a564bcb3eca'
 route: 'dispatch'
 review_loop_iteration: 0
@@ -24,7 +24,9 @@ context:
 
 **Always:** Follow the `tracked-json` skill. Each sibling takes its band from FR-22 over its own element's tiers. `pnpm tracked:check` exits 0 with `unreachable` empty. The class floors do not move.
 
-**Never:** No change to an existing entry. No Chaos Resistance siblings (not elemental). No edit to any other file in `data/`. No code change.
+**Never:** No change to an existing entry. No Chaos Resistance siblings (not elemental). No edit to any other file in `data/`. No code change beyond the decision below.
+
+**Decision (Lightning short form):** The player allows the code change that `pnpm test:data` needs for the new Lightning entries: a `Lightning Res` short form in `packages/web/src/list/short-forms.ts`, and a remeasured chase-cell budget if the fit check still fails (as commit 8fd63be did). It lands in the same commit as the data.
 
 ## I/O & Edge-Case Matrix
 
@@ -47,9 +49,9 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] scratchpad script -- given a `tracked.json` path, insert each missing sibling right after its source entry (order Fire, Cold, Lightning) -- deterministic, so the same edit applies to HEAD's file for staging and to the working tree.
-- [ ] `data/tracked.json` -- apply the script to the working tree, then run `pnpm tracked:check` -- the data edit.
-- [ ] `docs/stories/deferred-work.md` -- remove the entry "Track all three elemental resistances…" in the commit that lands the data -- AGENTS.md ledger rule.
+- [x] scratchpad script -- given a `tracked.json` path, insert each missing sibling right after its source entry (order Fire, Cold, Lightning) -- deterministic, so the same edit applies to HEAD's file for staging and to the working tree.
+- [x] `data/tracked.json` -- apply the script to the working tree, then run `pnpm tracked:check` -- the data edit.
+- [x] `docs/stories/deferred-work.md` -- remove the entry "Track all three elemental resistances…" in the commit that lands the data -- AGENTS.md ledger rule.
 
 **Acceptance Criteria:**
 - Given the edited file, when the resistance triplets are counted per (class, prefix), then every group has Fire, Cold and Lightning exactly once.
@@ -58,9 +60,53 @@ context:
 
 ## Implementation Notes
 
+- The data edit is done and staged (HEAD-based blob, 1,752 + 302 entries). `pnpm tracked:check` passed. `pnpm test:data` failed 3 tests in `packages/web/src/list/tracked.data.test.ts` because `short-forms.ts` has no Lightning entry. The player then allowed the code change (frozen block).
+- The working tree's other uncommitted `tracked.json` edits include the Body Armour Spirit id change and 7 Rings suffix changes, not only story 5.1's 24 Wand and Staff deletions. 14 staged siblings carry HEAD's old Spirit id, the same as their staged source entries.
+- Commit 38746be landed while this work ran. It holds the ledger removal of this entry, so the data commit will not. It also cleared the index. The script re-ran on the new HEAD's `tracked.json` (identical to fe9dd45's) and gave the same blob, which is staged again.
+- `packages/web/src/list/short-forms.ts`: added `'explicit.stat_1671376347': 'Lightning Res'`, staged. The fit check passed without a budget remeasure.
+- Staged: `data/tracked.json` and `short-forms.ts` only. The story 5.1 edits stay unstaged.
+- `pnpm test:data`: 7/7 passed. `pnpm check`: 8 passed, 0 failed (dup, depcruise, knip, typecheck, lint, build, test:data, test).
+
+- After review: the staged state alone (HEAD 0596909 + 302) failed `tracked:check`, as HEAD did alone, because the Spirit and Rings re-key was uncommitted; its extra 14 issues and 28 unreachable pairs were all on the 14 siblings with the old Spirit id. By the player's choice, the story 5.1 data edit was committed first (6f32d36, green alone), and this change was committed on top. On that tree: `tracked:check` passed all five checks, `test:data` 7/7, `pnpm check` 8/8.
+
+### Agent browser checks (before review)
+
+No review had run. The after-review run goes under its own heading.
+
+- Session `poe-79ae64f4395d`, run at 2026-10-24 14:22 local, against HEAD `38746be99c1f6a19396b35ca213131ec1e051e60`. The tree was dirty: the staged change plus the story 5.1 work.
+- Load: passed. The page showed no refusal and no cross-file error, the console had no errors, the appendix showed "Unrankable — 0 Item Classes", and the list rendered with its ranked rows.
+- New entries visible: passed. The Boots (Dex) row listed six new combinations: % EV, Mov Spd and EV, each with Cold Res and with Lightning Res. Each showed `—` and "pending · not checked yet". The Fire Res source rows were unchanged: Mov Spd · Fire Res and EV · Fire Res each showed 1.00 rough, and % EV · Fire Res showed 0.02, below threshold. Screenshot: `C:/Users/ilyal/AppData/Local/Temp/claude/E--Program-Files-Jetbrains-Projects-poe-crafting-base-price-checker/52cafe76-17a2-4a94-8730-9570816934dc/scratchpad/boots-dex-siblings.png`.
+- `pnpm dev:stop`: stopped the server and freed port 5173.
+
+### Agent browser checks (after review)
+
+- Session `poe-79ae64f4395d`, run 2026-10-24 16:52–16:53 local, against HEAD `6f32d361ee91a5a6e6cf2149894c5fd349d6917c`. The tree was dirty: only this spec's change (`data/tracked.json`, `packages/web/src/list/short-forms.ts`, `docs/stories/deferred-work.md` and this spec), unstaged.
+- Load: passed. There was no refusal and no cross-file load error, `agent-browser errors` was empty, the console had no errors or warnings, the appendix read "Unrankable — 0 Item Classes", and the ranked list rendered with "+ Read the remaining 21 rows". Screenshot: `C:/Users/ilyal/AppData/Local/Temp/claude/E--Program-Files-Jetbrains-Projects-poe-crafting-base-price-checker/52cafe76-17a2-4a94-8730-9570816934dc/scratchpad/after-review-load.png`.
+- New entries visible: passed. The Boots (Dex) row listed six new combinations: % EV, Mov Spd and EV, each with Cold Res and with Lightning Res. Each showed `—` and "pending · not checked yet", with no price. The Fire Res source rows were unchanged: Mov Spd · Fire Res and EV · Fire Res each showed 1.00 rough, priced 7 days ago, and % EV · Fire Res showed 0.02, below threshold. Screenshot: `C:/Users/ilyal/AppData/Local/Temp/claude/E--Program-Files-Jetbrains-Projects-poe-crafting-base-price-checker/52cafe76-17a2-4a94-8730-9570816934dc/scratchpad/after-review-boots-dex-siblings.png`.
+- `pnpm dev:stop`: stopped PID 12044 and freed port 5173.
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+Pass 1 (2026-10-24). Diff: the staged change against HEAD `38746be`, histogram algorithm (the baseline `fe9dd45` predates the player's story 5.1 commits).
+
+| # | Layer | Finding | Verdict | Evidence | Route |
+|---|-------|---------|---------|----------|-------|
+| 1 | design | `Lightning Res` makes ~68 new chase texts overrun the 27-character budget; `T1 Added Lightning · T1-T2 <el> Res` siblings may read the same in the cell | medium | EXPERIENCE.md *Combinations and short forms*: an overrun ends in an ellipsis; *Escape valve* makes it a pruning candidate, the player's call | defer |
+| 2 | blind | `Lightning Res` margin unrecorded; consider `Ltng Res` | medium | same root cause as 1; a shorter coinage is ruled out by *Escape valve* and coining rule 2 | grouped with 1 |
+| 3 | design | no live-data chase-budget check | medium | `combination-fit.test.ts` reads the frozen fixture only; Fire hybrid overruns at HEAD are already unreported, so the gap predates this change | defer |
+| 4 | blind | SM-C1 ceiling exceeded, not recorded with the PRD | medium | 2,030 vs ~1,500; the list was at 1,728 before; the PRD is PM-owned (Review brief rule 2) | defer, note for PM |
+| 5 | blind | `tracked-json` skill does not state the sibling rule | low | SKILL.md has no such rule; the fix edits agent context | defer |
+| 6 | blind | no lasting guard for triplet completeness | low | no product rule (FR) requires triplets; a new check adds surface for a curation preference; covered by 5 | reject |
+| 7 | blind | Cold-source groups come out Cold, Fire, Lightning | low | siblings follow their source; entry order has no effect on the canonical key, sync or rank | reject |
+| 8 | blind | 14 staged siblings carry HEAD's old Spirit id | low | their staged source entries carry the same id; the unstaged Spirit re-key covers both; named in the commit message | reject |
+| 9 | blind | generator script not kept in the repo | low | one-shot curation edit; the data is the artifact and `tracked:check` validates it | reject |
+| 10 | blind | `Lightning Res` placed apart from `Cold Res` | false | the table is not grouped by family: `Fire Res` already sits apart from `Cold Res`; the new line sits next to `Fire Res` | reject |
+| 11 | blind | class EV and trust unchecked while siblings are unpriced | false | an unsynced entry is handled the same as any new entry; the browser check saw "Unrankable — 0 Item Classes" and unchanged Fire rows | reject |
+| 12 | blind | time to first price for 302 entries unstated | maybe-false | settled by AD-7's rotation order for never-attempted entries; would only be low, since the player accepted the budget | reject |
+| 13 | edge | AC3 names a ledger removal the commit does not hold | low | 38746be removed it (Implementation Notes); the fix edits this spec | reject |
+| 14 | verification | the staged state alone was not run through `tracked:check` | maybe-false | every run read the working tree; the reviewer's own run was denied permission; settled by checking the staged blob | raised with the player |
 
 ## Design Notes
 

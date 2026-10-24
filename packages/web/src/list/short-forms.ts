@@ -43,6 +43,7 @@ export const SHORT_FORMS: Readonly<Record<string, string>> = {
   'explicit.stat_1062208444': '% AR',
   'explicit.stat_3362812763': 'AR to Elem Dmg',
   'explicit.stat_3372524247': 'Fire Res',
+  'explicit.stat_1671376347': 'Lightning Res',
   'explicit.stat_4080418644': 'Str',
   'explicit.stat_3325883026': 'Life Regen',
   'explicit.stat_3984865854': '% Spirit',
