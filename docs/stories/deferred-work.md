@@ -41,25 +41,9 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 ## Deferred from: player feedback on tracked data and weights (2026-10-18)
 
 - source_spec: `data/tracked.json`
-  summary: Fix the Spirit stat id on body armour entries: `explicit.stat_2704225257` gets no listings on any armour; find the stat id the trade site uses for Spirit on body armours.
-  evidence: The body armour entries (`armour.chest`, `Body_Armours_*`) are uncommitted in the `Dragsaw/sync-4` worktree and use `explicit.stat_2704225257` ("# to Spirit"). Amulets use `explicit.stat_3981240776` for the same text. Player report: no listing on any armour matches the tracked id.
-
-- source_spec: `data/tracked.json`
-  summary: Track all three elemental resistances wherever one is tracked, so that a valuable fire-res pairing also prices its cold and lightning twins and the recipe EV is complete.
-  evidence: Player report: if boots with Movement Speed and Fire Resistance are valuable, the Cold and Lightning variants are too, and leaving them out lowers the recipe's EV. Example: the body armour entries in the `Dragsaw/sync-4` worktree track Fire (`explicit.stat_3372524247`) and Chaos Resistance but not Cold or Lightning.
-
-- source_spec: `data/tracked.json`
-  summary: Delete (not prune) the seven Rings entries whose suffix is "# to all Attributes" (`explicit.stat_2897413282`): the mod does not exist on rings.
-  evidence: `data/tracked.json` Rings entries pair each of seven prefixes with suffix `explicit.stat_2897413282`. `pnpm tracked:lookup tiers explicit.stat_2897413282 --class Rings` still lists an `AllAttributes` suffix tier (T4, ilvl 1, weight 400), so the producer's ring pool may also be wrong; check where that tier comes from. Player asks for deletion, which is an exception to the AD-12 prune tombstone.
-
-- source_spec: `data/tracked.json`
   summary: Find out why the Emerald entries with "increased bonuses gained from Equipped Quiver" and "increased Effect of your Mark Skills" get no listings; check the stat ids against the trade site.
   evidence: In the `Dragsaw/sync-4` worktree, 18 Emerald entries use `explicit.stat_1200678966` (quiver bonuses) and 18 use `explicit.stat_712554801` (Mark effect). The catalogue also has the radius forms `explicit.stat_4180952808` and `explicit.stat_179541474`; jewels may roll those instead. The player plans to check the market.
   retry_when: never — needs a human
-
-- source_spec: `docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md`
-  summary: Make the Craft Cost of every jewel recipe 0: greater and perfect currency does not affect jewel mods, so jewels are always crafted with basic currency.
-  evidence: `data/recipes.json` has only the `greater` and `perfect` recipes, and `craftCost` in `packages/core/src/craft-cost.ts` sums their currency rates for every class, the Emerald jewel class included (AD-20, FR-26). Player report: the jewel cost per craft must always be 0.
 
 - source_spec: `data/tracked.json`
   summary: Track more normal (raw) bases.

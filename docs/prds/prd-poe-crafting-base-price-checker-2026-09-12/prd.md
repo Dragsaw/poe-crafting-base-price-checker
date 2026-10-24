@@ -172,7 +172,7 @@ Item Classes that `core` cannot rank honestly appear in a separate group, each w
   - the producer published the class, and the tracked entries contradict it
 
   FR-9's rule against collapsing distinct causes into one state applies here too. `EXPERIENCE.md` owns the words.
-- **One reason covers all five cross-file checks** *(PRD-owned)*. The failed check and the failed entry are diagnosis, not a player-facing reason. The player asks which classes he cannot rank. He does not ask why each one broke. `EXPERIENCE.md` decides where the diagnosis shows.
+- **One reason covers every cross-file check** *(PRD-owned; the checks: AD-17)*. The failed check and the failed entry are diagnosis, not a player-facing reason. The player asks which classes he cannot rank. He does not ask why each one broke. `EXPERIENCE.md` decides where the diagnosis shows.
 - The count of Unrankable Item Classes is visible without expanding the group *(PRD-owned)*.
 - A probability derived from a `partial` pool renders as unknown, not as a number, because it carries Provenance `absent` (AD-17, AD-10, FR-10).
 - Coverage — the share of tracked Item Classes with a complete pool — is measured before any view work, re-measured on every Weights File regeneration, and published in the Sync Report with its denominator (AD-27, FR-25). It is **reported, not a gate**: no threshold and no layout binds to it, and how prominently the Unrankable group sits beside the ranking is UX's (`EXPERIENCE.md`) *(PRD-owned)*.
