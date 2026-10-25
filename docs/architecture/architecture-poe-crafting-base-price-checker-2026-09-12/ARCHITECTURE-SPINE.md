@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 42
+revision: 43
 created: '2026-09-12'
 updated: '2026-10-25'
 binds: []
@@ -225,7 +225,7 @@ never import each other.
   | Kind | Key | For |
   | --- | --- | --- |
   | `crafted` | `(categoryId, className, itemLevelMin, prefix, suffix)`, **both affixes required** | the modifier combinations the product ranks |
-  | `raw` | `(baseTypeId, itemLevelMin)`, no affix members at all; it also names its item class pair `(categoryId, className)`, outside the key and never sent, but read: `categoryId` selects AD-16's condition filter (FR-4 state 16) | a white ilvl-82 base, priced as it comes |
+  | `raw` | `(baseTypeId, itemLevelMin)`, no affix members at all; it also names its item class pair `(categoryId, className)`, outside the key and never sent, but read: `categoryId` selects AD-16's condition filter (FR-4 state 16) | an uncrafted white base, priced as it comes (FR-3) |
 
   **A crafted entry names both affixes, and no component handles an absent one.** The
   same-`statId` sum of AD-16 assumes each slot contributes exactly one reference, and a
@@ -1358,8 +1358,8 @@ never import each other.
   `dataset.json` carries **only the latest observation per tracked entry** — no history —
   each stamped with its league, alongside the current `CurrencyRate` set (AD-20). **`sync` does not filter `dataset.json` on write** — league filtering
   happens once, in `core`, so a league change neither rewrites the dataset nor blanks the
-  site while a re-sync runs. Historical prices are recovered from the git log of the player's
-  data commits — so history is as fine as his commit cadence, not the chunk cadence (AD-3) —
+  site while a re-sync runs. Historical prices are recovered from the git log of the operator's
+  data commits — so history is as fine as the publish cadence, not the chunk cadence (AD-3) —
   and **no component may depend on in-file history or on git history**. No v1 feature reads
   either (*Deferred*). A chunked partial refresh
   publishes normally, and AD-10's per-row freshness is what makes that honest.
@@ -1771,7 +1771,7 @@ graph TB
   sync --> report
   sync --> progress
   producer -.->|schema-conformant 7.0.0<br/>tiers + lines + modGroup + blocking tags + itemLevelMin| weights
-  dataset -->|player commits + pushes| pages
+  dataset -->|operator commits + pushes| pages
   pages --> web
   weights --> web
   recipes --> web
@@ -1886,7 +1886,7 @@ poe-crafting-base-price-checker/
 | Weights file (the data) | external scraper project — **not this repo** | AD-11, AD-27 |
 | Trade catalogue: base types, categories, stat ids, currencies | `sync` + `contracts` | AD-25, AD-9 |
 | Magic item classes, one prefix + one suffix | `contracts` | AD-5 |
-| White ilvl-82 bases | `contracts` + `core` | AD-5, AD-17 |
+| Uncrafted white bases | `contracts` + `core` | AD-5, AD-17 |
 | Craft cost from currency prices | `sync` + `core` | AD-20, AD-3 |
 | Surviving league resets | `core` + config | AD-19 |
 
@@ -1904,12 +1904,12 @@ poe-crafting-base-price-checker/
 - **A mechanical guard on a dropped tier or a dropped stat line.** `5.0.0` leaves both
   resting entirely on the producer's `poolCoverage` assertion, and the quiet case fires no
   error at all (AD-11). **Revisit if** a file is ever found to have dropped one in practice.
-- **A publish command.** `sync` makes no git write (AD-3) and the player commits by hand, so
-  nothing in the product prevents a `git commit -a` from sweeping an unfinished `tracked.json`
-  edit into a data commit — a separation AD-3's explicit-path commit used to enforce. A
-  human-invoked `publish` command that commits the sync-owned paths and pushes would restore it
-  without putting git back on the chunk path. **Revisit if** a mixed commit actually costs the
-  player something.
+- **A publish command.** `sync` makes no git write, and an operator job must commit only the
+  sync-owned files (AD-3). The sync host's scheduled job enforces that, but a hand publish has
+  no guard, so nothing prevents a `git commit -a` from sweeping an unfinished `tracked.json`
+  edit into a data commit. A human-invoked `publish` command that commits the sync-owned paths
+  and pushes would give the hand publish the same guard without putting git back on the chunk
+  path. **Revisit if** a mixed commit actually costs the player something.
 - **Automated currency rates.** AD-20 makes the rate hand-maintained committed data, because
   `trade2` exposes no exchange surface. The two paths back are a per-currency search
   filtered to divine-denominated listings — which costs a search per row against AD-7's cap
