@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pi Sync Forge</title>
+<style>
+:root{--bg:#f6f1e7;--card:#fffdf8;--ink:#2a2420;--muted:#6d625a;--rule:#e2d8c8;--seal:#8f1d1d;--seal2:#b5302b;--ok:#2f6b3a;--kill:#8a3b2b;--risk:#9a6a12}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1815;--card:#24201c;--ink:#ece4d8;--muted:#a89c8e;--rule:#3a332c;--seal:#b5302b;--seal2:#d2483f;--ok:#7cc48a;--kill:#e08a74;--risk:#e0b35a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Georgia,"Iowan Old Style",serif}
+main{max-width:860px;margin:0 auto;padding:40px 16px 64px}
+header{display:flex;gap:28px;align-items:center;flex-wrap:wrap;border-bottom:2px solid var(--rule);padding-bottom:24px}
+header svg{flex:0 0 auto;width:150px;height:150px}
+h1{margin:0 0 6px;font-size:1.9rem}
+.sub{color:var(--muted);margin:0}
+h2{font-size:1.15rem;margin:34px 0 10px;letter-spacing:.02em;text-transform:uppercase}
+section{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:18px 22px;margin-top:14px}
+ul{margin:0;padding-left:1.2em}li{margin:6px 0}
+code{font:0.88em ui-monospace,Consolas,monospace;background:var(--rule);padding:1px 5px;border-radius:4px}
+.lock li::marker{content:"🔒 "}
+.kill li::marker{content:"✕  ";color:var(--kill)}
+.risk li::marker{content:"⚠ ";color:var(--risk)}
+.cast{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.p{border:1px solid var(--rule);border-radius:8px;padding:12px 14px}
+.p b{display:block}.p i{color:var(--muted);font-size:.92rem}
+footer{color:var(--muted);font-size:.85rem;margin-top:36px}
+</style>
+</head>
+<body>
+<main>
+<header>
+<svg viewBox="0 0 200 200" role="img" aria-label="Hardened seal">
+  <defs><radialGradient id="g" cx="40%" cy="35%"><stop offset="0" stop-color="var(--seal2)"/><stop offset="1" stop-color="var(--seal)"/></radialGradient></defs>
+  <path d="M100 8c14 0 18 10 30 13s24-2 31 9 2 22 8 32 18 15 16 29-14 16-17 28 6 22-3 32-22 6-33 12-15 19-29 19-19-12-31-15-24 3-31-8-2-22-8-32-18-15-16-29 14-16 17-28-6-22 3-32 22-6 33-12S86 8 100 8z" fill="url(#g)"/>
+  <circle cx="100" cy="100" r="64" fill="none" stroke="#f3d9c9" stroke-width="2" stroke-dasharray="4 4" opacity=".7"/>
+  <text x="100" y="94" text-anchor="middle" font-family="Georgia,serif" font-size="25" font-weight="700" fill="#fbeee4" letter-spacing="2">HARDENED</text>
+  <text x="100" y="118" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#fbeee4" opacity=".85">π · sync · 2026</text>
+</svg>
+<div>
+  <h1>Hosting sync on a Raspberry Pi 3B</h1>
+  <p class="sub">Forge session · 2026-10-25 · poe-crafting-base-price-checker</p>
+  <p>The Pi runs <code>pnpm sync</code> and publishes the data to <code>master</code> on its own, so the PC can stay off. The plan is generic, tracked infra in <code>ops/pi/</code>, run by the developer agent over SSH. Nothing in <code>packages/</code> changes.</p>
+</div>
+</header>
+
+<h2>Locked decisions</h2>
+<section><ul class="lock">
+<li><b>The Pi publishes itself.</b> A systemd timer runs every <b>4 h</b>, outside the sync chunk path.</li>
+<li><b>One tick:</b> stop the service → commit the sync-owned paths → <code>pull --rebase</code> → push → <code>pnpm install --prod</code> if the lockfile changed → start. It skips the commit when nothing changed, never force-pushes, and retries on the next tick. Code deploys ride the same tick.</li>
+<li><b>Drift guard:</b> the tick aborts if any path that isn't sync-owned is dirty, because nobody curates on the Pi.</li>
+<li><b><code>ops/pi/</code> is git-tracked and generic:</b> runbook, tick script, systemd units and <code>set-poesessid.sh</code>. It uses placeholders and contains no secrets. The Pi commits as your GitHub noreply address.</li>
+<li><b>Runbook, not a bootstrap script.</b> The agent executes it and stops at the human-only steps (Imager, secrets, deploy key). <code>AGENTS.md</code> points to it.</li>
+<li><b>Provisioning:</b> Pi OS Lite 64-bit with SSH key preset, Ethernet, Node 24 arm64, a repo-scoped deploy key.</li>
+<li><b>Recovery after an outage:</b> sync starts at boot, but only after the network and the clock are back (the Pi 3B has no clock battery). A tick missed during the outage runs right after boot, and the tick clears any stale git lock or half-done rebase.</li>
+<li><b>Access:</b> home network only, <code>ssh &lt;pi-host&gt;.local</code>. The agent has the same reach.</li>
+<li><b>Cookie rotation:</b> you run the script over <code>ssh -t</code>; it reads from stdin and writes <code>.env</code> with mode 600. The agent never sees the cookie.</li>
+<li><b>Spine:</b> amend AD-3 (publishing becomes an operator job outside the product). Deployment stays platform-agnostic: "Windows Task Scheduler or systemd".</li>
+</ul></section>
+
+<h2>Rejected, and why</h2>
+<section><ul class="kill">
+<li><b>The PC keeps publishing:</b> the site would still depend on the PC being on.</li>
+<li><b><code>data</code> branch + Action merge:</b> it solves blast radius, not merge conflicts. The Pi still has to pull <code>master</code>, and a <code>GITHUB_TOKEN</code> push doesn't trigger the deploy.</li>
+<li><b><code>pnpm publish:data</code>:</b> mixes app logic with infra and still needs a timer.</li>
+<li><b>A <code>SYNC_HOST</code> guard:</b> discipline is enough, since you run sync by hand today.</li>
+<li><b>An attention signal (report record or phone push):</b> not worth building for a cookie that lasts about six months.</li>
+<li><b>A bootstrap script:</b> the agent follows the runbook.</li>
+<li><b>Tailscale:</b> deferred until you need access from outside the home.</li>
+</ul></section>
+
+<h2>Weak points that survived</h2>
+<section><ul class="risk">
+<li>A sync run on the PC shares the rate budget and can make the Pi's rebase conflict on <code>dataset.json</code>.</li>
+<li>A dead cookie downgrades silently (AD-30). The six-month lifetime is unverified; the spine re-check is due 2026-11-02.</li>
+<li>A power cut during a write can leave <code>dataset.json</code> empty or cut off, and the next tick commits it to <code>master</code>. The deploy check keeps it off the site. Fix it by hand on the Pi with <code>git checkout -- data/</code>. An atomic write and a validity guard were both rejected as too much.</li>
+<li>SD wear: about 5–7 GB written a day, which is years on a decent card. The used card's unknown history and corruption on power loss matter more, so use a high-endurance card. Recovery loses at most one 4 h tick.</li>
+</ul></section>
+
+<h2>Who pressure-tested it</h2>
+<div class="cast">
+<div class="p"><b>🏗️ Winston, System Architect</b><i>Found the AD-3 collision, combined publish and deploy into one tick, and caught the deploy trigger that a GITHUB_TOKEN push skips.</i></div>
+<div class="p"><b>📋 John, Product Manager</b><i>"Who maintains this script in a year?" He asked how fresh the site really needs to be.</i></div>
+<div class="p"><b>🎨 Sally, UX Designer</b><i>Argued the site should be the signal. Overruled, and on record.</i></div>
+<div class="p"><b>💻 Amelia, Developer</b><i>Proposed the idempotent bootstrap. Overruled in favour of an agent-run runbook.</i></div>
+<div class="p"><b>🔧 Gus, homelab sysadmin (generated)</b><i>Has killed a dozen SD cards. Covered deploy keys, discipline lasting three weeks, and placeholders "for a stranger".</i></div>
+<div class="p"><b>🚨 Priya, SRE (generated)</b><i>"A runbook nobody has run is fiction."</i></div>
+</div>
+
+<footer>Record: <code>docs/forge/raspberry-pi-sync-host/.memlog.md</code> · brief: <code>forged-idea.md</code></footer>
+</main>
+</body>
+</html>
