@@ -1,5 +1,5 @@
 [Unit]
-Description=PoE crafting base price publish tick (commit, rebase, push)
+Description=PoE crafting base price publish tick (refresh rates, commit, rebase, push)
 After=network-online.target time-sync.target
 Wants=network-online.target time-sync.target
 
@@ -12,5 +12,6 @@ Environment=COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 ExecStartPre=+systemctl stop poe-sync.service
 ExecStart=/bin/bash <repo-dir>/ops/pi/tick.sh <repo-dir>
 ExecStopPost=+systemctl start poe-sync.service
-# The stop alone can take poe-sync's TimeoutStopSec; a lockfile change adds an install.
+# The stop alone can take poe-sync's TimeoutStopSec; the rates refresh adds its per-page fetch
+# timeouts, and a lockfile change adds an install.
 TimeoutStartSec=45min

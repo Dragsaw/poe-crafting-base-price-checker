@@ -66,6 +66,7 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
     expect(git(remote, 'rev-list', '--count', `${before}..master`)).toBe('1');
     expect(git(remote, 'log', '-1', '--format=%s', 'master')).toBe(SUBJECT);
     expect(head(pi)).toBe(remoteHead());
+    expect(pushedFiles()).toEqual(new Set(['data/dataset.json', 'data/sync-progress.json']));
     expect(sandbox.fakeLog()).toEqual([REFRESH]);
   });
 
@@ -281,8 +282,11 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
   });
 
   it('commits the rates alone when only they changed', () => {
+    const before = remoteHead();
     const result = tick(refreshWrites('{"v":"rates-13"}'));
     expect(result.status, result.output).toBe(0);
+    expect(git(remote, 'rev-list', '--count', `${before}..master`)).toBe('1');
+    expect(git(remote, 'log', '-1', '--format=%s', 'master')).toBe(SUBJECT);
     expect(pushedFiles()).toEqual(new Set([RATES]));
     expect(git(remote, 'show', `master:${RATES}`)).toBe('{"v":"rates-13"}');
   });
@@ -295,6 +299,18 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
     expect(readText(pi, RATES)).toBe(SEEDED_RATES);
     expect(pushedFiles()).toEqual(new Set(['data/dataset.json']));
     expect(head(pi)).toBe(remoteHead());
+  });
+
+  // A failed earlier `git commit` leaves the rates staged; only a restore from HEAD drops them.
+  it('restores a staged rates edit from HEAD when the refresh fails', () => {
+    writeLine(pi, RATES, '{"v":"staged"}');
+    git(pi, 'add', RATES);
+    const before = remoteHead();
+    const result = tick(refreshWrites('{"v":"half-written', '1'));
+    expect(result.status, result.output).toBe(0);
+    expect(readText(pi, RATES)).toBe(SEEDED_RATES);
+    expect(git(pi, 'diff', '--cached', '--name-only')).toBe('');
+    expect(remoteHead()).toBe(before);
   });
 
   it('makes no commit when the refresh leaves the rates identical', () => {

@@ -212,9 +212,9 @@ a `data/currencies.json.tmp` that a power cut during a refresh left behind. It c
 is checked out and that no other path is dirty. It runs `pnpm currencies:refresh`, which rewrites
 `data/currencies.json` from poe2scout while `poe-sync` is stopped, so the restarted `poe-sync`
 reads the new rates. A failed refresh does not fail the tick: the tick logs a warning, restores
-`data/currencies.json` with `git checkout HEAD --`, and publishes the sync data as usual. It commits the
-four tick-owned files as `chore(data): sync dataset`, or skips the commit when they did not change.
-Then it runs `git pull --rebase`. When `pnpm-lock.yaml` differs from the one last installed, it runs
+`data/currencies.json` with `git checkout HEAD --`, and publishes the sync data as usual. It
+commits the four tick-owned files as `chore(data): sync dataset`, or skips the commit when they did
+not change. Then it runs `git pull --rebase`. When `pnpm-lock.yaml` differs from the one last installed, it runs
 `pnpm install --prod --frozen-lockfile --config.confirm-modules-purge=false` before the push.
 The last flag lets pnpm purge `node_modules` without a prompt, for example after a pnpm major
 bump, because the tick has no terminal. The install runs before the push so a failed push does not leave the
@@ -287,19 +287,20 @@ First run the *Pause syncing* block (*3. Operate*). Then:
 cd <repo-dir>
 git rebase --abort 2>/dev/null || true   # only acts on a half-done rebase
 keep=$(mktemp -d)
-cp data/dataset.json data/sync-progress.json data/sync-report.json data/currencies.json "$keep/"
+cp data/dataset.json data/sync-progress.json data/sync-report.json "$keep/"
 git fetch origin
 git reset --hard origin/master
-cp "$keep/dataset.json" "$keep/sync-progress.json" "$keep/sync-report.json" "$keep/currencies.json" data/
+cp "$keep/dataset.json" "$keep/sync-progress.json" "$keep/sync-report.json" data/
 rm -r "$keep"
 COREPACK_ENABLE_DOWNLOAD_PROMPT=0 bash <repo-dir>/ops/pi/tick.sh <repo-dir>
 sudo systemctl enable --now poe-sync poe-sync-tick.timer
 ```
 
-The tick refreshes the rates, commits the four files as `chore(data): sync dataset` and pushes. To
-keep the remote's data instead, skip the second `cp` line. Then the tick commits at most the rates
-that its refresh rewrote. Do not use `git rebase --continue`, `--ours` or `--theirs`: with more than one local commit, the rebase stops
-again for each of them.
+The tick refreshes the rates, or keeps the remote's rates when the refresh fails. It commits the
+three sync files and the rates as `chore(data): sync dataset` and pushes. To keep the remote's
+data instead, skip the second `cp` line. Then the tick commits at most the rates that its refresh
+rewrote. Do not use `git rebase --continue`, `--ours` or `--theirs`: with more than one local
+commit, the rebase stops again for each of them.
 
 **Truncated `dataset.json`.** A power cut during a write can leave `data/dataset.json` empty or cut
 off, because sync rewrites the file in place. The deploy check keeps a bad file off the site.
