@@ -56,7 +56,7 @@ No such command is part of a test run. An agent does not run any of them unatten
 
 `catalogue:refresh` reads the four trade data endpoints and writes them into `data/catalogue/` (AD-25). Run `catalogue:refresh` when GGG releases a patch. Do not run `catalogue:refresh` on a schedule. A renamed stat id appears as a line in that diff. AD-9 checks the tracked list against the catalogue. That check gives the renamed stat id an `unresolvable` state instead of a silent mismatch.
 
-Run `currencies:refresh` by hand when the rates in `data/currencies.json` look stale, and review its diff before you commit it. Do not run it on a schedule.
+Run `currencies:refresh` when the rates in `data/currencies.json` look stale, and review its diff before you commit it.
 
 Fixture hygiene:
 

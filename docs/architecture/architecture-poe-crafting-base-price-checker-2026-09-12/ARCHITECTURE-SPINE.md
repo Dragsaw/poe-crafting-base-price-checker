@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 43
+revision: 44
 created: '2026-09-12'
 updated: '2026-10-25'
 binds: []
@@ -1383,10 +1383,10 @@ never import each other.
   the orientation in the `CurrencyRate` schema description, because `contracts` is built
   first, by whoever holds neither side of the calculation.
 
-  **Rates are hand-maintained committed data, not a fetched observation.** `data/currencies.json`
+  **Rates are committed data, not a fetched observation.** `data/currencies.json`
   carries the rate itself, and `sync` makes **no request of any kind** to obtain one. The
-  `trade2` site publishes no currency-exchange surface, and the rates this product needs move slowly enough that a file the player
-  refreshes by hand beats a fabricated substitute. **Divine's own rate is never
+  `trade2` site publishes no currency-exchange surface, and the rates this product needs move slowly enough that a committed file
+  beats a fabricated substitute. **Divine's own rate is never
   sourced and is always written**: `sync` emits a `CurrencyRate` for divine of exactly `1`,
   so the set `core` reads is complete. Omitting it
   instead would make every divine-denominated recipe uncostable by this AD's own
@@ -1854,7 +1854,7 @@ poe-crafting-base-price-checker/
     web/            # static Mantine view, read-time ranking via core
   data/
     tracked.json    # curated combinations — the request budget (AD-12)
-    currencies.json # hand-maintained rates in divine, each with league + asOf (AD-20)
+    currencies.json # rates in divine, each with league + asOf (AD-20)
     recipes.json    # CraftRecipe definitions (AD-3)
     config.json     # active league (AD-19) + minChunkSearches (AD-7) + schemaVersion
     weights.json    # consumed weights file, contract 7.0.0 — external producer (AD-11)
