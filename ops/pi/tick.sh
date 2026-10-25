@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
-# Publish tick of the sync host (AD-3): commit the sync-owned files, rebase onto the remote,
+# Publish tick of the sync host (AD-3): refresh rates, commit the tick-owned files, rebase,
 # reinstall dependencies when the lockfile moved, and push. poe-sync-tick.service stops poe-sync
 # around it. Usage: tick.sh <repo-dir>, or set POE_REPO_DIR. Runbook: ops/pi/README.md.
 set -Eeuo pipefail
 
-readonly OWNED=(data/dataset.json data/sync-progress.json data/sync-report.json)
+readonly RATES=data/currencies.json
+readonly OWNED=(data/dataset.json data/sync-progress.json data/sync-report.json "$RATES")
 readonly REMOTE=origin
 readonly BRANCH=master
 readonly SUBJECT='chore(data): sync dataset'
 
 log() { printf 'tick: %s\n' "$*"; }
+warn() { printf 'tick: WARNING: %s\n' "$*" >&2; }
 die() {
   local code=$1
   shift
@@ -50,6 +52,11 @@ clear_leftovers() {
     log 'aborting a half-done rebase'
     git rebase --abort
   fi
+  # The refresh renames its temp file into place, so a power cut can leave it behind.
+  if [[ -e $RATES.tmp ]]; then
+    log "removing the stale $RATES.tmp"
+    rm -f -- "$RATES.tmp"
+  fi
 }
 
 check_branch() {
@@ -66,17 +73,26 @@ check_drift() {
     [[ -n $line ]] || continue
     path=${line:3}
     if ! is_owned "$path"; then
-      printf 'tick: ERROR: dirty path outside the sync-owned list: %s\n' "$path" >&2
+      printf 'tick: ERROR: dirty path outside the tick-owned list: %s\n' "$path" >&2
       drift=1
     fi
   done <<<"$listing"
   ((drift == 0)) || die 3 'drift guard: clean the paths above by hand; nothing was committed'
 }
 
+# A failed refresh keeps the committed rates, so the sync data still publishes.
+refresh_currencies() {
+  if pnpm currencies:refresh; then
+    return 0
+  fi
+  warn "pnpm currencies:refresh failed; restoring $RATES from HEAD"
+  git checkout -- "$RATES"
+}
+
 commit_owned() {
   git add -- "${OWNED[@]}"
   if git diff --cached --quiet; then
-    log 'no change in the sync-owned files, so no commit'
+    log 'no change in the tick-owned files, so no commit'
   else
     git commit --quiet -m "$SUBJECT"
     log "committed $(git rev-parse --short HEAD)"
@@ -125,6 +141,7 @@ main() {
   clear_leftovers
   check_branch
   check_drift
+  refresh_currencies
   seed_install_stamp
   commit_owned
   pull_rebase

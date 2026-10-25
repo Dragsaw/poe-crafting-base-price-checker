@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -8,9 +8,9 @@ export const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
 export const OPS_PI = path.join(REPO_ROOT, 'ops/pi');
 
 // pgrep reports no git process, so a git child of a parallel test file never makes a stale
-// index.lock look live. FAKE_PNPM_RUN is a command that pnpm runs while it "installs".
+// index.lock look live. FAKE_PNPM_RUN is a command that each pnpm call runs, with pnpm's arguments.
 const FAKES: Readonly<Record<string, string>> = {
-  pnpm: 'printf "%s\\n" "$*" >>"$FAKE_LOG"\nif [[ -n ${FAKE_PNPM_RUN:-} ]]; then bash -c "$FAKE_PNPM_RUN"; fi\nexit "${FAKE_PNPM_EXIT:-0}"',
+  pnpm: 'printf "%s\\n" "$*" >>"$FAKE_LOG"\nif [[ -n ${FAKE_PNPM_RUN:-} ]]; then bash -c "$FAKE_PNPM_RUN" pnpm "$@"; fi\nexit "${FAKE_PNPM_EXIT:-0}"',
   systemctl: 'printf "systemctl %s\\n" "$*" >>"$FAKE_LOG"\n[[ $1 == show ]] && printf "%s\\n" "${FAKE_TICK_STATE:-inactive}"\nexit 0',
   sudo: 'exec "$@"',
   pgrep: 'exit "${FAKE_PGREP_EXIT:-1}"',
@@ -102,4 +102,47 @@ export class Sandbox {
   dispose(): void {
     rmSync(this.work, { recursive: true, force: true });
   }
+}
+
+export interface TickRepos {
+  readonly remote: string;
+  readonly pc: string;
+  readonly pi: string;
+}
+
+/** A bare remote that rejects pushes while `reject-push` exists in it, seeded by a "PC" clone, and a "Pi" clone. */
+export function seedTickRepos(sandbox: Sandbox, seeded: readonly string[]): TickRepos {
+  const git = (cwd: string, ...arguments_: string[]): string => sandbox.git(cwd, ...arguments_);
+  const [remote, pc, pi] = ['remote.git', 'pc', 'pi'].map((name) => path.join(sandbox.work, name)) as [string, string, string];
+  git(sandbox.work, 'init', '-q', '--bare', '-b', 'master', remote);
+  git(remote, 'config', 'core.logAllRefUpdates', 'always');
+  // A bare repository runs its hooks in its own directory.
+  writeExecutable(path.join(remote, 'hooks', 'pre-receive'), '[[ ! -e reject-push ]]');
+
+  // The PC clone has no hooks, so only the Pi's push could run the pre-push hook's `pnpm check`.
+  git(sandbox.work, 'clone', '-q', remote, pc);
+  git(pc, 'config', 'user.name', 'pc');
+  git(pc, 'config', 'user.email', 'pc@example.invalid');
+  mkdirSync(path.join(pc, 'data'));
+  mkdirSync(path.join(pc, '.githooks'));
+  for (const file of [...seeded, 'data/tracked.json']) {
+    writeLine(pc, file, `{"v":"${path.basename(file)}-0"}`);
+  }
+  writeLine(pc, 'pnpm-lock.yaml', 'lock: 1');
+  writeLine(pc, '.gitignore', '*.lock\n.env\n.env.*');
+  for (const hook of ['commit-msg', 'pre-push']) {
+    copyFileSync(path.join(REPO_ROOT, '.githooks', hook), path.join(pc, '.githooks', hook));
+    chmodSync(path.join(pc, '.githooks', hook), 0o755);
+  }
+  git(pc, 'add', '-A');
+  git(pc, 'commit', '-q', '-m', 'chore: seed');
+  writeLine(pc, 'data/tracked.json', '{"v":"tracked-1"}');
+  git(pc, 'commit', '-q', '-am', 'chore: seed tracked');
+  git(pc, 'push', '-q', 'origin', 'master');
+
+  git(sandbox.work, 'clone', '-q', remote, pi);
+  git(pi, 'config', 'user.name', 'pi');
+  git(pi, 'config', 'user.email', 'pi@example.invalid');
+  git(pi, 'config', 'core.hooksPath', '.githooks');
+  return { remote, pc, pi };
 }

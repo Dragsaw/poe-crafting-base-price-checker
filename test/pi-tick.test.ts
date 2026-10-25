@@ -1,15 +1,22 @@
-import { chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import path from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { OPS_PI, readText, REPO_ROOT, type RunResult, Sandbox, writeExecutable, writeLine } from './pi-tick-sandbox.ts';
+import { OPS_PI, readText, type RunResult, Sandbox, seedTickRepos, writeLine } from './pi-tick-sandbox.ts';
 
 const TICK = path.join(OPS_PI, 'tick.sh');
 const SUBJECT = 'chore(data): sync dataset';
-const OWNED = ['data/dataset.json', 'data/sync-progress.json', 'data/sync-report.json'];
+const RATES = 'data/currencies.json';
+const OWNED = ['data/dataset.json', 'data/sync-progress.json', 'data/sync-report.json', RATES];
+const SEEDED_RATES = '{"v":"currencies.json-0"}\n';
 const INSTALL = 'install --prod --frozen-lockfile --config.confirm-modules-purge=false';
+const REFRESH = 'currencies:refresh';
 const ZERO_SHA = /^0+$/;
+
+function refreshWrites(content: string, exit = '0'): NodeJS.ProcessEnv {
+  return { FAKE_PNPM_RUN: `echo '${content}' >${RATES}`, FAKE_PNPM_EXIT: exit };
+}
 
 describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_000 }, () => {
   let sandbox: Sandbox;
@@ -24,6 +31,7 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
     sandbox.run('git', ['merge-base', '--is-ancestor', older, newer], { cwd: remote }).status === 0;
   const tick = (environment: NodeJS.ProcessEnv = {}): RunResult => sandbox.run('bash', [TICK, pi], { env: environment });
   const isRebasing = (): boolean => existsSync(path.join(pi, '.git/rebase-merge')) || existsSync(path.join(pi, '.git/rebase-apply'));
+  const pushedFiles = (): Set<string> => new Set(git(remote, 'show', '--name-only', '--format=', 'master').split('\n'));
 
   function pcPush(file: string, content: string): void {
     git(pc, 'pull', '-q', '--rebase', 'origin', 'master');
@@ -32,43 +40,9 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
     git(pc, 'push', '-q', 'origin', 'master');
   }
 
-  // The PC clone has no hooks, so only the Pi's push could run the pre-push hook's `pnpm check`.
-  function seedPc(): void {
-    git(sandbox.work, 'clone', '-q', remote, pc);
-    git(pc, 'config', 'user.name', 'pc');
-    git(pc, 'config', 'user.email', 'pc@example.invalid');
-    mkdirSync(path.join(pc, 'data'));
-    mkdirSync(path.join(pc, '.githooks'));
-    for (const file of [...OWNED, 'data/tracked.json']) {
-      writeLine(pc, file, `{"v":"${path.basename(file)}-0"}`);
-    }
-    writeLine(pc, 'pnpm-lock.yaml', 'lock: 1');
-    writeLine(pc, '.gitignore', '*.lock\n.env\n.env.*');
-    for (const hook of ['commit-msg', 'pre-push']) {
-      copyFileSync(path.join(REPO_ROOT, '.githooks', hook), path.join(pc, '.githooks', hook));
-      chmodSync(path.join(pc, '.githooks', hook), 0o755);
-    }
-    git(pc, 'add', '-A');
-    git(pc, 'commit', '-q', '-m', 'chore: seed');
-    writeLine(pc, 'data/tracked.json', '{"v":"tracked-1"}');
-    git(pc, 'commit', '-q', '-am', 'chore: seed tracked');
-    git(pc, 'push', '-q', 'origin', 'master');
-  }
-
   beforeEach(() => {
     sandbox = new Sandbox();
-    remote = path.join(sandbox.work, 'remote.git');
-    pc = path.join(sandbox.work, 'pc');
-    pi = path.join(sandbox.work, 'pi');
-    git(sandbox.work, 'init', '-q', '--bare', '-b', 'master', remote);
-    git(remote, 'config', 'core.logAllRefUpdates', 'always');
-    // A bare repository runs its hooks in its own directory.
-    writeExecutable(path.join(remote, 'hooks', 'pre-receive'), '[[ ! -e reject-push ]]');
-    seedPc();
-    git(sandbox.work, 'clone', '-q', remote, pi);
-    git(pi, 'config', 'user.name', 'pi');
-    git(pi, 'config', 'user.email', 'pi@example.invalid');
-    git(pi, 'config', 'core.hooksPath', '.githooks');
+    ({ remote, pc, pi } = seedTickRepos(sandbox, OWNED));
   });
 
   afterEach(() => {
@@ -92,7 +66,7 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
     expect(git(remote, 'rev-list', '--count', `${before}..master`)).toBe('1');
     expect(git(remote, 'log', '-1', '--format=%s', 'master')).toBe(SUBJECT);
     expect(head(pi)).toBe(remoteHead());
-    expect(sandbox.fakeLog()).toEqual([]);
+    expect(sandbox.fakeLog()).toEqual([REFRESH]);
   });
 
   it('makes no commit on a clean tree and still pulls', () => {
@@ -118,7 +92,7 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
     const [local, before] = [head(pi), remoteHead()];
     const result = tick();
     expect(result.status).toBe(3);
-    expect(result.output).toContain('outside the sync-owned list: data/tracked.json');
+    expect(result.output).toContain('outside the tick-owned list: data/tracked.json');
     expect(head(pi)).toBe(local);
     expect(remoteHead()).toBe(before);
   });
@@ -129,7 +103,7 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
     const local = head(pi);
     const result = tick();
     expect(result.status).toBe(3);
-    expect(result.output).toContain('outside the sync-owned list: sub/stray file.txt');
+    expect(result.output).toContain('outside the tick-owned list: sub/stray file.txt');
     expect(head(pi)).toBe(local);
   });
 
@@ -180,12 +154,14 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
     expect(git(remote, 'show', 'master:data/dataset.json')).toContain('pi-dataset');
   });
 
-  it('removes a stale index.lock, then ticks normally', () => {
+  it('removes a stale index.lock and rates temp file, then ticks normally', () => {
     writeLine(pi, '.git/index.lock', '');
+    writeLine(pi, `${RATES}.tmp`, '');
     writeLine(pi, 'data/dataset.json', '{"v":"fresh-6"}');
     const result = tick();
     expect(result.status, result.output).toBe(0);
     expect(existsSync(path.join(pi, '.git/index.lock'))).toBe(false);
+    expect(existsSync(path.join(pi, `${RATES}.tmp`))).toBe(false);
     expect(head(pi)).toBe(remoteHead());
   });
 
@@ -209,10 +185,10 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
   it('installs once when the pull changes pnpm-lock.yaml', () => {
     pcPush('pnpm-lock.yaml', 'lock: 2');
     expect(tick().status).toBe(0);
-    expect(sandbox.fakeLog()).toEqual([INSTALL]);
+    expect(sandbox.fakeLog()).toEqual([REFRESH, INSTALL]);
     sandbox.clearFakeLog();
     expect(tick().status).toBe(0);
-    expect(sandbox.fakeLog()).toEqual([]);
+    expect(sandbox.fakeLog()).toEqual([REFRESH]);
   });
 
   it('retries a failed install on the next tick', () => {
@@ -221,7 +197,7 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
     sandbox.clearFakeLog();
     const result = tick();
     expect(result.status, result.output).toBe(0);
-    expect(sandbox.fakeLog()).toEqual([INSTALL]);
+    expect(sandbox.fakeLog()).toEqual([REFRESH, INSTALL]);
   });
 
   it('has installed the new lockfile when the push after it fails', () => {
@@ -230,12 +206,12 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
     writeLine(remote, 'reject-push', '');
     const result = tick();
     expect(result.status, result.output).toBe(5);
-    expect(sandbox.fakeLog()).toEqual([INSTALL]);
+    expect(sandbox.fakeLog()).toEqual([REFRESH, INSTALL]);
     expect(readText(pi, '.git/poe-tick-installed-lockfile').trim()).toBe(git(pi, 'rev-parse', 'HEAD:pnpm-lock.yaml'));
     rmSync(path.join(remote, 'reject-push'));
     sandbox.clearFakeLog();
     expect(tick().status).toBe(0);
-    expect(sandbox.fakeLog()).toEqual([]);
+    expect(sandbox.fakeLog()).toEqual([REFRESH]);
     expect(remoteHead()).toBe(head(pi));
   });
 
@@ -243,7 +219,7 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
   it('never overwrites a commit that reaches the remote during the tick', () => {
     pcPush('pnpm-lock.yaml', 'lock: 5');
     writeLine(pi, 'data/dataset.json', '{"v":"fresh-10"}');
-    const race = 'git -C "$FAKE_PC" commit -q --allow-empty -m "chore: pc race" && git -C "$FAKE_PC" push -q origin master';
+    const race = '[[ $1 == install ]] || exit 0; git -C "$FAKE_PC" commit -q --allow-empty -m "chore: pc race" && git -C "$FAKE_PC" push -q origin master';
     const result = tick({ FAKE_PC: pc, FAKE_PNPM_RUN: race });
     expect(result.status, result.output).toBe(5);
     expect(git(pc, 'log', '-1', '--format=%s')).toBe('chore: pc race');
@@ -286,5 +262,51 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
     const result = tick();
     expect(result.status).not.toBe(0);
     expect(result.output).toMatch(/tick: ERROR: line \d+ exited [1-9]\d*: git commit/);
+  });
+
+  it('publishes the refreshed rates and the sync files in one commit', () => {
+    for (const file of OWNED.slice(0, 3)) {
+      writeLine(pi, file, `{"v":"${path.basename(file)}-12"}`);
+    }
+    const before = remoteHead();
+    const result = tick(refreshWrites('{"v":"rates-12"}'));
+    expect(result.status, result.output).toBe(0);
+    expect(git(remote, 'rev-list', '--count', `${before}..master`)).toBe('1');
+    expect(git(remote, 'log', '-1', '--format=%s', 'master')).toBe(SUBJECT);
+    expect(pushedFiles()).toEqual(new Set(OWNED));
+  });
+
+  it('commits the rates alone when only they changed', () => {
+    const result = tick(refreshWrites('{"v":"rates-13"}'));
+    expect(result.status, result.output).toBe(0);
+    expect(pushedFiles()).toEqual(new Set([RATES]));
+    expect(git(remote, 'show', `master:${RATES}`)).toBe('{"v":"rates-13"}');
+  });
+
+  it('restores the rates and still publishes the sync data when the refresh fails', () => {
+    writeLine(pi, 'data/dataset.json', '{"v":"fresh-14"}');
+    const result = tick(refreshWrites('{"v":"half-written', '1'));
+    expect(result.status, result.output).toBe(0);
+    expect(result.output).toContain('WARNING: pnpm currencies:refresh failed');
+    expect(readText(pi, RATES)).toBe(SEEDED_RATES);
+    expect(pushedFiles()).toEqual(new Set(['data/dataset.json']));
+    expect(head(pi)).toBe(remoteHead());
+  });
+
+  it('makes no commit when the refresh leaves the rates identical', () => {
+    const before = remoteHead();
+    const result = tick(refreshWrites(SEEDED_RATES.trim()));
+    expect(result.status, result.output).toBe(0);
+    expect(result.output).toContain('no change');
+    expect(remoteHead()).toBe(before);
+  });
+
+  it('does not count a stray rates edit as drift', () => {
+    writeLine(pi, RATES, '{"v":"stray"}');
+    expect(tick({ FAKE_PNPM_EXIT: '1' }).status).toBe(0);
+    expect(readText(pi, RATES)).toBe(SEEDED_RATES);
+    writeLine(pi, RATES, '{"v":"stray"}');
+    expect(tick(refreshWrites('{"v":"rates-15"}')).status).toBe(0);
+    expect(git(remote, 'show', `master:${RATES}`)).toBe('{"v":"rates-15"}');
   });
 });
