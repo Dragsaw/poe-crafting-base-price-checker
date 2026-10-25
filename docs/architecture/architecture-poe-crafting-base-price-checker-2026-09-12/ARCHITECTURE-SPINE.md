@@ -138,9 +138,10 @@ never import each other.
   pushes the sync-owned files and `data/currencies.json`, by hand or from a scheduled job on that
   host, and that push is what deploys (*Deployment & environments*). No component of the product
   commits, and no commit rides the chunk path. The rule exists because AD-7 makes `sync` a bounded
-  chunk invoked repeatedly: a commit per chunk produces thousands of commits a day, which buries the curation history the
-  audit trail depends on (AD-19). An operator job therefore commits only the sync-owned files and
-  `data/currencies.json`, on its own cadence and never per chunk, and never force-pushes.
+  chunk invoked repeatedly: a commit per chunk produces thousands of commits a day, which buries
+  the curation history the audit trail depends on (AD-19). An operator job therefore commits only
+  the sync-owned files and `data/currencies.json`, on its own cadence and never per chunk, and
+  never force-pushes.
 
   **The git port is therefore read-only** (AD-1) and carries exactly one operation: the author date
   of the last commit touching a path (AD-12). A component that needs a git write is an amendment to
@@ -1907,9 +1908,9 @@ poe-crafting-base-price-checker/
 - **A publish command.** `sync` makes no git write, and an operator job must commit only the
   sync-owned files and `data/currencies.json` (AD-3). The sync host's scheduled job enforces
   that, but a hand publish has no guard, so nothing prevents a `git commit -a` from sweeping an
-  unfinished `tracked.json` edit into a data commit. A human-invoked `publish` command that commits those paths and
-  pushes would give the hand publish the same guard without putting git back on the chunk
-  path. **Revisit if** a mixed commit actually costs the player something.
+  unfinished `tracked.json` edit into a data commit. A human-invoked `publish` command that
+  commits those paths and pushes would give the hand publish the same guard without putting git
+  back on the chunk path. **Revisit if** a mixed commit actually costs the player something.
 - **Automated currency rates.** AD-20 makes the rate hand-maintained committed data, because
   `trade2` exposes no exchange surface. The two paths back are a per-currency search
   filtered to divine-denominated listings — which costs a search per row against AD-7's cap
