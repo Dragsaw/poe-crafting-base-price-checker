@@ -1,0 +1,26 @@
+[Unit]
+Description=PoE crafting base price sync session (the sync script's command run by node)
+After=network-online.target time-sync.target
+Wants=network-online.target time-sync.target
+
+[Service]
+Type=simple
+User=<pi-user>
+WorkingDirectory=<repo-dir>
+# systemd runs one instance per checkout, so a lock at start is stale (power cut, SIGKILL), and
+# lock.ts would otherwise wait out its 6 h staleness.
+ExecStartPre=/bin/rm -f data/sync.lock data/sync.break.lock
+# The command of the `sync` script, run by node itself: under pnpm the wrapper dies on SIGTERM and
+# systemd then signals the cgroup again, and a second SIGTERM ends sync.ts mid-entry (AD-7).
+ExecStart=node --env-file-if-exists=.env packages/sync/src/sync.ts
+# SIGTERM reaches only node, so the git child of the running entry is not killed under it.
+KillMode=mixed
+Restart=always
+RestartSec=60
+# SIGTERM lets the running entry finish. Sync writes the owned files only after an entry's
+# requests, so a SIGKILL after this timeout during a pacing wait loses only that entry.
+TimeoutStopSec=15min
+MemoryMax=700M
+
+[Install]
+WantedBy=multi-user.target

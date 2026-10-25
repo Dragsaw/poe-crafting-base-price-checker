@@ -37,3 +37,14 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-tablet-condition-filter.md`
   summary: [NOTE FOR ARCHITECT] ARCHITECTURE-SPINE.md still calls a raw entry a white ilvl-82 base, which the PRD no longer says and tracked tablets (itemLevelMin 1) contradict.
   evidence: ARCHITECTURE-SPINE.md:227 AD-5 raw row reads "a white ilvl-82 base, priced as it comes" and :1890 Scope map reads "White ilvl-82 bases"; prd.md rev 33 (FR-3, glossary, §7.1) dropped the item level for a Raw Base. Blind Hunter finding; the Review brief bars a review fix from editing the owner document.
+
+## Deferred from: spec-raspberry-pi-sync-host review (2026-10-25)
+
+- source_spec: `docs/stories/spec-raspberry-pi-sync-host.md`
+  summary: Provision the first Raspberry Pi sync host per ops/pi/README.md, run its first-run checklist and the CPU and memory measurement after the first pass, and record the results.
+  evidence: The spec's human decision (2026-10-25) kept provisioning out of the build. Live criteria are unverified: prod install, graceful stop, a deploy within one tick, drift guard, no force-push, reboot and power cut, MemoryMax. The inputSignature cache decision waits on the measurement (ops/pi/README.md). Deferred-ledger audit finding.
+  retry_when: never — needs a human
+
+- source_spec: `docs/stories/spec-raspberry-pi-sync-host.md`
+  summary: [NOTE FOR ARCHITECT] Spine rev 42 left the deployment diagram edge "player commits + pushes" and the deferred item "A publish command" describing human-only publishing.
+  evidence: ARCHITECTURE-SPINE.md:1774 (mermaid `dataset -->|player commits + pushes| pages`) and :1907 ("the player commits by hand"; the sync host's tick now commits only the sync-owned paths) predate AD-3's operator job. Blind and edge hunter findings; the approved proposal covered only A1–A3, and the Review brief bars a review fix from editing the owner document.

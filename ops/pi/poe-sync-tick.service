@@ -1,0 +1,16 @@
+[Unit]
+Description=PoE crafting base price publish tick (commit, rebase, push)
+After=network-online.target time-sync.target
+Wants=network-online.target time-sync.target
+
+[Service]
+Type=oneshot
+User=<pi-user>
+WorkingDirectory=<repo-dir>
+Environment=COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+# "+" runs these as root. ExecStopPost runs even when the stop or the tick fails.
+ExecStartPre=+systemctl stop poe-sync.service
+ExecStart=/bin/bash <repo-dir>/ops/pi/tick.sh <repo-dir>
+ExecStopPost=+systemctl start poe-sync.service
+# The stop alone can take poe-sync's TimeoutStopSec; a lockfile change adds an install.
+TimeoutStartSec=45min
