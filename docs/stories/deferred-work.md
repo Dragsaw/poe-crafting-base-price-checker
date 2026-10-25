@@ -38,3 +38,7 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Provision the first Raspberry Pi sync host per ops/pi/README.md, run its first-run checklist and the CPU and memory measurement after the first pass, and record the results.
   evidence: The spec's human decision (2026-10-25) kept provisioning out of the build. Live criteria are unverified: prod install, graceful stop, a deploy within one tick, drift guard, no force-push, reboot and power cut, MemoryMax. The inputSignature cache decision waits on the measurement (ops/pi/README.md). Deferred-ledger audit finding.
   retry_when: never — needs a human
+
+- source_spec: `docs/stories/spec-pi-currency-refresh.md`
+  summary: "[NOTE FOR ARCHITECT] AGENT-WORKFLOW.md (Fixtures, the currencies:refresh sentence) does not tell an agent that the Pi tick commits data/currencies.json on every tick, so a rates commit on master from the PC while the Pi syncs stops every tick at status 4."
+  evidence: Review 2 triage row 32. The rule is only in ops/pi/README.md (One syncer at a time). Review brief rule 2 keeps the reviewer from adding a rule to the architect's document.
