@@ -179,18 +179,26 @@ sync writes the files that the tick commits.
 so a sync on the PC does not see the lock of the Pi. `poe-sync.service` removes the lock before
 each start, which is safe only because systemd runs one session per checkout. All hosts share one
 rate budget, and a PC sync also makes the next rebase of the Pi conflict on `data/dataset.json`.
+Do not commit `data/currencies.json` on the PC while the Pi syncs, either. Every tick commits
+refreshed rates before it pulls, so the next rebase of the Pi conflicts and the tick exits with
+status 4.
 
 **PC hand-off.** To sync on the PC:
 
 1. Run the *Pause syncing* block on the Pi.
 2. Run *Tick by hand* on the Pi. It publishes the data of the Pi.
-3. On the PC, pull, sync, commit the three sync files and push. Run `pnpm currencies:refresh`
-   when the rates matter for the run, because the paused Pi does not refresh them.
+3. On the PC, pull and sync. Run `pnpm currencies:refresh` when the rates matter for the run,
+   because the paused Pi does not refresh them. Commit the three sync files, and
+   `data/currencies.json` when you refreshed it, and push.
 
 To give syncing back to the Pi:
 
-1. Run *Tick by hand* on the Pi first. The Pi pulls the data of the PC before sync writes again.
-2. Resume syncing on the Pi.
+1. On the Pi, run `git -C <repo-dir> pull --rebase`. The tree of the Pi is clean after step 2 of
+   the hand-off, so the pull takes the data and the rates of the PC. Do not start with a tick: a
+   tick commits refreshed rates before it pulls, and that commit conflicts with a rates commit of
+   the PC.
+2. Run *Tick by hand* on the Pi.
+3. Resume syncing on the Pi.
 
 **Nobody curates on the Pi.** Edit `data/tracked.json` and the code on the PC and push. The next
 tick pulls the change, and a code deploy rides the same tick. The tick refuses to commit when a
@@ -204,7 +212,7 @@ a `data/currencies.json.tmp` that a power cut during a refresh left behind. It c
 is checked out and that no other path is dirty. It runs `pnpm currencies:refresh`, which rewrites
 `data/currencies.json` from poe2scout while `poe-sync` is stopped, so the restarted `poe-sync`
 reads the new rates. A failed refresh does not fail the tick: the tick logs a warning, restores
-`data/currencies.json` with `git checkout --`, and publishes the sync data as usual. It commits the
+`data/currencies.json` with `git checkout HEAD --`, and publishes the sync data as usual. It commits the
 four tick-owned files as `chore(data): sync dataset`, or skips the commit when they did not change.
 Then it runs `git pull --rebase`. When `pnpm-lock.yaml` differs from the one last installed, it runs
 `pnpm install --prod --frozen-lockfile --config.confirm-modules-purge=false` before the push.
@@ -335,8 +343,9 @@ that records the run.
       `poe-sync` is active and the next tick pushes. Also, either the JSON check of `dataset.json`
       passes, or it fails and the *Truncated `dataset.json`* recovery was done and recorded.
 - [ ] The tick refreshes the rates: after a tick, `journalctl -u poe-sync-tick` shows
-      `currencies:refresh: wrote` and no `WARNING`, the tick commit on `master` holds
-      `data/currencies.json` with a fresh `asOf`, and `pnpm currencies:refresh` ran on the
+      `currencies:refresh: wrote`, no `tick: WARNING:` line and no `currencies:refresh: warning:`
+      line (a partial refresh prints the latter and still exits 0), the tick commit on `master`
+      holds `data/currencies.json` with a fresh `asOf`, and `pnpm currencies:refresh` ran on the
       `--prod` install with no module-not-found error.
 - [ ] `MemoryMax` has an effect: `cat /sys/fs/cgroup/system.slice/poe-sync.service/memory.max`
       prints `734003200`, not `max` and not an error.

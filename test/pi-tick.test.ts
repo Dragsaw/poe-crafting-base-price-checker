@@ -93,6 +93,7 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
     const result = tick();
     expect(result.status).toBe(3);
     expect(result.output).toContain('outside the tick-owned list: data/tracked.json');
+    expect(sandbox.fakeLog()).toEqual([]);
     expect(head(pi)).toBe(local);
     expect(remoteHead()).toBe(before);
   });
@@ -104,6 +105,7 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
     const result = tick();
     expect(result.status).toBe(3);
     expect(result.output).toContain('outside the tick-owned list: sub/stray file.txt');
+    expect(sandbox.fakeLog()).toEqual([]);
     expect(head(pi)).toBe(local);
   });
 
@@ -273,7 +275,9 @@ describe.skipIf(process.platform === 'win32')('ops/pi/tick.sh', { timeout: 60_00
     expect(result.status, result.output).toBe(0);
     expect(git(remote, 'rev-list', '--count', `${before}..master`)).toBe('1');
     expect(git(remote, 'log', '-1', '--format=%s', 'master')).toBe(SUBJECT);
+    expect(isAncestor(before, remoteHead())).toBe(true);
     expect(pushedFiles()).toEqual(new Set(OWNED));
+    expect(git(remote, 'show', `master:${RATES}`)).toBe('{"v":"rates-12"}');
   });
 
   it('commits the rates alone when only they changed', () => {

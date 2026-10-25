@@ -86,7 +86,7 @@ refresh_currencies() {
     return 0
   fi
   warn "pnpm currencies:refresh failed; restoring $RATES from HEAD"
-  git checkout -- "$RATES"
+  git checkout HEAD -- "$RATES"
 }
 
 commit_owned() {
