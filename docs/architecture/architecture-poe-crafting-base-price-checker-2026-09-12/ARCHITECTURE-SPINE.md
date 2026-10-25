@@ -6,9 +6,9 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 41
+revision: 42
 created: '2026-09-12'
-updated: '2026-10-24'
+updated: '2026-10-25'
 binds: []
 sources:
   - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
@@ -134,12 +134,13 @@ never import each other.
   writes the files it owns to the working tree, by explicit path, and exits. Those files are
   **git-tracked and updated in place**, so a chunk's output is an ordinary working-tree change.
 
-  **Publishing is a human act.** The player commits and pushes the sync-owned files at whatever
-  cadence he chooses, and that push is what deploys (*Deployment & environments*). The rule exists
-  because AD-7 makes `sync` a bounded chunk invoked repeatedly: an automated commit-and-push per
-  run produces thousands of commits a day, which buries the curation history the audit trail
-  depends on (AD-19) and puts an unattended job on the write path of a shared remote. With no
-  automated push, a non-fast-forward remote cannot arise from this product at all.
+  **Publishing is an operator job outside the product.** The operator of the sync host commits and
+  pushes the sync-owned files, by hand or from a scheduled job on that host, and that push is what
+  deploys (*Deployment & environments*). No component of the product commits, and no commit rides
+  the chunk path. The rule exists because AD-7 makes `sync` a bounded chunk invoked repeatedly: a
+  commit per chunk produces thousands of commits a day, which buries the curation history the
+  audit trail depends on (AD-19). An operator job therefore commits only the sync-owned files, on
+  its own cadence and never per chunk, and never force-pushes.
 
   **The git port is therefore read-only** (AD-1) and carries exactly one operation: the author date
   of the last commit touching a path (AD-12). A component that needs a git write is an amendment to
@@ -1712,7 +1713,7 @@ Everything in this section is true at cold-start and owned by the code once it e
 | ESLint CSS language (`@eslint/css`) | 2.0.0 |
 | dependency-cruiser | 18.4.0 |
 | Hosting | GitHub Pages via Actions build workflow |
-| Sync invoker | `pnpm sync`, a long-running session; or `pnpm sync:batch` under Windows Task Scheduler (host-agnostic per AD-7) |
+| Sync invoker | `pnpm sync`, a long-running session; or `pnpm sync:batch` under an OS scheduler (host-agnostic per AD-7) |
 
 **Upgrade trigger — TypeScript 7.** TS 7.0.2 is current, but two dependencies block the
 upgrade and both must clear (re-verified 2026-09-20): `typescript-eslint` 8.70.0 peers
@@ -1819,21 +1820,19 @@ and contributes nothing to the eligible pool (AD-25).
 
 ### Deployment & environments
 
-There is one environment. The syncer runs on the player's machine, either as the long-running
+There is one environment. The syncer runs on the operator's sync host, either as the long-running
 `pnpm sync` session, which runs one chunk per entry and paces itself (AD-7, AD-8), or as
-`pnpm sync:batch` under Task Scheduler, invoked repeatedly. Each chunk takes the lock, does its
-bounded work, **writes the files it owns, and releases the lock — it touches git not at all**
-(AD-3). **Publishing is a separate, human act:** the
-player commits the sync-owned files and pushes them to the default branch, and *that* push
-triggers a **GitHub Actions workflow** that builds the Vite bundle and deploys to Pages —
-branch-published Pages runs Jekyll and cannot build this app, so the workflow is required, not
-optional. There is no staging environment and nothing to patch on a server. The trade API works
-unauthenticated, as confirmed, so the product needs no secret. The one optional secret is
-the operator's `POESESSID` (AD-30). It lives only in the operator's local `.env`, never in
-git and never in CI, because only the operator's machine runs sync. Local development is
-`pnpm dev` against committed fixtures, with no network.
+`pnpm sync:batch` invoked repeatedly by an OS scheduler. Each chunk takes the lock, does its
+bounded work, writes the files it owns, and releases the lock (AD-3). Publishing is an operator
+job (AD-3). A push to the default branch triggers a **GitHub Actions workflow** that builds the
+Vite bundle and deploys to Pages — branch-published Pages runs Jekyll and cannot build this app,
+so the workflow is required, not optional. There is no staging environment, and the product has
+nothing to patch on a server. The trade API works unauthenticated, as confirmed, so the product
+needs no secret. The one optional secret is the operator's `POESESSID` (AD-30). It lives only in
+the sync host's local `.env`, never in git and never in CI, because only the sync host runs sync.
+Local development is `pnpm dev` against committed fixtures, with no network.
 
-The site's freshness is therefore bounded by the player's push cadence rather than the sync
+The site's freshness is therefore bounded by the publish cadence rather than the sync
 cadence, and the dataset on disk is routinely newer than the dataset on the site. This costs no
 honesty: AD-10 stamps freshness per row at observation time, so a page published from a
 three-day-old push states three-day-old ages rather than implying current ones.

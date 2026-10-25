@@ -16,6 +16,7 @@ A crafting base price checker for Path of Exile. The repository is a pnpm worksp
 - Mantine documentation for agents: https://mantine.dev/llms.txt
 - UX design system: `docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/DESIGN.md`. impeccable finds only `PROJECT_ROOT/DESIGN.md`. Give `--target <path>` to use this file.
 - Tools for `data/tracked.json`: `pnpm tracked:lookup` and `pnpm tracked:check`. The `tracked-json` skill (`.claude/skills/tracked-json/SKILL.md`) uses both. The rule for their use is in *Parallel worktrees* of `docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/AGENT-WORKFLOW.md`.
+- Sync host (Raspberry Pi) runbook: `ops/pi/README.md`.
 
 ## Running and verifying
 
