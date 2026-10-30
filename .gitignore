@@ -55,3 +55,7 @@ desktop.ini
 .claude/settings.local.json
 # _bmad/render/ is a per-run snapshot of skill workflows, regenerated on demand.
 _bmad/render/
+
+# --- Sync host --------------------------------------------------------------
+# The real values of the ops/pi/README.md placeholders stay on the operator's PC.
+ops/pi/placeholders.local

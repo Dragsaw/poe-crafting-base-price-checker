@@ -18,7 +18,10 @@ Steps marked **HUMAN** are for the operator only. The agent does every other ste
 
 ## Placeholders
 
-Replace these everywhere. Never commit the real values to this directory.
+Replace these everywhere. Never commit the real values. Record them in
+`ops/pi/placeholders.local` on the PC, one `<placeholder>=value` line each. Git ignores that file.
+Read it before a step that uses a placeholder. The units in this directory keep `<pi-user>` and
+`<repo-dir>`, because the install block in *2. Install the units* fills them in.
 
 | Placeholder | Meaning |
 |---|---|
@@ -26,27 +29,41 @@ Replace these everywhere. Never commit the real values to this directory.
 | `<pi-user>` | The user set in Raspberry Pi Imager. |
 | `<repo-dir>` | The absolute path of the clone on the Pi, for example `/home/<pi-user>/poe-crafting-base-price-checker`. Use a path with no spaces, because the units put it in `ExecStart=`. |
 | `<repo-ssh-url>` | The SSH clone URL of the GitHub repository. |
-| `<noreply-email>` | The GitHub noreply address of the operator, `<id>+<login>@users.noreply.github.com`. |
+| `<commit-email>` | The author email of the tick's commits: an address of the operator's GitHub account, or its noreply address `<id>+<login>@users.noreply.github.com`. The repository is public, so the commits show it. |
 
 ## 1. Provision
 
 1. **HUMAN: flash the card.** Use a high-endurance microSD card. In Raspberry Pi Imager, choose
    Raspberry Pi OS Lite (64-bit). In the OS customisation, set the hostname `<pi-host>`, the user
-   `<pi-user>`, and SSH with public-key authentication only, with the public key of the PC. Leave
-   Wi-Fi empty and connect Ethernet.
-2. Check the access from the PC: `ssh <pi-user>@<pi-host>.local true`.
-3. Update the OS and install the tools:
+   `<pi-user>`, and SSH with public-key authentication only, with the public key of the PC. Set the
+   Wi-Fi network and the wireless country. The Pi 3B has only 2.4 GHz Wi-Fi, so choose a 2.4 GHz
+   network. Record the user's password: step 3 needs it once. Without a card reader, use a computer
+   with an SD slot and a microSD adapter. Do not flash a USB stick instead: a Pi 3B boots from USB
+   only after a one-time OTP setting, and many sticks answer its boot ROM too slowly.
+2. Check the access from the PC: `ssh <pi-user>@<pi-host>.local true`. A rebuild has a new host
+   key, so first remove the old one with `ssh-keygen -R <pi-host>.local`.
+3. **HUMAN: allow `sudo` without a password.** The user from Imager needs its password for `sudo`,
+   and the agent cannot type it. From the PC, run this and give the password at the prompt.
+   `visudo -c` must print `parsed OK`:
+
+   ```sh
+   ssh -t <pi-user>@<pi-host>.local "echo '<pi-user> ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/010_<pi-user>-nopasswd >/dev/null && sudo chmod 440 /etc/sudoers.d/010_<pi-user>-nopasswd && sudo visudo -c"
+   ```
+
+   Then the PC's SSH key gives root on the Pi. Check it with
+   `ssh <pi-user>@<pi-host>.local sudo -n true`.
+4. Update the OS and install the tools:
 
    ```sh
    sudo apt-get update && sudo apt-get full-upgrade -y
    sudo apt-get install -y git ca-certificates curl
    ```
 
-4. Turn on the memory cgroup, so that `MemoryMax=` has an effect. Raspberry Pi kernels ship with it
+5. Turn on the memory cgroup, so that `MemoryMax=` has an effect. Raspberry Pi kernels ship with it
    off. Append ` cgroup_enable=memory cgroup_memory=1` to the single line of
    `/boot/firmware/cmdline.txt`, then `sudo reboot`. After the reboot,
    `cat /sys/fs/cgroup/cgroup.controllers` must list `memory`.
-5. Make boot wait for a synchronised clock. The Pi 3B has no clock battery, and `poe-sync.service`
+6. Make boot wait for a synchronised clock. The Pi 3B has no clock battery, and `poe-sync.service`
    orders itself after `time-sync.target`:
 
    ```sh
@@ -54,7 +71,7 @@ Replace these everywhere. Never commit the real values to this directory.
    timedatectl show -p NTPSynchronized   # NTPSynchronized=yes
    ```
 
-6. Install Node 24 for arm64, at the version that `engines` in `package.json` accepts, and enable
+7. Install Node 24 for arm64, at the version that `engines` in `package.json` accepts, and enable
    Corepack so that `pnpm` follows `packageManager`:
 
    ```sh
@@ -64,7 +81,7 @@ Replace these everywhere. Never commit the real values to this directory.
    sudo corepack enable
    ```
 
-7. Make a deploy key and print its public half:
+8. Make a deploy key and print its public half:
 
    ```sh
    ssh-keygen -t ed25519 -f ~/.ssh/poe_deploy -N '' -C '<pi-host> deploy key'
@@ -73,36 +90,36 @@ Replace these everywhere. Never commit the real values to this directory.
    chmod 600 ~/.ssh/config
    ```
 
-8. **HUMAN: approve the deploy key.** In the GitHub repository, open *Settings → Deploy keys → Add
+9. **HUMAN: approve the deploy key.** In the GitHub repository, open *Settings → Deploy keys → Add
    deploy key*, paste the public key, and select *Allow write access*.
-9. Trust GitHub's host key and check the deploy key. Write the scanned key to a temporary file
-   first, and print its fingerprint:
+10. Trust GitHub's host key and check the deploy key. Write the scanned key to a temporary file
+    first, and print its fingerprint:
 
-   ```sh
-   ssh-keyscan -t ed25519 github.com > /tmp/github_host_key
-   ssh-keygen -lf /tmp/github_host_key
-   ```
+    ```sh
+    ssh-keyscan -t ed25519 github.com > /tmp/github_host_key
+    ssh-keygen -lf /tmp/github_host_key
+    ```
 
-   Compare the printed `SHA256:` fingerprint with the `ed25519` fingerprint that GitHub publishes
-   in *GitHub's SSH key fingerprints* (docs.github.com). Only when they are equal, append the key
-   and test the deploy key. When they differ, stop and append nothing.
+    Compare the printed `SHA256:` fingerprint with the `ed25519` fingerprint that GitHub publishes
+    in *GitHub's SSH key fingerprints* (docs.github.com). Only when they are equal, append the key
+    and test the deploy key. When they differ, stop and append nothing.
 
-   ```sh
-   cat /tmp/github_host_key >> ~/.ssh/known_hosts && rm /tmp/github_host_key
-   ssh -T git@github.com   # "successfully authenticated"
-   ```
+    ```sh
+    cat /tmp/github_host_key >> ~/.ssh/known_hosts && rm /tmp/github_host_key
+    ssh -T git@github.com   # "successfully authenticated"
+    ```
 
-10. Make a full clone. Do not use `--depth`: the git port reads the author date of
+11. Make a full clone. Do not use `--depth`: the git port reads the author date of
     `data/tracked.json` (AD-12), which a shallow clone does not have.
 
     ```sh
     git clone <repo-ssh-url> <repo-dir>
     cd <repo-dir>
-    git config user.name '<pi-host> sync'
-    git config user.email '<noreply-email>'
+    git config user.name 'pi sync'
+    git config user.email '<commit-email>'
     ```
 
-11. Install the production dependencies. The `prepare` script sets `core.hooksPath`, so the
+12. Install the production dependencies. The `prepare` script sets `core.hooksPath`, so the
     commit-msg hook checks the tick's commits:
 
     ```sh
@@ -110,10 +127,17 @@ Replace these everywhere. Never commit the real values to this directory.
     git config core.hooksPath   # .githooks
     ```
 
-12. **HUMAN: write `.env`.** The agent never reads or writes this file. Create `<repo-dir>/.env`
+13. **HUMAN: write `.env`.** The agent never reads or writes this file. Create `<repo-dir>/.env`
     with the `POE_SYNC_USER_AGENT=` line (required) and `chmod 600` it. Set the optional
     `POESESSID` with `set-poesessid.sh` (*Rotate POESESSID* below), never by hand in a shared
     terminal.
+
+    To copy the `.env` of the PC instead, strip the Windows line ends, which would end each value
+    with a carriage return. Run this on the PC in the repository root:
+
+    ```sh
+    tr -d '\r' < .env | ssh <pi-user>@<pi-host>.local 'umask 077; cat > <repo-dir>/.env'
+    ```
 
 ## 2. Install the units
 
