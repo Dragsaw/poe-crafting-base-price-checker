@@ -52,7 +52,7 @@ export interface SearchBody {
       readonly type_filters: {
         readonly filters: {
           readonly category?: { readonly option: string };
-          /** A raw entry only. A crafted search admits listings below its floor (AD-16, OQ-21). */
+          /** A raw entry only. A crafted search admits listings below its floor (AD-16, AD-11). */
           readonly ilvl?: { readonly min: number };
           readonly rarity: { readonly option: 'magic' | 'normal' };
         };

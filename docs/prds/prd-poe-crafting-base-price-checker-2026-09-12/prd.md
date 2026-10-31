@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 33
+revision: 34
 created: 2026-09-12
-updated: 2026-10-24
+updated: 2026-10-31
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -131,7 +131,7 @@ EV = ( Σ P(combo) × price(combo) over Combinations that are priced and whose p
 - An Item Class whose priced Combinations all fall below the Payout Threshold is still ranked, at an EV of minus its Craft Cost; it is not Unrankable (AD-17).
 - An Item Class with no priced Combination has no EV and is not ranked, because a missing price is not zero. The list shows it after every ranked row *(PRD-owned)* (FR-9, AD-17).
 - A crafted row's payout term describes the **Item Class, not any one base in it**: the price behind a Combination is the asking price for that Combination across every Base Type in the class, so a strong base in the class is understated and a weak one overstated (FR-13). The probability term carries no such spread, because the modifier pool genuinely is the class's. This is an accepted property of the figure rather than a defect — the player crafts on whatever the class gives him, so the class is the decision the number is for — and the view does not claim otherwise *(PRD-owned)* (AD-16, AD-17).
-- **No Base Type outside the Item Class contributes to that price** *(PRD-owned)*. An Item Class is valued against its own Base Types alone, so an Item Class the player would never craft on can neither inflate nor depress one he would. The spread above is therefore bounded by a single Item Class, and the ranking separates two Item Classes that a coarser unit would have averaged into one row (AD-16, AD-17, OQ-25).
+- **No Base Type outside the Item Class contributes to that price** *(PRD-owned)*. An Item Class is valued against its own Base Types alone, so an Item Class the player would never craft on can neither inflate nor depress one he would. The spread above is therefore bounded by a single Item Class, and the ranking separates two Item Classes that a coarser unit would have averaged into one row (AD-16, AD-17).
 - Changing the Payout Threshold reorders the list without a sync (AD-4).
 - The player chooses which Craft Recipe is active, and changing it reorders the list without a sync, as the Payout Threshold does. The ranking is read under one recipe at a time and is not recipe-invariant: the same Item Class can sit at a different rank under each recipe *(PRD-owned)* (FR-26, AD-17).
 - The price of a Combination is the asking price of any item in the Item Class whose rolls satisfy the Combination, at any item level, because a buyer pays for rolled values and not for item level *(PRD-owned)*. The probability of the Combination is scoped to the Tracked Entry's Item Level Floor, because the floor sets what can roll (AD-17, FR-22).
@@ -388,7 +388,7 @@ A curator can track the outcomes the game actually rolls. A Hybrid Modifier is o
 - A sample smaller than the full one is valid and the true count is recorded; zero listings means `no-listings`, never a price (AD-16, AD-9).
 - Every Price Observation carries when it was taken, which league it was taken in, and the exchange observation used (AD-19, AD-20).
 - Whenever the trade site answers a search, the entry records that search's identifier so the view can offer a link to it. The identifier lives on the entry, not the observation, so a `no-listings` row can link as readily as a `priced` one (AD-9, AD-16, AD-24, FR-33).
-- Because a curated band may span adjacent tiers, the priced population is deliberately wider than the weighted one; how far that can move the ordering is open as OQ-21 (AD-16, AD-11).
+- Because a curated band may span adjacent tiers, the priced population is deliberately wider than the weighted one; the player accepts the effect on the ordering (FR-29, AD-16, AD-11).
 
 #### FR-22: Declare each entry's Item Level Floor from its Accepted Tier
 
@@ -495,7 +495,7 @@ A producer's completeness claim and the consumer's treatment of it are two halve
 - A tier only partly covered by a curated band contributes nothing to the probability, and that is not an error (AD-11, AD-17).
 - A Tracked Entry a Weights File cannot support is reported at load with the offending entry named, rather than ranked on a guess (AD-17).
 - The view reports such a failure at load and still renders the unaffected rows; a sync run treats the same check as a run-start gate and aborts before spending budget (AD-17, AD-12).
-- Whole-tier containment understates probabilities unevenly and can reorder the list. How far it does so is unmeasured and owned by OQ-21 (AD-11). The understatement is assumed acceptable for v1: an operating bet, not a bound.
+- Whole-tier containment understates probabilities unevenly and can reorder the list. The player accepts this: a band that only partly covers a tier is rare, it occurs mostly on modifiers with two values, such as added damage, and no band choice can avoid it (AD-11).
 - A Combination's probability follows one crafting act on the Item Class (AD-17).
 
 #### FR-30: Depend on an externally produced Weights File as a v1 prerequisite
@@ -606,11 +606,8 @@ These are engineering and workflow requirements. The cited owner states each one
 The spine's *Deferred* section is the register of technical deferrals and their revisit triggers, and this document does not duplicate it. The items below are product-scope calls, or technical deferrals with a product consequence the player will feel.
 
 - **Producing Modifier Weights.** v1 ranks on whatever the scraper project delivers; coverage is measured and reported, never gated (FR-4). The ranking improves as the file improves and the app does not change.
-- **Coarser fallback pricing for zero-listing Combinations** — a "base plus this prefix, any suffix" estimate, marked as such. Held as the named option if the unknown bucket proves unusable. `[NOTE FOR PM]` The likeliest thing to be missed if `no-listings` is a large fraction of the Tracked List; check after the first full refresh (§10 OQ-6).
-- **Spawn-weight disambiguation of the unknown bucket** — using modifier rarity to separate "rare and unlisted" from "common and unlisted". The only identified route that *resolves* a `no-listings` entry rather than segregating it; contingent on measured weights *(PRD-owned)*.
 - **Re-seeding the Tracked List from community sources.** The most promising answer to Risk R-2 and the single largest gap v1 leaves open.
 - **Conjunctions of separate modifiers.** A curator cannot express two different modifiers as one priced outcome. The one exception is a stat summed across both affixes (FR-34). Recorded here because a curator will plausibly try it and the rejection is not a defect.
-- **Measuring how far whole-tier containment understates the ranking.** Open as §10 OQ-21, owned by the spine. Until it is answered, the ordering is trusted on an operating bet (FR-29), and the deferred pro-rating and dropped-line guards in the spine's *Deferred* section are only as safe as that answer.
 - **A hosted syncer, observability beyond the Sync Report, a repository split for the schema.** Spine-owned deferrals with stated revisit triggers; none changes what the player sees. OAuth and any credential flow beyond the pasted cookie are deferred in the spine on the same terms.
 
 ### 7.3 Release Dependencies
@@ -663,10 +660,7 @@ Spine-owned questions are stated in full in `ARCHITECTURE-SPINE.md` *Open Questi
 - **OQ-12** — How a stat filter compares a modifier that publishes several values. Owners: the weights scraper project, and the sync builder.
 - **OQ-19** — Whether any Stat Line's shape makes a derived band edge inexact. Owner: the weights scraper project.
 - **OQ-20** — What a search must declare about listing status. Owner: the sync builder.
-- **OQ-21** — How far whole-tier containment can understate the ranking. Owner: the spine, with the player. `[NOTE FOR PM]` This is the document's live tension: §7.2's deferrals rest on its answer.
-- **OQ-25** — How far a crafted search's priced population reaches beyond the Item Class it prices. Owner: the spine, with the player. FR-1's guarantee that no Base Type outside the class contributes to a crafted row's price is the product commitment this question has to land on; a resolution that cannot deliver it is a revision to this document, not a footnote in the spine.
 
 **Owned by this document**
 
-- **OQ-6 — What fraction of the Tracked List returns `no-listings`?** Unknown until the first full refresh. If large, the deferred coarser-fallback pricing (§7.2) moves from held option to needed. Revisit after the first full refresh.
 - **OQ-7 — Cold-start seeding.** The first Tracked List must be authored from the player's existing knowledge, the very knowledge the tool exists to supply. Not a blocker; the acknowledged price of the curation approach.

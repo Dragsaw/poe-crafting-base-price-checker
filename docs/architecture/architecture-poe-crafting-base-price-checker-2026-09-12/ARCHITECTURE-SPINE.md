@@ -6,9 +6,9 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 44
+revision: 45
 created: '2026-09-12'
-updated: '2026-10-25'
+updated: '2026-10-31'
 binds: []
 sources:
   - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
@@ -719,9 +719,8 @@ never import each other.
   and takes the tracked tier's mass with it. A `56.0 – 80.0` band over
   T7 `[43.0, 56.5]` / T8 `[56.0, 80.0]` is exactly that shape, and edge alignment
   (`packages/core/src/cross-file/edge-alignment.ts`) accepts it. Nothing in the
-  contract prevents either shape. **How far the understatement can run is therefore
-  unmeasured and unbounded (OQ-21).** The residual is carried under Deferred with its
-  revisit condition.
+  contract prevents either shape. **The residual is accepted as is (FR-29):** no check,
+  measurement or remedy is built for it.
 
   **`gamePatch` is operator-asserted, and no component derives it.** Neither the
   producer's sources nor the trade API states a patch version, so a producer takes it as a
@@ -1273,8 +1272,8 @@ never import each other.
   Edge alignment is evaluated **under the scope, at the entry's own floor**, and is
   floor-dependent by design; AD-17 gives an item class exactly one crafted floor, so `core`
   evaluates it once per class. **Edge alignment is therefore not a general bound
-  on containment's loss** — it tests a band only against its own containment set, and OQ-21
-  records the shape that escapes it.
+  on containment's loss** — it tests a band only against its own containment set, and the
+  shapes that escape it are AD-11's accepted residual (FR-29).
 
   **A tier cannot be isolated, and a band spanning adjacent tiers is legitimate.** Because
   tiers overlap, a band on one tier necessarily admits the neighbour's tail into the priced
@@ -1893,15 +1892,6 @@ poe-crafting-base-price-checker/
 
 ## Deferred
 
-- **Consumer-side pro-rating.** `core` could compute `P(value ∈ band | tier)` from raw
-  `ranges` instead of applying whole-tier containment, recovering the understated mass.
-  Deferred because it re-sites a producer-side model inside the browser, where
-  nobody can diff it. **Revisit if** the measured understatement below proves material —
-  and if adopted, AD-10's `modelled-split` provenance must return **in the same change**,
-  or the product carries an unlabelled model inside every ranked number.
-- **Measuring the understatement.** Whole-tier containment's residual error is unmeasured
-  (AD-11). This is cheap and gates the two items around it. **Revisit when** the first
-  conforming `5.0.0` file lands.
 - **A mechanical guard on a dropped tier or a dropped stat line.** `5.0.0` leaves both
   resting entirely on the producer's `poolCoverage` assertion, and the quiet case fires no
   error at all (AD-11). **Revisit if** a file is ever found to have dropped one in practice.
@@ -1965,23 +1955,6 @@ poe-crafting-base-price-checker/
   that edge: `sync`'s builder**, by live verification recorded as a fixture (AD-13). **Owner
   for the unit: the weights
   scraper project**, by live verification. *Blocking for correctness, not for building.*
-- **OQ-21 — how far can whole-tier containment understate, and does the gap need a check?**
-  AD-11 records that containment understates unevenly and therefore reorders, and that
-  neither of the two mitigations is a bound. **Two shapes escape.** A **flush intrusion** is
-  a scoped same-`statId` tier that intersects a band without being contained *and* shares
-  an edge with it, which edge alignment cannot see because it compares a band only against
-  its own containment set. A **floor intrusion** is a scoped same-`statId` tier whose
-  interval covers the band's `valueMin` without being contained, sharing no edge; it is the
-  worse case because AD-16's ascending sort prices the band **on the intruder**, and
-  an accepted `56.0 – 80.0` band over T7 `[43.0, 56.5]` / T8 `[56.0, 80.0]` is exactly this shape. The
-  question has two halves, asked of **each** shape: how often it occurs in a real pool, and
-  how far the error runs when it does — and for the floor case, how far the *price* moves.
-  The obvious remedy — reject any intersecting-but-uncontained tier —
-  **must not be adopted without analysis**, because it would reject every crafted configuration on 53 of 63 item classes.
-  A narrower rule keyed on one shape specifically may be satisfiable, and that is the
-  question. **Owner: this spine, with the player, once the first conforming `5.0.0` file
-  makes the frequency measurable.** *Not blocking for building; blocking for trusting the
-  ordering.*
 - **OQ-26 — do AD-30's two premises hold beyond one sample?** The first premise is that a live
   `POESESSID` adds a rule name to `X-Rate-Limit-Rules`, measured once (research [30]). The
   second is that a dead cookie gets `401` or `403` on trade2, which is assumed. A capture of
