@@ -9,7 +9,7 @@ sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/sprint-change-proposal-2026-09-13.md
   - docs/sprint-change-proposal-2026-09-19.md
-  - docs/sprint-change-proposal-2026-10-11.md
+  - docs/stories/archive/sprint-change-proposal-2026-10-11.md
   - docs/stories/archive/spec-poesessid-sync/SPEC.md
   - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
 inherits:
