@@ -7121,6 +7121,14 @@
     },
     {
       "kind": "raw",
+      "baseTypeId": "Sacrificial Regalia",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_str_dex_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
       "baseTypeId": "Wolfskin Mantle",
       "categoryId": "armour.chest",
       "className": "Body_Armours_str_int",
