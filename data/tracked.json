@@ -5329,6 +5329,1749 @@
       "status": "active"
     },
     {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_280731498",
+        "valueMin": 4,
+        "valueMax": 6,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_280731498",
+        "valueMin": 4,
+        "valueMax": 6,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_280731498",
+        "valueMin": 4,
+        "valueMax": 6,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_458438597",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_280731498",
+        "valueMin": 4,
+        "valueMax": 6,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_280731498",
+        "valueMin": 4,
+        "valueMax": 6,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1030153674",
+        "valueMin": 1,
+        "valueMax": 2,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_280731498",
+        "valueMin": 4,
+        "valueMax": 6,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_280731498",
+        "valueMin": 4,
+        "valueMax": 6,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_458438597",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1030153674",
+        "valueMin": 1,
+        "valueMax": 2,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2353576063",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2353576063",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2353576063",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_458438597",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2353576063",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2353576063",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1030153674",
+        "valueMin": 1,
+        "valueMax": 2,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2353576063",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2353576063",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2440073079",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2440073079",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2440073079",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_458438597",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2440073079",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2440073079",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1030153674",
+        "valueMin": 1,
+        "valueMax": 2,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2440073079",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2440073079",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2518900926",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2518900926",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2518900926",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_458438597",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2518900926",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2518900926",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1030153674",
+        "valueMin": 1,
+        "valueMax": 2,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2518900926",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2518900926",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3067892458",
+        "valueMin": 10,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3067892458",
+        "valueMin": 10,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3067892458",
+        "valueMin": 10,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_458438597",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3067892458",
+        "valueMin": 10,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3067892458",
+        "valueMin": 10,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1030153674",
+        "valueMin": 1,
+        "valueMax": 2,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3067892458",
+        "valueMin": 10,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3067892458",
+        "valueMin": 10,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3141070085",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3141070085",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3141070085",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_458438597",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3141070085",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3141070085",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1030153674",
+        "valueMin": 1,
+        "valueMax": 2,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3141070085",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3141070085",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1782086450",
+        "valueMin": 10,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1782086450",
+        "valueMin": 10,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1782086450",
+        "valueMin": 10,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_458438597",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1782086450",
+        "valueMin": 10,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1782086450",
+        "valueMin": 10,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1030153674",
+        "valueMin": 1,
+        "valueMax": 2,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1782086450",
+        "valueMin": 10,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1782086450",
+        "valueMin": 10,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_458438597",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1030153674",
+        "valueMin": 1,
+        "valueMax": 2,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 7,
+        "valueMax": 13,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 7,
+        "valueMax": 13,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 7,
+        "valueMax": 13,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_458438597",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 7,
+        "valueMax": 13,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 7,
+        "valueMax": 13,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1030153674",
+        "valueMin": 1,
+        "valueMax": 2,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 7,
+        "valueMax": 13,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 7,
+        "valueMax": 13,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_458438597",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1030153674",
+        "valueMin": 1,
+        "valueMax": 2,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3091578504",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_491450213",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1854213750",
+        "valueMin": 15,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1589917703",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3091578504",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1589917703",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_491450213",
+        "valueMin": 10,
+        "valueMax": 20,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Sapphire",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1589917703",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1854213750",
+        "valueMin": 15,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
       "kind": "raw",
       "baseTypeId": "Gold Amulet",
       "categoryId": "accessory.amulet",
@@ -5378,6 +7121,14 @@
     },
     {
       "kind": "raw",
+      "baseTypeId": "Wolfskin Mantle",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_str_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
       "baseTypeId": "Falconer's Jacket",
       "categoryId": "armour.chest",
       "className": "Body_Armours_dex_int",
@@ -5386,7 +7137,23 @@
     },
     {
       "kind": "raw",
+      "baseTypeId": "Rambler Jacket",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_dex_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
       "baseTypeId": "Sacramental Robe",
+      "categoryId": "armour.chest",
+      "className": "Body_Armours_int",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Vile Robe",
       "categoryId": "armour.chest",
       "className": "Body_Armours_int",
       "itemLevelMin": 82,
