@@ -32,9 +32,3 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Guard against CRLF in edited files: Serena `replace_content` writes CRLF on Windows, so add a CR check to lint-on-edit or a Known pitfalls line in AGENTS.md.
   evidence: Every Serena edit on this branch left CRLF in the working copy despite `.gitattributes` `eol=lf`; `packages/web/src/list/display-rows.test.ts`'s raw-source scan of `summands` uses then failed on a trailing `\r` until the files were normalised (Blind Hunter finding).
   
-## Deferred from: spec-raspberry-pi-sync-host review (2026-10-25)
-
-- source_spec: `docs/stories/spec-raspberry-pi-sync-host.md`
-  summary: Provision the first Raspberry Pi sync host per ops/pi/README.md, run its first-run checklist and the CPU and memory measurement after the first pass, and record the results.
-  evidence: The spec's human decision (2026-10-25) kept provisioning out of the build. Live criteria are unverified: prod install, graceful stop, a deploy within one tick, drift guard, no force-push, reboot and power cut, MemoryMax. The inputSignature cache decision waits on the measurement (ops/pi/README.md). Deferred-ledger audit finding.
-  retry_when: never — needs a human
