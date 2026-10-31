@@ -119,6 +119,18 @@ export const SHORT_FORMS: Readonly<Record<string, string>> = {
   'explicit.stat_2704225257': 'Spirit',
   'explicit.stat_3523867985': '% AR/EV/ES',
   'explicit.stat_1241625305': 'Bow Skill Dmg',
+  'explicit.stat_280731498': 'AoE',
+  'explicit.stat_2353576063': 'Curse Magnitude',
+  'explicit.stat_2440073079': 'Shapeshifted Dmg',
+  'explicit.stat_2518900926': 'Plant Skill Dmg',
+  'explicit.stat_3067892458': 'Triggered Spell Dmg',
+  'explicit.stat_1782086450': 'Faster ES Recharge',
+  'explicit.stat_1589917703': 'Minion Dmg',
+  'explicit.stat_458438597': 'Dmg from Mana',
+  'explicit.stat_1030153674': 'Mana on Kill',
+  'explicit.stat_3091578504': 'Minion Atk/Cast Spd',
+  'explicit.stat_491450213': 'Minion Crit Chance',
+  'explicit.stat_1854213750': 'Minion Crit Dmg',
 };
 
 /** The short form for `statId`, or `undefined` for a product gap (no entry in the table). */
