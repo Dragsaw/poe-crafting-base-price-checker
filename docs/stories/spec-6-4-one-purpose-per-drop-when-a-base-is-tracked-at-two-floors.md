@@ -37,6 +37,12 @@ context:
 2. Close the modal, change the threshold, then download again. Expected: a valid file with the same shape as before, and no `ItemLevel <=` line.
 
 **Verification:** `pnpm check` passes.
+### Agent browser checks (after review)
+
+Session `poe-79ae64f4395d`, run 2026-11-01 20:24–20:25 WEST against HEAD `0a7f0c3780a69733d240bf73a8ee8731f88f1358`, tree clean. `pnpm dev` ran on port 5173 and was stopped with `pnpm dev:stop`. The Blob text came from a hook on `URL.createObjectURL`, because the agent-browser `download` command reported the Blob download as canceled. A first run ended when the agent-browser daemon dropped (the page went to `about:blank`), so the whole list was re-run from a fresh page.
+
+1. **Download:** pass. Name `NeverSink strict`, then download. The modal closed. 90 `Show` blocks, no `ItemLevel <=` line, last line `Import "NeverSink strict.filter"`, no page error. Screenshot: `C:/Users/ilyal/AppData/Local/Temp/claude/E--Program-Files-Jetbrains-Projects-poe-crafting-base-price-checker/0e427b17-1e4d-4bdd-a13c-d0546db0954a/scratchpad/6-4-check1-modal.png`.
+2. **After a threshold change:** pass. With the threshold at 1.00 div, the lead names `1.00 div` with greater orbs. The download has 82 `Show` blocks, no `ItemLevel <=` line, the same `Import` line last, and no page error. Screenshot: `C:/Users/ilyal/AppData/Local/Temp/claude/E--Program-Files-Jetbrains-Projects-poe-crafting-base-price-checker/0e427b17-1e4d-4bdd-a13c-d0546db0954a/scratchpad/6-4-check2-modal.png`.
 
 ## Review Triage Log
 
