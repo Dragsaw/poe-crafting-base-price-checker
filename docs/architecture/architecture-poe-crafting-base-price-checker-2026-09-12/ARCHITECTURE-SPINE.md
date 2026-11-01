@@ -6,9 +6,9 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 45
+revision: 46
 created: '2026-09-12'
-updated: '2026-10-31'
+updated: '2026-11-01'
 binds: []
 sources:
   - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
@@ -19,6 +19,7 @@ sources:
   - docs/stories/archive/spec-poesessid-sync/SPEC.md
   - docs/research/technical-poesessid-vs-oauth-for-trade-api-rate-li-2026-10-02/research.md
   - docs/research/technical-poe2-no-tag-mod-blocking-2026-10-23/research.md
+  - docs/forge/loot-filter-integration/forged-idea.md
   - .memlog.md
 companions:
   - WEIGHTS-FILE-SCHEMA.md
@@ -892,6 +893,11 @@ never import each other.
   because `web` may not make the call, `web` cannot mint a trade-site search itself, so
   any search a link targets must have been issued by `sync` and persisted (AD-9).
 
+  **A download the player starts is permitted on the same test.** `web` may hand the
+  browser a file it built in memory (a `Blob` behind an `<a download>`), and the browser's
+  save is the player's act, so it is not a write path. **A write the page performs itself
+  is one:** the File System Access API, or any other write to a file the page names, needs
+  an amendment to this AD. AD-31 is the one use.
 
 ### AD-16 — The price estimate is the cheapest live instant-buyout listings
 
@@ -1662,6 +1668,36 @@ never import each other.
   `packages/sync/src/trade/session-auth.ts` and
   `packages/sync/src/trade/client/session-cookie.ts`, binding under AD-0.
 
+### AD-31 — The Pick-up Filter is a Show-only file generated in the browser that imports the Base Filter last
+
+- **Binds:** `core`, `web`
+- **Prevents:**
+  - two builders layering the file differently, so one build hides items, or lets the Base
+    Filter's later blocks restyle or hide a base the file names (FR-35).
+  - the purpose rules of FR-36 being evaluated in a second place beside the ranking.
+  - a `Class` match, which cannot express the attribute split of the app's item classes, or
+    a substring `BaseType` match that also catches a longer base name.
+- **Rule:** **The layering.** The generated file is the filter the player selects in the game.
+  **Its last line is an `Import` of the Base Filter export**, after every block, so the
+  Base Filter sees only the items that no generated block caught. The player gives the
+  export's filename when generating; `EXPERIENCE.md` owns how. The tool never reads or
+  writes the Base Filter.
+
+  **The generated file holds only `Show` blocks, with no `Continue` and no `Hide`.** The
+  game stops at the first matching block, so a block in this file is final for the item it
+  catches, and an item that no block catches falls through to the Base Filter (FR-35).
+
+  **Every block matches by `BaseType ==` on the entry's `baseTypeId`**, the exact-match form,
+  plus the rarity, item-level and unidentified-tier conditions that FR-36 states. A jewel
+  kind matches by its own `baseTypeId`. No block matches by `Class`.
+
+  **`core` decides, `web` writes the text.** The purpose of each base is a pure `core`
+  function over the read-time ranking under the current dial (AD-1, AD-4), so FR-36 is
+  evaluated in one place. `web` serialises its output to filter text and starts the
+  download that AD-15 permits. Generation uses only the artifacts already loaded (AD-24's
+  set is unchanged) and makes no request. `web`'s filter serialiser and its tests own
+  each treatment (FR-37).
+
 ## Retired AD map
 
 Ids are never reused. A citation of a retired id resolves here: AD-2 → AD-1; AD-6 → AD-9;
@@ -1889,6 +1925,7 @@ poe-crafting-base-price-checker/
 | Uncrafted white bases | `contracts` + `core` | AD-5, AD-17 |
 | Craft cost from currency prices | `sync` + `core` | AD-20, AD-3 |
 | Surviving league resets | `core` + config | AD-19 |
+| Pick-up Filter (FR-35 to FR-37) | `core` + `web` | AD-31, AD-15, AD-4 |
 
 ## Deferred
 
@@ -1930,6 +1967,12 @@ poe-crafting-base-price-checker/
 - **A current-patch source for the stale-patch problem** (AD-12). No artifact names the
   current game patch, so the problem cannot fire. **Revisit when** the weights producer or
   `sync` can record one. That source amends AD-3's artifact list.
+- **A one-click write of the Pick-up Filter** through the File System Access API. It is a
+  write path, so it amends AD-15. **Revisit if** the save dialog of AD-31's download becomes
+  a real cost to the player.
+- **Upload of the Pick-up Filter to the player's account** (OAuth `account:item_filter`).
+  It breaks AD-15, and GGG accepts no new OAuth clients. **Revisit if** GGG opens client
+  registration again.
 
 ## Open Questions
 

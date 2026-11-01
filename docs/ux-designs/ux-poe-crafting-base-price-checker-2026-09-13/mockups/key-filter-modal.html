@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Key screen: Pick-up filter modal</title>
+<style>
+/*
+  Governing spine sections — check these before trusting this mock:
+  EXPERIENCE.md
+    - Copy Deck, "### Pick-up Filter" (every string in the modal and the Filter ▾ button)
+    - Copy Deck, header strings (eyebrow, `Worth picking up`, Orbs, Items worth ≥, Synced <age> ▾)
+    - Interaction Primitives item 9 (Download the Pick-up Filter: lead, four steps, step contents, order)
+    - Interaction Primitives, the interaction looks table and the hover/persistent table
+      (filter-button, filter-modal download / field / copy rows)
+    - State Patterns rows 44, 45 (both errors), 46, 47
+    - Component Patterns rows `header-bar`, `filter-button`, `filter-modal`
+  DESIGN.md
+    - YAML components: header-bar (layout), sync-button, filter-button, filter-modal
+      (placement, overlay, background, border, radius, shadow, padding, title, close,
+      body, rhythm, steps, path, copy, field, fieldError, download), threshold-control figureBox,
+      show-more, column-header, ranked-row tokens
+    - YAML colors, typography, rounded, spacing
+    - Layout & Spacing, header width budget (target frame 1063px = 1015px inside the gutters)
+    - Elevation & Depth (shadows only on floating layers); Components, "Filter button and filter modal"
+  Base: mockups/key-redesign-dark.html (Rarity Dark tokens, header, marks).
+  Offline: no web font is fetched; Inter is used only if installed, else system-ui.
+*/
+:root {
+  --ground: #1A1A1D;
+  --surface: #222226;
+  --surface-2: #2C2C31;
+  --line: #2E2E33;
+  --line-strong: #44444B;
+  --text: #D9D9D9;
+  --text-2: #9A9A9A;
+  --text-3: #8A8A8E;
+  --normal: #C8C8C8;
+  --magic: #8888FF;
+  --magic-dim: #8C8CCF;
+  --accent: #BFA77A;
+  --accent-soft: rgba(191,167,122,.14);
+  --rough: #E0913A;
+  --pending: #9898A0;
+  --broken: #F0756C;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Cascadia Mono", monospace;
+}
+* { box-sizing: border-box; }
+.ic { width: .9em; height: .9em; vertical-align: -0.12em; flex: 0 0 auto; }
+.ic.sm { width: .8em; height: .8em; }
+body {
+  margin: 0; background: var(--ground); color: var(--text);
+  font: 14px/1.4 Inter, system-ui, "Segoe UI", sans-serif;
+  font-feature-settings: "tnum" 1, "cv11" 1;
+}
+.page { width: 1063px; margin: 0 auto; padding: 0 0 40px; }
+.frame { width: 1063px; padding: 0 24px; position: relative; overflow: hidden; outline: 1px solid var(--line); }
+
+/* ---------- header bar ---------- */
+header {
+  display: flex; align-items: center; gap: 22px;
+  height: 64px; border-bottom: 1px solid var(--line-strong);
+  background: var(--ground);
+}
+header > * { flex-shrink: 0; white-space: nowrap; }
+.brand { display: flex; flex-direction: column; line-height: 1.15; margin-right: auto; flex-shrink: 1; min-width: 0; }
+.brand .league { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
+.brand h1 { margin: 0; font-size: 18px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+.ctl { display: flex; align-items: center; gap: 10px; }
+.ctl .lbl { font-size: 12px; color: var(--text-2); }
+.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 6px; padding: 2px; }
+.seg button { all: unset; cursor: pointer; padding: 4px 10px; border-radius: 4px; font-size: 13px; color: var(--text-2); }
+.seg button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.sub { font-size: 13px; color: var(--text-2); }
+.thr .fig { font-size: 15px; font-weight: 600; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 6px; padding: 3px 8px; min-width: 64px; text-align: right; }
+.thr .fig small { font-weight: 400; color: var(--text-2); font-size: 12px; }
+.slider { width: 75px; height: 4px; background: var(--line-strong); border-radius: 2px; position: relative; }
+.slider::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 8.3%; background: var(--accent); border-radius: 2px; }
+.slider::after { content: ""; position: absolute; left: 8.3%; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--ground); }
+/* sync-button look; filter-button borrows it (DESIGN filter-button.look) */
+.sync { font-size: 12px; color: var(--text-2); display: flex; align-items: center; gap: 6px; }
+.sync { white-space: nowrap; cursor: pointer; padding: 4px 8px; border: 1px solid transparent; border-radius: 6px; }
+.sync:hover { border-color: var(--line-strong); color: var(--text); }
+.sync .chev { color: var(--accent); font-size: 10px; }
+
+/* ---------- ranked list (behind the overlay) ---------- */
+.list { margin-top: 16px; padding-bottom: 24px; }
+.cols, .row { display: grid; grid-template-columns: 32px 220px 96px 1fr; align-items: center; column-gap: 14px; }
+.cols { height: 30px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); border-bottom: 1px solid var(--line-strong); }
+.cols .r { text-align: right; }
+.tip-anchor { border-bottom: 1px dotted var(--text-3); cursor: help; color: var(--text-2); }
+.cols .ev-h { display: block; text-align: right; padding-right: 18px; }
+.row { height: 38px; border-bottom: 1px solid var(--line); }
+.row:last-child { border-bottom: 0; }
+.rank { text-align: right; color: var(--text-3); font-size: 13px; }
+.name { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.name.normal { color: var(--normal); }
+.name.magic { color: var(--magic); }
+.top .name, .top .ev { font-weight: 650; }
+.top .rank { color: var(--text); font-weight: 600; }
+.ev { display: flex; justify-content: flex-end; align-items: center; font-size: 15px; color: var(--text); }
+.mk { width: 18px; flex: 0 0 18px; text-align: right; font-size: 13px; }
+.mk.rough { color: var(--rough); }
+.ev .est { color: var(--rough); font-weight: 500; margin-right: 2px; }
+.neg .ev { color: var(--text-3); }
+.chase { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; font-size: 12.5px; color: var(--magic-dim); min-width: 0; }
+.chase span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t { color: var(--text-2); font-weight: 600; font-size: .9em; letter-spacing: .01em; }
+.j { color: var(--text-3); padding: 0 4px; }
+.sell { font-size: 12.5px; color: var(--text-2); }
+.sell b { color: var(--normal); font-weight: 600; }
+
+/* ---------- filter modal ----------
+   rhythm: 10px title→lead, 12px lead→step 1 and between steps, 8px step text→control and state line→download.
+   The overlay covers the frame, not the viewport: a fixed overlay would also cover the state specimens. */
+.overlay { position: absolute; inset: 0; background: rgba(26,26,29,.7); z-index: 5; display: flex; align-items: center; justify-content: center; }
+.modal {
+  width: 480px; background: var(--surface); border: 1px solid var(--line-strong);
+  border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.5); padding: 16px; position: relative;
+  font-size: 13.5px; line-height: 1.4; color: var(--text-2);
+}
+.modal h2 { margin: 0 0 10px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); line-height: 1.2; }
+.modal .close { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: var(--text-2); cursor: pointer; }
+.modal .close svg { width: 15px; height: 15px; }
+.modal .close:hover { color: var(--text); }
+.modal p { margin: 0 0 12px; }
+.modal ol { margin: 0; padding-left: 20px; }
+.modal li { margin-top: 12px; }
+.modal li:first-child { margin-top: 0; }
+.modal li::marker { color: var(--text-3); }
+.step-ctl { padding-top: 8px; }
+.path { font-family: var(--mono); font-size: 13.5px; color: var(--text); user-select: text; }
+.copy { font-size: 12.5px; color: var(--accent); cursor: pointer; margin-left: 10px; }
+.field {
+  display: block; width: 100%; background: var(--surface-2); border: 1px solid var(--line-strong);
+  border-radius: 6px; padding: 3px 8px; text-align: left; font-size: 13.5px; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.field:hover { border-color: var(--accent); }
+.field.empty { color: var(--text-2); }
+.field.err { border-color: var(--broken); }
+.ferr { font-size: 12px; line-height: 1.4; color: var(--broken); padding-top: 4px; display: flex; align-items: center; gap: 6px; }
+.dl { font-size: 12.5px; font-weight: 600; color: var(--accent); cursor: pointer; }
+.dl.off { color: var(--text-3); cursor: default; }
+.stateline { color: var(--text-2); }
+
+/* ---------- state examples (annotation, not product) ---------- */
+.examples { margin: 26px 0 0; border: 1px dashed #3E4F66; border-radius: 6px; padding: 8px 12px 14px; }
+.examples > h2 { margin: 0 0 10px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #7F95B3; }
+.specimens { display: flex; flex-wrap: wrap; gap: 20px; }
+.spec .note { font-size: 12px; color: var(--text-3); margin-bottom: 6px; }
+.capt { font-size: 12px; color: #7F95B3; margin: 10px 0 6px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="capt">Main frame · 1063px target monitor · filter modal open, field filled, download enabled</div>
+<div class="frame">
+
+<header>
+  <div class="brand">
+    <span class="league">Forbidden Rites</span>
+    <h1>Worth picking up</h1>
+  </div>
+  <div class="ctl">
+    <span class="lbl">Orbs</span>
+    <div class="seg"><button class="on">greater</button><button>perfect</button></div>
+    <span class="sub">0.01 div / craft</span>
+  </div>
+  <div class="ctl thr">
+    <span class="lbl">Items worth ≥</span>
+    <span class="fig">0.25 <small>div</small></span>
+    <div class="slider"></div>
+  </div>
+  <div class="sync">Filter <span class="chev"><svg class="ic sm" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6h8l-4 5z" fill="currentColor"/></svg></span></div>
+  <div class="sync">Synced 1m ago <span class="chev"><svg class="ic sm" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6h8l-4 5z" fill="currentColor"/></svg></span></div>
+</header>
+
+<div class="list">
+  <div class="cols"><span class="r">#</span><span>Item class / base</span><span class="r ev-h"><span class="tip-anchor">EV (Divine)</span></span><span>Best combinations</span></div>
+
+  <div class="row top"><span class="rank">1</span><span class="name normal">Gold Amulet</span><span class="ev">2.00<span class="mk"></span></span><span class="sell"><b>Sell as is</b> · item level 82+</span></div>
+  <div class="row top"><span class="rank">2</span><span class="name magic">Bows</span><span class="ev"><span class="est"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6.2c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0M2.5 10.6c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>0.10<span class="mk rough"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 2.4a5.6 5.6 0 0 0 0 11.2z" fill="currentColor"/></svg></span></span><span class="chase">
+    <span><span class="t">T1-T2</span> % Phys<span class="j">·</span><span class="t">T1-T2</span> Proj Skills</span>
+    <span><span class="t">T1-T2</span> % Phys<span class="j">·</span><span class="t">T1-T2</span> Extra Arrow</span>
+    <span><span class="t">T1-T2</span> % Phys, +Accuracy<span class="j">·</span><span class="t">T1-T2</span> Proj</span></span></div>
+  <div class="row top"><span class="rank">3</span><span class="name magic">Wands</span><span class="ev">0.04<span class="mk"></span></span><span class="chase">
+    <span><span class="t">T1</span> Extra Cold<span class="j">·</span><span class="t">T1-T2</span> Cold Spell</span>
+    <span><span class="t">T1</span> Spell Dmg<span class="j">·</span><span class="t">T1-T2</span> Phys Spell</span>
+    <span><span class="t">T1</span> Extra Lightning<span class="j">·</span><span class="t">T1-T2</span> Cold</span></span></div>
+  <div class="row top"><span class="rank">4</span><span class="name magic">Spears</span><span class="ev">0.03<span class="mk"></span></span><span class="chase">
+    <span><span class="t">T1-T2</span> % Phys<span class="j">·</span><span class="t">T1-T2</span> Proj Skills</span>
+    <span><span class="t">T1</span> Flat Phys<span class="j">·</span><span class="t">T1-T2</span> Proj Skills</span>
+    <span><span class="t">T1-T2</span> % Phys<span class="j">·</span><span class="t">T1-T2</span> Melee Skills</span></span></div>
+  <div class="row top"><span class="rank">5</span><span class="name magic">Amulets</span><span class="ev"><span class="est"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6.2c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0M2.5 10.6c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>0.02<span class="mk"></span></span><span class="chase">
+    <span><span class="t">T1</span> Mana<span class="j">·</span><span class="t">T1</span> Spell Skills</span>
+    <span><span class="t">T1</span> ES<span class="j">·</span><span class="t">T1</span> Spell Skills</span>
+    <span><span class="t">T1</span> % ES<span class="j">·</span><span class="t">T1</span> Spell Skills</span></span></div>
+  <div class="row"><span class="rank">6</span><span class="name magic">Sceptres</span><span class="ev">0.01<span class="mk"></span></span><span class="chase">
+    <span><span class="t">T1</span> % Spirit, Mana<span class="j">·</span><span class="t">T1</span> Minion Skills</span>
+    <span><span class="t">T1-T2</span> % Spirit<span class="j">·</span><span class="t">T1</span> Minion Skills</span>
+    <span><span class="t">T1-T2</span> Allies Dmg<span class="j">·</span><span class="t">T1</span> Minion</span></span></div>
+  <div class="row"><span class="rank">7</span><span class="name magic">Crossbows</span><span class="ev"><span class="est"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6.2c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0M2.5 10.6c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>0.01<span class="mk"></span></span><span class="chase">
+    <span><span class="t">T1</span> % Phys<span class="j">·</span><span class="t">T1</span> Proj Skills</span>
+    <span><span class="t">T1</span> Flat Phys<span class="j">·</span><span class="t">T1</span> Proj Skills</span>
+    <span><span class="t">T1</span> Flat Lightning<span class="j">·</span><span class="t">T1</span> Proj Skills</span></span></div>
+  <div class="row neg"><span class="rank">8</span><span class="name magic">Emerald</span><span class="ev"><span class="est"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6.2c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0M2.5 10.6c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>−0.01<span class="mk"></span></span><span class="chase">
+    <span><span class="t">T1</span> Atk Dmg<span class="j">·</span><span class="t">T1</span> Atk Spd</span><span></span><span></span></span></div>
+  <div class="row neg"><span class="rank">9</span><span class="name magic">Helmets (Str)</span><span class="ev">−0.01<span class="mk"></span></span><span class="chase">
+    <span><span class="t">T1</span> % Armour, Life<span class="j">·</span><span class="t">T1-T2</span> Chaos Res</span><span></span><span></span></span></div>
+</div>
+
+<div class="overlay">
+  <div class="modal">
+    <h2>Pick-up filter</h2>
+    <span class="close"><svg viewBox="0 0 15 15" aria-hidden="true"><path d="M3.5 3.5l8 8M11.5 3.5l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+    <p>Shows the bases worth picking up at your threshold of 0.25 div with greater orbs. Your NeverSink filter handles everything else.</p>
+    <ol>
+      <li>Download your NeverSink filter from FilterBlade for offline use, and save it in this folder:
+        <div class="step-ctl"><span class="path">%UserProfile%\Documents\My Games\Path of Exile 2</span><span class="copy">Copy</span></div></li>
+      <li>Enter that file's name:
+        <div class="step-ctl"><span class="field">NeverSink's filter 2 - 3-STRICT.filter</span></div></li>
+      <li>Download this filter and save it in the same folder, over the last one. Your browser must ask where to save each download (Settings › Downloads).
+        <div class="step-ctl"><span class="dl">Download crafting-bases.filter</span></div></li>
+      <li>In the game, select crafting-bases once. After each download, reload the filter.</li>
+    </ol>
+  </div>
+</div>
+
+</div>
+
+<div class="examples">
+  <h2>State examples — the filter modal alone, overlay and page omitted</h2>
+  <div class="specimens">
+
+    <div class="spec">
+      <div class="note">State 44 · no file name: placeholder shown, download disabled</div>
+      <div class="modal">
+        <h2>Pick-up filter</h2>
+        <span class="close"><svg viewBox="0 0 15 15" aria-hidden="true"><path d="M3.5 3.5l8 8M11.5 3.5l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        <p>Shows the bases worth picking up at your threshold of 0.25 div with greater orbs. Your NeverSink filter handles everything else.</p>
+        <ol>
+          <li>Download your NeverSink filter from FilterBlade for offline use, and save it in this folder:
+            <div class="step-ctl"><span class="path">%UserProfile%\Documents\My Games\Path of Exile 2</span><span class="copy">Copy</span></div></li>
+          <li>Enter that file's name:
+            <div class="step-ctl"><span class="field empty">e.g. NeverSink's filter 2 - 3-STRICT.filter</span></div></li>
+          <li>Download this filter and save it in the same folder, over the last one. Your browser must ask where to save each download (Settings › Downloads).
+            <div class="step-ctl"><span class="dl off">Download crafting-bases.filter</span></div></li>
+          <li>In the game, select crafting-bases once. After each download, reload the filter.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="spec">
+      <div class="note">State 45 · a name it cannot use (shown after blur): error under the field, download disabled</div>
+      <div class="modal">
+        <h2>Pick-up filter</h2>
+        <span class="close"><svg viewBox="0 0 15 15" aria-hidden="true"><path d="M3.5 3.5l8 8M11.5 3.5l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        <p>Shows the bases worth picking up at your threshold of 0.25 div with greater orbs. Your NeverSink filter handles everything else.</p>
+        <ol>
+          <li>Download your NeverSink filter from FilterBlade for offline use, and save it in this folder:
+            <div class="step-ctl"><span class="path">%UserProfile%\Documents\My Games\Path of Exile 2</span><span class="copy">Copy</span></div></li>
+          <li>Enter that file's name:
+            <div class="step-ctl"><span class="field err">"NeverSink's filter 2 - 3-STRICT.filter"</span>
+              <div class="ferr"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Enter the file name only, with no double quotes or folders.</div></div></li>
+          <li>Download this filter and save it in the same folder, over the last one. Your browser must ask where to save each download (Settings › Downloads).
+            <div class="step-ctl"><span class="dl off">Download crafting-bases.filter</span></div></li>
+          <li>In the game, select crafting-bases once. After each download, reload the filter.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="spec">
+      <div class="note">State 45 · the generated name (shown after blur): error under the field, download disabled</div>
+      <div class="modal">
+        <h2>Pick-up filter</h2>
+        <span class="close"><svg viewBox="0 0 15 15" aria-hidden="true"><path d="M3.5 3.5l8 8M11.5 3.5l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        <p>Shows the bases worth picking up at your threshold of 0.25 div with greater orbs. Your NeverSink filter handles everything else.</p>
+        <ol>
+          <li>Download your NeverSink filter from FilterBlade for offline use, and save it in this folder:
+            <div class="step-ctl"><span class="path">%UserProfile%\Documents\My Games\Path of Exile 2</span><span class="copy">Copy</span></div></li>
+          <li>Enter that file's name:
+            <div class="step-ctl"><span class="field err">crafting-bases</span>
+              <div class="ferr"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>That is this filter's own name. Enter your own filter's file name.</div></div></li>
+          <li>Download this filter and save it in the same folder, over the last one. Your browser must ask where to save each download (Settings › Downloads).
+            <div class="step-ctl"><span class="dl off">Download crafting-bases.filter</span></div></li>
+          <li>In the game, select crafting-bases once. After each download, reload the filter.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="spec">
+      <div class="note">State 46 · filter with no EV (under state 35): one line above the download, download enabled</div>
+      <div class="modal">
+        <h2>Pick-up filter</h2>
+        <span class="close"><svg viewBox="0 0 15 15" aria-hidden="true"><path d="M3.5 3.5l8 8M11.5 3.5l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        <p>Shows the bases worth picking up at your threshold of 0.25 div with greater orbs. Your NeverSink filter handles everything else.</p>
+        <ol>
+          <li>Download your NeverSink filter from FilterBlade for offline use, and save it in this folder:
+            <div class="step-ctl"><span class="path">%UserProfile%\Documents\My Games\Path of Exile 2</span><span class="copy">Copy</span></div></li>
+          <li>Enter that file's name:
+            <div class="step-ctl"><span class="field">NeverSink's filter 2 - 3-STRICT.filter</span></div></li>
+          <li>Download this filter and save it in the same folder, over the last one. Your browser must ask where to save each download (Settings › Downloads).
+            <div class="step-ctl stateline">The greater orbs have no Craft Cost figure yet, so this filter marks only bases to sell as is.</div>
+            <div class="step-ctl"><span class="dl">Download crafting-bases.filter</span></div></li>
+          <li>In the game, select crafting-bases once. After each download, reload the filter.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="spec">
+      <div class="note">State 47 · nothing qualifies: its line replaces state 46's line, download enabled</div>
+      <div class="modal">
+        <h2>Pick-up filter</h2>
+        <span class="close"><svg viewBox="0 0 15 15" aria-hidden="true"><path d="M3.5 3.5l8 8M11.5 3.5l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        <p>Shows the bases worth picking up at your threshold of 0.25 div with greater orbs. Your NeverSink filter handles everything else.</p>
+        <ol>
+          <li>Download your NeverSink filter from FilterBlade for offline use, and save it in this folder:
+            <div class="step-ctl"><span class="path">%UserProfile%\Documents\My Games\Path of Exile 2</span><span class="copy">Copy</span></div></li>
+          <li>Enter that file's name:
+            <div class="step-ctl"><span class="field">NeverSink's filter 2 - 3-STRICT.filter</span></div></li>
+          <li>Download this filter and save it in the same folder, over the last one. Your browser must ask where to save each download (Settings › Downloads).
+            <div class="step-ctl stateline">Nothing qualifies right now. The filter holds only the import of your own filter.</div>
+            <div class="step-ctl"><span class="dl">Download crafting-bases.filter</span></div></li>
+          <li>In the game, select crafting-bases once. After each download, reload the filter.</li>
+        </ol>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div>
+</body>
+</html>

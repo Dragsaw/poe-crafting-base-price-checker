@@ -6,14 +6,13 @@ description: >-
   The game's rarity colours say what each row is, bronze marks what the player
   can operate, and every other colour appears only when a price needs attention.
 status: final
-revision: 22
+revision: 23
 created: 2026-09-13
-updated: 2026-10-24
+updated: 2026-11-01
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
-  - .memlog.md (rows 239-279 hold the visual redesign)
 peer-contract: EXPERIENCE.md — behaviour, every on-screen string and every fixed
   value. This document owns the look. Its YAML is the visual spec; its prose
   gives only the reasons and relationships the YAML cannot carry.
@@ -166,7 +165,7 @@ spacing:
   col-gap: '14px'
   chase-gap: '18px'
   expansion-indent: '46px'
-  expansion-trust-cell: '270px'  # holds the longest reason clear of the trade link (memlog 261)
+  expansion-trust-cell: '270px'  # holds the longest reason clear of the trade link
   open-row-bar: '2px'            # drawn inset, in accent
 
 components:
@@ -175,8 +174,8 @@ components:
     position: 'sticky at the top of the viewport, above the list'
     background: '{colors.ground}'
     borderBottom: '1px solid {colors.line-strong}'
-    layout: 'one flex row, items centred, 22px between groups, nothing wraps or shrinks: brand block (takes the free space) · {components.recipe-toggle} · {components.threshold-control} · {components.sync-button}'
-    eyebrow: '{typography.eyebrow}, uppercase, {colors.text-secondary}. Never the accent (memlog 265)'
+    layout: 'one flex row, items centred, 22px between groups, no control wraps or shrinks: brand block (takes the free space; the title cuts with an ellipsis when the free space is too narrow) · {components.recipe-toggle} · {components.threshold-control} · {components.filter-button} · {components.sync-button}'
+    eyebrow: '{typography.eyebrow}, uppercase, {colors.text-secondary}. Never the accent'
     title: '{typography.title} in {colors.text}'
     brandLineHeight: '1.15, eyebrow above title'
   recipe-toggle:
@@ -185,10 +184,10 @@ components:
     segment: '{typography.control} in {colors.text-secondary}, padding 4px 10px, radius {rounded.segment}, cursor pointer'
     segmentActive: '{colors.accent-soft} fill, {colors.accent} text, weight 600, cursor default'
     segmentHover: 'inactive segment only: text goes to {colors.text}'
-    segmentPressed: 'inactive segment only: {colors.surface-raised} fill until release (memlog 265)'
-    single: 'one published recipe: the label, then the option word as plain text in {typography.control} {colors.text}, with no frame and no segment (memlog 275)'
-    none: 'no published recipe: label, toggle and Craft Cost are absent (memlog 275)'
-    craftCost: '{typography.craft-cost} in {colors.text-secondary}, 10px after the toggle, tabular figures (memlog 258 N-16)'
+    segmentPressed: 'inactive segment only: {colors.surface-raised} fill until release'
+    single: 'one published recipe: the label, then the option word as plain text in {typography.control} {colors.text}, with no frame and no segment'
+    none: 'no published recipe: label, toggle and Craft Cost are absent'
+    craftCost: '{typography.craft-cost} in {colors.text-secondary}, 10px after the toggle, tabular figures'
     craftCostUncostable: 'the uncostable phrase in the same role and colour, never a number'
   threshold-control:
     label: '{typography.label} in {colors.text-secondary}, 10px before the figure. Its ≥ is an angle pointing right over one horizontal bar, drawn as {components.trust-mark} marks are'
@@ -208,11 +207,31 @@ components:
     openSign: '▾, a small solid triangle pointing down, in {colors.accent}, 6px after the label, drawn as {components.trust-mark} marks are'
     hover: 'border {colors.line-strong}, text {colors.text}'
     open: 'keeps the hover border while the panel is open'
-    pressed: '{colors.surface-raised} fill until release (memlog 265)'
-    healthy: 'label and open sign only: no dot, no colour, no count (memlog 254)'
-    problem: 'the problem count in place of the label, before the open sign, at weight 600: in {colors.trust-broken} led by the broken mark, or in {colors.trust-rough} led by the rough mark (which: EXPERIENCE.md, Loud when wrong). Never wider than the healthy label (memlog 270)'
+    pressed: '{colors.surface-raised} fill until release'
+    healthy: 'label and open sign only: no dot, no colour, no count'
+    problem: 'the problem count in place of the label, before the open sign, at weight 600: in {colors.trust-broken} led by the broken mark, or in {colors.trust-rough} led by the rough mark (which: EXPERIENCE.md, Loud when wrong). Never wider than the healthy label'
+  filter-button:
+    look: 'the {components.sync-button} look at rest, on hover and pressed: {typography.label} in {colors.text-secondary}, padding 4px 8px, transparent border, accent open sign. It has no problem state'
+  filter-modal:
+    placement: 'centred over the page, 480px wide, height of its content'
+    overlay: '{colors.ground} at 70% opacity over the page'
+    background: '{colors.surface}'
+    border: '1px solid {colors.line-strong}'
+    radius: '{rounded.tooltip}'
+    shadow: '0 6px 18px rgba(0,0,0,.5), the {components.mark-tooltip} shadow'
+    padding: '16px'
+    title: '{typography.column-header}, uppercase, {colors.text-tertiary}, as a sync report heading'
+    close: 'Mantine CloseButton, size sm, top right: × in {colors.text-secondary}; {colors.text} on hover'
+    body: '{typography.line-text} at line height 1.4, because it wraps, in {colors.text-secondary}; the lead, the step text and the state line'
+    rhythm: '10px from the title to the lead, 12px from the lead to step 1, 8px from a step''s text to its control and from the state line to the download'
+    steps: 'an ordered list, numerals in {colors.text-tertiary}, 12px between steps; a step''s control sits under its text, indented to it'
+    path: '{typography.stack-mono.fontFamily} at the body size in {colors.text}, the verbatim register; the copy action 10px after it'
+    copy: '{components.show-more} accent text, cursor pointer'
+    field: 'the {components.threshold-control} figure box: {colors.surface-raised} fill here, 1px solid {colors.line-strong}, radius {rounded.control}, padding 3px 8px, full width, left-aligned; hover and editing as the figure box. Text {typography.line-text} in {colors.text}; placeholder in {colors.text-secondary}, never {colors.text-tertiary}, which fails the floor on this step'
+    fieldError: '{typography.note} in {colors.trust-broken}, led by the broken mark, under the field; the field border goes to {colors.trust-broken}'
+    download: '{components.show-more} accent text, weight 600, cursor pointer. Disabled: {colors.text-tertiary}, cursor default'
   sync-report-panel:
-    placement: 'in the page flow directly under {components.header-bar}, pushing the list down. Never an overlay, a dropdown, a modal or a drawer (memlog 258 N-7)'
+    placement: 'in the page flow directly under {components.header-bar}, pushing the list down. Never an overlay, a dropdown, a modal or a drawer'
     background: '{colors.surface}'
     borderBottom: '1px solid {colors.line-strong}'
     padding: '14px 16px 12px'
@@ -222,7 +241,7 @@ components:
     body: '{typography.line-text} in {colors.text-secondary}'
     figure: '{colors.text}, tabular figures'
     brokenLine: 'leads with the broken mark in {colors.trust-broken}; the rest of the line in the body colour'
-    unreliableLine: 'a starved-pin or stale-patch line leads with the rough mark in {colors.trust-rough}; the rest of the line in the body colour (memlog 265)'
+    unreliableLine: 'a starved-pin or stale-patch line leads with the rough mark in {colors.trust-rough}; the rest of the line in the body colour'
     diagnosis: '{typography.stack-mono.fontFamily} at the body size, line height and colour'
     absenceLine: 'plain body text, no mark, no colour'
     missingFigure: 'a phrase in {colors.text-secondary}, no mark'
@@ -244,7 +263,7 @@ components:
     radius: '{rounded.tooltip}'
     shadow: '0 8px 24px rgba(0,0,0,.6)'
     typography: '{typography.tooltip} in {colors.text}; sentence case, no letter-spacing'
-    textAlign: 'left (memlog 275)'
+    textAlign: 'left'
     emphasis: 'the live threshold and the Craft Cost figure at weight 600'
     lastParagraph: '{colors.text-secondary}; each mark it decodes in its own colour'
   ranked-row:
@@ -254,7 +273,7 @@ components:
     borderBottom: '1px solid {colors.line}'
     cursor: 'pointer'
     hover: '{colors.surface}'
-    pressed: '{colors.surface} until release, never {colors.surface-raised} (memlog 268)'
+    pressed: '{colors.surface} until release, never {colors.surface-raised}'
     open: '{colors.surface}, an inset {spacing.open-row-bar} {colors.accent} bar on the left edge, bottom border transparent so the row joins its panel'
     rank: '{typography.row-rank}, right-aligned, {colors.text-tertiary}'
     rankTopFive: '{colors.text} at weight 600'
@@ -264,14 +283,14 @@ components:
     nameTopFive: 'weight 600'
     figure: '{typography.row-figure} in {colors.text}, tabular, right-aligned, then {components.trust-mark} in {spacing.mark-slot}'
     figureTopFive: 'weight 650'
-    figureNegative: '{colors.text-tertiary} (memlog 258 N-20); U+2212 minus'
+    figureNegative: '{colors.text-tertiary}; U+2212 minus'
     figureMissing: '— in {colors.text-tertiary}, weight 400'
     estimate: '{components.estimate-mark} before the figure'
     chaseCrafted: 'three or two {components.chase-cell} cells (Layout & Spacing, The chase column)'
     chaseRaw: 'one line across the chase area: {typography.chase} in {colors.text-secondary}; its lead words at weight 600 in {colors.rarity-normal}'
     skeleton: 'twenty slots of {spacing.row-height} in this grid, each cell a flat {colors.surface} bar 10px tall, as wide as its cell; no shimmer'
   trust-mark:
-    drawing: 'inline SVG in a 1em box at the font size of its line, painted in currentColor set to its token; strokes as heavy as the stem of the line''s text; ◐ and ○ share one circle diameter and one ring stroke, and ✕ fills the same box (memlog 274)'
+    drawing: 'inline SVG in a 1em box at the font size of its line, painted in currentColor set to its token; strokes as heavy as the stem of the line''s text; ◐ and ○ share one circle diameter and one ring stroke, and ✕ fills the same box'
     rough: '◐, a ring with its left half filled solid, in {colors.trust-rough}'
     pending: '○, an empty ring, in {colors.trust-pending}'
     broken: '✕, two straight strokes crossing corner to corner at the centre, in {colors.trust-broken}'
@@ -291,23 +310,23 @@ components:
     radius: '{rounded.tooltip}'
     shadow: '0 6px 18px rgba(0,0,0,.5)'
     typography: '{typography.trust} in {colors.text-secondary}, one line, no wrap'
-    textAlign: 'left (memlog 275)'
+    textAlign: 'left'
     word: 'weight 600 in the mark colour, then a middle dot and the reason'
   chase-cell:
     grid: 'three equal cells, or two (Layout & Spacing, The chase column), gap {spacing.chase-gap}, each one line with ellipsis'
     typography: '{typography.chase}'
     modText: '{colors.rarity-magic-dim}'
-    tier: '{typography.tier} in {colors.text-secondary} (memlog 275)'
+    tier: '{typography.tier} in {colors.text-secondary}'
     joiner: 'the middle dot in {colors.text-tertiary}, 4px each side'
     fallback: 'the same cell in {typography.stack-mono.fontFamily} at the line size; colour unchanged'
-    cutHover: 'the shell of {components.mark-tooltip} holding the full cell text in {typography.chase}: mod text {colors.rarity-magic}, tier and joiner {colors.text-secondary} (memlog 273, 279)'
+    cutHover: 'the shell of {components.mark-tooltip} holding the full cell text in {typography.chase}: mod text {colors.rarity-magic}, tier and joiner {colors.text-secondary}'
   expansion-panel:
     join: 'flush under its open row, no gap, no rule between'
     background: '{colors.surface}'
     borderBottom: '1px solid {colors.line}; none under the last row (Density)'
     padding: '6px 0 14px {spacing.expansion-indent}'
     bar: 'the row''s inset {spacing.open-row-bar} {colors.accent} bar continues down the panel'
-    title: 'none, and no sub-line (memlog 258 N-11)'
+    title: 'none, and no sub-line'
     contextLine: '{typography.note}, padding 4px 0 8px; the full name in the row''s name colour ({colors.rarity-magic} or {colors.rarity-normal}), then any cue sentence in {colors.text-tertiary} with ≈ in {colors.trust-rough}'
     content: 'context line, then {components.expansion-line} rows, then {components.show-more}'
   expansion-line:
@@ -322,8 +341,8 @@ components:
     rough: 'trust cell: the rough mark, word, reason'
     pending: 'price — in {colors.text-tertiary} at weight 400; trust cell: the pending mark, word, reason'
     broken: 'price — in {colors.text-tertiary} at weight 400; trust cell: the broken mark, word, reason'
-    belowThreshold: 'combination, its tiers and its price in {colors.text-tertiary}, price at weight 400; trust cell holds the reason alone in {colors.text-secondary}, no mark (memlog 275)'
-    pruned: 'combination struck through in {colors.text-tertiary}, led by its curation mark; price — in {colors.text-tertiary} at weight 400; trust cell empty; no trade link; a second line in {typography.note} {colors.text-tertiary} carries the prune reason across the line''s width (memlog 258 N-3)'
+    belowThreshold: 'combination, its tiers and its price in {colors.text-tertiary}, price at weight 400; trust cell holds the reason alone in {colors.text-secondary}, no mark'
+    pruned: 'combination struck through in {colors.text-tertiary}, led by its curation mark; price — in {colors.text-tertiary} at weight 400; trust cell empty; no trade link; a second line in {typography.note} {colors.text-tertiary} carries the prune reason across the line''s width'
     pinnedMark: 'leads the combination cell, {colors.text-tertiary} at weight 600, at the line size'
     fallback: 'combination cell in {typography.stack-mono.fontFamily} at the line size; colour unchanged'
   show-more:
@@ -342,7 +361,7 @@ components:
   unrankable-appendix:
     placement: 'after the ranked list and its show-more, before {components.footer-legend}'
     borderTop: '1px solid {colors.line-strong}'
-    title: '{typography.row-name} in {colors.text}; the count in {colors.text}, never an attention colour (memlog 258 N-9)'
+    title: '{typography.row-name} in {colors.text}; the count in {colors.text}, never an attention colour'
     lead: '{typography.note} in {colors.text-secondary}'
     row: 'at least {spacing.line-height-expansion} tall, a wrapped note grows it; 1px {colors.line} between rows, last row without a rule'
     grid: 'item class {spacing.col-name} (after a blank {spacing.col-rank}) · reason {spacing.expansion-trust-cell} · note 1fr, gap {spacing.col-gap}'
@@ -377,12 +396,12 @@ This is one page for one player. It stays open on a second monitor for a whole
 play session, beside a dark game. The player reads it at an angle, with the
 pointer still in the game. The ground is dark charcoal, so the page sits beside
 the game without glare. It is charcoal and not near-black, because a near-black
-ground made the text burn (memlog 240).
+ground made the text burn.
 
 The page speaks the game's language. A crafted Item Class prints in magic blue,
 `{colors.rarity-magic}`. A Raw Base prints in normal grey,
 `{colors.rarity-normal}`. The game and the trade site print magic and normal
-items in the same way (memlog 241). That pair is the page's identity, and every
+items in the same way. That pair is the page's identity, and every
 other colour serves it. The neutrals are greys with no warm cast. One bronze,
 `{colors.accent}`, comes from the game's UI frame and marks what the player can
 operate. Bronze stays apart from both rarity colours, so a control never reads as
@@ -398,7 +417,7 @@ borders, no zebra striping and no column chrome. A row is one line of names and
 figures between two hairlines.
 
 **Substrate.** Mantine v9 (`@mantine/core` + `@mantine/hooks` 9.6.1)
-`[ASSUMPTION — memlog 8]`. Mantine supplies behaviour, layout primitives and the
+`[ASSUMPTION]`. Mantine supplies behaviour, layout primitives and the
 CSS-variable mechanism. The page does not use its appearance. The tokens above
 replace its palette, radii, shadows and type ramp, and a token wins over a Mantine
 default. Point `theme.primaryColor` at a palette built from `{colors.accent}`.
@@ -406,18 +425,18 @@ Then carets, focus and selection use bronze. They never use Mantine's blue, whic
 would read as `{colors.rarity-magic}`.
 
 **One theme.** The page has one dark theme. It has no light theme and does not
-follow the OS colour scheme (memlog 240).
+follow the OS colour scheme.
 
 ## Colors
 
 Colour has three jobs on this page, and each colour has exactly one of them.
 
-**Identity: the rarity pair** (memlog 241). These colours say what a row is. They
+**Identity: the rarity pair**. These colours say what a row is. They
 never say whether its figure is sound. `{colors.rarity-magic-dim}` prints mod text
 in a ranked row one step quieter than the name beside it, so the name leads.
 
 **Interactive: one accent.** `{colors.accent}` marks what the player can operate.
-**It marks controls only** (memlog 265). It never marks a state of the data or a
+**It marks controls only**. It never marks a state of the data or a
 label. For this reason the league eyebrow is `{colors.text-secondary}`.
 
 **Attention: three colours, each always with a mark.**
@@ -428,10 +447,10 @@ label. For this reason the league eyebrow is `{colors.text-secondary}`.
 | `{colors.trust-pending}` | ○ pending | — |
 | `{colors.trust-broken}` | ✕ broken | the problem count when anything counted is broken, and the failure-screen eyebrows |
 
-One amber, `{colors.trust-rough}`, carries ◐ and ≈ (memlog 258 N-15). Shape and
+One amber, `{colors.trust-rough}`, carries ◐ and ≈. Shape and
 side tell them apart: ≈ sits before the figure and ◐ after it.
 `{colors.trust-broken}` marks broken things only. It never marks age, odds or a
-missing price (memlog 253). EXPERIENCE.md (Epistemics) decides which data state
+missing price. EXPERIENCE.md (Epistemics) decides which data state
 takes which mark. Colour is never alone (EXPERIENCE.md, Accessibility Floor). ◐, ○
 and ✕ differ in silhouette, and ≈ differs from all three.
 
@@ -462,14 +481,14 @@ The active segment's `{colors.accent}` text on `{colors.accent-soft}` measures 5
 over the ground and 5.24 over the surface. Two pairs fall under the floor:
 `{colors.text-tertiary}` and `{colors.rarity-magic-dim}` on
 `{colors.surface-raised}`. Neither colour goes on that step. Neither appears inside
-a tooltip (memlog 265), and a pressed ranked row takes `{colors.surface}`, not the
-raised step (memlog 268). Measure each new colour or new pairing against the floor
+a tooltip, and a pressed ranked row takes `{colors.surface}`, not the
+raised step. Measure each new colour or new pairing against the floor
 before it ships.
 
 ## Typography
 
-One family: **Inter**, bundled with the static site and served from it
-(memlog 242). PRD NFR-7 forbids a server, not a bundled font. Every figure that
+One family: **Inter**, bundled with the static site and served from it.
+PRD NFR-7 forbids a server, not a bundled font. Every figure that
 aligns in a column uses tabular numerals (`font-feature-settings: "tnum"`). The
 page uses the weights 400, 500, 600 and 650. The bundle ships the variable face or
 each of those weights. The page sets no italic.
@@ -494,26 +513,25 @@ each of those weights. The page sets no italic.
 | `{typography.tooltip}` | the EV tooltip |
 | `{typography.note}` | context lines, the appendix lead and notes, the footer |
 
-**Rank emphasis uses weight and the numeral's colour, never size**
-(memlog 31b, 258 N-20). Thus a top-ranked row is never taller than the rest.
+**Rank emphasis uses weight and the numeral's colour, never size**.
+Thus a top-ranked row is never taller than the rest.
 
-**Weight separates the tier from the mod** (memlog 241, 275). The mod text keeps
+**Weight separates the tier from the mod**. The mod text keeps
 its rarity colour. The tier is `{colors.text-secondary}` at 600. Its weight
 separates it, and its tone keeps it from outshining the mod it qualifies. On a
 below-threshold line the tier dims with the rest of the line. The middle dot that
 joins two affixes echoes the in-game mod line. EXPERIENCE.md (Domain Vocabulary)
 owns how a combination is written.
 
-**The verbatim register** (memlog 208). `{typography.stack-mono.fontFamily}` sets
-text that the page quotes out of a file, and nothing else. That text is the
-fallback for a modifier with no short form or no declared Accepted Tier, and the
-cross-file diagnosis in the sync report. Entry names, short forms and every other
-string the page wrote stay in Inter (memlog 275). The register has no size,
+**The verbatim register**. `{typography.stack-mono.fontFamily}` sets
+text that the page quotes out of a file, or that the player copies from the page to paste exactly, and nothing else. That text is the
+fallback for a modifier with no short form or no declared Accepted Tier, the cross-file diagnosis in the sync report, and the folder path in `{components.filter-modal}`. Entry names, short forms and every other
+string the page wrote stay in Inter. The register has no size,
 weight, line height or colour of its own. It takes those of its line, so no row
 height moves. It is system-resident and not bundled. It is a cue, not an attention
 colour, because quoted text says nothing about whether a figure is sound.
 
-**Marks are drawn, not typed** (memlog 274). ◐ ○ ✕ ≈ ▾ ↗ ■ and the ≥ of the
+**Marks are drawn, not typed**. ◐ ○ ✕ ≈ ▾ ↗ ■ and the ≥ of the
 threshold label are inline SVG. Draw each one as `{components.trust-mark}` says:
 a 1em box at the font size of the mark's line, painted in its token, the same on
 every machine. Each component above names its mark's silhouette in words:
@@ -543,20 +561,25 @@ parts: the header bar, the ranked list with an open expansion, both tooltips, th
 problem state of the sync button, rough and pending rows, the sync report panel,
 the list-statement slot and the footer legend. Its dashed *State examples* box is
 annotation, not product UI. The mockup sets the layout of the sync report and the
-list statement (memlog 269), not their text. On-screen text comes from
+list statement, not their text. On-screen text comes from
 EXPERIENCE.md's copy deck, and the mockup's sample lines do not ship. **Where a
 mockup and a spine disagree, the spine wins.**
+
+[`mockups/key-filter-modal.html`](mockups/key-filter-modal.html) draws the header
+with `{components.filter-button}`, the open `{components.filter-modal}` over the
+overlay, and specimens of its states. Its overlay covers the frame, not the
+viewport, so the specimens below stay visible.
 
 **The frame.** The page is one centred column between `{spacing.content-min}` and
 `{spacing.content-max}`, with `{spacing.gutter}` inside each edge
 (`box-sizing: border-box`). A narrower viewport scrolls sideways. The target
 screen is a 1080×1920 portrait second monitor. With a vertical scrollbar, its
-frame is about 1063px, and the content inside the gutters is about 1015px
-(memlog 258 N-22). The page has no fixed height. The document scrolls, and the
-footer comes after the content (memlog 243). `{components.header-bar}` is sticky.
+frame is about 1063px, and the content inside the gutters is about 1015px.
+The page has no fixed height. The document scrolls, and the
+footer comes after the content. `{components.header-bar}` is sticky.
 `{components.sync-report-panel}` is the only region that scrolls inside itself.
 
-**One width-dependent rule** (memlog 273): the number of chase cells, below.
+**One width-dependent rule**: the number of chase cells, below.
 Nothing else on the page changes with width.
 
 **Order down the page:** header bar → sync report panel, when open → list
@@ -574,7 +597,7 @@ Unrankable appendix → footer legend.
 
 The row always reserves the mark slot, so every figure ends at the same x.
 
-**The chase column** (memlog 273). The chase column is the frame's inner width
+**The chase column**. The chase column is the frame's inner width
 less 390px (`{spacing.col-rank}`, `{spacing.col-name}`, `{spacing.col-ev}` and
 three `{spacing.col-gap}`). It holds three cells when each of the three is at
 least the measured cell budget *B* (*Measure at build*). Otherwise it holds two
@@ -591,8 +614,8 @@ Three cells show while (chase column − 36px) ÷ 3 ≥ *B*. That is, they show 
 frame width of 3*B* + 474px. EXPERIENCE.md (Responsive & Platform) owns what the
 switch does.
 
-**Measure at build.** Report an overrun. Never cut text to make it fit
-(memlog 268).
+**Measure at build.** Report an overrun. Never cut text to make it fit, except
+where EXPERIENCE.md, *What may be cut*, allows it.
 
 - The chase-cell budget *B*: the width of EXPERIENCE.md's short-form budget
   (Domain Vocabulary, *Combinations and short forms*) at `{typography.chase}` in
@@ -606,24 +629,30 @@ switch does.
 - The header bar against its width budget, below.
 - Each mark's drawing against its line: ◐ and ○ at one diameter.
 
-**The header's width budget** (memlog 270, 277, 279, 296). At `{spacing.content-min}`
-the bar has 952px inside its gutters. It never wraps or shrinks. These figures
-come from the browser at 1000px, with `Orbs`, `Items worth ≥` and a 75px slider
-(memlog 296):
+**The header's width budget**. The controls never wrap or shrink. The title takes
+what is left and cuts with an ellipsis when that is too little. These figures come
+from the browser, with `Orbs`, `Items worth ≥`, a 75px slider and `{components.filter-button}`
+(64.4px, plus its gap). They are the controls alone, gaps included, without the title:
 
-| Craft Cost slot | Bar |
+| Craft Cost slot | Controls |
 |---|---|
-| `no figure yet` | 921.1px |
-| `0.42 div / craft` | 934.5px |
-| `10.00 div / craft` | 942.9px |
-| `< 0.01 div / craft`, the widest form | 946.4px |
+| `no figure yet` | 795.6px |
+| `0.42 div / craft` | 809.0px |
+| `10.00 div / craft` | 817.4px |
+| `< 0.01 div / craft`, the widest form | 820.9px |
 
-The sync button keeps one width across its age and problem forms, so the Craft
-Cost slot is the only text that moves the bar. A cost of 100 div or more would
-overflow by about 2px. Re-measure the bar at build against these forms.
+The target frame leaves 1015px inside the gutters, so `Worth picking up` prints in
+full on the target monitor `[ASSUMPTION — measure the title at build]`. At
+`{spacing.content-min}` (952px inside the gutters) the title cuts.
 
-**The expansion-line grid** gives the longest reason room to clear the trade link
-(memlog 261). At `{spacing.content-min}` the combination cell is about 464px.
+The sync button keeps one 134px slot across its age and problem forms, so the
+Craft Cost slot is the only text that moves the controls. A wider cost takes its
+width from the title. The sync button's slot must hold its widest form, but `Synced 365d ago ▾` measures
+136.1px, 2.1px over the 134px slot `[OPEN]`.
+Re-measure the bar at build against these forms.
+
+**The expansion-line grid** gives the longest reason room to clear the trade link.
+At `{spacing.content-min}` the combination cell is about 464px.
 
 **What may be cut:** EXPERIENCE.md (Domain Vocabulary) owns this. A cut looks like
 a trailing ellipsis, and nothing else.
@@ -645,11 +674,11 @@ Depth is tonal, in three steps: `{colors.ground}` → `{colors.surface}` →
 `{colors.surface-raised}`. A row that is hovered, pressed or open steps up to the
 surface. An expansion is the surface, joined flush to its row. Only a tooltip
 rests on the raised step. A pressed sync button or recipe segment takes the raised
-step until release (memlog 265).
+step until release.
 
-**Shadows are for floating layers only.** The tooltips carry a soft drop shadow,
-because they float over the rows and need an edge against them. Nothing else has a
-shadow, and hover never lifts anything.
+**Shadows are for floating layers only.** The tooltips and `{components.filter-modal}`
+carry a soft drop shadow, because they float over the rows and need an edge against
+them. Nothing else has a shadow, and hover never lifts anything.
 
 The open-row bar is a rule, not a shadow, even where an inset box-shadow draws it.
 It is the page's one directional mark. It tells the player which row an open panel
@@ -675,12 +704,14 @@ behaviour, copy and when each case occurs, under the same component name.
 
 ### The interaction looks
 
-There are four looks, plus the ranked row, and each look means one thing
-(memlog 248, 258 N-12). EXPERIENCE.md, Interaction Primitives, owns the meanings.
+There are four looks, plus the ranked row, and each look means one thing.
+EXPERIENCE.md, Interaction Primitives, owns the meanings.
 The YAML specifies the looks on these parts:
 
 - the EV label of `{components.column-header}`: dotted underline, help cursor
-- `{components.sync-button}`: accent open sign, outline on hover
+- `{components.sync-button}` and `{components.filter-button}`: accent open sign,
+  outline on hover
+- the download and copy actions of `{components.filter-modal}`: accent text
 - `{components.show-more}`: accent text
 - the active segment of `{components.recipe-toggle}` and the slider of
   `{components.threshold-control}`: accent fill
@@ -690,15 +721,15 @@ A mark takes the help cursor alone, with no underline under it.
 
 ### Header bar
 
-The brand block takes the free space and pushes the controls right. Nothing wraps
-or shrinks, because the width budget (Layout & Spacing) assumes a bar that never
-reflows. Attribution and the sync time are not in the bar. They are in the sync
-report (memlog 243).
+The brand block takes the free space and pushes the controls right. No control
+wraps or shrinks. Only the title gives way, with an ellipsis, in a frame narrower than the target
+(Layout & Spacing). Attribution and the sync time are not in the bar. They are in the sync
+report.
 
 ### Recipe toggle
 
 With one recipe, the word prints as plain text with no frame, because there is
-nothing to choose (memlog 275). **Craft Cost** sits beside the recipe and nowhere
+nothing to choose. **Craft Cost** sits beside the recipe and nowhere
 else. It is a property of the recipe, not of a row: `core` subtracts the same
 figure from every crafted EV (AD-17). An uncostable recipe prints a phrase in that
 slot and never a number. A zero would look free and inflate every crafted EV.
@@ -715,15 +746,27 @@ the hover and editing states. The YAML specifies them.
 
 The button keeps its hover border while its panel is open. Thus the player can
 always identify the opener of an open panel. The problem state replaces the age and
-does not add to it. This keeps the header inside its width budget (memlog 270).
+does not add to it. This keeps the header inside its width budget.
+
+### Filter button and filter modal
+
+→ [`mockups/key-filter-modal.html`](mockups/key-filter-modal.html)
+
+The filter button borrows the sync button's look because it means the same thing:
+click to open. The modal is the page's one floating panel. It takes
+the tooltip's radius and shadow, so it reads as a floating layer and not as a
+region of the page. The folder path is in the verbatim register because the player
+pastes it, so they must see its exact characters. The download is accent text, not
+a filled button, because an accent fill means a setting (EXPERIENCE.md,
+Interaction Primitives). The game-side look of the filter is not in this document
+(EXPERIENCE.md, Foundation).
 
 ### Sync report panel
 
 An absence line has no mark and no colour, because its file is absent-tolerable
-(AD-24). The absence is a declared state, not a break (memlog 213). A missing
-figure is a phrase and never `0` (memlog 212). Starved-pin and stale-patch lines
-take the rough mark, not the broken one. They are unreliable, not broken
-(memlog 265).
+(AD-24). The absence is a declared state, not a break. A missing
+figure is a phrase and never `0`. Starved-pin and stale-patch lines
+take the rough mark, not the broken one. They are unreliable, not broken.
 
 ### Column header
 
@@ -732,36 +775,36 @@ figures and not over the marks.
 
 ### EV tooltip
 
-It is the one place that decodes every mark beside the figures it qualifies
-(memlog 247). It is left-aligned and in sentence case, with no letter-spacing. This
-holds although it hangs from a right-aligned, uppercase header label (memlog 275).
+It is the one place that decodes every mark beside the figures it qualifies.
+It is left-aligned and in sentence case, with no letter-spacing. This
+holds although it hangs from a right-aligned, uppercase header label.
 
 ### Ranked row
 
 Tone alone cannot mark the open row, because hover uses the same tone. The inset
 bar identifies the open row while the pointer is on another row. A pressed row
-stays on the surface, so its tertiary and dim text keeps the floor (memlog 268). A
-negative EV is dimmed, not hidden, because it is still a real figure
-(memlog 258 N-20). On a Raw Base row, the sell-as-is line in the chase area is the
-non-colour cue that tells it from a crafted class (memlog 258 N-13). The skeleton
-paints this grid in flat bars with no shimmer (memlog 211). EXPERIENCE.md, state
+stays on the surface, so its tertiary and dim text keeps the floor. A
+negative EV is dimmed, not hidden, because it is still a real figure.
+On a Raw Base row, the sell-as-is line in the chase area is the
+non-colour cue that tells it from a crafted class. The skeleton
+paints this grid in flat bars with no shimmer. EXPERIENCE.md, state
 22, says when.
 
 ### Trust mark and mark tooltip
 
 On a row the mark stands alone. Thus the verdict is visible without the pointer,
-and only its reason waits for a hover (memlog 247). A current price renders no
+and only its reason waits for a hover. A current price renders no
 element. The slot stays reserved, so the figures never shift.
 
 ### Estimate mark
 
 ≈ sits before the figure and the trust mark sits after it, so one amber can serve
-both (memlog 258 N-15).
+both.
 
 ### Chase cell
 
 A fallback entry changes face only. A cut cell shows its full text in the mark
-tooltip's shell, the shared tooltip look (memlog 279). There the mod text is
+tooltip's shell, the shared tooltip look. There the mod text is
 `{colors.rarity-magic}`, and the tier and joiner are `{colors.text-secondary}`.
 These colours replace the row's colours, because the row's dim mod text and
 tertiary joiner fall under the floor on the raised step.
@@ -769,22 +812,22 @@ tertiary joiner fall under the floor on the raised step.
 ### Expansion panel and expansion line
 
 The panel has no title and no sub-line, because the sticky header always shows the
-threshold and the recipe (memlog 258 N-11). A below-threshold line is dimmed, tiers
-included, and not hidden (memlog 258 N-3, 275). The strike, the dagger and the tone
-identify a pruned line. A pruned line carries no removal date (memlog 234).
+threshold and the recipe. A below-threshold line is dimmed, tiers
+included, and not hidden. The strike, the dagger and the tone
+identify a pruned line. A pruned line carries no removal date.
 
-**Pinned** (memlog 199). The pinned mark leads the combination cell at 600, because
+**Pinned**. The pinned mark leads the combination cell at 600, because
 it is a lookup key. A player who reads about starved pinned entries in the sync
 report scans open panels for it. A curation status says nothing about a figure, so
 it takes no attention colour and no accent.
 
 ### Show more
 
-One look serves every show-more and act on the page (memlog 258 N-12).
+One look serves every show-more and act on the page.
 
 ### Trade link
 
-*Its restraint is functional* (memlog 202). This is the page's only outbound link.
+*Its restraint is functional*. This is the page's only outbound link.
 PRD SM-1 counts sessions in which the trade site stays shut. A prominent link would
 invite the habit whose absence SM-1 measures. Do not promote it: no button, no
 label, no wider cell, no larger click target.
@@ -793,11 +836,11 @@ label, no wider cell, no larger click target.
 
 It follows the list because it answers a question that comes after the list: what
 did the ranking leave out? Its count never takes an attention colour, and its rows
-carry no mark. The reason says why (memlog 258 N-9).
+carry no mark. The reason says why.
 
 ### Footer legend
 
-It comes after the content and is never pinned (memlog 243). EXPERIENCE.md's copy
+It comes after the content and is never pinned. EXPERIENCE.md's copy
 deck owns its items and their order.
 
 ### List statement
@@ -827,7 +870,7 @@ states 26 and 28, owns the causes and the copy.
 | Show the mark on the row and its reason in a hover tooltip | Hide the verdict itself behind the pointer |
 | Spell out mark, word and reason on an expansion line | Leave an expansion line with a mark only |
 | Use the four interaction looks for their four meanings | Give a hover explanation and a click-to-open the same look |
-| Open the sync report and a ranked row in place, pushing the page down | Put either in an overlay, a dropdown, a modal or a drawer |
+| Open the sync report and a ranked row in place, pushing the page down. Keep `{components.filter-modal}` as the one modal | Put the sync report or a ranked row in an overlay, a dropdown, a modal or a drawer |
 | Keep tooltips for explanation only, left-aligned | Put an action, a link or a control in a tooltip |
 | Carry rank emphasis with weight and the rank numeral's colour | Make a top-ranked row taller or its type larger |
 | Hold every ranked row at `{spacing.row-height}` and every expansion line at `{spacing.line-height-expansion}`. A pruned line's reason line is the one addition. An appendix row is the one exception: a wrapped note grows it past `{spacing.line-height-expansion}` | Vary row height by rank, content or state |
@@ -842,7 +885,7 @@ states 26 and 28, owns the causes and the copy.
 | Leave the link cell empty where no trade link renders | Draw the link greyed |
 | Keep ↗ a single mark, quiet at rest | Add a button, a label, a second icon or a wider click target |
 | Round controls and tooltips. Keep rows and panels square | Round a row or a panel, or add a chip, a pill or a badge background |
-| Give shadows to the tooltips only | Shadow a panel, a row or a control, or lift anything on hover |
+| Give shadows to the tooltips and the filter modal only | Shadow a panel, a row or a control, or lift anything on hover |
 | Declare a `lineHeight` on every type role but the inline tier | Let Mantine's 1.55 decide a row height |
 | Keep one dark theme, centred between `{spacing.content-min}` and `{spacing.content-max}` | Add a light theme, an OS switch, or a width rule other than the chase-cell count |
 | Let the page grow and the document scroll | Fix the page to a height, or shrink rows to fit a screen |

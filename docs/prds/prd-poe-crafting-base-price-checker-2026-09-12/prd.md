@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 34
+revision: 35
 created: 2026-09-12
-updated: 2026-10-31
+updated: 2026-11-01
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -12,6 +12,7 @@ sources:
   - docs/stories/archive/sprint-change-proposal-2026-10-11.md
   - docs/stories/archive/spec-poesessid-sync/SPEC.md
   - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
+  - docs/forge/loot-filter-integration/forged-idea.md
 inherits:
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/WEIGHTS-FILE-SCHEMA.md
@@ -30,7 +31,7 @@ This PRD is the requirements layer for a single-player tool that answers one que
 
 **Inheritance.** `ARCHITECTURE-SPINE.md` is settled and its decisions are inherited, not re-decided. A citation `(AD-n)` names the decision and its rationale. Under **AD-0**, a companion section an AD delegates to binds exactly as that AD, so a citation to `WEIGHTS-FILE-SCHEMA.md` is a citation to the architecture. The spine's *Retired AD map* is the authority for any id that no longer resolves.
 
-**Conventions.** §3 defines every domain noun and the rest of the document uses those terms verbatim. FRs are numbered globally, FR-1 to FR-34, and a number is never reused or reassigned. A bullet marked *(PRD-owned)* is a product decision this document owns, and the architecture does not adjudicate it. A heading marked *Architecture-owned* names a capability whose acceptance conditions live in the cited decision rather than here; a workflow turning this document into stories reads the cited decision for acceptance rather than the bullets below it. Revision history lives in `.memlog.md` and git, not here.
+**Conventions.** §3 defines every domain noun and the rest of the document uses those terms verbatim. FRs are numbered globally, FR-1 to FR-37, and a number is never reused or reassigned. A bullet marked *(PRD-owned)* is a product decision this document owns, and the architecture does not adjudicate it. A heading marked *Architecture-owned* names a capability whose acceptance conditions live in the cited decision rather than here; a workflow turning this document into stories reads the cited decision for acceptance rather than the bullets below it. Revision history lives in `.memlog.md` and git, not here.
 
 ## 1. Vision
 
@@ -67,6 +68,7 @@ There is a single operator, a single role, no authentication and no multi-device
 - **UJ-4. The trust check.** The player notices a row that ranks suspiciously high. The row itself says that its price is not current enough to act on, and that its odds are estimated. He discounts that row rather than acting on it.
 - **UJ-5. The curation pass.** The player reviews deliberately after a few weeks, working through the Combinations he tracks against each Item Class. He sees three Combinations that have returned no listings all league, and one Combination flagged unresolvable since the last patch. He opens `data/tracked.json`, tombstones the dead Combinations with a reason, pins one Combination he wants watched closely, and commits. The next sync run reflects the edit.
 - **UJ-6. The league reset.** A new league starts. The player edits the active league in `data/config.json` and commits. The ranking goes honestly empty rather than quietly serving last league's numbers, and the ranking refills over the following day.
+- **UJ-7. The filter refresh.** After the pre-session read, the Payout Threshold and Craft Recipe stay where he left them. The player saves a fresh Pick-up Filter over last session's and reloads it in the game. For the rest of the session, his Base Filter hides what he never wants. The bases worth picking up show in a treatment that says whether to craft on them, sell them raw or identify them and check the rolls. He reads no list in the middle of a map.
 
 ## 3. Glossary
 
@@ -81,7 +83,7 @@ Downstream readers and workflows use these terms exactly. A synonym introduced a
   - a **raw** entry names a Base Type and no affixes.
 
   The two kinds are told apart by **what the entry names**, never by craftedness inferred from absent fields, so a crafted entry and a Raw Base are never confused (AD-5). Each Modifier Reference carries a hand-written, display-only **Accepted Tier** label (FR-22).
-- **Raw Base** — a raw Tracked Entry: an uncrafted white base, the one case where selling the base may beat crafting on it.
+- **Raw Base** — a raw Tracked Entry: an uncrafted white base, the one case where selling the base may beat crafting on it. The Raw Bases of an Item Class are also the bases of that class the player would craft on. For this reason, they are the bases the Pick-up Filter names (FR-36) *(PRD-owned)*.
 - **Combination** — the outcome a Tracked Entry describes: this Item Class carrying this prefix and this suffix. A Raw Base describes the degenerate Combination of an uncrafted base, and the Payout Threshold applies to it exactly as to any other (FR-3, AD-17).
 - **Chase Combination** — one of the Combinations on an Item Class that contribute most to its EV. The collapsed ranked row shows it, so the player knows what to look for without expanding the row (FR-2).
 - **Tracked List** — the complete curated set of Tracked Entries, held in `data/tracked.json`. It is at once what the tool watches and the tool's entire request budget (AD-12).
@@ -105,6 +107,8 @@ Downstream readers and workflows use these terms exactly. A synonym introduced a
 - **Unrankable** — an Item Class the tool excludes from the ordering because its Eligible Pool is incomplete or absent, or because its Tracked List entries contradict the Weights File; it appears in a separate group with the reason (AD-17, FR-4).
 - **Chunk** — one bounded, resumable unit of sync work, sized at runtime and never configured (AD-7).
 - **Dataset** — the published snapshot of the latest Price Observation per Tracked Entry, together with the current exchange rates (AD-19, AD-20).
+- **Base Filter** — the player's own third-party item filter, which decides everything the Pick-up Filter does not name. The tool neither reads nor edits it.
+- **Pick-up Filter** — the in-game item filter the view generates from the ranking under the current Payout Threshold and Craft Recipe. It names bases and says what each is for, never Combinations (FR-35).
 - **Sync Report** — the published structured record of a sync run: requests consumed per source, unresolvable entries, entries not reached in this Chunk *(PRD-owned)*, pinned-starvation records, the measured pool-coverage fraction with its denominator, and the date of the last Tracked List edit (AD-7, AD-12, AD-27, FR-25).
 
 ## 4. Features
@@ -555,6 +559,50 @@ The ranking treats a Price Observation from any league but the active one as abs
 - A Tracked Entry offers a trade-site link only when its stored search is valid for the active league, never on a `pruned` tombstone, never keyed on Price State. The link is the player's own act, in a new tab (AD-15, AD-24).
 
 
+### 4.11 The Pick-up Filter
+
+**Description.** The Ranked List says what is worth picking up. But the player reads it before a session and then plays from memory for two hours. The Pick-up Filter carries the pick-up half of that knowledge into the game. The ground itself then shows which bases to keep and what each one is for. It does not carry the Combinations to chase. The filter cannot express them, and the view stays the place to read them. Realises UJ-7.
+
+**Functional Requirements:**
+
+#### FR-35: Generate a Pick-up Filter from the current ranking
+
+The player generates a Pick-up Filter from the view. The filter shows exactly what the ranking says under the Payout Threshold and Craft Recipe on screen at that moment. Realises UJ-7.
+
+**Consequences (testable):**
+- Generating the filter needs no network request and no sync, as for a Payout Threshold change (AD-15, AD-24, NFR-6).
+- The player saves the generated filter himself. The tool writes nothing outside the viewer's own browser storage (AD-15).
+- The filter adds visibility and never hides an item. For an item that the filter names, the filter's treatment is final and overrides the Base Filter. Every item it does not name keeps the Base Filter's treatment *(PRD-owned; mechanism: AD-31)*.
+- The filter is a snapshot of the ranking, not a second judgement of it. A figure that FR-10 to FR-12 mark as weak or not current enters the filter unmarked. The player reads those marks in the view when he generates the filter. On the ground this gives up SM-C4's guard, which stays in the view *(PRD-owned)*.
+- The filter never names a Combination, a modifier or a price.
+- A change to the Payout Threshold, the Craft Recipe or a price reaches the game only when the player saves the filter again *(PRD-owned)*.
+
+#### FR-36: Name each base worth picking up, and what it is for
+
+Each drop the filter names carries exactly one purpose: craft on it, sell it raw, or identify it and check the rolls. The purpose can differ by rarity on the same base. Realises UJ-7.
+
+**Consequences (testable):**
+- The bases are the Raw Bases of the Tracked List that are not pruned (FR-15). A jewel kind is the one exception. Jewels never drop white, so the jewel kind itself is the base *(PRD-owned)*.
+- A drop qualifies at or above its Raw Base's own Item Level Floor. For craft and check the rolls, the drop must also reach the Item Level Floor that the crafted entries of its Item Class share, because that floor scopes the EV (FR-22, AD-17). A jewel kind uses the shared Item Level Floor of its Item Class.
+- An Item Class is worth crafting when its EV under the current Payout Threshold and Craft Recipe is above zero *(PRD-owned)*. The filter does not apply the Payout Threshold a second time as a cutoff, because the Payout Threshold already shapes EV (FR-1).
+- Crafting on a base forfeits its raw sale. The raw sale is worth its price at or above the Payout Threshold and nothing below it, as FR-3 truncates a Raw Base. Call that raw value(B). For a white Raw Base B of Item Class C *(PRD-owned)*:
+  - **craft** when EV(C) > 0 and raw value(B) < EV(C).
+  - **sell raw** when raw value(B) > 0 and raw value(B) ≥ EV(C).
+- A magic drop of a Raw Base B whose Item Class has EV > 0 is **check the rolls** when the game shows its unidentified tier as 4 or 5, the two best *(PRD-owned)*. Any magic jewel whose Item Class (its jewel kind) has EV > 0 is **check the rolls**. Jewels drop with no unidentified tier.
+- An Item Class with no EV, because it is Unrankable (FR-4) or has no priced Combination (FR-9), has no craft and no check-the-rolls entry. Its Raw Bases are **sell raw** when raw value(B) > 0, as the raw branch ranks them (FR-3).
+- While the active Craft Recipe is uncostable, no Item Class has an EV, so every class follows the bullet above (FR-26).
+- A Raw Base with no price has no sell-raw entry, because a missing price is never zero (FR-9). It is **craft** when EV(C) > 0, because nothing shows that its raw sale beats the craft. Its check-the-rolls entry depends on EV(C) alone.
+
+#### FR-37: Tell the three purposes apart on the ground
+
+The player can tell craft, sell raw and check the rolls apart at a glance. Realises UJ-7.
+
+**Consequences (testable):**
+- Each purpose has one treatment. The filter does not grade a purpose by EV *(PRD-owned)*.
+- The treatments are quiet. The filter exists to unhide and label, not to alarm *(PRD-owned)*.
+- Each treatment carries the colour meaning that the player's Base Filter, NeverSink's filter through FilterBlade, gives that kind of item. His reading of the colours then carries over if he returns to the Base Filter alone *(PRD-owned)*. The code owns every treatment (AD-31).
+- What the game's item filter can express bounds the treatments (NFR-10).
+
 ## 5. Cross-Cutting NFRs
 
 These are engineering and workflow requirements. The cited owner states each one. The ids stay so that citations still resolve.
@@ -568,12 +616,12 @@ These are engineering and workflow requirements. The cited owner states each one
 - **NFR-7 — Static delivery, zero upkeep.** No server, no secret material, no expiring credential (AD-15). FR-20 and AD-30 cover the optional sync cookie.
 - **NFR-8 — Schema versioning at every trust boundary** (AD-3).
 - **NFR-9 — Third-party citizenship.** Keeping API access is a standing requirement, because the product depends on it entirely (R-7) *(PRD-owned)*. AD-8 and AD-30 own the mechanism and the one operator-chosen departure that OQ-26 verifies.
-- **NFR-10 — Accessibility floor.** Colour alone never carries a product-meaningful distinction: price trustworthiness (FR-12), estimated odds (FR-11) and crafted versus uncrafted (FR-3). AD-24 requires this for Provenance. This PRD extends it to the others *(PRD-owned)*.
+- **NFR-10 — Accessibility floor.** Colour alone never carries a product-meaningful distinction: price trustworthiness (FR-12), estimated odds (FR-11) and crafted versus uncrafted (FR-3). AD-24 requires this for Provenance. This PRD extends it to the others *(PRD-owned)*. It binds the view. What the game's item filter can express bounds the Pick-up Filter instead (FR-37) *(PRD-owned)*.
 ## 6. Non-Goals (Explicit)
 
 - **Producing modifier weight data.** The scraper is a separate project; this app consumes a file and is indifferent to its producer (AD-11). The file is a release dependency, not an optional input (§7.3).
 - **Advising whether to augment an item already in hand.** Excluded by design; the strongest v2 candidate if the pickup list proves its value.
-- **Loot filter export in v1.** PoE2's filter syntax cannot express modifier Combinations, so a generated filter could automate only the base-name half of the knowledge. The web view is the permanent product, not a step toward another one.
+- **Combinations in the Pick-up Filter.** PoE2's filter syntax cannot express modifier Combinations, so the filter carries only which bases to pick up and for what (FR-35). The web view stays the place to read what to chase. The view generates the filter, and the filter does not replace the view.
 - **Rare items.** Magic only: at most one prefix and one suffix.
 - **Accounts, sharing, per-user preferences, anything multi-user.** Any requirement that appears to need a backend is escalated, not implemented (AD-15).
 - **Visual design beyond an off-the-shelf framework.** Appearance is explicitly not a priority *(PRD-owned)*.
@@ -600,6 +648,7 @@ These are engineering and workflow requirements. The cited owner states each one
 - A defined Weights File **schema**, with its pool-completeness contract enforced in both directions. The **file** itself is an external deliverable, and is not in scope here (§7.3).
 - Divine normalisation at the sync boundary, with exchange observations carried in Provenance.
 - League-scoped observations with an honest empty state across a reset.
+- A Pick-up Filter generated from the current ranking, naming bases and their purpose, never Combinations (FR-35 to FR-37).
 
 ### 7.2 Out of Scope for MVP
 
