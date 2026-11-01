@@ -3,7 +3,7 @@ stepsCompleted: ['step-01-validate-prerequisites', 'step-02-design-epics', 'step
 storiesWrittenForEpics: [1, 2, 3, 4, 5, 6]
 storiesPendingForEpics: []
 blockedStories: []
-revisionPass: 'Targeted revision 2026-11-01 for PRD revision 35, spine revision 46, EXPERIENCE.md revision 33 and DESIGN.md revision 23 (the Pick-up Filter): FR inventory to 37, UX-DR54 to UX-DR60 added, Epic 6 appended with three stories. Epics 1 to 5 are unedited records. Before it, targeted revision 2026-10-23 for weights contract 7.0.0 and spine revision 39 (blocking mod tags): Epic 5 appended with one story. Epics 1 to 4 are unedited records. Before it, targeted revision 2026-10-09 for PRD revision 27 and the Rarity Dark redesign (UX revision 24, DESIGN revision 19): FR inventory to 34, thirteen FR titles retitled, retired-direction UX-DRs marked superseded, Epic 4 appended. Epics 1 to 3 are unedited records. Before it, targeted revision 2026-09-27 of Story 3.6 and the weights-contract citations for spine revision 23 (AD-10 folds Provenance per (itemClass, recipe) pair; contract 6.1.0) and PRD revision 23. Before it, targeted revision 2026-09-27 of Epic 2 and Stories 2.7 and 2.8 (epic 2 retro item 19) for the committed weights.json 6.0.0 with recipes.json published with no recipe, which the masthead dek explains. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
+revisionPass: 'Targeted revision 2026-11-01 for PRD revision 36 (FR-36: one base tracked at two floors): Story 6.4 appended to Epic 6. Before it, targeted revision 2026-11-01 for PRD revision 35, spine revision 46, EXPERIENCE.md revision 33 and DESIGN.md revision 23 (the Pick-up Filter): FR inventory to 37, UX-DR54 to UX-DR60 added, Epic 6 appended with three stories. Epics 1 to 5 are unedited records. Before it, targeted revision 2026-10-23 for weights contract 7.0.0 and spine revision 39 (blocking mod tags): Epic 5 appended with one story. Epics 1 to 4 are unedited records. Before it, targeted revision 2026-10-09 for PRD revision 27 and the Rarity Dark redesign (UX revision 24, DESIGN revision 19): FR inventory to 34, thirteen FR titles retitled, retired-direction UX-DRs marked superseded, Epic 4 appended. Epics 1 to 3 are unedited records. Before it, targeted revision 2026-09-27 of Story 3.6 and the weights-contract citations for spine revision 23 (AD-10 folds Provenance per (itemClass, recipe) pair; contract 6.1.0) and PRD revision 23. Before it, targeted revision 2026-09-27 of Epic 2 and Stories 2.7 and 2.8 (epic 2 retro item 19) for the committed weights.json 6.0.0 with recipes.json published with no recipe, which the masthead dek explains. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
 inputDocuments:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md
@@ -2883,7 +2883,7 @@ After the pre-session read, the player downloads an in-game item filter built fr
 
 **Source of truth.** PRD revision 35 holds FR-35 to FR-37: the purpose rules, the floors and the snapshot rule. `ARCHITECTURE-SPINE.md` revision 46 holds AD-31, the file's layering, block kinds, match form and the `core`/`web` split, and AD-15, the download. `EXPERIENCE.md` revision 33 holds Interaction 9, states 44 to 47, the Copy Deck *Pick-up Filter* and *What survives a reload*. `DESIGN.md` revision 23 holds `filter-button`, `filter-modal` and `mockups/key-filter-modal.html`. Every acceptance criterion cites these documents and copies no rule or string.
 
-**Order.** 6.1, then 6.2, then 6.3. Each story is green under `pnpm check` on its own. 6.1 and 6.2 add no UI. 6.3 is the first story the player sees.
+**Order.** 6.1, then 6.2, then 6.3. Each story is green under `pnpm check` on its own. 6.1 and 6.2 add no UI. 6.3 is the first story the player sees. 6.4 changes only the outputs of 6.1 and 6.2 and adds no UI, so it can land before or after 6.3. PRD revision 36 holds the FR-36 rule that 6.4 builds.
 
 ### Story 6.1: The purpose of each base, decided once in `core`
 
@@ -3029,6 +3029,45 @@ So that before each session one click puts the current ranking on the ground.
 **When** the player selects `crafting-bases` in the game and loads it
 **Then** the game accepts the filter, a named base shows its purpose's treatment, and an item no block names looks as the NeverSink export alone makes it look
 **And** this is the story's human acceptance step, because no offline test can load the game's filter parser (UJ-7; UX-DR60).
+
+**Given** the change is done
+**When** `pnpm check` runs
+**Then** it passes, and no test makes a network call (NFR-1).
+
+### Story 6.4: One purpose per drop when a base is tracked at two floors
+
+As the player,
+I want a base that I track at two item levels to show the purpose of the tier that the drop reaches,
+So that a high-item-level drop never shows the purpose of a cheaper tier.
+
+**Note.** PRD revision 36 adds this rule to FR-36. It closes the two FR-36 entries of the spec-6-1 and spec-6-2 reviews in `docs/stories/deferred-work.md`. Block order alone cannot meet the second and third criteria. AD-31 admits any item-level condition that FR-36 states, and an upper bound is one.
+
+**Acceptance Criteria:**
+
+**Given** two non-pruned Raw Bases of one `baseTypeId` at different Item Level Floors
+**When** `core`'s purpose function runs and `web`'s serialiser writes its output
+**Then** exactly one block catches each drop of each rarity, and that block carries the purpose that FR-36 gives the drop through the Raw Base it belongs to
+**And** the file still holds only `Show` blocks and ends with the `Import`, and FR-36 is still evaluated only in `core` (AD-31).
+
+**Given** the higher-floor Raw Base gives a drop no purpose, for example because its raw value(B) is 0 and its Item Class has no EV above zero
+**When** the file is generated
+**Then** no block catches that drop, so the Base Filter decides it (FR-36, FR-35).
+
+**Given** the lower-floor Raw Base is craft or check the rolls, and the floor that its class's crafted entries share is at or above the higher Raw Base's floor
+**When** the file is generated
+**Then** a drop at or above the higher floor takes the higher Raw Base's purpose (FR-36, FR-22; AD-17).
+
+**Given** the higher-floor Raw Base is pruned
+**When** the file is generated
+**Then** the lower-floor Raw Base gives the purpose of every drop at or above its own floor (FR-15, FR-36).
+
+**Given** one Raw Base for each `baseTypeId`, as `data/tracked.json` holds today
+**When** the file is generated
+**Then** the text is byte-identical to Story 6.2's golden text (NFR-3).
+
+**Given** the change is done
+**When** the branch lands
+**Then** tests of this rule replace the open-case pinning test in `filter-text.test.ts`, and the last commit of the branch removes the two FR-36 entries from `docs/stories/deferred-work.md`.
 
 **Given** the change is done
 **When** `pnpm check` runs

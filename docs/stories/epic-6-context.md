@@ -11,6 +11,7 @@ After the pre-session read, the player downloads an in-game item filter (`crafti
 - Story 6.1: The purpose of each base, decided once in `core`
 - Story 6.2: The filter text, Show-only, with the Base Filter imported last
 - Story 6.3: The filter button, the filter modal and the download
+- Story 6.4: One purpose per drop when a base is tracked at two floors
 
 ## Requirements & Constraints
 
@@ -29,6 +30,7 @@ After the pre-session read, the player downloads an in-game item filter (`crafti
 - *No EV:* a class that is Unrankable (FR-4), has no priced Combination (FR-9), or sits under an uncostable recipe (FR-26, state 35) or no published recipe (state 43) gets no craft and no check-the-rolls entry. Its Raw Bases are sell raw when raw value(B) > 0.
 - *EV <= 0* (for example state 25): no craft and no check-the-rolls entry for that class.
 - *Unpriced Raw Base:* a missing price is never zero (FR-9). It has no sell-raw entry. It is craft when EV(C) > 0. Its check-the-rolls entry depends on EV(C) alone.
+- *One base at two floors (FR-36, PRD revision 36):* a drop belongs to the Raw Base with the highest Item Level Floor it reaches and takes its purpose from that Raw Base alone. If that Raw Base gives no purpose, no block names the drop. Story 6.4 builds this rule.
 - *Item-level floors (FR-36, FR-22, AD-17):* every drop must be at or above its Raw Base's own Item Level Floor. Craft and check the rolls must also reach the floor that the class's crafted entries share, because that floor scopes the EV. A jewel kind uses its class's shared floor.
 
 **Treatments (FR-37, NFR-10).** One treatment per purpose, never graded by EV, quiet (unhide and label, not alarm), carrying the colour meaning NeverSink's filter gives that kind of item, bounded by what the game's filter syntax can express. NFR-10's colour floor binds the view, not the filter.
@@ -54,6 +56,8 @@ After the pre-session read, the player downloads an in-game item filter (`crafti
 
 ## Cross-Story Dependencies
 
-- The stories run in order: 6.1, then 6.2, then 6.3. 6.2 serialises the output of 6.1. 6.3 calls both on download. Only 6.3 has UI.
+- The stories run in order: 6.1, then 6.2, then 6.3, and 6.4 at any point after 6.2. 6.2 serialises the output of 6.1. 6.3 calls both on download. Only 6.3 has UI.
+- 6.1 is done: `core` exports the purpose function and its entry types. The Payout Threshold reaches it only through the ranking that `rank` built under that threshold, so 6.3 passes the ranking on screen and never a second threshold (a second one could disagree and make a second judgement, which FR-35 forbids).
+- 6.4 builds the FR-36 rule for one base at two floors (PRD revision 36). It changes only the outputs of 6.1 and 6.2, adds no UI, and can land before or after 6.3. 6.3 adds no rule of its own for this case.
 - Builds on Epics 2 and 3 for the raw branch, EV under the dial, the Item Level Floor and the recipe states (35, 43). It adds no artifact and no external dependency.
 - 6.3 ends in a human acceptance step: load the file next to a real NeverSink export in the game. No offline test can run the game's filter parser.

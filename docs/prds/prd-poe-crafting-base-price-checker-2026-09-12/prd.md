@@ -1,7 +1,7 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 35
+revision: 36
 created: 2026-09-12
 updated: 2026-11-01
 sources:
@@ -584,6 +584,7 @@ Each drop the filter names carries exactly one purpose: craft on it, sell it raw
 **Consequences (testable):**
 - The bases are the Raw Bases of the Tracked List that are not pruned (FR-15). A jewel kind is the one exception. Jewels never drop white, so the jewel kind itself is the base *(PRD-owned)*.
 - A drop qualifies at or above its Raw Base's own Item Level Floor. For craft and check the rolls, the drop must also reach the Item Level Floor that the crafted entries of its Item Class share, because that floor scopes the EV (FR-22, AD-17). A jewel kind uses the shared Item Level Floor of its Item Class.
+- Two Raw Bases can name one base at different Item Level Floors. A drop belongs to the Raw Base with the highest Item Level Floor that the drop reaches, and only that Raw Base gives the drop its purpose. When that Raw Base gives the drop no purpose, the filter does not name the drop *(PRD-owned)*.
 - An Item Class is worth crafting when its EV under the current Payout Threshold and Craft Recipe is above zero *(PRD-owned)*. The filter does not apply the Payout Threshold a second time as a cutoff, because the Payout Threshold already shapes EV (FR-1).
 - Crafting on a base forfeits its raw sale. The raw sale is worth its price at or above the Payout Threshold and nothing below it, as FR-3 truncates a Raw Base. Call that raw value(B). For a white Raw Base B of Item Class C *(PRD-owned)*:
   - **craft** when EV(C) > 0 and raw value(B) < EV(C).

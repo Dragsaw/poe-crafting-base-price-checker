@@ -89,5 +89,6 @@ development_status:
   6-1-the-purpose-of-each-base-decided-once-in-core: done
   6-2-the-filter-text-show-only-with-the-base-filter-imported-last: review
   6-3-the-filter-button-the-filter-modal-and-the-download: backlog
+  6-4-one-purpose-per-drop-when-a-base-is-tracked-at-two-floors: backlog
   epic-6-retrospective: optional
 action_items: []
