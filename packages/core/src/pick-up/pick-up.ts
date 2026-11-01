@@ -12,6 +12,8 @@ export interface PickUpEntry {
   readonly baseTypeId: string;
   readonly rarity: 'normal' | 'magic';
   readonly itemLevelMin: number;
+  /** Set when a higher-floor Raw Base of this base type owns the drops above it (FR-36). */
+  readonly itemLevelMax?: number;
   readonly unidentifiedTierMin?: 4;
   readonly purpose: PickUpPurpose;
 }
@@ -78,7 +80,12 @@ function whitePurpose(value: ClassValue | undefined, rawValue: number | undefine
   return rawValue !== undefined && rawValue > 0 ? 'sell-raw' : undefined;
 }
 
-function rawBaseEntries(entry: RawTrackedEntry, value: ClassValue | undefined, rawValue: number | undefined): PickUpEntry[] {
+function rawBaseEntries(
+  entry: RawTrackedEntry,
+  value: ClassValue | undefined,
+  rawValue: number | undefined,
+  itemLevelMax: number | undefined,
+): PickUpEntry[] {
   const { baseTypeId } = entry;
   const classFloor = Math.max(entry.itemLevelMin, value?.itemLevelMin ?? entry.itemLevelMin);
   const out: PickUpEntry[] = [];
@@ -90,7 +97,25 @@ function rawBaseEntries(entry: RawTrackedEntry, value: ClassValue | undefined, r
   if (isWorthCrafting(value)) {
     out.push({ baseTypeId, rarity: 'magic', itemLevelMin: classFloor, unidentifiedTierMin: 4, purpose: 'check-rolls' });
   }
-  return out;
+  return itemLevelMax === undefined
+    ? out
+    : out.filter((pickUp) => pickUp.itemLevelMin <= itemLevelMax).map((pickUp) => ({ ...pickUp, itemLevelMax }));
+}
+
+/** Each Raw Base's last item level before the next higher floor of its base type (FR-36); absent for the highest. */
+function itemLevelMaxByKey(raws: readonly RawTrackedEntry[]): Map<string, number> {
+  const floorsByBase = new Map<string, number[]>();
+  for (const entry of raws) {
+    floorsByBase.set(entry.baseTypeId, [...(floorsByBase.get(entry.baseTypeId) ?? []), entry.itemLevelMin]);
+  }
+  const byKey = new Map<string, number>();
+  for (const entry of raws) {
+    const higher = (floorsByBase.get(entry.baseTypeId) ?? []).filter((floor) => floor > entry.itemLevelMin);
+    if (higher.length > 0) {
+      byKey.set(canonicalKey(entry), Math.min(...higher) - 1);
+    }
+  }
+  return byKey;
 }
 
 function jewelKindEntry(value: ClassValue): PickUpEntry {
@@ -110,15 +135,14 @@ export function pickUpPurposes(input: PickUpInput): readonly PickUpEntry[] {
   const { ranking, tracked, recipeId } = input;
   const byClass = classValuesOf(ranking, recipeId);
   const rawValues = rawValuesOf(ranking);
+  const raws = tracked.filter((entry): entry is RawTrackedEntry => entry.kind === 'raw' && entry.status !== 'pruned');
+  const maxByKey = itemLevelMaxByKey(raws);
   const keyed: KeyedEntry[] = [];
 
-  for (const entry of tracked) {
-    if (entry.kind !== 'raw' || entry.status === 'pruned') {
-      continue;
-    }
+  for (const entry of raws) {
     const key = canonicalKey(entry);
     const value = byClass.get(classKeyOf(entry.categoryId, entry.className));
-    const entries = rawBaseEntries(entry, value, rawValues.get(key));
+    const entries = rawBaseEntries(entry, value, rawValues.get(key), maxByKey.get(key));
     keyed.push(...entries.map((pickUp) => ({ key, entry: pickUp })));
   }
 

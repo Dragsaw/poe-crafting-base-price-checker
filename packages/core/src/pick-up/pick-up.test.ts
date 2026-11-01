@@ -1,16 +1,14 @@
-import { canonicalKey } from '@poe/contracts';
-import type { CraftedRankedRow, PriceTrust, RawRankedRow, RawTrackedEntry, TrackedEntry } from '@poe/contracts';
+import type { RawTrackedEntry, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { classKeyOf } from '../crafted-classes.ts';
-import type { Ranking, RecipelessClass, UnrankedEntry } from '../rank.ts';
+import type { Ranking, RecipelessClass } from '../rank.ts';
 import { pickUpPurposes } from './pick-up.ts';
 import type { PickUpEntry } from './pick-up.ts';
 import {
   BOWS_POOLS,
   chase,
   GREATER,
-  observation,
   permute,
   poolsFile,
   priced,
@@ -18,107 +16,8 @@ import {
   rankCrafted,
   RATES,
 } from '../rank/test-support.ts';
-
-const RECIPE = 'greater';
-const CURRENT: PriceTrust = { verdict: 'current', reasons: [] };
-const BOW_CLASS_FLOOR = 82;
-const BOW_RAW_FLOOR = 70;
-
-const EMPTY: Ranking = {
-  ordering: [],
-  unpricedCrafted: [],
-  belowThreshold: [],
-  noListings: [],
-  notYetSynced: [],
-  unresolvable: [],
-  unrankable: [],
-  recipeless: [],
-  uncostableRecipes: [],
-  pricedInLeague: true,
-};
-
-const rankingOf = (parts: Partial<Ranking>): Ranking => ({ ...EMPTY, ...parts });
-
-function rawBase(baseTypeId: string, status: TrackedEntry['status'] = 'active'): RawTrackedEntry {
-  const base = { kind: 'raw' as const, baseTypeId, categoryId: 'weapon.bow', className: 'Bows', itemLevelMin: BOW_RAW_FLOOR };
-  return status === 'pruned' ? { ...base, status, prunedReason: 'no market' } : { ...base, status };
-}
-
-const B = rawBase('Dualstring Bow');
-
-interface ClassRowOptions {
-  readonly categoryId?: string;
-  readonly className?: string;
-  readonly itemLevelMin?: number;
-  readonly recipeId?: string;
-}
-
-const UNCOSTABLE = 'uncostable';
-
-/** A crafted row with EV `expectedValue`, or an uncostable recipe's row (state 35). */
-function classRow(expectedValue: number | typeof UNCOSTABLE, options: ClassRowOptions = {}): CraftedRankedRow {
-  const { categoryId = 'weapon.bow', className = 'Bows', itemLevelMin = BOW_CLASS_FLOOR, recipeId = RECIPE } = options;
-  const isUncostable = expectedValue === UNCOSTABLE;
-  const grossPayout = isUncostable ? 1 : Math.max(expectedValue, 0);
-  return {
-    kind: 'crafted',
-    classKey: classKeyOf(categoryId, className),
-    categoryId,
-    className,
-    itemLevelMin,
-    recipeId,
-    grossPayout,
-    craftCost: isUncostable ? { kind: 'uncostable', currencyId: 'divine' } : grossPayout - expectedValue,
-    // eslint-disable-next-line unicorn/no-null -- boundary: `RankedRow.ev` is `z.number().nullable()` in the contracts schema.
-    ev: isUncostable ? null : expectedValue,
-    summands: [],
-    combinations: [],
-    provenance: 'measured',
-    trust: CURRENT,
-  };
-}
-
-function rawRow(entry: RawTrackedEntry, priceDivine: number): RawRankedRow {
-  return {
-    kind: 'raw',
-    entryKey: canonicalKey(entry),
-    baseTypeId: entry.baseTypeId,
-    categoryId: entry.categoryId,
-    className: entry.className,
-    itemLevelMin: entry.itemLevelMin,
-    status: 'active',
-    ev: priceDivine,
-    craftCost: 0,
-    observation: observation(priceDivine),
-    trust: CURRENT,
-  };
-}
-
-const unranked = (entry: RawTrackedEntry): UnrankedEntry => ({ entry, entryKey: canonicalKey(entry), trust: CURRENT });
-
-const white = (purpose: 'craft' | 'sell-raw', itemLevelMin: number): PickUpEntry => ({
-  baseTypeId: B.baseTypeId,
-  rarity: 'normal',
-  itemLevelMin,
-  purpose,
-});
-
-const checkRolls = (itemLevelMin = BOW_CLASS_FLOOR): PickUpEntry => ({
-  baseTypeId: B.baseTypeId,
-  rarity: 'magic',
-  itemLevelMin,
-  unidentifiedTierMin: 4,
-  purpose: 'check-rolls',
-});
-
-interface Recipe {
-  readonly id: string | undefined;
-}
-
-const ACTIVE: Recipe = { id: RECIPE };
-
-const purposesOf = (ranking: Partial<Ranking>, tracked: readonly TrackedEntry[] = [B], recipe: Recipe = ACTIVE) =>
-  pickUpPurposes({ ranking: rankingOf(ranking), tracked, recipeId: recipe.id });
+import { ACTIVE, B, BOW_CLASS_FLOOR, BOW_RAW_FLOOR, checkRolls, classRow, EMPTY, purposesOf, rankingOf, rawBase, rawRow, RECIPE, UNCOSTABLE, unranked, white } from './test-support.ts';
+import type { Recipe } from './test-support.ts';
 
 const RECIPELESS: RecipelessClass = {
   classKey: classKeyOf('weapon.bow', 'Bows'),
@@ -309,8 +208,8 @@ describe('pickUpPurposes: AC 9, no price on an entry, and a deterministic order'
     noListings: [unranked(A)],
   });
 
-  it('carries only the five fields, never a Combination, a modifier, a price, an EV or a trust verdict', () => {
-    const allowed = new Set(['baseTypeId', 'rarity', 'itemLevelMin', 'unidentifiedTierMin', 'purpose']);
+  it('carries only the entry fields, never a Combination, a modifier, a price, an EV or a trust verdict', () => {
+    const allowed = new Set(['baseTypeId', 'rarity', 'itemLevelMin', 'itemLevelMax', 'unidentifiedTierMin', 'purpose']);
     const entries = pickUpPurposes({ ranking, tracked, recipeId: RECIPE });
     expect(entries.length).toBeGreaterThan(0);
     expect(entries.flatMap((entry) => Object.keys(entry).filter((key) => !allowed.has(key)))).toEqual([]);

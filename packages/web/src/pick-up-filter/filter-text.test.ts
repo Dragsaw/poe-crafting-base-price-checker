@@ -1,14 +1,11 @@
-import { canonicalKey, type CraftedRankedRow, type PriceTrust, type RawRankedRow, type RawTrackedEntry, type TrackedEntry } from '@poe/contracts';
-import { classKeyOf, pickUpPurposes, type PickUpEntry, type PickUpPurpose, type Ranking } from '@poe/core';
+import type { RawTrackedEntry } from '@poe/contracts';
+import type { PickUpEntry, PickUpPurpose, Ranking } from '@poe/core';
 import { describe, expect, it } from 'vitest';
 
-import { TEST_LEAGUE } from '../test-support/artifact-server';
 import { rawEntry } from '../test-support/list-fixtures';
 import { filterText, TREATMENTS } from './filter-text';
+import { BASE_FILTER, blocksOf, classRow, isCaughtBy, purposesOf, rawRow } from './filter-text-support';
 
-const BASE_FILTER = 'Base.filter';
-const RECIPE = 'greater';
-const CURRENT: PriceTrust = { verdict: 'current', reasons: [] };
 const RINGS = { categoryId: 'accessory.ring', className: 'Rings' } as const;
 const PURPOSES: readonly PickUpPurpose[] = ['craft', 'sell-raw', 'check-rolls'];
 
@@ -24,30 +21,11 @@ const whiteSell: PickUpEntry = { baseTypeId: 'Solar Amulet', rarity: 'normal', i
 const magicCheck: PickUpEntry = { baseTypeId: 'Gold Amulet', rarity: 'magic', itemLevelMin: 82, unidentifiedTierMin: 4, purpose: 'check-rolls' };
 const jewelKind: PickUpEntry = { baseTypeId: 'Ruby', rarity: 'magic', itemLevelMin: 75, purpose: 'check-rolls' };
 const rubyRing: PickUpEntry = { baseTypeId: 'Ruby Ring', rarity: 'normal', itemLevelMin: 82, purpose: 'sell-raw' };
-const ALL = [whiteCraft, whiteSell, magicCheck, jewelKind, rubyRing];
-
-/** Each `Show` block's lines, without its trailing blank line. */
-const blocksOf = (text: string): string[][] =>
-  text
-    .split('\n\n')
-    .filter((chunk) => chunk.startsWith('Show'))
-    .map((chunk) => chunk.split('\n'));
+const boundedCheck: PickUpEntry = { ...magicCheck, baseTypeId: 'Sapphire Ring', itemLevelMin: 75, itemLevelMax: 81 };
+const ALL = [whiteCraft, whiteSell, magicCheck, jewelKind, rubyRing, boundedCheck];
 
 const treatmentOf = (block: readonly string[]): string[] =>
   block.filter((line) => TREATMENT_KEYWORDS.some((keyword) => line.startsWith(`\t${keyword} `))).map((line) => line.slice(1));
-
-/** The game's `BaseType` predicate: `==` is an exact match on a quoted name, no operator is a substring match. */
-function isCaughtBy(block: readonly string[], baseName: string): boolean {
-  const match = /^\tBaseType (==\s)?(.*)$/.exec(block.find((line) => line.startsWith('\tBaseType ')) ?? '');
-  if (match === null) {
-    return false;
-  }
-  const names = (match[2] ?? '')
-    .matchAll(/"([^"]*)"/g)
-    .map((name) => name[1] ?? '')
-    .toArray();
-  return names.some((name) => (match[1] === undefined ? baseName.includes(name) : baseName === name));
-}
 
 const DIGITS = /^\d+$/;
 const isWithin = (value: string | undefined, low: number, high: number): boolean => value !== undefined && DIGITS.test(value) && Number(value) >= low && Number(value) <= high;
@@ -72,63 +50,6 @@ function isExpressible(line: string): boolean {
     }
   }
 }
-
-function classRow(categoryId: string, className: string, expectedValue: number, itemLevelMin: number): CraftedRankedRow {
-  return {
-    kind: 'crafted',
-    classKey: classKeyOf(categoryId, className),
-    categoryId,
-    className,
-    itemLevelMin,
-    recipeId: RECIPE,
-    grossPayout: expectedValue + 0.5,
-    craftCost: 0.5,
-    ev: expectedValue,
-    summands: [],
-    combinations: [],
-    provenance: 'measured',
-    trust: CURRENT,
-  };
-}
-
-function rawRow(entry: RawTrackedEntry, priceDivine: number): RawRankedRow {
-  const league = TEST_LEAGUE;
-  return {
-    kind: 'raw',
-    entryKey: canonicalKey(entry),
-    baseTypeId: entry.baseTypeId,
-    categoryId: entry.categoryId,
-    className: entry.className,
-    itemLevelMin: entry.itemLevelMin,
-    status: 'active',
-    ev: priceDivine,
-    craftCost: 0,
-    observation: {
-      league,
-      observedAt: '2026-10-31T10:00:00Z',
-      priceDivine,
-      sampleSize: 10,
-      exchangeObservation: { currencyId: 'exalted', rate: 0.0042, source: 'in-game exchange, by hand', league, asOf: '2026-10-30T08:00:00Z' },
-    },
-    trust: CURRENT,
-  };
-}
-
-const rankingOf = (ordering: Ranking['ordering']): Ranking => ({
-  ordering,
-  unpricedCrafted: [],
-  belowThreshold: [],
-  noListings: [],
-  notYetSynced: [],
-  unresolvable: [],
-  unrankable: [],
-  recipeless: [],
-  uncostableRecipes: [],
-  pricedInLeague: true,
-});
-
-const purposesOf = (ordering: Ranking['ordering'], tracked: readonly TrackedEntry[]): readonly PickUpEntry[] =>
-  pickUpPurposes({ ranking: rankingOf(ordering), tracked, recipeId: RECIPE });
 
 describe('filterText: the I/O matrix', () => {
   it('Empty: an empty list is the `Import` line alone', () => {
@@ -181,11 +102,16 @@ describe('filterText: the I/O matrix', () => {
     expect(text).toMatch(/\n\nImport "Base\.filter"\n$/);
   });
 
-  it('open FR-36 case (deferred-work.md), no rule yet: one base and rarity at two floors gives both blocks in input order', () => {
-    const blocks = blocksOf(filterText([{ ...whiteSell, itemLevelMin: 82 }, whiteSell], BASE_FILTER));
-    expect(blocks.map((block) => block.slice(1, 4))).toEqual([
-      ['\tBaseType == "Solar Amulet"', '\tRarity Normal', '\tItemLevel >= 82'],
-      ['\tBaseType == "Solar Amulet"', '\tRarity Normal', '\tItemLevel >= 75'],
+  it('Bounded tier: adds `ItemLevel <= n` right after `ItemLevel >= n`, before the tier', () => {
+    const [block] = blocksOf(filterText([boundedCheck], BASE_FILTER));
+    expect(block).toEqual([
+      'Show',
+      '\tBaseType == "Sapphire Ring"',
+      '\tRarity Magic',
+      '\tItemLevel >= 75',
+      '\tItemLevel <= 81',
+      '\tUnidentifiedItemTier >= 4',
+      ...TREATMENTS['check-rolls'].map((line) => `\t${line}`),
     ]);
   });
 });
@@ -220,6 +146,7 @@ describe('filterText: AC 2, a block matches by `BaseType ==` and never by `Class
         `\tBaseType == "${entry?.baseTypeId ?? ''}"`,
         `\tRarity ${entry?.rarity === 'magic' ? 'Magic' : 'Normal'}`,
         `\tItemLevel >= ${String(entry?.itemLevelMin)}`,
+        ...(entry?.itemLevelMax === undefined ? [] : [`\tItemLevel <= ${String(entry.itemLevelMax)}`]),
         ...(entry?.unidentifiedTierMin === undefined ? [] : ['\tUnidentifiedItemTier >= 4']),
       ]);
     }

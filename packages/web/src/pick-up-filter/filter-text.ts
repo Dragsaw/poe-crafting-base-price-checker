@@ -23,6 +23,7 @@ function showBlock(entry: PickUpEntry): string {
     `BaseType == "${entry.baseTypeId}"`,
     `Rarity ${RARITY[entry.rarity]}`,
     `ItemLevel >= ${String(entry.itemLevelMin)}`,
+    ...(entry.itemLevelMax === undefined ? [] : [`ItemLevel <= ${String(entry.itemLevelMax)}`]),
     ...(entry.unidentifiedTierMin === undefined ? [] : [`UnidentifiedItemTier >= ${String(entry.unidentifiedTierMin)}`]),
     ...TREATMENTS[entry.purpose],
   ];
