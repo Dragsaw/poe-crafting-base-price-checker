@@ -30,7 +30,7 @@ export type { BaseType, BaseTypeId } from './base-type.ts';
 export { CategoryIdSchema, ClassNameSchema, ItemClassSchema } from './item-class.ts';
 export type { CategoryId, ClassName, ItemClass } from './item-class.ts';
 
-export { DEFENCE_OF_LETTER, defenceLettersOf } from './class-name.ts';
+export { DEFENCE_OF_LETTER, defenceLettersOf, plainClassBaseTypeOf } from './class-name.ts';
 export type { DefenceLetter } from './class-name.ts';
 
 export {

@@ -2,7 +2,7 @@
  * The AD-16 search body, pure and built before any request.
  */
 
-import { canonicalKey, defenceLettersOf, linesOf, summedInterval, summedStatIds } from '@poe/contracts';
+import { canonicalKey, defenceLettersOf, linesOf, plainClassBaseTypeOf, summedInterval, summedStatIds } from '@poe/contracts';
 import type { CraftedTrackedEntry, DefenceLetter, ItemCatalogue, NamedLine, TrackedEntry } from '@poe/contracts';
 
 import { conditionFiltersOf } from './condition-filters.ts';
@@ -85,7 +85,7 @@ function discriminatorOf(entry: CraftedTrackedEntry, itemTypes: ItemTypes): Disc
   }
   const group = itemTypes.get(entry.categoryId);
   if (group !== undefined) {
-    const baseTypeId = entry.className.replaceAll('_', ' ');
+    const baseTypeId = plainClassBaseTypeOf(entry.className);
     if (!group.has(baseTypeId)) {
       throw new UnknownClassBaseTypeError(entry, baseTypeId);
     }

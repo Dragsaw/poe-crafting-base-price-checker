@@ -21,6 +21,10 @@ export type {
   UnrankedEntry,
 } from './rank.ts';
 
+/** The one FR-36 evaluator (AD-31): each base worth picking up, and its one purpose. */
+export { pickUpPurposes } from './pick-up/pick-up.ts';
+export type { PickUpEntry, PickUpInput, PickUpPurpose } from './pick-up/pick-up.ts';
+
 /** The one set of clock spans, for every age `core` and `web` read. */
 export { DAY_MS, HOUR_MS, MINUTE_MS } from './clock.ts';
 

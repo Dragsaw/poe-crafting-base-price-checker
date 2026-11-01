@@ -1,4 +1,4 @@
-/** The `className` grammar (arm 1), defined once for the weights schema and `sync`. */
+/** The `className` grammar, both arms, defined once for the weights schema, `sync` and `core`. */
 
 /** `str` → armour, `dex` → evasion, `int` → energy shield (WEIGHTS-FILE-SCHEMA.md `5.1.0`). */
 export const DEFENCE_OF_LETTER = { str: 'ar', dex: 'ev', int: 'es' } as const;
@@ -22,4 +22,9 @@ export function defenceLettersOf(className: string): ReadonlySet<DefenceLetter> 
     index -= 1;
   }
   return letters.size === 0 ? undefined : letters;
+}
+
+/** Arm 2's base type: a plain `className` with each `_` written as a space (WEIGHTS-FILE-SCHEMA.md `5.1.0`). */
+export function plainClassBaseTypeOf(className: string): string {
+  return className.replaceAll('_', ' ');
 }

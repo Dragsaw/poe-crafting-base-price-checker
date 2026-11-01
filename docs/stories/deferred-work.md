@@ -32,3 +32,10 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Guard against CRLF in edited files: Serena `replace_content` writes CRLF on Windows, so add a CR check to lint-on-edit or a Known pitfalls line in AGENTS.md.
   evidence: Every Serena edit on this branch left CRLF in the working copy despite `.gitattributes` `eol=lf`; `packages/web/src/list/display-rows.test.ts`'s raw-source scan of `summands` uses then failed on a trailing `\r` until the files were normalised (Blind Hunter finding).
   
+
+## Deferred from: spec-6-1 review (2026-11-01)
+
+- source_spec: `docs/stories/spec-6-1-the-purpose-of-each-base-decided-once-in-core.md`
+  summary: [NOTE FOR PM / ARCHITECT] Two raw Tracked Entries with one baseTypeId and different floors give one drop two Pick-up Filter purposes; FR-36 has no rule for which Raw Base a drop belongs to.
+  evidence: `canonicalKey` includes `itemLevelMin`, so `checkUniqueKeys` (`packages/contracts/src/envelopes/tracked-file-checks.ts:20`) accepts the pair. `pickUpPurposes` (`packages/core/src/pick-up/pick-up.ts`) then emits entries for each, and a drop at or above both floors matches both. FR-36 says each drop carries exactly one purpose. `data/tracked.json` has no such pair today (90 raw entries). The fix is a contract rule or an FR-36 rule, which the owners decide (Edge Case Hunter and Blind Hunter findings).
+  retry_when: never — needs a human

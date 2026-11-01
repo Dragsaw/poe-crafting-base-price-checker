@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { defenceLettersOf } from './class-name';
+import { defenceLettersOf, plainClassBaseTypeOf } from './class-name';
 import { parseEnvelope } from './envelopes';
 import * as contracts from './index';
 import { JSON_NULL } from './test-support';
@@ -253,5 +253,14 @@ describe('the className grammar', () => {
     expect(contracts.DEFENCE_OF_LETTER).toEqual({ str: 'ar', dex: 'ev', int: 'es' });
     expect(contracts.WEIGHTS_SCHEMA_VERSION).toBe('7.0.0');
     expect(contracts.WeightsFileSchema).toBe(WeightsFileSchema);
+    expect(contracts.plainClassBaseTypeOf).toBe(plainClassBaseTypeOf);
+  });
+
+  it.each([
+    ['Emerald', 'Emerald'],
+    ['Time-Lost_Diamond', 'Time-Lost Diamond'],
+    ['A_B_C', 'A B C'],
+  ])('writes each `_` of the plain class %s as a space for its base type', (className, baseTypeId) => {
+    expect(plainClassBaseTypeOf(className)).toBe(baseTypeId);
   });
 });
