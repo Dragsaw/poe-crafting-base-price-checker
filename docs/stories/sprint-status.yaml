@@ -30,7 +30,7 @@
 #   with its last story, before finish-worktree pushes (AGENT-WORKFLOW.md, Story acceptance)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 10-31-2026 12:00
+last_updated: 11-01-2026 13:53
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -84,4 +84,10 @@ development_status:
   epic-5: done
   5-1-blocking-mod-tags-in-the-second-draw: done
   epic-5-retrospective: optional
+
+  epic-6: backlog
+  6-1-the-purpose-of-each-base-decided-once-in-core: backlog
+  6-2-the-filter-text-show-only-with-the-base-filter-imported-last: backlog
+  6-3-the-filter-button-the-filter-modal-and-the-download: backlog
+  epic-6-retrospective: optional
 action_items: []

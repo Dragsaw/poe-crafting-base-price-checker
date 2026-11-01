@@ -1,9 +1,9 @@
 ---
 stepsCompleted: ['step-01-validate-prerequisites', 'step-02-design-epics', 'step-03-create-stories', 'step-04-final-validation']
-storiesWrittenForEpics: [1, 2, 3, 4, 5]
+storiesWrittenForEpics: [1, 2, 3, 4, 5, 6]
 storiesPendingForEpics: []
 blockedStories: []
-revisionPass: 'Targeted revision 2026-10-23 for weights contract 7.0.0 and spine revision 39 (blocking mod tags): Epic 5 appended with one story. Epics 1 to 4 are unedited records. Before it, targeted revision 2026-10-09 for PRD revision 27 and the Rarity Dark redesign (UX revision 24, DESIGN revision 19): FR inventory to 34, thirteen FR titles retitled, retired-direction UX-DRs marked superseded, Epic 4 appended. Epics 1 to 3 are unedited records. Before it, targeted revision 2026-09-27 of Story 3.6 and the weights-contract citations for spine revision 23 (AD-10 folds Provenance per (itemClass, recipe) pair; contract 6.1.0) and PRD revision 23. Before it, targeted revision 2026-09-27 of Epic 2 and Stories 2.7 and 2.8 (epic 2 retro item 19) for the committed weights.json 6.0.0 with recipes.json published with no recipe, which the masthead dek explains. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
+revisionPass: 'Targeted revision 2026-11-01 for PRD revision 35, spine revision 46, EXPERIENCE.md revision 33 and DESIGN.md revision 23 (the Pick-up Filter): FR inventory to 37, UX-DR54 to UX-DR60 added, Epic 6 appended with three stories. Epics 1 to 5 are unedited records. Before it, targeted revision 2026-10-23 for weights contract 7.0.0 and spine revision 39 (blocking mod tags): Epic 5 appended with one story. Epics 1 to 4 are unedited records. Before it, targeted revision 2026-10-09 for PRD revision 27 and the Rarity Dark redesign (UX revision 24, DESIGN revision 19): FR inventory to 34, thirteen FR titles retitled, retired-direction UX-DRs marked superseded, Epic 4 appended. Epics 1 to 3 are unedited records. Before it, targeted revision 2026-09-27 of Story 3.6 and the weights-contract citations for spine revision 23 (AD-10 folds Provenance per (itemClass, recipe) pair; contract 6.1.0) and PRD revision 23. Before it, targeted revision 2026-09-27 of Epic 2 and Stories 2.7 and 2.8 (epic 2 retro item 19) for the committed weights.json 6.0.0 with recipes.json published with no recipe, which the masthead dek explains. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
 inputDocuments:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md
@@ -23,7 +23,7 @@ This document holds the complete epic and story breakdown for PoE2 Crafting Base
 
 ### Functional Requirements
 
-`prd.md` §4 numbers thirty-four functional requirements globally, contiguous from FR-1 to FR-34. A heading marked *Architecture-owned* keeps its acceptance conditions in the cited AD. The PRD does not hold them. Titles below follow PRD revision 27. FR-34 belongs to Epic 3 and is built.
+`prd.md` §4 numbers thirty-seven functional requirements globally, contiguous from FR-1 to FR-37. A heading marked *Architecture-owned* keeps its acceptance conditions in the cited AD. The PRD does not hold them. Titles below follow PRD revision 27, and FR-35 to FR-37 follow PRD revision 35. FR-34 belongs to Epic 3 and is built. FR-35 to FR-37 belong to Epic 6.
 
 FR-1: Rank by threshold-truncated expected value (AD-17, AD-4)
 FR-2: Render Chase Combinations on each collapsed row (AD-17)
@@ -59,6 +59,9 @@ FR-31: Refuse to value an observation from a different league (AD-19, AD-20)
 FR-32: Validate the configured league against the live leagues endpoint — *Architecture-owned* (AD-19, AD-12, AD-7)
 FR-33: Load published artifacts at runtime as one consistent set (AD-3, AD-15, AD-24, AD-25)
 FR-34: Price Hybrid Modifiers and summed Stat Lines as the player reads them (AD-5, AD-16, AD-17)
+FR-35: Generate a Pick-up Filter from the current ranking (AD-31, AD-15, AD-24, AD-4)
+FR-36: Name each base worth picking up, and what it is for (AD-31, AD-17)
+FR-37: Tell the three purposes apart on the ground (AD-31)
 
 **Superseded UX design requirements.** UX-DR1–6, 11–17, 21, 24, 30, 32 and 36 below describe the retired paper direction. `EXPERIENCE.md` revision 24 and `DESIGN.md` revision 19 supersede them. Epics 1 to 3 shipped against them and stay unedited as records. Epic 4 acceptance cites `EXPERIENCE.md` state numbers and copies no string or threshold.
 
@@ -76,6 +79,8 @@ NFR-7: Static delivery, zero upkeep. No server, no secret material, no expiring 
 NFR-8: Schema versioning at every trust boundary. A consumer refuses an unknown major rather than guessing (AD-3)
 NFR-9: Third-party citizenship. Requests identify the tool and a contact address. Requests pace from live rate-limit headers and honour `Retry-After` (AD-8)
 NFR-10: Accessibility floor. Colour alone never carries a product-meaningful distinction. The three distinctions are Price State (FR-9), crafted versus Raw Base (FR-3) and Provenance (FR-10)
+
+From PRD revision 35, NFR-10 binds the view only. What the game's item filter can express bounds the Pick-up Filter instead (FR-37). Cite NFR-10 as the PRD words it, not the line above.
 
 ### Additional Requirements
 
@@ -111,6 +116,8 @@ These requirements come from `ARCHITECTURE-SPINE.md`. They shape the epic and st
 - **Deployment: one environment.** The syncer runs on the player's machine: the long-running `pnpm sync` session, or `pnpm sync:batch` under a scheduler such as Task Scheduler (AD-7). The syncer writes files and never pushes. **The player's push** triggers a GitHub Actions workflow. That workflow builds the Vite bundle and deploys it to Pages. Branch-published Pages runs Jekyll and cannot build this app. The workflow is therefore required, not optional.
 - **Agent loop and definition of done.** The commands are `pnpm install`, `pnpm check`, `pnpm test`, `pnpm dev` and `pnpm sync:dry`. `pnpm check` enforces the package boundaries. `pnpm sync:dry` runs the full pipeline against fixtures and writes nowhere. `fixtures:record` and `catalogue:refresh` are explicit and human-invoked. Neither is ever part of a test run (`AGENT-WORKFLOW.md`).
 - **`sync` measures pool coverage before any view work, and measures it again on every weights-file regeneration.** It publishes the figure with its denominator. Where `weights.json` is absent, the measurement does not happen at all and both fields are omitted together. Coverage is undefined there. It is never `0%` (AD-27).
+- **The Pick-up Filter is one `core` decision and one `web` serialiser (AD-31).** A pure `core` function decides each base's purpose over the read-time ranking under the current dial. `web` serialises its output to filter text and owns each treatment in its serialiser and tests. The file's layering, its block kinds and its match form are AD-31's rule. Generation adds no artifact to AD-24's set and makes no request.
+- **The one download (AD-15).** `web` hands the browser a file built in memory. A write the page performs itself, such as the File System Access API, stays forbidden. The spine defers it with its revisit condition.
 
 ### UX Design Requirements
 
@@ -250,6 +257,22 @@ UX-DR45: Accessibility floor, deliberately thin. The floor states no WCAG level,
 
 UX-DR46: Voice and tone. Eight paired do and don't microcopy rules govern the copy. The copy uses plain declaratives. It carries no exclamation, no encouragement and no celebration of a good number.
 
+**Pick-up Filter (EXPERIENCE.md revision 33, DESIGN.md revision 23).** Each item below cites its owner and copies no string, size or threshold.
+
+UX-DR54: `{components.filter-button}` in `{components.header-bar}`, before `{components.sync-button}`, in the sync button's look with no problem state (DESIGN.md `filter-button`; EXPERIENCE.md *Information Architecture*, Copy Deck *Pick-up Filter*).
+
+UX-DR55: `{components.filter-modal}`, the page's one modal. Its placement, overlay, surface, radius and shadow are DESIGN.md `filter-modal`. It opens and closes instantly, closes on Esc, the overlay or ×, and the page under it does not re-rank (EXPERIENCE.md *Foundation* Mantine deltas, *Information Architecture*, Interaction 9).
+
+UX-DR56: The modal's content: the lead and four numbered steps, the folder path in the verbatim register with its copy action, the file-name field, and the download action as accent text. The download builds the filter in memory, hands it to the browser under its one fixed name, makes no request and closes the modal with no confirmation (EXPERIENCE.md Interaction 9, Copy Deck *Pick-up Filter*; DESIGN.md *Filter button and filter modal*; AD-15, AD-31).
+
+UX-DR57: The file-name field's states 44 and 45: when the download is disabled, which names are unusable, the error on blur and the `.filter` the page adds at generation (EXPERIENCE.md states 44, 45).
+
+UX-DR58: The modal's lines on what the filter holds, states 46 and 47, and which line wins when both hold (EXPERIENCE.md states 46, 47).
+
+UX-DR59: The Base Filter's file name persists in the viewer's own browser storage, saved on each edit that leaves a usable name. The modal starts closed after a reload (EXPERIENCE.md *What survives a reload*; FR-7, AD-15).
+
+UX-DR60: UJ-7, the filter refresh, with its first visit and its failure path. It is discharged distributively, as UX-DR47 is (EXPERIENCE.md *UJ-7*).
+
 UX-DR47: Six PRD journeys, UJ-1 to UJ-6. Each journey has a Key Flow with numbered steps and a climax beat. Two journeys carry failure paths. The design supports UJ-5 in part: the *review* is fully on the page, and the *edit* happens in a text editor and in git.
 
 **Two requirements discharged distributively, by design**
@@ -326,6 +349,9 @@ FR-31: Epic 2 — refusing to value an observation from another league
 FR-32: Epic 1 — validating the configured league before the run spends budget
 FR-33: Epic 2 — runtime artifact loading as one consistent set
 FR-34: Epic 3 — Hybrid Modifier and summed Stat Line pricing, built
+FR-35: Epic 6 — the Pick-up Filter generated from the ranking on screen, offline, as a player-started download
+FR-36: Epic 6 — each base's one purpose under the current dial
+FR-37: Epic 6 — the three treatments on the ground
 
 Epic 4 restyles and re-words the treatment of FR-3, FR-6 to FR-13, FR-18, FR-24, FR-25 and NFR-10 for the Rarity Dark redesign. It adds no FR and changes no ownership above. A story inside Epic 4 owns the changed treatment, and the owning epic above keeps the FR.
 
@@ -427,6 +453,24 @@ The player reads Wand and Staff rows valued on the modifiers the game can really
 **Depends on:** the external producer emitting `7.0.0`. The epic's story merges only together with a committed `7.0.0` `data/weights.json`.
 
 **Standalone:** yes. It builds on Epics 1 to 4 and adds no state, string or control to the page.
+
+### Epic 6: The Pick-up Filter
+
+After the pre-session read, the player downloads an in-game item filter built from the ranking on screen. On the ground, the bases worth picking up show what each is for: craft on it, sell it raw, or identify it and check the rolls. Everything else looks as the player's own Base Filter always made it look. The player reads no list in the middle of a map (UJ-7).
+
+**FRs covered:** FR-35, FR-36, FR-37
+
+**Also delivers:**
+  - the `core` purpose function, the one place FR-36 is evaluated (AD-31)
+  - the `web` filter serialiser, which owns each treatment (AD-31, FR-37)
+  - `{components.filter-button}`, `{components.filter-modal}`, states 44 to 47 and the persisted file name (UX-DR54 to UX-DR59)
+  - the in-memory download that AD-15 permits
+
+**NFRs addressed:** NFR-1, NFR-3, NFR-6, NFR-10 (the game filter bounds the treatments, not the view's floor)
+
+**Depends on:** Epics 2 and 3, for the raw branch, EV under the dial, the Item Level Floor and the recipe states. It adds no artifact and no external dependency.
+
+**Standalone:** yes. It adds one header control and one modal, and changes no ranking, no sync behaviour and no artifact.
 
 ## Epic 1: Foundations and the Background Sync
 
@@ -2828,6 +2872,163 @@ So that a blocked modifier never inflates the odds behind a row, and a combinati
 **And** the story deletes those entries from `data/tracked.json` with the `tracked-json` skill, and does not prune them
 **And** the commit message names the deletion as an exception to the prune tombstone (FR-15)
 **And** `pnpm tracked:check` then exits 0.
+
+**Given** the change is done
+**When** `pnpm check` runs
+**Then** it passes, and no test makes a network call (NFR-1).
+
+## Epic 6: The Pick-up Filter
+
+After the pre-session read, the player downloads an in-game item filter built from the ranking on screen. On the ground, the bases worth picking up show what each is for, and everything else keeps the player's own Base Filter's look (UJ-7). The epic builds on Epics 2 and 3, adds one header control and one modal, and changes no ranking, no sync behaviour and no artifact.
+
+**Source of truth.** PRD revision 35 holds FR-35 to FR-37: the purpose rules, the floors and the snapshot rule. `ARCHITECTURE-SPINE.md` revision 46 holds AD-31, the file's layering, block kinds, match form and the `core`/`web` split, and AD-15, the download. `EXPERIENCE.md` revision 33 holds Interaction 9, states 44 to 47, the Copy Deck *Pick-up Filter* and *What survives a reload*. `DESIGN.md` revision 23 holds `filter-button`, `filter-modal` and `mockups/key-filter-modal.html`. Every acceptance criterion cites these documents and copies no rule or string.
+
+**Order.** 6.1, then 6.2, then 6.3. Each story is green under `pnpm check` on its own. 6.1 and 6.2 add no UI. 6.3 is the first story the player sees.
+
+### Story 6.1: The purpose of each base, decided once in `core`
+
+As the player,
+I want each base worth picking up given exactly one purpose under the dial on screen,
+So that the filter says what the ranking says and makes no second judgement of its own.
+
+**Acceptance Criteria:**
+
+**Given** the read-time ranking, the Tracked List and the current Payout Threshold and Craft Recipe as passed-in values
+**When** `core`'s purpose function runs
+**Then** it returns one entry per drop that FR-36 names, each carrying the `baseTypeId`, the rarity, the item-level floor, the unidentified-tier condition where FR-36 sets one, and exactly one purpose: craft, sell raw or check the rolls
+**And** it is a pure function in one `core` module, exported for `web`, and no other module evaluates FR-36 (AD-31, AD-1; NFR-3).
+
+**Given** an Item Class whose EV under the dial is above zero, and a white Raw Base of that class
+**When** the function decides the base's purpose
+**Then** it applies FR-36's craft and sell-raw rule, with raw value(B) as FR-3 truncates a Raw Base
+**And** fixtures cover raw value(B) below, equal to and above EV(C), and the equal case is sell raw (FR-36).
+
+**Given** a Raw Base and the crafted entries of its Item Class
+**When** the function sets the item-level floor
+**Then** a sell-raw entry takes the Raw Base's own Item Level Floor, and a craft or check-the-rolls entry also reaches the floor that the class's crafted entries share (FR-36, FR-22; AD-17).
+
+**Given** a magic drop of a Raw Base whose Item Class has EV above zero
+**When** the function decides
+**Then** the entry is check the rolls with FR-36's unidentified-tier condition
+**And** a jewel kind gets a check-the-rolls entry for any magic drop, matched by the jewel kind's own `baseTypeId` from the catalogue-validated jewel arm, at its class's shared floor, and never a white entry (FR-36; spine Consistency Conventions *Ids*).
+
+**Given** an Item Class with no EV, because it is Unrankable (FR-4) or has no priced Combination (FR-9), or because the active recipe is uncostable (`EXPERIENCE.md` state 35) or no recipe is published (state 43)
+**When** the function decides
+**Then** the class has no craft and no check-the-rolls entry, and each of its Raw Bases is sell raw only when raw value(B) is above zero (FR-36, FR-26).
+
+**Given** an Item Class whose EV under the dial is zero or below, as under state 25
+**When** the function decides
+**Then** the class has no craft and no check-the-rolls entry, and the Payout Threshold is not applied a second time as a cutoff (FR-36, FR-1).
+
+**Given** a Raw Base with no price
+**When** the function decides
+**Then** it has no sell-raw entry, it is craft when EV(C) is above zero, and its check-the-rolls entry depends on EV(C) alone (FR-36, FR-9).
+
+**Given** a pruned Raw Base
+**When** the function runs
+**Then** the base has no entry (FR-15, FR-36).
+
+**Given** any input
+**When** the function returns
+**Then** no entry carries a Combination, a modifier or a price (FR-35)
+**And** the entries are in a deterministic order by canonical key under UTF-8 code-unit comparison, so equal inputs give an equal list (spine Consistency Conventions *Entity keys*; NFR-3).
+
+**Given** the change is done
+**When** `pnpm check` runs
+**Then** it passes, and no test makes a network call (NFR-1).
+
+### Story 6.2: The filter text, Show-only, with the Base Filter imported last
+
+As the player,
+I want the purposes written as a filter file that only unhides and labels,
+So that my own filter still decides everything the ranking does not name.
+
+**Acceptance Criteria:**
+
+**Given** the output of Story 6.1's purpose function and a Base Filter file name
+**When** `web`'s filter serialiser runs
+**Then** the text holds only `Show` blocks, with no `Continue` and no `Hide`
+**And** its last line is an `Import` of the given file name, after every block (AD-31; FR-35).
+
+**Given** a purpose entry
+**When** the serialiser writes its block
+**Then** the block matches by `BaseType ==` on the entry's `baseTypeId` plus the entry's rarity, item-level and unidentified-tier conditions, and no block matches by `Class` (AD-31)
+**And** a fixture with one base name that is the prefix of another proves that a block catches only its own base.
+
+**Given** the three purposes
+**When** the serialiser writes their blocks
+**Then** each purpose has exactly one treatment, not graded by EV, quiet, carrying the colour meaning that NeverSink's filter gives that kind of item, and within what the game's filter syntax expresses (FR-37; NFR-10)
+**And** the serialiser and its tests own each treatment, and no planning document restates one (AD-31).
+
+**Given** an empty purpose list
+**When** the serialiser runs
+**Then** the text holds only the `Import` line (`EXPERIENCE.md` state 47).
+
+**Given** the same purposes and file name
+**When** the serialiser runs twice
+**Then** the two texts are byte-identical
+**And** a golden test pins the full text for a fixture ranking that holds all three purposes, a jewel kind and a pruned base (NFR-3).
+
+**Given** any input
+**When** the serialiser returns
+**Then** the text names no Combination, modifier or price (FR-35).
+
+**Given** the change is done
+**When** `pnpm check` runs
+**Then** it passes, and no test makes a network call (NFR-1).
+
+### Story 6.3: The filter button, the filter modal and the download
+
+As the player,
+I want to open the filter modal from the header, give my filter's file name once and download `crafting-bases.filter`,
+So that before each session one click puts the current ranking on the ground.
+
+**Acceptance Criteria:**
+
+**Given** the page at rest
+**When** it renders the header bar
+**Then** `{components.filter-button}` sits before `{components.sync-button}`, in the look `DESIGN.md` `filter-button` sets, and the header bar never grows a second line (UX-DR54; `EXPERIENCE.md` *Information Architecture*).
+
+**Given** the filter button
+**When** the player clicks it
+**Then** `{components.filter-modal}` opens over the page instantly, in the look `DESIGN.md` `filter-modal` sets, and closes instantly on Esc, the overlay or ×
+**And** the page under it stays as it was and does not re-rank (UX-DR55; `EXPERIENCE.md` Interaction 9).
+
+**Given** the open modal
+**When** it renders
+**Then** it holds the lead and the four numbered steps of Interaction 9, with every string from the Copy Deck *Pick-up Filter*, the lead naming the live threshold and recipe and taking its state-43 form where no recipe is published
+**And** the copy action writes the folder path to the clipboard exactly as printed and shows its after-click label for the time the Copy Deck states (UX-DR56).
+
+**Given** the file-name field
+**When** it is empty, or holds a name the page cannot use
+**Then** the modal follows `EXPERIENCE.md` states 44 and 45: the download is disabled, the error shows on blur and never on a keystroke, and a name without `.filter` is not an error (UX-DR57).
+
+**Given** state 35 or 43, or a ranking that names no base
+**When** the modal renders
+**Then** the line of state 46 or state 47 shows above the download action, state 47's line replaces state 46's when both hold, and the download stays enabled (UX-DR58).
+
+**Given** a usable file name
+**When** the player clicks the download action
+**Then** the page runs Story 6.1's function and Story 6.2's serialiser on the ranking that the threshold and recipe on screen produce, with `.filter` added to the name where it is missing, and hands the browser the text as `crafting-bases.filter` through a `Blob` behind an `<a download>`
+**And** the page makes no request, which the test setup's unhandled-request callback proves, and performs no write of its own: no File System Access API (FR-35; AD-15, AD-24, AD-31)
+**And** the modal closes and the page shows no confirmation (`EXPERIENCE.md` Interaction 9).
+
+**Given** a download, then a change to the threshold or the recipe
+**When** the page re-renders
+**Then** nothing is marked out of date, and the next download uses the new ranking (`EXPERIENCE.md` Interaction 9; FR-35).
+
+**Given** an edit that leaves a usable file name
+**When** the player reloads the page
+**Then** the field opens with that name, the modal starts closed, and a storage access that throws leaves the page working with an empty field (UX-DR59; FR-7, AD-15).
+
+**Given** the built page on `pnpm dev`
+**When** an agent checks it with the agent-browser skill in a named session
+**Then** the header and the open modal match `mockups/key-filter-modal.html` at the page's frame width.
+
+**Given** a downloaded `crafting-bases.filter` beside a real NeverSink export from FilterBlade
+**When** the player selects `crafting-bases` in the game and loads it
+**Then** the game accepts the filter, a named base shows its purpose's treatment, and an item no block names looks as the NeverSink export alone makes it look
+**And** this is the story's human acceptance step, because no offline test can load the game's filter parser (UJ-7; UX-DR60).
 
 **Given** the change is done
 **When** `pnpm check` runs
