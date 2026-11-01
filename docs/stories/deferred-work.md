@@ -39,3 +39,14 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: [NOTE FOR PM / ARCHITECT] Two raw Tracked Entries with one baseTypeId and different floors give one drop two Pick-up Filter purposes; FR-36 has no rule for which Raw Base a drop belongs to.
   evidence: `canonicalKey` includes `itemLevelMin`, so `checkUniqueKeys` (`packages/contracts/src/envelopes/tracked-file-checks.ts:20`) accepts the pair. `pickUpPurposes` (`packages/core/src/pick-up/pick-up.ts`) then emits entries for each, and a drop at or above both floors matches both. FR-36 says each drop carries exactly one purpose. `data/tracked.json` has no such pair today (90 raw entries). The fix is a contract rule or an FR-36 rule, which the owners decide (Edge Case Hunter and Blind Hunter findings).
   retry_when: never — needs a human
+
+## Deferred from: spec-6-2 review (2026-11-01)
+
+- source_spec: `docs/stories/spec-6-2-the-filter-text-show-only-with-the-base-filter-imported-last.md`
+  summary: [NOTE FOR PM / ARCHITECT] With two raw entries of one baseTypeId and different floors, the pick-up filter writes two Show blocks and the first one shadows the second for drops at or above both floors.
+  evidence: `filterText` (`packages/web/src/pick-up-filter/filter-text.ts`) writes blocks in input order with no `Continue`, as AD-31 and the spec require, so the game applies only the first match. Same root cause as the spec-6-1 entry (FR-36 has no rule for which Raw Base a drop belongs to); a pinning test in `filter-text.test.ts` fails when the owners add the rule (Edge Case Hunter and Blind Hunter findings).
+  retry_when: never — needs a human
+
+- source_spec: `docs/stories/spec-6-2-the-filter-text-show-only-with-the-base-filter-imported-last.md`
+  summary: The impeccable design-review prompt runs `.claude/skills/impeccable/scripts/impeccable.cmd`, which does not exist in the repo; point it at the installed plugin's script or a path that resolves.
+  evidence: `_bmad/custom/prompts/impeccable-design-review.md` steps 4 and 5 cite `.claude/skills/impeccable/`; `.claude/skills/` holds no `impeccable` directory. The 6.2 reviewer ran the plugin cache copy (`~/.claude/plugins/cache/impeccable/impeccable/4.6.0/skills/impeccable/scripts/impeccable`) instead (Impeccable Design Review layer).
