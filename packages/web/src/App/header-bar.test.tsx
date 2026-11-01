@@ -11,6 +11,9 @@ import { frame, mount, server } from './test-support';
 
 afterEach(unmount);
 
+/** DESIGN.md, Layout & Spacing: the target monitor's frame width. */
+const TARGET_FRAME_WIDTH = 1063;
+
 function headerBar(): HTMLElement {
   const found = frame().querySelector<HTMLElement>(':scope > [data-header-bar]');
   if (found === null) {
@@ -37,7 +40,7 @@ describe('the header bar', () => {
     expect(frame().querySelectorAll('[style*="sticky"]')).toHaveLength(1);
   });
 
-  it('lays one row that never wraps or shrinks: the brand block, then the recipe, threshold and sync slots', async () => {
+  it('lays one row that never wraps or shrinks: the brand block, then the recipe, threshold, filter and sync slots', async () => {
     serveArtifacts(server, { recipes: { kind: 'json', body: { schemaVersion: '1.0.0', recipes: RECIPES } } });
     mount();
     await settleTo('ready');
@@ -47,27 +50,37 @@ describe('the header bar', () => {
     expect(style.whiteSpace).toBe('nowrap');
     expect(style.gap).toBe('22px');
     expect(headerBar().firstElementChild?.hasAttribute('data-brand')).toBe(true);
-    expect(slots().map((slot) => slot.dataset['slot'])).toEqual(['recipe', 'threshold', 'sync']);
+    expect(slots().map((slot) => slot.dataset['slot'])).toEqual(['recipe', 'threshold', 'filter', 'sync']);
     // A filled slot sizes to its control, so the brand block takes the free space.
-    const [recipe, threshold, sync] = slots();
+    const [recipe, threshold, filter, sync] = slots();
     for (const slot of [recipe, threshold]) {
       expect(slot?.style.flex).toBe('0 0 auto');
       expect(slot?.style.width).toBe('');
     }
-    // The sync slot holds its reserved width with the button at its start: 22px from the threshold.
-    expect(sync?.style.flex).toBe(`0 0 ${px(HEADER_SLOT_WIDTHS.sync)}`);
-    expect(sync?.style.width).toBe(px(HEADER_SLOT_WIDTHS.sync));
-    expect(sync?.style.justifyContent).toBe('');
+    // The filter and sync slots hold their reserved widths with the button at the start.
+    for (const [slot, width] of [
+      [filter, HEADER_SLOT_WIDTHS.filter],
+      [sync, HEADER_SLOT_WIDTHS.sync],
+    ] as const) {
+      expect(slot?.style.flex).toBe(`0 0 ${px(width)}`);
+      expect(slot?.style.width).toBe(px(width));
+      expect(slot?.style.justifyContent).toBe('');
+    }
     for (const slot of slots()) {
       expect(slot.childElementCount).toBe(1);
     }
   });
 
-  it('fits the brand block, the three slots and the 22px gaps inside the bar at content-min', () => {
-    // The bar's inner width at `{spacing.content-min}`: the frame less its two gutters.
-    const inner = cssNumber(spacing['content-min']) - 2 * cssNumber(spacing.gutter);
-    const slotsWidth = HEADER_SLOTS.reduce((sum, slot) => sum + HEADER_SLOT_WIDTHS[slot], 0);
-    expect(HEADER_TITLE_WIDTH + slotsWidth + HEADER_SLOTS.length * HEADER_GROUP_GAP).toBeLessThanOrEqual(inner);
+  it('prints the full title beside the reserved slot widths in the target frame, and cuts it at content-min', () => {
+    // DESIGN.md width budget: the 1063px target frame and `{spacing.content-min}`, each less its two gutters.
+    const titleRoom = (frameWidth: number): number =>
+      frameWidth -
+      2 * cssNumber(spacing.gutter) -
+      HEADER_SLOTS.reduce((sum, slot) => sum + HEADER_SLOT_WIDTHS[slot], 0) -
+      HEADER_SLOTS.length * HEADER_GROUP_GAP;
+    expect(titleRoom(TARGET_FRAME_WIDTH)).toBeGreaterThanOrEqual(HEADER_TITLE_WIDTH);
+    expect(titleRoom(cssNumber(spacing['content-min']))).toBeGreaterThan(0);
+    expect(titleRoom(cssNumber(spacing['content-min']))).toBeLessThan(HEADER_TITLE_WIDTH);
   });
 
   it('prints the league alone in the eyebrow and the Copy Deck title, with no dek', async () => {
@@ -101,18 +114,23 @@ describe('the header bar', () => {
       expect(cut?.style.textOverflow).toBe('ellipsis');
     }
     expect(eyebrow?.style.display).toBe('block');
-    const [recipe, threshold, sync] = slots();
+    const [recipe, threshold, filter, sync] = slots();
     expect(recipe?.style.flex).toBe(`0 0 ${px(HEADER_SLOT_WIDTHS.recipe)}`);
-    expect([threshold?.style.flex, sync?.style.flex]).toEqual(['0 0 auto', `0 0 ${px(HEADER_SLOT_WIDTHS.sync)}`]);
+    expect([threshold?.style.flex, filter?.style.flex, sync?.style.flex]).toEqual([
+      '0 0 auto',
+      `0 0 ${px(HEADER_SLOT_WIDTHS.filter)}`,
+      `0 0 ${px(HEADER_SLOT_WIDTHS.sync)}`,
+    ]);
   });
 
-  it('holds the recipe toggle, the threshold control and the sync button in its slots, with no band under it', async () => {
+  it('holds the recipe toggle, the threshold control, the filter button and the sync button in its slots, with no band under it', async () => {
     serveArtifacts(server, { recipes: { kind: 'json', body: { schemaVersion: '1.0.0', recipes: RECIPES } } });
     mount();
     await settleTo('ready');
-    const [recipe, threshold, sync] = slots();
+    const [recipe, threshold, filter, sync] = slots();
     expect(recipe?.querySelector('[data-craft-recipe]')).not.toBeNull();
     expect(threshold?.querySelector('[data-payout-threshold]')).not.toBeNull();
+    expect(filter?.querySelector('[data-filter-button]')).not.toBeNull();
     expect(sync?.querySelector('[data-sync-button]')).not.toBeNull();
     expect(frame().querySelector('[data-interim-controls], [data-trust-strip], [data-asking-price-line]')).toBeNull();
     expect(headerBar().nextElementSibling?.hasAttribute('data-ranked-list')).toBe(true);
@@ -168,10 +186,12 @@ describe('the cold load (state 22)', () => {
     expect(frame().getAttribute('aria-busy')).toBe('true');
     expect(headerBar().querySelector('[data-eyebrow]')?.textContent.trim()).toBe('');
     expect(headerBar().querySelector('h1')?.textContent).toBe(HEADER_TITLE);
-    expect(slots()).toHaveLength(3);
+    expect(slots()).toHaveLength(4);
     // While pending only the threshold control is live; the empty slots hold their reserved widths.
-    const [recipe, threshold, sync] = slots();
+    const [recipe, threshold, filter, sync] = slots();
     expect(recipe?.style.width).toBe(px(HEADER_SLOT_WIDTHS.recipe));
+    expect(filter?.style.width).toBe(px(HEADER_SLOT_WIDTHS.filter));
+    expect(filter?.childElementCount).toBe(0);
     expect(sync?.style.width).toBe(px(HEADER_SLOT_WIDTHS.sync));
     expect(threshold?.style.flex).toBe('0 0 auto');
     expect(frame().querySelector('[data-column-header]')).not.toBeNull();

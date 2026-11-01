@@ -3,27 +3,31 @@ import type { JSX, ReactNode } from 'react';
 import { colors, px, spacing, typeStyle } from '../theme/tokens';
 
 /** EXPERIENCE.md, Copy Deck: *Header title*. */
-export const HEADER_TITLE = "What's worth picking up";
+export const HEADER_TITLE = 'Worth picking up';
 
 /** `{components.header-bar}` layout: 22px between groups. */
 export const HEADER_GROUP_GAP = 22;
 
-export type HeaderSlot = 'recipe' | 'threshold' | 'sync';
+export type HeaderSlot = 'recipe' | 'threshold' | 'filter' | 'sync';
 
 /**
  * An empty slot's reserved width, measured in the browser at `{spacing.content-min}` against the
- * widest content: two recipes with a `10.00 div / craft` cost, `3.00 div`, and `✕ 999 problems`.
+ * widest content: two recipes with a `10.00 div / craft` cost, `3.00 div`, `Filter ▾` and `✕ 999 problems`.
  */
 export const HEADER_SLOT_WIDTHS: Readonly<Record<HeaderSlot, number>> = {
   recipe: 296,
   threshold: 242,
+  filter: 65,
   sync: 134,
 };
 
-/** The title's width in Inter at `{typography.title}`, measured in the browser: the brand block's floor. */
-export const HEADER_TITLE_WIDTH = 212;
+/** The title's full width in Inter at `{typography.title}`, measured in the browser; it cuts below this (DESIGN.md width budget). */
+export const HEADER_TITLE_WIDTH = 149;
 
-export const HEADER_SLOTS: readonly HeaderSlot[] = ['recipe', 'threshold', 'sync'];
+export const HEADER_SLOTS: readonly HeaderSlot[] = ['recipe', 'threshold', 'filter', 'sync'];
+
+/** These slots hold their width in every state, so the controls beside them never move (state 22). */
+const FIXED_SLOTS: ReadonlySet<HeaderSlot> = new Set(['filter', 'sync']);
 
 /** A long league or title is cut, so the slots never leave the bar. */
 const CUT = { overflow: 'hidden', textOverflow: 'ellipsis' } as const;
@@ -71,10 +75,9 @@ export function HeaderBar({
       </div>
       {HEADER_SLOTS.map((slot) => {
         const control = controls[slot];
-        // A filled slot sizes to its control so the brand block takes the free space. The sync
-        // slot holds its width, start-aligned: its face only exists once loaded, and the
-        // threshold beside it must not move then (state 22).
-        const isReserved = control === undefined || slot === 'sync';
+        // A filled slot sizes to its control so the brand block takes the free space. A fixed slot
+        // holds its width, start-aligned: its control only exists once loaded.
+        const isReserved = control === undefined || FIXED_SLOTS.has(slot);
         const size = isReserved
           ? { flex: `0 0 ${px(HEADER_SLOT_WIDTHS[slot])}`, width: px(HEADER_SLOT_WIDTHS[slot]) }
           : { flex: '0 0 auto' };

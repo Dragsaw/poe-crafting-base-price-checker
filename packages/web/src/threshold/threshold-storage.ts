@@ -1,5 +1,5 @@
-// The Payout Threshold's bounds and its one persisted value (FR-7, AD-15, UX-DR37), the only thing
-// the page writes to browser storage. Each access is guarded: a failing storage gives the default.
+// The Payout Threshold's bounds and its persisted value (FR-7, AD-15, UX-DR37), under its own
+// storage key. Each access is guarded: a failing storage gives the default.
 
 import { MONEY_DECIMALS } from '../shared/money';
 import { DEFAULT_THRESHOLD } from '../shared/product';

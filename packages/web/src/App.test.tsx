@@ -30,6 +30,7 @@ import { ARTIFACT_ORDER } from './load/artifacts';
 import { flush, mountedContainer, rgb, settleTo, unmount } from './test-support/dom';
 import { server, mount, frame, panelLines, toggleReport } from './App/test-support';
 import { THRESHOLD_WORD } from './threshold/PayoutThreshold';
+import { LEAD_OPENING } from './pick-up-filter/filter-copy';
 
 afterEach(unmount);
 
@@ -302,8 +303,14 @@ describe('the copy', () => {
     for (const [path, text] of Object.entries(sources)) {
       // The EV tooltip's count of outcomes worth at least the threshold is the other owned use (EXPERIENCE.md, Voice and Tone).
       // The threshold label is the third (Copy Deck, *Threshold*), in its control's source only.
+      // The filter modal's lead is the fourth (Copy Deck, *Pick-up Filter*), in its copy module only.
       const owned = text.replaceAll(HEADER_TITLE, '').replaceAll(EXPECTED_VALUE_TOOLTIP_COPY.what, '');
-      const scanned = path === './threshold/PayoutThreshold.tsx' ? owned.replaceAll(`'${THRESHOLD_WORD}'`, '') : owned;
+      const scopedOwned: Readonly<Record<string, string>> = {
+        './threshold/PayoutThreshold.tsx': `'${THRESHOLD_WORD}'`,
+        './pick-up-filter/filter-copy.ts': LEAD_OPENING,
+      };
+      const scoped = scopedOwned[path];
+      const scanned = scoped === undefined ? owned : owned.replaceAll(scoped, '');
       expect(scanned, path).not.toMatch(/sells for|worth|market value/i);
     }
   });

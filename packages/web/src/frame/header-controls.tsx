@@ -3,6 +3,7 @@ import type { CrossFileFailure, Ranking } from '@poe/core';
 import { useCallback, useState, type ReactNode } from 'react';
 
 import type { ArtifactSet, TolerableKey } from '../load/artifacts';
+import { PickUpFilter } from '../pick-up-filter/PickUpFilter';
 import { CraftRecipe, type RecipeCost, type RecipeOption } from '../recipe/CraftRecipe';
 import { activeRecipe } from '../recipe/recipe-storage';
 import { recipeCostLine, recipeOptions } from '../recipe/recipe-view';
@@ -45,7 +46,7 @@ export interface ReadyControlsInput {
   readonly onReportToggle: () => void;
 }
 
-/** The header's three controls, the sync report under it, and the active recipe the list reads. */
+/** The header's four controls, the sync report under it, and the active recipe the list reads. */
 export interface ReadyControls {
   readonly controls: Partial<Record<HeaderSlot, ReactNode>>;
   readonly panel: ReactNode;
@@ -58,15 +59,10 @@ export function readyControls(input: ReadyControlsInput): ReadyControls {
   const recipes = set.recipes?.recipes ?? [];
   const recipe = activeRecipe(recipes, input.storedRecipe);
   const options = recipeOptions(recipes);
+  const active = options.find((option) => option.id === recipe?.id);
+  const isUncostable = recipe !== undefined && input.ranking.uncostableRecipes.some((item) => item.recipeId === recipe.id);
   const cost =
-    recipe === undefined
-      ? undefined
-      : recipeCostLine(
-          recipe,
-          set.dataset.currencyRates,
-          set.config.league,
-          input.ranking.uncostableRecipes.some((item) => item.recipeId === recipe.id),
-        );
+    recipe === undefined ? undefined : recipeCostLine(recipe, set.dataset.currencyRates, set.config.league, isUncostable);
   const problems = problemSummary(set.dataset.entries, set.syncReport, {
     pinnedCount: set.tracked.entries.filter((entry) => entry.status === 'pinned').length,
     minChunkSearches: set.config.minChunkSearches,
@@ -91,6 +87,15 @@ export function readyControls(input: ReadyControlsInput): ReadyControls {
         recipe === undefined || cost === undefined ? undefined : (
           <CraftRecipe recipe={{ options, activeId: recipe.id, cost, onChange: input.onRecipeChange }} />
         ),
+      filter: (
+        <PickUpFilter
+          ranking={input.ranking}
+          tracked={set.tracked.entries}
+          threshold={input.threshold}
+          recipe={active}
+          isUncostable={isUncostable}
+        />
+      ),
       sync: (
         <SyncButton
           face={syncButtonFace(problems, set.syncReport, input.now)}
@@ -100,7 +105,7 @@ export function readyControls(input: ReadyControlsInput): ReadyControls {
       ),
     },
     panel,
-    active: options.find((option) => option.id === recipe?.id),
+    active,
     cost,
   };
 }

@@ -1,0 +1,36 @@
+/*
+ * `{components.filter-modal}`: what inline styles cannot express. Token custom
+ * properties only, as frame.css states. No transition.
+ */
+.fg-filter-steps li + li {
+  margin-top: 12px;
+}
+
+.fg-filter-steps li::marker {
+  color: var(--fg-color-text-tertiary);
+}
+
+.fg-filter-field {
+  outline: none;
+  caret-color: var(--fg-color-text);
+}
+
+.fg-filter-field::placeholder {
+  color: var(--fg-color-text-secondary);
+  opacity: 1;
+}
+
+.fg-filter-field::selection {
+  background: var(--fg-color-accent-soft);
+  color: var(--fg-color-text);
+}
+
+.fg-filter-close {
+  color: var(--fg-color-text-secondary);
+  background: none;
+}
+
+.fg-filter-close:hover {
+  color: var(--fg-color-text);
+  background: none;
+}
