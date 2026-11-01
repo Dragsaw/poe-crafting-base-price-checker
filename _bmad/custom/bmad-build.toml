@@ -124,3 +124,21 @@ Launch a context-free subagent with this prompt:
 
 Read `{project-root}/_bmad/custom/prompts/impeccable-design-review.md` and follow it. Use the changed files in the current worktree. The spec is at `{spec_file}`.
 """
+
+[[workflow.review_layers]]
+id = "ocr-delegate"
+name = "OCR Delegate Reviewer"
+instruction = """
+Launch a context-free subagent on the Sonnet model (set the subagent's model to `sonnet`) with this prompt:
+
+Read `{project-root}/_bmad/custom/prompts/ocr-delegate-review.md` and follow it. The diff is at `{diff_file}`. The spec is at `{claims_file}`. If the spec path is empty, there is no spec.
+"""
+
+[[workflow.oneshot_review_layers]]
+id = "ocr-delegate"
+name = "OCR Delegate Reviewer"
+instruction = """
+Write a unified diff of all uncommitted changes in the current worktree, untracked files included, to a uniquely-named file in the system temp directory. Then launch a context-free subagent on the Sonnet model (set the subagent's model to `sonnet`) with this prompt, with `<diff path>` replaced by the absolute path of that file:
+
+Read `{project-root}/_bmad/custom/prompts/ocr-delegate-review.md` and follow it. The diff is at `<diff path>`. The spec is at `{spec_file}`. If the spec path is empty, there is no spec.
+"""
