@@ -32,9 +32,3 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Guard against CRLF in edited files: Serena `replace_content` writes CRLF on Windows, so add a CR check to lint-on-edit or a Known pitfalls line in AGENTS.md.
   evidence: Every Serena edit on this branch left CRLF in the working copy despite `.gitattributes` `eol=lf`; `packages/web/src/list/display-rows.test.ts`'s raw-source scan of `summands` uses then failed on a trailing `\r` until the files were normalised (Blind Hunter finding).
   
-
-## Deferred from: spec-6-2 review (2026-11-01)
-
-- source_spec: `docs/stories/spec-6-2-the-filter-text-show-only-with-the-base-filter-imported-last.md`
-  summary: The impeccable design-review prompt runs `.claude/skills/impeccable/scripts/impeccable.cmd`, which does not exist in the repo; point it at the installed plugin's script or a path that resolves.
-  evidence: `_bmad/custom/prompts/impeccable-design-review.md` steps 4 and 5 cite `.claude/skills/impeccable/`; `.claude/skills/` holds no `impeccable` directory. The 6.2 reviewer ran the plugin cache copy (`~/.claude/plugins/cache/impeccable/impeccable/4.6.0/skills/impeccable/scripts/impeccable`) instead (Impeccable Design Review layer).

@@ -7,8 +7,8 @@ You are a design reviewer for UI code. The parent gives you a diff path, or tell
 1. List the changed files under `packages/web/src/` and under `docs/ux-designs/**/mockups/`. If there are none, report zero findings and stop.
 2. Read the Review brief section of `docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/AGENT-WORKFLOW.md`. Read the Accessibility Floor section of `docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/EXPERIENCE.md`.
 3. Find the DESIGN.md components and tokens, and the EXPERIENCE.md states, that the changed files implement. Search both files for the component, token and state names in the changed files and in the spec. Read those sections only. These sections are the design contract.
-4. Run `.claude/skills/impeccable/scripts/impeccable.cmd detect --json <changed files>`. On POSIX, use `impeccable` without `.cmd`. Exit 0 means no primary findings. Exit 2 means findings. Exit 1 means a scan failure. Report a scan failure as one finding.
-5. Read the "Assessment A" section of `.claude/skills/impeccable/reference/critique.md`. Apply its design-review lens to the changed components. Do not do Assessment B, persistence, or "Ask the User".
+4. Run the `detect` script of the impeccable skill: `scripts/impeccable.cmd detect --json <changed files>`, from that skill's directory. On POSIX, use `scripts/impeccable` without `.cmd`. Exit 0 means no primary findings. Exit 2 means findings. Exit 1 means a scan failure. Report a scan failure as one finding.
+5. Read the "Assessment A" section of `reference/critique.md` in the impeccable skill. Apply its design-review lens to the changed components. Do not do Assessment B, persistence, or "Ask the User".
 
 ## Report
 
