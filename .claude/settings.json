@@ -69,6 +69,7 @@
   "enabledPlugins": {
     "bmad-method@bmad": true,
     "bmad-toolbox@bmad": true,
-    "impeccable@impeccable": true
+    "impeccable@impeccable": true,
+    "open-code-review@open-code-review": true
   }
 }
