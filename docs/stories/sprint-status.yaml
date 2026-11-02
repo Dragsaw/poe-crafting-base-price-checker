@@ -30,7 +30,7 @@
 #   with its last story, before finish-worktree pushes (AGENT-WORKFLOW.md, Story acceptance)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 11-02-2026 00:11
+last_updated: 11-02-2026 16:04
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -90,5 +90,35 @@ development_status:
   6-2-the-filter-text-show-only-with-the-base-filter-imported-last: done
   6-3-the-filter-button-the-filter-modal-and-the-download: done
   6-4-one-purpose-per-drop-when-a-base-is-tracked-at-two-floors: done
-  epic-6-retrospective: optional
-action_items: []
+  epic-6-retrospective: done
+action_items:
+  - id: "epic-6-retro-item-1-give-the-app-level-pick-up-filter-downlo"
+    epic: 6
+    action: "Give the App-level pick-up filter download tests a content oracle: named-block
+      treatment, downloads under states 35 and 43, a two-floor App world, rank-built
+      Unrankable and no-priced-Combination cases"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-6-retro-2026-11-01.md"
+  - id: "epic-6-retro-item-2-refuse-raw-tracked-entries-in-a-jewel-ca"
+    epic: 6
+    action: "Refuse raw tracked entries in a jewel category (tracked:check or pickUpPurposes)
+      with a test"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-6-retro-2026-11-01.md"
+  - id: "epic-6-retro-item-3-ledger-the-deferred-epic-6-review-findin"
+    epic: 6
+    action: "Ledger the deferred epic-6 review findings ADV-13 (duplicated recipe
+      narrowing), VG-2 (no File System Access test) and ADV-12 (JSON-text entry order)
+      in deferred-work.md"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-6-retro-2026-11-01.md"
+  - id: "epic-6-retro-item-4-rule-whether-an-unresolvable-raw-base-ge"
+    epic: 6
+    action: "Rule whether an unresolvable Raw Base gets pick-up blocks under FR-36
+      (ADV-1)"
+    owner: "PM"
+    status: open
+    ref: "docs/stories/epic-6-retro-2026-11-01.md"
