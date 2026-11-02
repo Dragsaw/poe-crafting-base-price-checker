@@ -47,3 +47,10 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: ADV-12: order pick-up filter entries readably, not by JSON key text.
   evidence: `compareKeyed` in `packages/core/src/pick-up/pick-up.ts` sorts by `compareCanonicalKeys`, so a floor of 9 sorts after a floor of 70 and every jewel kind comes before every raw base. The order is deterministic, so NFR-3 holds (`docs/reviews/review-epic-6-diff.md` ADV-12). No owner document names the target order (numeric floors, raw bases or jewel kinds first, rarity tiebreak); the order is visible in the downloaded filter, so UX decides it before a build. A new order changes the expected text of the App-level download oracle tests (`d5be2a8`).
   retry_when: never — needs a human
+
+## Deferred from: spec-epic-6-retro-item-4 review (2026-11-02)
+
+- source_spec: `docs/stories/spec-epic-6-retro-item-4-unresolvable-raw-base-pick-up.md`
+  summary: Check in game whether a pick-up filter with a `BaseType ==` block for a base the game does not know loads, skips that block, or fails as a whole.
+  evidence: FR-36 (PRD revision 37) keeps craft and check-the-rolls blocks for an unresolvable Raw Base, and the player accepted the risk. Unverified, severity medium to high if true: if the game rejects the whole file, every block fails and the filter adds no visibility (FR-35). 0 unresolvable Raw Bases in `data/dataset.json` today. Proof: import a filter that names a made-up base in a `BaseType ==` line and observe the game.
+  retry_when: never — needs a human

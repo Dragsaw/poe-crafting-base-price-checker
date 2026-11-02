@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 36
+revision: 37
 created: 2026-09-12
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -593,6 +593,7 @@ Each drop the filter names carries exactly one purpose: craft on it, sell it raw
 - An Item Class with no EV, because it is Unrankable (FR-4) or has no priced Combination (FR-9), has no craft and no check-the-rolls entry. Its Raw Bases are **sell raw** when raw value(B) > 0, as the raw branch ranks them (FR-3).
 - While the active Craft Recipe is uncostable, no Item Class has an EV, so every class follows the bullet above (FR-26).
 - A Raw Base with no price has no sell-raw entry, because a missing price is never zero (FR-9). It is **craft** when EV(C) > 0, because nothing shows that its raw sale beats the craft. Its check-the-rolls entry depends on EV(C) alone.
+- An `unresolvable` Raw Base is a Raw Base with no price, and the bullet above decides its purpose. The filter names it by its Base Type, though the game may no longer know that Base Type (FR-24). A jewel kind differs, because an unresolvable jewel kind leaves its Item Class with no EV *(PRD-owned)*.
 
 #### FR-37: Tell the three purposes apart on the ground
 
