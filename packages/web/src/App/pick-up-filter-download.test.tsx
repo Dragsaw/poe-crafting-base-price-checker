@@ -2,12 +2,15 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { filterLead } from '../pick-up-filter/filter-copy';
 import { GENERATED_FILE_NAME } from '../pick-up-filter/filter-name';
-import { option } from '../recipe/craft-recipe/test-support';
+import { option, RATES } from '../recipe/craft-recipe/test-support';
 import { flush, unmount } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry } from '../test-support/list-fixtures';
 import { blur, pastDebounce, typeInto } from '../test-support/threshold-input';
 import {
+  blocksOf,
+  byCodeUnit,
   captureDownloads,
+  downloadedText,
   clickOn,
   downloadAction,
   enterName,
@@ -28,6 +31,42 @@ afterEach(() => {
   localStorage.clear();
 });
 
+// FR-36 by hand for `pickUpWorld()` at threshold 0.25. Wide Belt and Gold Amulet take `rawEntry`'s default Amulets
+// class, which has no crafted entry, so no EV: both sell raw. Under greater, Bows EV is above Recurve Bow's 0.3.
+const SELL_RAW_AMULETS = ['Wide Belt: Rarity Normal, ItemLevel >= 82 → sell-raw', 'Gold Amulet: Rarity Normal, ItemLevel >= 82 → sell-raw'];
+const STANDARD_UNDER_GREATER = [
+  'Recurve Bow: Rarity Normal, ItemLevel >= 82 → craft',
+  'Recurve Bow: Rarity Magic, ItemLevel >= 82, UnidentifiedItemTier >= 4 → check-rolls',
+  ...SELL_RAW_AMULETS,
+].toSorted(byCodeUnit);
+
+describe('the purposes in the downloaded file', () => {
+  it.each([
+    ['state 35 (uncostable recipe)', pickUpWorld({ rates: RATES.slice(0, 2) }), 'perfect'],
+    ['state 43 (no published recipe)', pickUpWorld({ recipes: [] }), undefined],
+  ] as const)('%s: no class has EV, so every priced base is sell raw and nothing is craft or check the rolls', async (_state, world, recipe) => {
+    expect(blocksOf(await downloadedText(world, recipe))).toEqual(
+      ['Recurve Bow: Rarity Normal, ItemLevel >= 82 → sell-raw', ...SELL_RAW_AMULETS].toSorted(byCodeUnit),
+    );
+  });
+
+  it('a base at two floors: the lower floor stops below the higher one, and each floor keeps its own purpose', async () => {
+    // Recurve Bow at 86 sells for 5, above Bows EV, so its white drop is sell raw; at 82 it stays craft.
+    const upper = rawEntry('Recurve Bow', 86, { categoryId: 'weapon.bow', className: 'Bows' });
+    const world = pickUpWorld();
+    const text = await downloadedText({ ...world, tracked: [...world.tracked, upper], dataset: [...world.dataset, priced(upper, 5, hoursBefore(Date.now(), 1))] });
+    expect(blocksOf(text)).toEqual(
+      [
+        'Recurve Bow: Rarity Normal, ItemLevel >= 82, ItemLevel <= 85 → craft',
+        'Recurve Bow: Rarity Magic, ItemLevel >= 82, ItemLevel <= 85, UnidentifiedItemTier >= 4 → check-rolls',
+        'Recurve Bow: Rarity Normal, ItemLevel >= 86 → sell-raw',
+        'Recurve Bow: Rarity Magic, ItemLevel >= 86, UnidentifiedItemTier >= 4 → check-rolls',
+        ...SELL_RAW_AMULETS,
+      ].toSorted(byCodeUnit),
+    );
+  });
+});
+
 describe('the download', () => {
   it('AC: hands the browser the filter of the ranking on screen as crafting-bases.filter, with no request, then closes with no confirmation', async () => {
     const capture = captureDownloads();
@@ -43,7 +82,7 @@ describe('the download', () => {
     expect(download?.download).toBe(GENERATED_FILE_NAME);
     const text = await download?.text;
     expect(text).toBe(expected);
-    expect(text).toContain('BaseType == "Recurve Bow"');
+    expect(blocksOf(text ?? '')).toEqual(STANDARD_UNDER_GREATER);
     expect(text?.endsWith('Import "My.filter"\n')).toBe(true);
     expect(capture.revoked).toEqual([]);
     await flush();

@@ -1,13 +1,14 @@
-/** Drives the filter button and the filter modal, and captures the `Blob` download, for the Story 6.3 tests. */
+/** Drives the filter button and the filter modal, captures the `Blob` download, and reads its blocks back. */
 
 import { crossFileChecks, pickUpPurposes, rank } from '@poe/core';
+import type { PickUpPurpose } from '@poe/core';
 import { act } from 'react';
 import { onTestFinished, vi } from 'vitest';
 
 import { loadArtifacts } from '../load/load-artifacts';
-import { filterText } from '../pick-up-filter/filter-text';
-import { serveWorld, standardWorld } from '../recipe/craft-recipe/test-support';
-import { settleTo } from '../test-support/dom';
+import { filterText, TREATMENTS } from '../pick-up-filter/filter-text';
+import { option, serveWorld, standardWorld } from '../recipe/craft-recipe/test-support';
+import { flush, settleTo } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry } from '../test-support/list-fixtures';
 import { blur, typeInto } from '../test-support/threshold-input';
 import { frame, mount } from './test-support';
@@ -169,4 +170,63 @@ export async function ready(world: ReturnType<typeof standardWorld> = pickUpWorl
 export function enterName(text: string): void {
   typeInto(nameField(), text);
   blur(nameField());
+}
+
+function purposeOf(lines: readonly string[]): readonly [PickUpPurpose, number] {
+  const matches = (Object.entries(TREATMENTS) as [PickUpPurpose, readonly string[]][]).filter(
+    ([, treatment]) => lines.slice(-treatment.length).join('\n') === treatment.join('\n'),
+  );
+  const [match] = matches;
+  if (match === undefined || matches.length > 1) {
+    throw new Error(`not exactly one treatment ends the block: ${lines.join(' | ')}`);
+  }
+  return [match[0], match[1].length];
+}
+
+/**
+ * Each `Show` block as `<base type>: <conditions> → <purpose>`, the purpose read back from its treatment, so a
+ * test can compare the file with a purpose list derived by hand from FR-36 rather than from `pickUpPurposes`.
+ * Sorted: the entry order is NFR-3's concern, which the core and serialiser tests own.
+ */
+export function blocksOf(text: string): string[] {
+  return text
+    .split('Show\n')
+    .slice(1)
+    .map((block) => {
+      const lines = block
+        .split('\n')
+        .filter((line) => line.startsWith('\t'))
+        .map((line) => line.slice(1));
+      const [purpose, treatmentLength] = purposeOf(lines);
+      const baseType = /^BaseType == "(.*)"$/u.exec(lines[0] ?? '')?.[1];
+      if (baseType === undefined) {
+        throw new Error(`the block does not open with a BaseType line: ${lines.join(' | ')}`);
+      }
+      return `${baseType}: ${lines.slice(1, -treatmentLength).join(', ')} → ${purpose}`;
+    })
+    .toSorted(byCodeUnit);
+}
+
+export function byCodeUnit(left: string, right: string): number {
+  return left < right ? -1 : Number(left > right);
+}
+
+/** Downloads the filter as `My.filter` from a page serving `world`, under `recipeId` when one is given. */
+export async function downloadedText(world: ReturnType<typeof standardWorld>, recipeId?: string): Promise<string> {
+  const capture = captureDownloads();
+  await ready(world);
+  if (recipeId !== undefined) {
+    clickOn(option(recipeId));
+  }
+  openFilterModal();
+  enterName('My');
+  clickOn(downloadAction());
+  const [download] = capture.downloads;
+  if (download === undefined) {
+    throw new Error('the download action handed the browser no file');
+  }
+  const text = await download.text;
+  // Let the deferred revoke run now, before a later test patches `URL` again.
+  await flush();
+  return text;
 }

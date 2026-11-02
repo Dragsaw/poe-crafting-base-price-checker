@@ -15,6 +15,7 @@ import {
   published,
   rankCrafted,
   RATES,
+  weightsWith,
 } from '../rank/test-support.ts';
 import { ACTIVE, B, BOW_CLASS_FLOOR, BOW_RAW_FLOOR, checkRolls, classRow, EMPTY, purposesOf, rankingOf, rawBase, rawRow, RECIPE, UNCOSTABLE, unranked, white } from './test-support.ts';
 import type { Recipe } from './test-support.ts';
@@ -147,6 +148,27 @@ describe('pickUpPurposes: AC 5, a class with no EV', () => {
 
   it('a recipe id that names no row gives no EV', () => {
     expect(purposesOf({ ordering: [classRow(2), rawRow(B, 3)] }, [B], { id: 'perfect' })).toEqual([white('sell-raw', BOW_RAW_FLOOR)]);
+  });
+
+  const RANK_BUILT_CAUSES = [
+    ['Unrankable (FR-4)', 'unrankable', [published(chase('Bows'), priced(30))], weightsWith(['weapon.bow', 'Bows', 'partial'])],
+    ['no priced Combination (FR-9)', 'unpricedCrafted', [], poolsFile(['weapon.bow', 'Bows', BOWS_POOLS])],
+  ] as const;
+  // Unpriced is craft under any EV > 0, so it fails if the cause leaks EV.
+  const RAW_STATES = [
+    ['priced', [published(B, priced(3))], [white('sell-raw', BOW_RAW_FLOOR)]],
+    ['below the threshold', [published(B, priced(0.1))], []],
+    ['unpriced', [], []],
+  ] as const;
+
+  describe.each(RANK_BUILT_CAUSES)('through `rank`, %s', (_cause, bucket, chaseRows, weights) => {
+    it.each(RAW_STATES)('a %s Raw Base', (_state, rawRows, expected) => {
+      const tracked = [chase('Bows'), B];
+      const ranking = rankCrafted({ tracked, dataset: [...chaseRows, ...rawRows], weights });
+
+      expect(new Set(ranking[bucket].map((row) => row.className))).toEqual(new Set(['Bows']));
+      expect(pickUpPurposes({ ranking, tracked, recipeId: RECIPE })).toEqual(expected);
+    });
   });
 });
 
