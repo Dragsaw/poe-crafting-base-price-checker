@@ -43,10 +43,18 @@ const RawTrackedEntrySchema = z.strictObject({
   prunedReason: PrunedReasonSchema.optional(),
 });
 
-/** The prune-reason rule only: FR-16 overlap is `./overlap.ts`, cross-file checks are `core`'s. */
+/** The single-entry rules only (prune reason, no raw jewel): FR-16 overlap is `./overlap.ts`, cross-file checks are `core`'s. */
 export const TrackedEntrySchema = z
   .discriminatedUnion('kind', [CraftedTrackedEntrySchema, RawTrackedEntrySchema])
   .superRefine((entry, context) => {
+    // `core`'s `isJewelCategory` is out of reach from `contracts`, so the id is spelled here.
+    if (entry.kind === 'raw' && entry.categoryId === 'jewel') {
+      context.addIssue({
+        code: 'custom',
+        path: ['categoryId'],
+        message: 'a Raw Base is a white base and jewels never drop white; track the jewel kind as crafted entries (FR-36)',
+      });
+    }
     if (entry.status === 'pruned' && entry.prunedReason === undefined) {
       context.addIssue({
         code: 'custom',

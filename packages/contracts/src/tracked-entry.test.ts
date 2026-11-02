@@ -96,6 +96,16 @@ describe('TrackedEntrySchema', () => {
     expect(issuesOf(without(rawEntry, 'categoryId')).map((issue) => issue.path.join('.'))).toEqual(['categoryId']);
   });
 
+  it('refuses a raw entry in the jewel category, active or pruned, at categoryId (FR-36)', () => {
+    const rawJewel = { ...rawEntry, baseTypeId: 'Emerald', categoryId: 'jewel', className: 'Emerald' };
+    expect(issuesOf(rawJewel).map((issue) => issue.path.join('.'))).toEqual(['categoryId']);
+    expect(issuesOf({ ...rawJewel, status: 'pruned', prunedReason: 'r' }).map((issue) => issue.path.join('.'))).toEqual(['categoryId']);
+  });
+
+  it('parses a crafted entry in the jewel category', () => {
+    expect(issuesOf({ ...craftedEntry, categoryId: 'jewel', className: 'Emerald' })).toEqual([]);
+  });
+
   it('carries status as a schema member, not a convention', () => {
     expect(TrackedEntrySchema.safeParse({ ...craftedEntry, status: 'pinned' }).success).toBe(true);
     expect(TrackedEntrySchema.safeParse({ ...craftedEntry, status: 'retired' }).success).toBe(
