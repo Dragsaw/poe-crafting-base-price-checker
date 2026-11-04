@@ -1,13 +1,13 @@
 {
-  "runStartedAt": "2026-11-04T02:58:56.283Z",
-  "runFinishedAt": "2026-11-04T02:59:01.156Z",
+  "runStartedAt": "2026-11-04T06:59:22.142Z",
+  "runFinishedAt": "2026-11-04T06:59:27.127Z",
   "figures": {
     "requestsBySource": {
-      "tracked-list": 400,
+      "tracked-list": 396,
       "league-validation": 1,
-      "session-probe": 1
+      "session-probe": 0
     },
-    "notReachedCount": 1080,
+    "notReachedCount": 878,
     "coverage": 1,
     "rankableClassCount": 40,
     "trackedListEditedAt": {
