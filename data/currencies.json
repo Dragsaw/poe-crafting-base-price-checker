@@ -1,12 +1,12 @@
 {
   "schemaVersion": "1.0.0",
   "rates": [
-    { "currencyId": "divine", "rate": 1, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-11-11T07:00:07Z" },
-    { "currencyId": "exalted", "rate": 0.00163, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-11-11T07:00:07Z" },
-    { "currencyId": "chaos", "rate": 0.101, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-11-11T07:00:07Z" },
-    { "currencyId": "greater-orb-of-transmutation", "rate": 0.00284, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-11-11T07:00:07Z" },
-    { "currencyId": "greater-orb-of-augmentation", "rate": 0.0029, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-11-11T07:00:07Z" },
-    { "currencyId": "perfect-orb-of-transmutation", "rate": 0.0182, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-11-11T07:00:07Z" },
-    { "currencyId": "perfect-orb-of-augmentation", "rate": 0.328, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-11-11T07:00:07Z" }
+    { "currencyId": "divine", "rate": 1, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-11-11T11:00:08Z" },
+    { "currencyId": "exalted", "rate": 0.0017, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-11-11T11:00:08Z" },
+    { "currencyId": "chaos", "rate": 0.1, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-11-11T11:00:08Z" },
+    { "currencyId": "greater-orb-of-transmutation", "rate": 0.00166, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-11-11T11:00:08Z" },
+    { "currencyId": "greater-orb-of-augmentation", "rate": 0.00282, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-11-11T11:00:08Z" },
+    { "currencyId": "perfect-orb-of-transmutation", "rate": 0.0109, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-11-11T11:00:08Z" },
+    { "currencyId": "perfect-orb-of-augmentation", "rate": 0.323, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-11-11T11:00:08Z" }
   ]
 }
