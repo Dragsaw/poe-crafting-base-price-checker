@@ -61,3 +61,15 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Name the words for the pair failures `pool empty` and `augment exhausted`: FR-4 and the `EXPERIENCE.md` Copy Deck name none, and AD-17 calls that gap a PRD finding.
   evidence: `UnrankableReason` in `packages/core/src/rank.ts` reports the causes `core` observed as `pool empty` (an empty class pool, or a slot the scope leaves empty, with `recipeId`) and `augment exhausted` (with `recipeId`). The appendix prints them verbatim with no reason note (`APPENDIX_NOTES` in `packages/web/src/list/UnrankableAppendix.tsx`). The committed data hits neither cause today. The PRD owner adds the FR-4 members, and UX adds the Copy Deck strings; then `core` and `web` adopt those words. [NOTE FOR UX] The appendix prints a recipe-scoped pair failure (with `recipeId`) the same as a class-wide one, so the player cannot tell that the row may go away on a recipe switch: the words should tell a recipe-scoped failure from a class-wide one.
   retry_when: never — needs a human
+
+- source_spec: `docs/stories/spec-7-1-the-recipe-floor-per-modifier-after-the-level-scope.md`
+  summary: Mark a not-counted (unreachable) entry in `CraftedCombination` and give it its own display and ordering in `web` (state 49, `+ N not counted`).
+  evidence: `scanSummands` in `packages/core/src/rank-crafted-row.ts` pushes a not-counted entry as `{entryKey, trust}` with the entry's own trust, which can be `current`, and no price. `compareCombinations` sorts it with the priced group, and `display-rows.ts` renders it as an ordinary unpriced line. The `CraftedCombinationSchema` description in `packages/contracts/src/ranked-row.ts` still says "below threshold, pending or broken". Stories 7.2 and 7.4 own the marker and the treatment (`EXPERIENCE.md` Interaction 3a, state 49). Found in the spec-7-1 review.
+
+- source_spec: `docs/stories/spec-7-1-the-recipe-floor-per-modifier-after-the-level-scope.md`
+  summary: Give a pair with no counted entry the reason `nothing rolls at ilvl <level>`, not `no prices yet`.
+  evidence: `craftedTrust` in `packages/core/src/price-trust.ts` returns `pending` with `no-prices` for an empty entry list. That tells the player prices are coming, when no entry counts. `EXPERIENCE.md` states 18 and 48 give `nothing rolls at ilvl <level>`, and Stories 7.2 and 7.4 add that reason kind. Found in the spec-7-1 review.
+
+- source_spec: `docs/stories/spec-7-1-the-recipe-floor-per-modifier-after-the-level-scope.md`
+  summary: Transcribe `level-toggle` and the revision 34 Copy Deck strings in Story 7.4. The DESIGN.md and EXPERIENCE.md revision pins no longer trip for them.
+  evidence: spec-7-1 raised the pins in `packages/web/src/theme/tokens.test.ts` and `packages/web/src/list/row/trust-words.test.ts` to DESIGN.md 24 and EXPERIENCE.md 34. Every content assertion passed against those revisions, and commit `15575f7` had left the pins failing for 7.4. With the pins green, nothing fails until 7.4 adds the `level-toggle` component and the new strings (`needs ilvl <floor>`, `<recipe> orbs can't roll this at ilvl <level>`, `nothing rolls at ilvl <level>`).

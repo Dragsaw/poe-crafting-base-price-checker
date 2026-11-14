@@ -92,8 +92,8 @@ development_status:
   6-4-one-purpose-per-drop-when-a-base-is-tracked-at-two-floors: done
   epic-6-retrospective: done
 
-  epic-7: backlog
-  7-1-the-recipe-floor-per-modifier-after-the-level-scope: backlog
+  epic-7: in-progress
+  7-1-the-recipe-floor-per-modifier-after-the-level-scope: review
   7-2-per-entry-floors-and-the-crafting-item-level-in-core: backlog
   7-3-regenerate-tracked-json-for-t1-and-t2: backlog
   7-4-the-item-level-toggle: backlog
