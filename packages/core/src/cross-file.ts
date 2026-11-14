@@ -27,7 +27,8 @@ import { coRollable } from './cross-file/co-rollable.ts';
 import { COMPLETE } from './cross-file/complete-pool.ts';
 import { edgeAlignment } from './cross-file/edge-alignment.ts';
 import { emptyContainment } from './cross-file/empty-containment.ts';
-import { formatLine, formatReference, setText } from './cross-file/reference-text.ts';
+import { kindAgreement } from './cross-file/kind-agreement.ts';
+import { formatReference, setText } from './cross-file/reference-text.ts';
 import { containedIn, isContaining, eligible, interval, lineSet, poolOf, statIds, isUntrackable } from './probability.ts';
 import type { ReferenceLine, Slot } from './probability.ts';
 
@@ -35,6 +36,7 @@ export { classDiscriminability } from './cross-file/class-discriminability.ts';
 export { coRollable } from './cross-file/co-rollable.ts';
 export { edgeAlignment } from './cross-file/edge-alignment.ts';
 export { emptyContainment } from './cross-file/empty-containment.ts';
+export { kindAgreement } from './cross-file/kind-agreement.ts';
 
 /** The cross-file checks and the unvalidated marks (AD-17). Pure (AD-1). */
 
@@ -70,53 +72,6 @@ export function scopedPools(pools: WeightsClassPools, floor: number): ScopedPool
   return { prefix: eligible(pools.prefix, floor, 0), suffix: eligible(pools.suffix, floor, 0) };
 }
 
-/** `disagrees(rl, line)`: a valueless reference line beside a banded line, same `statId`. */
-function isDisagreeing(rl: ReferenceLine, line: WeightsLine): boolean {
-  return line.statId === rl.statId && !('valueMin' in rl) && line.ranges.length > 0;
-}
-
-/** Per line: the detail when a valueless reference line meets a banded scoped line. */
-export function kindAgreement(
-  slot: Slot,
-  reference: ModifierReference,
-  scoped: readonly ModifierWeight[],
-  floor: number,
-): string | undefined {
-  const parts: string[] = [];
-  for (const rl of linesOf(reference)) {
-    const found = disagreementsOn(rl, scoped);
-    if (found === undefined) {
-      continue;
-    }
-    const { count, first } = found;
-    parts.push(
-      `${formatLine(slot, reference, rl)} at floor ${String(floor)}: ${String(count)} scoped ${count === 1 ? 'line' : 'lines'} on that statId ${count === 1 ? 'is' : 'are'} banded (e.g. ${first.sourceModifierId})`,
-    );
-  }
-  return parts.length === 0 ? undefined : parts.join('; ');
-}
-
-/** How many positive-weight scoped lines disagree with `rl`, and the first tier, or `undefined`. */
-function disagreementsOn(
-  rl: ReferenceLine,
-  scoped: readonly ModifierWeight[],
-): { readonly count: number; readonly first: ModifierWeight } | undefined {
-  let count = 0;
-  let first: ModifierWeight | undefined;
-  for (const entry of scoped) {
-    if (entry.weight === 0) {
-      continue;
-    }
-    const here = entry.lines.filter((line) => isDisagreeing(rl, line)).length;
-    if (here === 0) {
-      continue;
-    }
-    count += here;
-    first ??= entry;
-  }
-  return first === undefined ? undefined : { count, first };
-}
-
 /** `meets(rl, line)`: the search for `rl` can match a roll of `line`. */
 function isMeeting(rl: ReferenceLine, line: WeightsLine): boolean {
   if (line.statId !== rl.statId) {
@@ -134,11 +89,11 @@ export function lineSetCompleteness(
   slot: Slot,
   reference: ModifierReference,
   scoped: readonly ModifierWeight[],
-  floor: number,
+  level: number,
 ): string | undefined {
   const named = statIds(reference);
   const lines = linesOf(reference);
-  const at = `${formatReference(slot, reference)} at floor ${String(floor)}`;
+  const at = `${formatReference(slot, reference)} at item level ${String(level)}`;
   const parts: string[] = [];
 
   const wider = scoped.filter((entry) => {
@@ -201,9 +156,14 @@ export function coOccur(scoped: ScopedPools): CoOccur {
 
 type ReferenceCheck = (slot: Slot, reference: ModifierReference, scoped: readonly ModifierWeight[], floor: number) => string | undefined;
 
-const REF_CHECKS: readonly (readonly [CrossFileCheck, ReferenceCheck])[] = [
+/** A pass that a wider pool cannot undo: run at the entry's own floor (AD-17). */
+const FLOOR_CHECKS: readonly (readonly [CrossFileCheck, ReferenceCheck])[] = [
   ['empty-containment-set', emptyContainment],
   ['edge-alignment', edgeAlignment],
+];
+
+/** A search for a violating tier: run where the pool is widest, so no lower level hides one (AD-17). */
+const WIDEST_CHECKS: readonly (readonly [CrossFileCheck, ReferenceCheck])[] = [
   ['kind-agreement', kindAgreement],
   ['line-set-completeness', lineSetCompleteness],
 ];
@@ -232,7 +192,7 @@ function failureOf({ entry, key }: Keyed, check: CrossFileCheck, parts: readonly
     : [{ check, entryKey: key, categoryId: entry.categoryId, className: entry.className, detail: parts.join('; ') }];
 }
 
-/** One scope per level: each entry's own floor, and the highest offered level for a mixed-floor pair (AD-17). */
+/** One scope per level: an entry's own floor, or the widest level (AD-17). */
 function scopeCache(pools: WeightsClassPools): ScopeOf {
   const scopes = new Map<number, Scope>();
   return (floor) => {
@@ -262,17 +222,23 @@ function referenceFailures(keyed: readonly Keyed[], scopeOf: ScopeOf): CrossFile
   const failures: CrossFileFailure[] = [];
   for (const item of keyed) {
     const { entry } = item;
-    const { scoped } = scopeOf(entry.itemLevelMin);
-    for (const [check, run] of REF_CHECKS) {
-      const parts = OVERLAP_SLOTS.map((slot) => run(slot, entry[slot], scoped[slot], entry.itemLevelMin)).filter(
-        (part) => part !== undefined,
-      );
-      failures.push(...failureOf(item, check, parts));
+    const widest = widestLevel(entry.itemLevelMin);
+    for (const [checks, level] of [[FLOOR_CHECKS, entry.itemLevelMin], [WIDEST_CHECKS, widest]] as const) {
+      const { scoped } = scopeOf(level);
+      for (const [check, run] of checks) {
+        const parts = OVERLAP_SLOTS.map((slot) => run(slot, entry[slot], scoped[slot], level)).filter((part) => part !== undefined);
+        failures.push(...failureOf(item, check, parts));
+      }
     }
-    const pair = coRollable(entry, scoped, entry.itemLevelMin);
+    const pair = coRollable(entry, scopeOf(entry.itemLevelMin).scoped, entry.itemLevelMin);
     failures.push(...failureOf(item, 'co-rollable-combination', pair === undefined ? [] : [pair]));
   }
   return failures;
+}
+
+/** The highest offered level, or a floor above it, whose own tiers would otherwise go unchecked. */
+function widestLevel(...floors: readonly number[]): number {
+  return Math.max(HIGHEST_CRAFTING_ITEM_LEVEL, ...floors);
 }
 
 /** The pair's overlap text, or `undefined` when the pair is not evaluated or does not overlap. */
@@ -280,10 +246,9 @@ function pairOverlap(left: Keyed, right: Keyed, scopeOf: ScopeOf): string | unde
   if (!hasHybridAffix(left.entry) && !hasHybridAffix(right.entry)) {
     return undefined;
   }
-  const isSameFloor = right.entry.itemLevelMin === left.entry.itemLevelMin;
-  const [where, level] = isSameFloor ? ['floor', left.entry.itemLevelMin] : ['item level', HIGHEST_CRAFTING_ITEM_LEVEL];
+  const level = widestLevel(left.entry.itemLevelMin, right.entry.itemLevelMin);
   const branches = overlapBranches(left.entry, right.entry, scopeOf(level).coOccur);
-  return branches === undefined ? undefined : `at ${where} ${String(level)} on ${describeOverlap(branches)}`;
+  return branches === undefined ? undefined : `at item level ${String(level)} on ${describeOverlap(branches)}`;
 }
 
 function appendPartner(partners: Map<string, string[]>, key: string, text: string): void {

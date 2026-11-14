@@ -1248,7 +1248,7 @@ never import each other.
   | **`coOccur`** | two entries overlap under AD-17's predicate and any of their four references is hybrid, so a single item satisfies both and the partition is not a partition | `coOccur` in `packages/core/src/cross-file.ts`, `packages/contracts/src/overlap.ts` |
   | **Line-set completeness** | a reference names fewer lines than a tier its search reaches — a hybrid naming a subset of a tier's lines, or a single-line band reaching into a hybrid tier — or a hybrid's contained tiers span more than one `modGroup` | `lineSetCompleteness` in `packages/core/src/cross-file.ts` |
   | **Class discriminability** | the entry's `categoryId` carries **more than one** `className` in `weights.json`, and the entry's own `className` yields no class discriminator under `WEIGHTS-FILE-SCHEMA.md`'s `className` grammar — so AD-16 would price the entry across sibling classes while FR-1 guarantees it does not. **This is the only check that reads the weights file for something other than a pool** | `packages/core/src/cross-file/class-discriminability.ts` |
-  | **Kind agreement** | **per line**: a **valueless** reference line has a **banded** scoped line on its `statId` — a line's kind is read from **whether its `ranges` is empty**, since the weights contract has no `kind` field. **A banded reference line never disagrees**, because a tier that rolls no number reads as the value 1, the band `[1, 1]`: one `statId` may carry a valueless tier beside a banded one (*"Loads an additional bolt"* is 1 beside the `[2, 2]` tier). The quantifier stays **universal, not existential** for that case: one banded line is a defect however many valueless lines agree. `contracts` separately owns the **within-file** half, which a per-file schema sees on its own | `kindAgreement` in `packages/core/src/cross-file.ts` |
+  | **Kind agreement** | **per line**: a **valueless** reference line has a **banded** scoped line on its `statId` — a line's kind is read from **whether its `ranges` is empty**, since the weights contract has no `kind` field. **A banded reference line never disagrees**, because a tier that rolls no number reads as the value 1, the band `[1, 1]`: one `statId` may carry a valueless tier beside a banded one (*"Loads an additional bolt"* is 1 beside the `[2, 2]` tier). The quantifier stays **universal, not existential** for that case: one banded line is a defect however many valueless lines agree. `contracts` separately owns the **within-file** half, which a per-file schema sees on its own | `packages/core/src/cross-file/kind-agreement.ts` |
   | **Co-rollable combination** | no prefix tier and suffix tier of the entry's containment sets under the scope can be on one item in either draw order: in each order the two share a `modGroup`, or the first's `addsTags` meets the second's `blockedByTags`. This is a validation error, never a `P = 0` | `packages/core/src/cross-file/co-rollable.ts` |
 
   **One null-line rule, reading only the weights file, decides every `statId: null` line**,
@@ -1285,8 +1285,8 @@ never import each other.
   co-rollable combination are evaluated at the entry's own `itemLevelMin`**: a wider pool
   cannot undo a pass of theirs. **`coOccur` (every hybrid pair, whatever the two floors),
   line-set completeness and kind agreement are evaluated at the highest offered Crafting
-  Item Level**: each searches the pool for a violating tier, and a tier present at a lower
-  level is present there too. Neither scope is the player's `L`: the `sync` gate runs with
+  Item Level**, or at a higher floor of the entry or pair: each searches the pool for a
+  violating tier, and a tier present at a lower level is present there too. Neither scope is the player's `L`: the `sync` gate runs with
   no `L`. **Edge alignment is therefore not a general bound
   on containment's loss** — it tests a band only against its own containment set, and the
   shapes that escape it are AD-11's accepted residual (FR-29).

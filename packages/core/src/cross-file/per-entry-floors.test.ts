@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { CRAFTING_ITEM_LEVELS } from '../crafting-item-level.ts';
 import { rank } from '../rank.ts';
-import { band, bows, byPair, entry, failuresOf, line, OTHER, pools, STAT, T7, T8, tier } from './test-support.ts';
+import { band, bows, byPair, entry, failuresOf, line, OTHER, pools, STAT, T7, T8, tier, valueless } from './test-support.ts';
 
 const bandLine = (statId: string, valueMin: number, valueMax: number): HybridLine => ({ statId, valueMin, valueMax });
 
@@ -64,5 +64,41 @@ describe('crossFileChecks: per-entry floors (AD-5, AD-17; FR-16)', () => {
       }).unrankable;
     expect(unrankableAt(79)).toEqual([{ categoryId: 'weapon.bow', className: 'Bows', reason: 'class disagrees with weights file' }]);
     expect(unrankableAt(82)).toEqual(unrankableAt(79));
+  });
+
+  describe('the checks that search the pool run at the highest offered level, whatever the floor (AD-17)', () => {
+    const highest = `at item level ${String(Math.max(...CRAFTING_ITEM_LEVELS))}`;
+    // Only the pool at 80 and above holds the hybrid tier, so a check at the floor of 75 cannot see it.
+    const hybridAt80 = tier([line(STAT, [30, 40]), line(OTHER, [100, 150])], { itemLevelMin: 80, modGroup: 'hybrid-ab' });
+
+    it('fails a same-floor hybrid pair that co-occurs only above its floor, and a band that reaches that hybrid tier', () => {
+      const hybridEntry = entry({ prefix: { kind: 'hybrid', lines: [bandLine(STAT, 30, 40), bandLine(OTHER, 100, 150)] } }, { itemLevelMin: 75 });
+      const singleEntry = entry({ prefix: band(30, 40) }, { itemLevelMin: 75 });
+      const failures = failuresOf([hybridEntry, singleEntry], bows(pools([hybridAt80, tier([line(STAT, [30, 40])])])));
+      const searched = failures.filter((failure) => failure.check === 'co-occur' || failure.check === 'line-set-completeness');
+      expect(searched.map((failure) => [failure.check, failure.entryKey]).toSorted(byPair)).toEqual(
+        [
+          ['co-occur', canonicalKey(hybridEntry)],
+          ['co-occur', canonicalKey(singleEntry)],
+          ['line-set-completeness', canonicalKey(singleEntry)],
+        ].toSorted(byPair),
+      );
+      for (const failure of searched) {
+        expect(failure.detail).toContain(highest);
+      }
+    });
+
+    it('fails a valueless reference whose statId gains a banded tier only above its floor', () => {
+      const valuelessEntry = entry({ prefix: valueless() }, { itemLevelMin: 75 });
+      const failures = failuresOf([valuelessEntry], bows(pools([tier([line(STAT)]), tier([line(STAT, [5, 10])], { itemLevelMin: 80 })])));
+      expect(failures.map((failure) => failure.check)).toEqual(['kind-agreement']);
+      expect(failures[0]?.detail).toContain(highest);
+    });
+
+    it('passes the same entries when the pool gains no tier above their floor', () => {
+      const valuelessEntry = entry({ prefix: valueless(OTHER) }, { itemLevelMin: 75 });
+      const singleEntry = entry({ prefix: band(30, 40) }, { itemLevelMin: 75 });
+      expect(failuresOf([valuelessEntry, singleEntry], bows(pools([tier([line(OTHER)]), tier([line(STAT, [30, 40])])])))).toEqual([]);
+    });
   });
 });

@@ -73,9 +73,3 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-7-1-the-recipe-floor-per-modifier-after-the-level-scope.md`
   summary: Transcribe `level-toggle` and the revision 34 Copy Deck strings in Story 7.4. The DESIGN.md and EXPERIENCE.md revision pins no longer trip for them.
   evidence: spec-7-1 raised the pins in `packages/web/src/theme/tokens.test.ts` and `packages/web/src/list/row/trust-words.test.ts` to DESIGN.md 24 and EXPERIENCE.md 34. Every content assertion passed against those revisions, and commit `15575f7` had left the pins failing for 7.4. With the pins green, nothing fails until 7.4 adds the `level-toggle` component and the new strings (`needs ilvl <floor>`, `<recipe> orbs can't roll this at ilvl <level>`, `nothing rolls at ilvl <level>`).
-
-## Deferred from: spine revision 48 (2026-11-14)
-
-- source_spec: `docs/stories/spec-7-2-per-entry-floors-and-the-crafting-item-level-in-core.md`
-  summary: Run `coOccur` for every hybrid pair, line-set completeness and kind agreement at the highest offered Crafting Item Level, as AD-17 (spine revision 48) states.
-  evidence: `referenceFailures` in `packages/core/src/cross-file.ts` runs all four `REF_CHECKS` at `entry.itemLevelMin`, and `pairOverlap` checks a same-floor pair at that floor. AD-17 keeps edge alignment, the empty containment set and the co-rollable combination at the entry's own floor, and moves the three checks that search the pool for a violating tier to `HIGHEST_CRAFTING_ITEM_LEVEL`. Until then, two same-floor hybrid entries below 82 that co-occur only on a tier between their floor and 82 pass the gate and double-count in `rank` at 82. The committed data has 0 such failures. Story 7.3 adds lower-floor entries, so land this before 7.3. Done when tests feed a same-floor hybrid pair that co-occurs only above its floor, and an entry whose line-set or kind defect appears only above its floor, and each fails.
