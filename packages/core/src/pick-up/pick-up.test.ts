@@ -41,7 +41,7 @@ describe('pickUpPurposes: AC 1, one entry per named drop under the active recipe
   it('reads EV(C) only from the active recipe’s row', () => {
     const ranking = { ordering: [classRow(5, { recipeId: 'perfect' }), classRow(2), rawRow(B, 3)] };
     expect(purposesOf(ranking)).toEqual([white('sell-raw', BOW_RAW_FLOOR), checkRolls()]);
-    expect(purposesOf(ranking, [B], { id: 'perfect' })).toEqual([white('craft', BOW_CLASS_FLOOR), checkRolls()]);
+    expect(purposesOf(ranking, [B], { id: 'perfect' })).toEqual([white('craft', BOW_RAW_FLOOR), checkRolls()]);
   });
 
   it('returns [] when no base qualifies', () => {
@@ -63,7 +63,7 @@ describe('pickUpPurposes: AC 1, one entry per named drop under the active recipe
 
 describe('pickUpPurposes: AC 2, craft or sell raw against EV(C)', () => {
   it('raw value below EV(C) is craft', () => {
-    expect(purposesOf({ ordering: [classRow(2), rawRow(B, 1)] })).toEqual([white('craft', BOW_CLASS_FLOOR), checkRolls()]);
+    expect(purposesOf({ ordering: [classRow(2), rawRow(B, 1)] })).toEqual([white('craft', BOW_RAW_FLOOR), checkRolls()]);
   });
 
   it('raw value equal to EV(C) is sell raw', () => {
@@ -76,22 +76,23 @@ describe('pickUpPurposes: AC 2, craft or sell raw against EV(C)', () => {
 
   it('a base below the threshold has raw value 0, so it is craft', () => {
     expect(purposesOf({ ordering: [classRow(2)], belowThreshold: [rawRow(B, 0.1)] })).toEqual([
-      white('craft', BOW_CLASS_FLOOR),
+      white('craft', BOW_RAW_FLOOR),
       checkRolls(),
     ]);
   });
 });
 
-describe('pickUpPurposes: AC 3, item-level floors', () => {
-  it('sell raw takes the Raw Base’s own floor; craft and check the rolls also reach the class floor', () => {
+describe('pickUpPurposes: AC 3, item-level floors (FR-36)', () => {
+  it('every purpose takes the Raw Base’s own floor, below the class’s crafted floor', () => {
     expect(purposesOf({ ordering: [classRow(2), rawRow(B, 3)] })[0]?.itemLevelMin).toBe(BOW_RAW_FLOOR);
     expect(purposesOf({ ordering: [classRow(2), rawRow(B, 1)] }).map((entry) => entry.itemLevelMin)).toEqual([
-      BOW_CLASS_FLOOR,
-      BOW_CLASS_FLOOR,
+      BOW_RAW_FLOOR,
+      BOW_RAW_FLOOR,
     ]);
+    expect(BOW_RAW_FLOOR).toBeLessThan(BOW_CLASS_FLOOR);
   });
 
-  it('a Raw Base floor above the class floor wins for craft and check the rolls', () => {
+  it('a Raw Base floor above the class’s crafted floor is its own floor for craft and check the rolls', () => {
     const high: RawTrackedEntry = { ...B, itemLevelMin: 86 };
     expect(purposesOf({ ordering: [classRow(2)] }, [high])).toEqual([white('craft', 86), checkRolls(86)]);
   });
@@ -102,7 +103,7 @@ describe('pickUpPurposes: AC 4, check the rolls', () => {
     expect(purposesOf({ ordering: [classRow(2), rawRow(B, 3)] })).toContainEqual(checkRolls());
   });
 
-  it('a jewel kind with EV > 0 is one magic check-the-rolls entry: derived base type, class floor, no tier, no white entry', () => {
+  it('a jewel kind with EV > 0 is one magic check-the-rolls entry: derived base type, lowest crafted floor, no tier, no white entry', () => {
     const jewel = classRow(1.5, { categoryId: 'jewel', className: 'Time-Lost_Diamond', itemLevelMin: 75 });
     expect(purposesOf({ ordering: [jewel] }, [])).toEqual([
       { baseTypeId: 'Time-Lost Diamond', rarity: 'magic', itemLevelMin: 75, purpose: 'check-rolls' },
@@ -196,7 +197,7 @@ describe('pickUpPurposes: AC 7, a Raw Base with no price', () => {
     ['unresolvable', { unresolvable: [unranked(B)] }],
     ['in no group', {}],
   ] as const)('%s, EV(C) > 0: craft, and check the rolls; never sell raw', (_case, parts) => {
-    expect(purposesOf({ ...parts, ordering: [classRow(2)] })).toEqual([white('craft', BOW_CLASS_FLOOR), checkRolls()]);
+    expect(purposesOf({ ...parts, ordering: [classRow(2)] })).toEqual([white('craft', BOW_RAW_FLOOR), checkRolls()]);
   });
 });
 
@@ -208,7 +209,7 @@ describe('pickUpPurposes: AC 8, a pruned Raw Base', () => {
   it('a pinned Raw Base gets the same entries as an active one', () => {
     const ranking = { ordering: [classRow(2), rawRow(B, 1)] };
     expect(purposesOf(ranking, [rawBase('Dualstring Bow', 'pinned')])).toEqual(purposesOf(ranking, [B]));
-    expect(purposesOf(ranking, [rawBase('Dualstring Bow', 'pinned')])).toEqual([white('craft', BOW_CLASS_FLOOR), checkRolls()]);
+    expect(purposesOf(ranking, [rawBase('Dualstring Bow', 'pinned')])).toEqual([white('craft', BOW_RAW_FLOOR), checkRolls()]);
   });
 });
 

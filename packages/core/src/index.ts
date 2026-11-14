@@ -12,6 +12,7 @@ export { compareRankedRows, rank } from './rank.ts';
 
 /** The Crafting Item Levels on offer (FR-38). */
 export { CRAFTING_ITEM_LEVELS } from './crafting-item-level.ts';
+export type { CraftingItemLevel } from './crafting-item-level.ts';
 export { classKeyOf, craftedClassesOf } from './crafted-classes.ts';
 export type {
   NotYetSyncedEntry,

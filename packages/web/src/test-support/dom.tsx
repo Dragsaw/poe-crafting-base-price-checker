@@ -7,7 +7,7 @@ import { createRoot, type Root } from 'react-dom/client';
 
 import { toDisplayRows } from '../list/display-rows';
 import { RankedList } from '../list/RankedList';
-import { DEFAULT_THRESHOLD } from '../shared/product';
+import { DEFAULT_THRESHOLD, FIRST_VISIT_CRAFTING_ITEM_LEVEL } from '../shared/product';
 import { PageProvider } from '../theme/PageProvider';
 import { TEST_LEAGUE } from './artifact-server';
 
@@ -96,7 +96,7 @@ export function rerender(node: ReactNode): void {
 
 /** The ranked list for `tracked` against `dataset` at `threshold`, at `NOW`. */
 function rankedList(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[], threshold: number): ReactNode {
-  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold, weights: undefined }), dataset);
+  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold, weights: undefined, craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL }), dataset);
   return (
     <PageProvider>
       <RankedList rows={rows} activeLeague={TEST_LEAGUE} note={{ threshold, cost: { kind: 'no-recipe' } }} />

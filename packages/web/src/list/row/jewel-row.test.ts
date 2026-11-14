@@ -2,7 +2,7 @@ import { rank } from '@poe/core';
 import type { CraftedRankedRow, PriceTrust } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_THRESHOLD } from '../../shared/product';
+import { DEFAULT_THRESHOLD, FIRST_VISIT_CRAFTING_ITEM_LEVEL } from '../../shared/product';
 import { TEST_LEAGUE } from '../../test-support/artifact-server';
 import { NOW_ISO } from '../../test-support/dom';
 import { toDisplayRows } from '../display-rows';
@@ -31,7 +31,7 @@ function nothingClears(categoryId: string, className: string, craftCost: number)
 describe('a jewel class row (FR-26)', () => {
   // State 21: a jewel subtracts no Craft Cost, so nothing clearing prints a dimmed `0.00`.
   it('is marked as a jewel and dims its 0.00 when nothing clears', () => {
-    const ranking = rank({ tracked: [], dataset: [], activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined });
+    const ranking = rank({ tracked: [], dataset: [], activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined, craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL });
     const ordering = [nothingClears('jewel', 'Emerald', 0), nothingClears('weapon.bow', 'Bows', 0.03)];
     const rows = toDisplayRows({ ...ranking, ordering }, [], { honestEmpty: false });
     expect(rows.map((row) => [row.label, row.ev, row.unit === 'class' && row.isJewel])).toEqual([

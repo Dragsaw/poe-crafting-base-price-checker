@@ -19,6 +19,7 @@ import type { ArtifactSet } from './load/artifacts';
 import { loadArtifacts, type LoadOutcome } from './load/load-artifacts';
 import { readStoredRecipe, writeStoredRecipe } from './recipe/recipe-storage';
 import { expectedValueCost } from './recipe/recipe-view';
+import { FIRST_VISIT_CRAFTING_ITEM_LEVEL } from './shared/product';
 import type { ExpectedValueNote } from './list/ColumnHeader';
 import { readStoredThreshold, writeStoredThreshold } from './threshold/threshold-storage';
 
@@ -153,6 +154,7 @@ function useRanking(view: ViewState, threshold: number): Ranking | undefined {
             crossFileFailures: readyFailures,
             recipes: readySet.recipes?.recipes ?? [],
             currencyRates: readySet.dataset.currencyRates,
+            craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL,
           }),
     [readySet, readyFailures, readyNow, threshold],
   );

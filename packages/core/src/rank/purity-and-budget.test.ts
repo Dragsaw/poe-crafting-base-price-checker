@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compareRankedRows, rank } from '../rank.ts';
 import type { RankInput, Ranking } from '../rank.ts';
-import { crafted, keysOf, LEAGUE, NOW, OLD_LEAGUE, permute, priced, published, raw, THRESHOLD, WEIGHTS } from './test-support.ts';
+import { crafted, keysOf, LEAGUE, LEVEL, NOW, OLD_LEAGUE, permute, priced, published, raw, THRESHOLD, WEIGHTS } from './test-support.ts';
 
 /** A mixed input covering every matrix row. */
 function matrixInput(): RankInput {
@@ -42,6 +42,7 @@ function matrixInput(): RankInput {
     activeLeague: LEAGUE,
     threshold: THRESHOLD,
     now: NOW,
+    craftingItemLevel: LEVEL,
     weights: WEIGHTS,
   };
 }
@@ -89,6 +90,7 @@ describe('compareRankedRows', () => {
       activeLeague: LEAGUE,
       threshold: THRESHOLD,
       now: NOW,
+      craftingItemLevel: LEVEL,
       weights: WEIGHTS,
     }).ordering.toSorted(compareRankedRows).flatMap((row) => (row.kind === 'raw' ? [row] : []));
     expect(a?.baseTypeId).toBe('A');
@@ -100,7 +102,7 @@ describe('rank: the read-time budget (NFR-6)', () => {
   it('ranks 5,000 raw entries in under 100 ms', () => {
     const tracked = Array.from({ length: 5000 }, (_, index) => raw(`Base ${String(index).padStart(4, '0')}`));
     const dataset = tracked.map((entry, index) => published(entry, priced(((index * 37) % 500) / 100 + 0.01)));
-    const input: RankInput = { tracked, dataset, activeLeague: LEAGUE, threshold: THRESHOLD, now: NOW, weights: WEIGHTS };
+    const input: RankInput = { tracked, dataset, activeLeague: LEAGUE, threshold: THRESHOLD, now: NOW, weights: WEIGHTS, craftingItemLevel: LEVEL };
     const result = rank(input); // warm up
     const samples: number[] = [];
     for (let run = 0; run < 5; run += 1) {

@@ -3,6 +3,7 @@ import type { CraftedRankedRow, PriceTrust } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { MINUS } from '../../shared/money';
+import { FIRST_VISIT_CRAFTING_ITEM_LEVEL } from '../../shared/product';
 import { TEST_LEAGUE } from '../../test-support/artifact-server';
 import { NOW, NOW_ISO } from '../../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../../test-support/list-fixtures';
@@ -68,7 +69,7 @@ describe('the trust each row carries', () => {
       unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 2)),
       unpriced(lost, { state: 'unresolvable' }, hoursBefore(NOW, 1)),
     ];
-    const ranking = rank({ tracked: [fresh, old, tried, lost], dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: 0, weights: undefined });
+    const ranking = rank({ tracked: [fresh, old, tried, lost], dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: 0, weights: undefined, craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL });
     const rows = toDisplayRows(ranking, dataset);
     const expected = new Map([
       ...ranking.ordering.flatMap((row) => (row.kind === 'raw' ? [[row.entryKey, row.trust] as const] : [])),

@@ -3,7 +3,7 @@ import { rank } from '@poe/core';
 import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { DEFAULT_THRESHOLD } from '../../shared/product';
+import { DEFAULT_THRESHOLD, FIRST_VISIT_CRAFTING_ITEM_LEVEL } from '../../shared/product';
 import { TEST_LEAGUE } from '../../test-support/artifact-server';
 import { mount, mountList, NOW, NOW_ISO, rgb, rowsIn, unmount } from '../../test-support/dom';
 import { hover, leave } from '../../test-support/hover';
@@ -115,7 +115,7 @@ const ruleOf = (element: HTMLElement | undefined): string | undefined => element
 
 function rawRows(count: number): readonly ListRow[] {
   const { tracked, dataset } = many(count, NOW);
-  return toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined }), dataset);
+  return toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined, craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL }), dataset);
 }
 
 function mountBranches(raw: readonly ListRow[]): { readonly raw: HTMLElement[]; readonly crafted: HTMLElement[] } {

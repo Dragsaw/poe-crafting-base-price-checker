@@ -7,6 +7,7 @@ import { onTestFinished, vi } from 'vitest';
 
 import { loadArtifacts } from '../load/load-artifacts';
 import { filterText, TREATMENTS } from '../pick-up-filter/filter-text';
+import { FIRST_VISIT_CRAFTING_ITEM_LEVEL } from '../shared/product';
 import { option, serveWorld, standardWorld } from '../recipe/craft-recipe/test-support';
 import { flush, settleTo } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry } from '../test-support/list-fixtures';
@@ -144,6 +145,7 @@ export async function expectedFilterText(threshold: number, recipeId: string | u
     crossFileFailures: crossFileChecks(set.tracked.entries, set.weights).failures,
     recipes: set.recipes?.recipes ?? [],
     currencyRates: set.dataset.currencyRates,
+    craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL,
   });
   return filterText(pickUpPurposes({ ranking, tracked: set.tracked.entries, recipeId }), importName);
 }

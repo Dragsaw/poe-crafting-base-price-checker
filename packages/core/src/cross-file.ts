@@ -21,6 +21,7 @@ import type {
 } from '@poe/contracts';
 
 import { craftedClassesOf } from './crafted-classes.ts';
+import { HIGHEST_CRAFTING_ITEM_LEVEL } from './crafting-item-level.ts';
 import { classDiscriminability } from './cross-file/class-discriminability.ts';
 import { coRollable } from './cross-file/co-rollable.ts';
 import { COMPLETE } from './cross-file/complete-pool.ts';
@@ -61,10 +62,10 @@ export interface CrossFileResult {
   readonly unvalidated: readonly UnvalidatedMark[];
 }
 
-/** The two scoped slot sets of one class at one floor. */
+/** The two scoped slot sets of one class at one item level. */
 export type ScopedPools = Readonly<Record<Slot, readonly ModifierWeight[]>>;
 
-/** Both slots scoped to the class floor: `eligible(pool, floor, 0)`. */
+/** Both slots scoped to one item level, with no recipe floor: `eligible(pool, floor, 0)`. */
 export function scopedPools(pools: WeightsClassPools, floor: number): ScopedPools {
   return { prefix: eligible(pools.prefix, floor, 0), suffix: eligible(pools.suffix, floor, 0) };
 }
@@ -231,7 +232,7 @@ function failureOf({ entry, key }: Keyed, check: CrossFileCheck, parts: readonly
     : [{ check, entryKey: key, categoryId: entry.categoryId, className: entry.className, detail: parts.join('; ') }];
 }
 
-/** One scope per floor: AD-17 gives a class one, but the list may not yet agree. */
+/** One scope per level: each entry's own floor, and the highest offered level for a mixed-floor pair (AD-17). */
 function scopeCache(pools: WeightsClassPools): ScopeOf {
   const scopes = new Map<number, Scope>();
   return (floor) => {
@@ -276,14 +277,14 @@ function referenceFailures(keyed: readonly Keyed[], scopeOf: ScopeOf): CrossFile
 
 /** The pair's overlap text, or `undefined` when the pair is not evaluated or does not overlap. */
 function pairOverlap(left: Keyed, right: Keyed, scopeOf: ScopeOf): string | undefined {
-  if (
-    right.entry.itemLevelMin !== left.entry.itemLevelMin ||
-    (!hasHybridAffix(left.entry) && !hasHybridAffix(right.entry))
-  ) {
+  if (!hasHybridAffix(left.entry) && !hasHybridAffix(right.entry)) {
     return undefined;
   }
-  const branches = overlapBranches(left.entry, right.entry, scopeOf(left.entry.itemLevelMin).coOccur);
-  return branches === undefined ? undefined : `at floor ${String(left.entry.itemLevelMin)} on ${describeOverlap(branches)}`;
+  const isSameFloor = right.entry.itemLevelMin === left.entry.itemLevelMin;
+  // The pool only grows with the level, so the highest offered level's verdict holds at every level (AD-17).
+  const [where, level] = isSameFloor ? ['floor', left.entry.itemLevelMin] : ['item level', HIGHEST_CRAFTING_ITEM_LEVEL];
+  const branches = overlapBranches(left.entry, right.entry, scopeOf(level).coOccur);
+  return branches === undefined ? undefined : `at ${where} ${String(level)} on ${describeOverlap(branches)}`;
 }
 
 function appendPartner(partners: Map<string, string[]>, key: string, text: string): void {

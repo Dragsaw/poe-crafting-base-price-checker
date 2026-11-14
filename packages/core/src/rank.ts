@@ -20,7 +20,8 @@ import type { CrossFileFailure } from './cross-file.ts';
 import { assertClock, entryTrust, NO_RECIPE_TRUST, resolvedPrice } from './price-trust.ts';
 import { isEmptyPool, poolOf } from './probability.ts';
 import { compareOrdering, compareRankedRows } from './rank-order.ts';
-import { compareCombinations, craftedRow, type PairFailure } from './rank-crafted-row.ts';
+import type { CraftingItemLevel } from './crafting-item-level.ts';
+import { compareCombinations, craftedRow, lowestFloorOf, type PairFailure } from './rank-crafted-row.ts';
 import { groupRawEntries, type NotYetSyncedEntry, type UnrankedEntry } from './rank-raw-groups.ts';
 
 export { compareRankedRows } from './rank-order.ts';
@@ -48,6 +49,8 @@ export interface RankInput {
   readonly recipes?: readonly CraftRecipe[];
   /** The rate set `core` costs recipes from: `dataset.json`'s `currencyRates` (AD-20). Absent means none. */
   readonly currencyRates?: readonly CurrencyRate[];
+  /** The Crafting Item Level `L` (FR-38): it scopes every crafted EV and never a Raw Base (AD-17, FR-3). */
+  readonly craftingItemLevel: CraftingItemLevel;
 }
 
 /**
@@ -73,6 +76,7 @@ export interface RecipelessClass {
   readonly classKey: string;
   readonly categoryId: string;
   readonly className: string;
+  /** The lowest floor among the class's non-pruned crafted entries: the jewel-kind floor of FR-36. */
   readonly itemLevelMin: number;
   readonly trust: PriceTrust;
   /** Each non-pruned entry's verdict and active-league price, in `compareCombinations` order. */
@@ -228,7 +232,7 @@ function rankCraftedClass(
       classKey: classKeyOf(first.categoryId, first.className),
       categoryId: first.categoryId,
       className: first.className,
-      itemLevelMin: first.itemLevelMin,
+      itemLevelMin: lowestFloorOf(keyed),
       trust: NO_RECIPE_TRUST,
       combinations: keyed
         .map(({ entry, entryKey }): CraftedCombination => {
@@ -244,7 +248,18 @@ function rankCraftedClass(
   const isJewel = isJewelCategory(first.categoryId);
   for (const { recipe, cost: recipeCost } of costed) {
     const cost = isJewel && recipeCost.ok ? JEWEL_CRAFT_COST : recipeCost;
-    const row = craftedRow({ first, recipe, cost, pools, keyed, byKey, activeLeague: input.activeLeague, threshold: input.threshold, now: input.now });
+    const row = craftedRow({
+      first,
+      recipe,
+      itemLevel: input.craftingItemLevel,
+      cost,
+      pools,
+      keyed,
+      byKey,
+      activeLeague: input.activeLeague,
+      threshold: input.threshold,
+      now: input.now,
+    });
     if (row.kind === 'pair-failure') {
       out.unrankable.set(JSON.stringify([classKeyOf(first.categoryId, first.className), recipe.id]), {
         categoryId: first.categoryId,

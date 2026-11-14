@@ -2,7 +2,7 @@ import { rank } from '@poe/core';
 import { compareCanonicalKeys, type CraftedRankedRow, type DatasetEntry, type PriceTrust, type RawTrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_THRESHOLD } from '../shared/product';
+import { DEFAULT_THRESHOLD, FIRST_VISIT_CRAFTING_ITEM_LEVEL } from '../shared/product';
 import { TEST_LEAGUE } from '../test-support/artifact-server';
 import { NOW, NOW_ISO } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
@@ -21,7 +21,7 @@ function reasonOf(row: ListRow): string | undefined {
 
 /** A raw-only list, narrowed to Raw Base rows. */
 function rowsFor(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[]): DisplayRow[] {
-  const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined });
+  const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined, craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL });
   return toDisplayRows(ranking, dataset).flatMap((row) => (row.unit === 'raw' ? [row] : []));
 }
 
@@ -162,7 +162,7 @@ describe('toDisplayRows', () => {
       activeLeague: TEST_LEAGUE,
       now: NOW_ISO,
       threshold: DEFAULT_THRESHOLD,
-      weights: undefined,
+      weights: undefined, craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL,
     });
     expect(ranking.belowThreshold.length).toBeGreaterThan(0);
     expect(isHonestEmpty(ranking)).toBe(false);
@@ -210,7 +210,7 @@ describe('toDisplayRows', () => {
       unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 2)),
       unpriced(lost, { state: 'unresolvable' }, hoursBefore(NOW, 1)),
     ];
-    const ranking = rank({ tracked: [lost, never, a, tried], dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined });
+    const ranking = rank({ tracked: [lost, never, a, tried], dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined, craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL });
     const unpricedCrafted = [
       unpricedClass('Bows', { verdict: 'pending', reasons: [{ kind: 'no-prices' }] }),
       unpricedClass('Claws', { verdict: 'broken', reasons: [{ kind: 'all-broken' }] }),
@@ -249,7 +249,7 @@ describe('toDisplayRows', () => {
         activeLeague: TEST_LEAGUE,
         now: NOW_ISO,
         threshold: 0,
-        weights: undefined,
+        weights: undefined, craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL,
       }),
       [],
     );
@@ -259,7 +259,7 @@ describe('toDisplayRows', () => {
 
     const tiny = rawEntry('Tiny');
     const [only] = toDisplayRows(
-      rank({ tracked: [tiny], dataset: [priced(tiny, 0.0031, hoursBefore(NOW, 1))], activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: 0, weights: undefined }),
+      rank({ tracked: [tiny], dataset: [priced(tiny, 0.0031, hoursBefore(NOW, 1))], activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: 0, weights: undefined, craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL }),
       [],
     );
     expect(only?.ev).toEqual({ kind: 'figure', text: '< 0.01', negative: false });

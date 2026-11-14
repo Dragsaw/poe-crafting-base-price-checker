@@ -1,0 +1,62 @@
+import { canonicalKey } from '@poe/contracts';
+import type { HybridLine } from '@poe/contracts';
+import { describe, expect, it } from 'vitest';
+
+import { CRAFTING_ITEM_LEVELS } from '../crafting-item-level.ts';
+import { rank } from '../rank.ts';
+import { band, bows, byCodeUnit, entry, failuresOf, line, OTHER, pools, STAT, T7, T8, tier } from './test-support.ts';
+
+const bandLine = (statId: string, valueMin: number, valueMax: number): HybridLine => ({ statId, valueMin, valueMax });
+
+describe('crossFileChecks: per-entry floors (AD-5, AD-17; FR-16)', () => {
+  const otherTier = tier([line(OTHER, [1, 5])]);
+
+  // I/O matrix: "Mixed floors load".
+  it('passes crafted entries on one class at 75 and 82', () => {
+    const low = entry({ prefix: band(56, 80) }, { itemLevelMin: 75 });
+    const top = entry({ prefix: band(1, 5, OTHER) });
+    expect(failuresOf([low, top], bows(pools([T8(), otherTier])))).toEqual([]);
+  });
+
+  // I/O matrix: "Mixed-floor hybrid pair that overlaps at 82".
+  it('checks a mixed-floor hybrid pair at the highest offered level and names it', () => {
+    // Only the pool at 82 holds the shared tier, so the overlap shows only at the highest offered level.
+    const hybrid = tier([line(STAT, [30, 40]), line(OTHER, [100, 150])], { itemLevelMin: 80, modGroup: 'hybrid-ab' });
+    const pure = tier([line(STAT, [30, 40])]);
+    const hybridEntry = entry({ prefix: { kind: 'hybrid', lines: [bandLine(STAT, 30, 40), bandLine(OTHER, 100, 150)] } }, { itemLevelMin: 75 });
+    const singleEntry = entry({ prefix: band(30, 40) });
+    const coOccurs = failuresOf([hybridEntry, singleEntry], bows(pools([hybrid, pure]))).filter(
+      (failure) => failure.check === 'co-occur',
+    );
+    expect(coOccurs.map((failure) => failure.entryKey).toSorted(byCodeUnit)).toEqual(
+      [canonicalKey(hybridEntry), canonicalKey(singleEntry)].toSorted(byCodeUnit),
+    );
+    for (const failure of coOccurs) {
+      expect(failure.detail).toContain(`at item level ${String(Math.max(...CRAFTING_ITEM_LEVELS))}`);
+    }
+  });
+
+  it('runs edge alignment at the entry’s own floor, so every level `rank` uses reads the same failures (AD-17)', () => {
+    const misaligned = entry({ prefix: band(0, 9999) }, { itemLevelMin: 75 });
+    const top = entry({ prefix: band(1, 5, OTHER) });
+    const weights = bows(pools([T7(), T8(), otherTier]));
+    const failures = failuresOf([misaligned, top], weights);
+    const edge = failures.find((failure) => failure.check === 'edge-alignment');
+    expect(edge?.entryKey).toBe(canonicalKey(misaligned));
+    expect(edge?.detail).toContain('at floor 75');
+    expect(failures.filter((failure) => failure.entryKey === canonicalKey(misaligned))).toEqual(failuresOf([misaligned], weights));
+    const unrankableAt = (craftingItemLevel: (typeof CRAFTING_ITEM_LEVELS)[number]) =>
+      rank({
+        tracked: [misaligned, top],
+        dataset: [],
+        activeLeague: 'Forbidden Rites',
+        threshold: 0,
+        now: '2026-09-27T00:00:00Z',
+        weights,
+        crossFileFailures: failures,
+        craftingItemLevel,
+      }).unrankable;
+    expect(unrankableAt(79)).toEqual([{ categoryId: 'weapon.bow', className: 'Bows', reason: 'class disagrees with weights file' }]);
+    expect(unrankableAt(82)).toEqual(unrankableAt(79));
+  });
+});
