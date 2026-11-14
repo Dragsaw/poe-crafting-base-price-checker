@@ -73,3 +73,14 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-7-1-the-recipe-floor-per-modifier-after-the-level-scope.md`
   summary: Transcribe `level-toggle` and the revision 34 Copy Deck strings in Story 7.4. The DESIGN.md and EXPERIENCE.md revision pins no longer trip for them.
   evidence: spec-7-1 raised the pins in `packages/web/src/theme/tokens.test.ts` and `packages/web/src/list/row/trust-words.test.ts` to DESIGN.md 24 and EXPERIENCE.md 34. Every content assertion passed against those revisions, and commit `15575f7` had left the pins failing for 7.4. With the pins green, nothing fails until 7.4 adds the `level-toggle` component and the new strings (`needs ilvl <floor>`, `<recipe> orbs can't roll this at ilvl <level>`, `nothing rolls at ilvl <level>`).
+
+## Deferred from: spec-7-2 review (2026-11-14)
+
+- source_spec: `docs/stories/spec-7-2-per-entry-floors-and-the-crafting-item-level-in-core.md`
+  summary: Decide the cross-file check scope for an entry whose floor is below the Crafting Item Level: today the gate checks at the floor, and `rank` sums at `L`.
+  evidence: `referenceFailures` and the same-floor branch of `pairOverlap` in `packages/core/src/cross-file.ts` scope at the entry's own floor, as AD-17 states ("Edge alignment is evaluated at the entry's own `itemLevelMin`"). Only a mixed-floor hybrid pair is checked at the highest offered level. `scanSummands` in `packages/core/src/rank-crafted-row.ts` scopes every counted entry at `L`. Two same-floor hybrid entries at 75 that co-occur only on a tier at 80 pass the gate and double-count at 82, and a band can clip a tier between its floor and `L` unchecked. On the committed data, raising every crafted floor to 79 or 82 gives 0 cross-file failures, so no entry is affected today; Story 7.3 adds lower-floor entries. [NOTE FOR ARCHITECT] AD-17 owns the scope; the code follows it.
+  retry_when: never — needs a human
+
+- source_spec: `docs/stories/spec-7-2-per-entry-floors-and-the-crafting-item-level-in-core.md`
+  summary: Measure the old-versus-new crafted EVs at level 82 for Emerald, Sapphire, Wands, Staves, Talismans and Belts, and confirm each change comes from the one-pool-per-pair scope.
+  evidence: spec-7-2 scopes every counted entry at `L` instead of at its own floor (`scanSummands` in `packages/core/src/rank-crafted-row.ts`). These six classes are the only ones with crafted floors below 82 in `data/tracked.json`. The filter text for the committed data is byte-identical at 82, so no purpose changed. A comparison script was refused at the permission prompt during the run, so the EV figures were not compared.
