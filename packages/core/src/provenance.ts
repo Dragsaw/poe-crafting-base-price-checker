@@ -1,6 +1,6 @@
-import type { CraftedTrackedEntry, ModifierWeight, Provenance, WeightsClassPools } from '@poe/contracts';
+import type { ModifierWeight, Provenance, WeightsClassPools } from '@poe/contracts';
 
-import { eligible } from './probability.ts';
+import { eligible, type RecipeScope } from './probability.ts';
 
 /** Provenance of a crafted `(Item Class, recipe)` pair: order, mapping and inputs are AD-10's. */
 
@@ -20,15 +20,8 @@ export function provenanceOfTier(tier: Pick<ModifierWeight, 'weightSource'>): Ra
 }
 
 /** The weakest label over both slots' eligible set; an empty set folds to `measured`. */
-export function foldPair(
-  pools: WeightsClassPools,
-  entry: Pick<CraftedTrackedEntry, 'itemLevelMin'>,
-  modifierLevelMin: number,
-): RankedProvenance {
-  const inputs = [
-    ...eligible(pools.prefix, entry.itemLevelMin, modifierLevelMin),
-    ...eligible(pools.suffix, entry.itemLevelMin, modifierLevelMin),
-  ];
+export function foldPair(pools: WeightsClassPools, { itemLevel, modifierLevelMin }: RecipeScope): RankedProvenance {
+  const inputs = [...eligible(pools.prefix, itemLevel, modifierLevelMin), ...eligible(pools.suffix, itemLevel, modifierLevelMin)];
   let label: RankedProvenance = 'measured';
   for (const tier of inputs) {
     label = weakest(label, provenanceOfTier(tier));

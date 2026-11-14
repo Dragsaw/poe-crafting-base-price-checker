@@ -54,3 +54,10 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Check in game whether a pick-up filter with a `BaseType ==` block for a base the game does not know loads, skips that block, or fails as a whole.
   evidence: FR-36 (PRD revision 37) keeps craft and check-the-rolls blocks for an unresolvable Raw Base, and the player accepted the risk. Unverified, severity medium to high if true: if the game rejects the whole file, every block fails and the filter adds no visibility (FR-35). 0 unresolvable Raw Bases in `data/dataset.json` today. Proof: import a filter that names a made-up base in a `BaseType ==` line and observe the game.
   retry_when: never — needs a human
+
+## Deferred from: spec-7-1 (2026-11-14)
+
+- source_spec: `docs/stories/spec-7-1-the-recipe-floor-per-modifier-after-the-level-scope.md`
+  summary: Name the words for the pair failures `pool empty` and `augment exhausted`: FR-4 and the `EXPERIENCE.md` Copy Deck name none, and AD-17 calls that gap a PRD finding.
+  evidence: `UnrankableReason` in `packages/core/src/rank.ts` reports the causes `core` observed as `pool empty` (an empty class pool, or a slot the scope leaves empty, with `recipeId`) and `augment exhausted` (with `recipeId`). The appendix prints them verbatim with no reason note (`APPENDIX_NOTES` in `packages/web/src/list/UnrankableAppendix.tsx`). The committed data hits neither cause today. The PRD owner adds the FR-4 members, and UX adds the Copy Deck strings; then `core` and `web` adopt those words. [NOTE FOR UX] The appendix prints a recipe-scoped pair failure (with `recipeId`) the same as a class-wide one, so the player cannot tell that the row may go away on a recipe switch: the words should tell a recipe-scoped failure from a class-wide one.
+  retry_when: never — needs a human

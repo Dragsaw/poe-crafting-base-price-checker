@@ -234,10 +234,15 @@ export const RATES = [
 export const GREATER_COST = 0 + 0.01 + 0.02;
 export const PERFECT_COST = 0 + 0.1 + 0.2;
 
-/** Bows: the target is 1 in 10 of the prefix pool at floor 0, and 1 in 2 at floor 70. */
+/** Bows: the target is 1 in 10 of the prefix pool at floor 0, and 1 in 4 at floor 70. */
 export const BOWS_POOLS: Pools = [
-  // stat_low shares FILLER's group, so the perfect floor removes it (AD-17).
-  [tierOf(TARGET, 10, 75), tierOf(FILLER, 10, 75, 'filler'), tierOf('explicit.stat_low', 80, 1, 'filler')],
+  // stat_low's modifier has a tier at 75, outside every band, so the perfect floor removes its tier at 1 (AD-17).
+  [
+    tierOf(TARGET, 10, 75),
+    tierOf(FILLER, 10, 75, 'filler'),
+    tierOf('explicit.stat_low', 60, 1, 'low'),
+    { ...tierOf('explicit.stat_low', 20, 75, 'low'), lines: [{ statId: 'explicit.stat_low', ranges: [[11, 20]] }] },
+  ],
   [tierOf(SUFFIX_STAT, 10, 80)],
 ];
 

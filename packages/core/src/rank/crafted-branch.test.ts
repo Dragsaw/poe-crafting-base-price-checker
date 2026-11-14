@@ -109,30 +109,6 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
     ]);
   });
 
-  it('a recipe floor that removes the contained tier makes that pair unrankable, and the other recipe ranks (state 36)', () => {
-    const target = chase('Bows');
-    const lowOnly = poolsFile(['weapon.bow', 'Bows', [[tierOf(TARGET, 10, 1, 'g'), tierOf(FILLER, 10, 75, 'g')], [tierOf(SUFFIX_STAT, 10, 1)]]]);
-    const result = rankCrafted({ tracked: [target], dataset: [published(target, priced(1))], weights: lowOnly });
-    expect(craftedRows(result.ordering).map((row) => row.recipeId)).toEqual(['greater']);
-    expect(result.unrankable).toEqual([
-      { categoryId: 'weapon.bow', className: 'Bows', reason: 'recipe cannot reach this class', recipeId: 'perfect' },
-    ]);
-  });
-
-  it('an exhausted augment makes the pair unrankable, never P = 0', () => {
-    // The suffix pool holds only the prefix's own modGroup, so the augment has nothing after it.
-    const shared = poolsFile([
-      'weapon.bow',
-      'Bows',
-      [[tierOf(TARGET, 10, 1, 'shared')], [tierOf(SUFFIX_STAT, 10, 1, 'shared')]],
-    ]);
-    const result = rankCrafted({ tracked: [chase('Bows')], weights: shared, recipes: [GREATER] });
-    expect(craftedRows(result.ordering)).toEqual([]);
-    expect(result.unrankable.map((item) => [item.reason, item.recipeId])).toEqual([
-      ['recipe cannot reach this class', 'greater'],
-    ]);
-  });
-
   it('a class-level reason holds under every recipe, with no recipe id and no crafted row', () => {
     const result = rankCrafted({ tracked: [chase('Bows')], weights: undefined });
     expect(craftedRows(result.ordering)).toEqual([]);
@@ -181,7 +157,7 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
     const perfect = craftedRows(result.ordering).find((row) => row.recipeId === 'perfect');
     expect(perfect?.craftCost).toEqual({ kind: 'uncostable', currencyId: 'perfect-orb-of-transmutation' });
     expect(perfect?.ev).toBeNull();
-    expect(perfect?.grossPayout).toBe(0.5);
+    expect(perfect?.grossPayout).toBe(0.25);
     expect(RankedRowSchema.parse(perfect)).toEqual(perfect);
     // The uncostable pair is still ranked, after every comparable row.
     expect(result.ordering.at(-1)).toBe(perfect);
@@ -229,9 +205,10 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
   });
 
   it('two recipes over one Tracked List give orderings that differ by more than a constant offset', () => {
-    // Bows: P = 0.1 at floor 0 and 0.5 at floor 70. Staves: P = 0.5 at floor 0, and at floor 70 its
-    // reference contains no eligible tier: its group's top tier is FILLER's.
-    const staves: Pools = [[tierOf(TARGET, 50, 1, 'staves'), tierOf(FILLER, 50, 75, 'staves')], [tierOf(SUFFIX_STAT, 10, 80)]];
+    // Bows: P = 0.1 at floor 0 and 0.25 at floor 70. Staves: P = 0.5 at floor 0, and at floor 70 its
+    // reference contains no eligible tier: its modifier's tier at 75 lies outside the band.
+    const stavesHigh = { ...tierOf(TARGET, 25, 75, 'staves'), lines: [{ statId: TARGET, ranges: [[11, 20]] as [number, number][] }] };
+    const staves: Pools = [[tierOf(TARGET, 50, 1, 'staves'), stavesHigh, tierOf(FILLER, 25, 75)], [tierOf(SUFFIX_STAT, 10, 80)]];
     const bows = chase('Bows');
     const stavesEntry = chase('Staves', TARGET, 'active', 'weapon.staff');
     const result = rankCrafted({
@@ -245,12 +222,10 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
         .map((row) => row.className);
     expect(orderOf('greater')).toEqual(['Staves', 'Bows']);
     expect(orderOf('perfect')).toEqual(['Bows']);
-    expect(result.unrankable).toContainEqual({
-      categoryId: 'weapon.staff',
-      className: 'Staves',
-      reason: 'recipe cannot reach this class',
-      recipeId: 'perfect',
-    });
+    expect(result.unrankable).toEqual([]);
+    expect(result.unpricedCrafted.map((row) => [row.className, row.recipeId, row.trust])).toEqual([
+      ['Staves', 'perfect', { verdict: 'pending', reasons: [{ kind: 'no-prices' }] }],
+    ]);
   });
 
   it('is identical under a shuffled Tracked List, dataset and rate set', () => {

@@ -7,8 +7,7 @@ import {
   frame,
   tier,
   TARGET,
-  FILLER,
-  LOW,
+  outsideBand,
   SUFFIX,
   type Pools,
   STAVES,
@@ -36,11 +35,11 @@ const invented = (item: ModifierWeight): ModifierWeight => ({ ...item, weightSou
 describe('the estimated-odds cue from weights data (state 12)', () => {
   /** An invented tier at floor 50: in the greater recipe's set (floor 44), not under perfect (70). */
   const priorBows: Pools = [
-    [tier(TARGET, 10, 75, 'bows'), invented(tier(FILLER, 10, 50, 'bows')), tier(LOW, 80, 1, 'bows')],
+    [tier(TARGET, 10, 75, 'bows'), invented(outsideBand(10, 50, 'bows')), outsideBand(80, 1, 'bows')],
     [tier(SUFFIX, 10, 80)],
   ];
   const priorStaves: Pools = [
-    [tier(TARGET, 50, 50, 'staves'), invented(tier(FILLER, 50, 50, 'staves')), tier(FILLER, 50, 75, 'staves')],
+    [tier(TARGET, 50, 50, 'staves'), invented(outsideBand(50, 50, 'staves')), outsideBand(50, 75, 'staves')],
     [tier(SUFFIX, 10, 80)],
   ];
 

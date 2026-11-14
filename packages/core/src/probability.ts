@@ -39,8 +39,8 @@ export type PoolLookup =
   | { readonly ok: true; readonly pools: WeightsClassPools }
   | { readonly ok: false; readonly reason: { readonly kind: 'class-absent' } };
 
-/** The affixes and the floor that scope a combination. A `CraftedTrackedEntry` satisfies it. */
-export type CombinationInput = Pick<CraftedTrackedEntry, 'itemLevelMin' | 'prefix' | 'suffix'>;
+/** The two affixes of a combination. A `CraftedTrackedEntry` satisfies it. */
+export type CombinationInput = Pick<CraftedTrackedEntry, 'prefix' | 'suffix'>;
 
 /**
  * A line's derived interval: two pairs give each edge's midpoint, pending OQ-12.
@@ -123,41 +123,51 @@ export function poolOf(weights: WeightsFile, categoryId: string, className: stri
   return pools === undefined ? { ok: false, reason: { kind: 'class-absent' } } : { ok: true, pools };
 }
 
-/**
- * The recipe floor per `modGroup` over the unscoped pool, before the item-level scope (AD-17): a group
- * whose top positive-weight tier is below the floor keeps that top tier, but the scope can still drop it.
- */
-export function floored(pool: WeightsPool, modifierLevelMin: number): readonly ModifierWeight[] {
-  const top = new Map<string, number>();
-  for (const entry of pool.entries) {
-    if (entry.weight > 0) {
-      top.set(entry.modGroup, Math.max(top.get(entry.modGroup) ?? entry.itemLevelMin, entry.itemLevelMin));
-    }
+/** The scope of one eligible pool: the Crafting Item Level `L` and the recipe's floor (AD-17). */
+export interface RecipeScope {
+  readonly itemLevel: number;
+  readonly modifierLevelMin: number;
+}
+
+// Keyed by tier identity: a ranking pass asks for each tier's key once per entry and recipe.
+const modifierKeys = new WeakMap<ModifierWeight, string>();
+
+/** The modifier a tier belongs to: its `modGroup` with its line set (AD-17). */
+function modifierOf(entry: ModifierWeight): string {
+  let key = modifierKeys.get(entry);
+  if (key === undefined) {
+    key = JSON.stringify([entry.modGroup, lineSet(entry)]);
+    modifierKeys.set(entry, key);
   }
-  return pool.entries.filter(
-    (entry) => entry.itemLevelMin >= modifierLevelMin || (entry.weight > 0 && entry.itemLevelMin === top.get(entry.modGroup)),
+  return key;
+}
+
+/** One slot's eligible set: the scope, then the recipe floor per modifier (AD-17, FR-26). */
+export function eligible(pool: WeightsPool, itemLevel: number, modifierLevelMin: number): readonly ModifierWeight[] {
+  const scoped = pool.entries.filter((entry) => entry.itemLevelMin <= itemLevel);
+  const top = new Map<string, number>();
+  for (const entry of scoped) {
+    if (entry.weight === 0) {
+      continue;
+    }
+    const key = modifierOf(entry);
+    top.set(key, Math.max(top.get(key) ?? entry.itemLevelMin, entry.itemLevelMin));
+  }
+  return scoped.filter(
+    (entry) => entry.itemLevelMin >= modifierLevelMin || (entry.weight > 0 && entry.itemLevelMin === top.get(modifierOf(entry))),
   );
 }
 
-/** One slot's eligible set: the recipe floor, then the item-level scope (AD-5, AD-17). */
-export function eligible(
-  pool: WeightsPool,
-  itemLevelMin: number,
-  modifierLevelMin: number,
-): readonly ModifierWeight[] {
-  return floored(pool, modifierLevelMin).filter((entry) => entry.itemLevelMin <= itemLevelMin);
-}
-
-/** Whether a recipe can roll an entry: `combinationProbability` is defined, as the ranking backstop requires. */
+/** Whether a recipe can roll an entry at a scope: `combinationProbability` is defined and above `0`. */
 export type RecipeReach = { readonly reached: true } | { readonly reached: false; readonly slots: readonly Slot[] };
 
-/** The reach verdict of one `(entry, recipe)` pair (AD-17). */
-export function recipeReach(pools: WeightsClassPools, entry: CombinationInput, modifierLevelMin: number): RecipeReach {
-  const result = combinationProbability(pools, entry, modifierLevelMin);
+/** The reach verdict of one `(entry, recipe, L)` triple (AD-17). */
+export function recipeReach(pools: WeightsClassPools, entry: CombinationInput, scope: RecipeScope): RecipeReach {
+  const result = combinationProbability(pools, entry, scope);
   if (result.ok) {
     return result.p > 0 ? { reached: true } : { reached: false, slots: SLOTS };
   }
-  const empty = SLOTS.filter((slot) => containedIn(entry[slot], eligible(pools[slot], entry.itemLevelMin, modifierLevelMin)).length === 0);
+  const empty = SLOTS.filter((slot) => containedIn(entry[slot], eligible(pools[slot], scope.itemLevel, scope.modifierLevelMin)).length === 0);
   // Both contained sets are non-empty only when a first draw exhausts the other slot.
   return { reached: false, slots: empty.length > 0 ? empty : SLOTS.filter((slot) => !(result.reason.kind === 'augment-exhausted' && result.reason.firstDrawSlot === slot)) };
 }
@@ -196,9 +206,9 @@ export function affixProbability(
   pools: WeightsClassPools,
   slot: Slot,
   reference: ModifierReference,
-  { itemLevelMin, modifierLevelMin }: { readonly itemLevelMin: number; readonly modifierLevelMin: number },
+  { itemLevel, modifierLevelMin }: RecipeScope,
 ): ProbabilityResult {
-  const eligibleSet = eligible(pools[slot], itemLevelMin, modifierLevelMin);
+  const eligibleSet = eligible(pools[slot], itemLevel, modifierLevelMin);
   const total = totalWeight(eligibleSet);
   return total === 0 ? { ok: false, reason: { kind: 'empty-eligible-pool', slot } } : { ok: true, p: totalWeight(containedIn(reference, eligibleSet)) / total };
 }
@@ -262,15 +272,15 @@ function orderedTerm(
 }
 
 /**
- * `P(prefix ∧ suffix | recipe)`: floor, scope, renormalise, exclude, renormalise; reasons per slot.
+ * `P(prefix ∧ suffix | recipe, L)`: scope, floor, renormalise, exclude, renormalise (AD-17); reasons per slot.
  */
 export function combinationProbability(
   pools: WeightsClassPools,
   combination: CombinationInput,
-  modifierLevelMin: number,
+  { itemLevel, modifierLevelMin }: RecipeScope,
 ): ProbabilityResult {
   const setsOf = (slot: Slot, reference: ModifierReference): SlotSets => {
-    const eligibleSet = eligible(pools[slot], combination.itemLevelMin, modifierLevelMin);
+    const eligibleSet = eligible(pools[slot], itemLevel, modifierLevelMin);
     return { slot, eligibleSet, contained: containedIn(reference, eligibleSet), total: totalWeight(eligibleSet) };
   };
   const prefix = setsOf('prefix', combination.prefix);

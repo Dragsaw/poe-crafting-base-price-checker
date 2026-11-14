@@ -157,7 +157,7 @@ describe('the crafted states', () => {
     expect(statement()?.textContent).toBe(honestEmptyCopy(TEST_LEAGUE));
   });
 
-  it('state 36: a pair the recipe cannot reach is Unrankable under that recipe only', async () => {
+  it('an entry the recipe cannot reach is not counted, and is no Unrankable reason (AD-17; state 36 retired)', async () => {
     const now = Date.now();
     const wands = chase('weapon.wand', 'Wands');
     serveWorld(
@@ -179,11 +179,16 @@ describe('the crafted states', () => {
     expect(names()).toEqual(['Wands', 'Bows']);
     expect(frame().querySelector('[data-appendix-row]')).toBeNull();
     click(option('perfect'));
-    expect(names()).toEqual(['Bows']);
-    const rows = Array.from(frame().querySelectorAll('[data-appendix-row]'), (row) => [
-      row.querySelector('[data-appendix-class]')?.textContent,
-      row.querySelector('[data-cell="reason"]')?.textContent,
-    ]);
-    expect(rows).toEqual([['Wands', 'recipe cannot reach this class']]);
+    // Nothing of Wands counts under perfect, so it reads as a row with no priced Combination (FR-1).
+    expect(names()).toEqual(['Bows', 'Wands']);
+    expect(frame().querySelector('[data-appendix-row]')).toBeNull();
+    const wandsRow = [...frame().querySelectorAll<HTMLElement>('[data-ranked-row]')].find((row) => row.textContent.includes('Wands'));
+    if (wandsRow === undefined) {
+      throw new Error('no Wands row');
+    }
+    click(wandsRow);
+    const lines = [...frame().querySelectorAll<HTMLElement>('[data-expansion-panel] [data-expansion-line]')];
+    expect(lines).toHaveLength(1);
+    expect(lines[0]?.textContent).not.toMatch(/NaN|undefined/);
   });
 });

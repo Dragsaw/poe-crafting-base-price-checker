@@ -38,22 +38,22 @@ describe('provenance (AD-10)', () => {
 
   it('folds to measured when every eligible tier is published or not-in-game, weight 0 included', () => {
     const p = pools([tier('published', 1), tier('not-in-game', 1)], [tier('published', 1)]);
-    expect(foldPair(p, { itemLevelMin: 82 }, 0)).toBe('measured');
+    expect(foldPair(p, { itemLevel: 82, modifierLevelMin: 0 })).toBe('measured');
   });
 
   it('folds to uniform-prior when one eligible tier in either slot is invented', () => {
-    expect(foldPair(pools([tier('absent', 1)], [tier('published', 1)]), { itemLevelMin: 82 }, 0)).toBe('uniform-prior');
-    expect(foldPair(pools([tier('published', 1)], [tier('absent', 1)]), { itemLevelMin: 82 }, 0)).toBe('uniform-prior');
+    expect(foldPair(pools([tier('absent', 1)], [tier('published', 1)]), { itemLevel: 82, modifierLevelMin: 0 })).toBe('uniform-prior');
+    expect(foldPair(pools([tier('published', 1)], [tier('absent', 1)]), { itemLevel: 82, modifierLevelMin: 0 })).toBe('uniform-prior');
   });
 
   it('counts a weight-0 absent-source tier as an input', () => {
-    expect(foldPair(pools([{ ...tier('absent', 1), weight: 0 }], []), { itemLevelMin: 82 }, 0)).toBe('uniform-prior');
+    expect(foldPair(pools([{ ...tier('absent', 1), weight: 0 }], []), { itemLevel: 82, modifierLevelMin: 0 })).toBe('uniform-prior');
   });
 
-  it('ignores an invented tier the recipe floor removes from its group, and one above the entry floor', () => {
+  it('ignores an invented tier the recipe floor removes from its modifier, and one above the entry floor', () => {
     const p = pools([{ ...tier('absent', 10), modGroup: 'g-published-50' }, tier('absent', 90), tier('published', 50)], []);
-    expect(foldPair(p, { itemLevelMin: 82 }, 20)).toBe('measured');
-    expect(foldPair(p, { itemLevelMin: 82 }, 0)).toBe('uniform-prior');
+    expect(foldPair(p, { itemLevel: 82, modifierLevelMin: 20 })).toBe('measured');
+    expect(foldPair(p, { itemLevel: 82, modifierLevelMin: 0 })).toBe('uniform-prior');
   });
 
   it('takes the oldest instant, and none for no input', () => {

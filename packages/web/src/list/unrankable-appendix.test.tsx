@@ -1,4 +1,4 @@
-import { RECIPE_UNREACHABLE, type UnrankableClass, type UnrankableReason } from '@poe/core';
+import type { UnrankableClass, UnrankableReason } from '@poe/core';
 import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -188,12 +188,13 @@ describe('the note cell (states 14 to 16, 36)', () => {
     expect(noteOf(item, new Set([appendixClassKey(klass('Wands'))]))).toBe(APPENDIX_NOTES['pool partial']);
   });
 
-  // Matrix: unreachable.
-  it('prints the state 36 reason and no note, even when a base of the class ranks', () => {
-    const item = { ...klass('Bows', RECIPE_UNREACHABLE), recipeId: 'greater' };
+  // Matrix: a pair failure (AD-17); state 36 is retired.
+  it.each(['pool empty', 'augment exhausted'] as const)('prints the %s reason with no reason note, and state 16 note when a base ranks', (reason) => {
+    const item = { ...klass('Bows', reason), recipeId: 'greater' };
     const panel = mountAppendix([item], new Set([appendixClassKey(item)]));
     const row = panel.querySelector('[data-appendix-row]');
-    expect(cell(row, 'reason')?.textContent).toBe(RECIPE_UNREACHABLE);
-    expect(cell(row, 'note')?.textContent).toBe('');
+    expect(cell(row, 'reason')?.textContent).toBe(reason);
+    expect(cell(row, 'note')?.textContent).toBe(RAW_RANKS_NOTE);
+    expect(noteOf(item, new Set())).toBe('');
   });
 });

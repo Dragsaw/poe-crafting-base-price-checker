@@ -1,5 +1,4 @@
 import type { TrackedEntry } from '@poe/contracts';
-import { RECIPE_UNREACHABLE } from '@poe/core';
 import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -48,7 +47,7 @@ function serveWorld(): ReturnType<typeof serveArtifacts> {
   const staffBase: TrackedEntry = { ...rawEntry('Gnarled Staff', 82, STAVES), status: 'pruned', prunedReason: 'no market' };
   const amuletBase = rawEntry('Gold Amulet');
   const beltBase = rawEntry('Wide Belt', 82, BELTS);
-  // Its one containing tier sits below the perfect floor, in a group with a tier above it (AD-17).
+  // Its one containing tier sits below the perfect floor, in a modifier with a tier above it (AD-17).
   const amulets: TrackedEntry = {
     ...craftedEntry('Amulets', 'accessory.amulet'),
     prefix: { kind: 'banded', statId: BANDED_STAT, valueMin: 1, valueMax: 5 },
@@ -114,12 +113,11 @@ describe('the state 16 note through the page', () => {
       Wands: ['class absent from weights file', ABSENT],
     });
 
-    // Row 3: the perfect recipe cannot reach Amulets, whose raw base ranks; state 36 takes no note.
+    // Row 3: the perfect recipe cannot reach the Amulets entry; that is not a reason, so no row (AD-17, state 36 retired).
     act(() => {
       frame().querySelector<HTMLElement>('[data-recipe-option="perfect"]')?.click();
     });
     expect(appendixCells()).toEqual({
-      Amulets: [RECIPE_UNREACHABLE, ''],
       Bows: ['pool partial', [PARTIAL, RAW_RANKS_NOTE].join(JOINER)],
       Staves: ['pool partial', PARTIAL],
       Wands: ['class absent from weights file', ABSENT],

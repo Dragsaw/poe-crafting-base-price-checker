@@ -20,7 +20,7 @@ import type { CrossFileFailure } from './cross-file.ts';
 import { assertClock, entryTrust, NO_RECIPE_TRUST, resolvedPrice } from './price-trust.ts';
 import { isEmptyPool, poolOf } from './probability.ts';
 import { compareOrdering, compareRankedRows } from './rank-order.ts';
-import { compareCombinations, craftedRow } from './rank-crafted-row.ts';
+import { compareCombinations, craftedRow, type PairFailure } from './rank-crafted-row.ts';
 import { groupRawEntries, type NotYetSyncedEntry, type UnrankedEntry } from './rank-raw-groups.ts';
 
 export { compareRankedRows } from './rank-order.ts';
@@ -51,22 +51,20 @@ export interface RankInput {
 }
 
 /**
- * FR-4's three reasons (PRD-owned) and the provisional fourth: two by lookup, one by cross-file.
+ * FR-4's three reasons (PRD-owned), and the two causes `core` observed that FR-4 names no words for (AD-17).
  */
 export type UnrankableReason =
   | 'class absent from weights file'
   | 'pool partial'
   | 'class disagrees with weights file'
-  | typeof RECIPE_UNREACHABLE;
+  | PairFailure['reason'];
 
 /** One Unrankable Item Class: the `(categoryId, className)` pair and its reason. Never a Base Type. */
 export interface UnrankableClass {
   readonly categoryId: string;
   readonly className: string;
   readonly reason: UnrankableReason;
-  /**
-   * Only on the recipe-scoped `recipe cannot reach this class`; else it holds under every recipe.
-   */
+  /** Only on a pair that fails under one recipe; else the reason holds under every recipe. */
   readonly recipeId?: string;
 }
 
@@ -96,7 +94,7 @@ export interface Ranking {
   readonly notYetSynced: readonly NotYetSyncedEntry[];
   /** In canonical key order. */
   readonly unresolvable: readonly UnrankedEntry[];
-  /** One per Unrankable class and unreachable pair; by `className`, `categoryId`, `recipeId`. */
+  /** One per Unrankable class and failed pair; by `className`, `categoryId`, `recipeId`. */
   readonly unrankable: readonly UnrankableClass[];
   /** Empty unless the recipe set is absent or empty; then each rankable crafted class, by class key. */
   readonly recipeless: readonly RecipelessClass[];
@@ -111,11 +109,6 @@ export interface UncostableRecipe {
   readonly recipeId: string;
   readonly currencyId: string;
 }
-
-/**
- * The reason for an empty eligible pool or contained set or exhausted augment.
- */
-export const RECIPE_UNREACHABLE = 'recipe cannot reach this class';
 
 const byEntryKey = (left: { entryKey: string }, right: { entryKey: string }): number =>
   compareCanonicalKeys(left.entryKey, right.entryKey);
@@ -141,7 +134,7 @@ function unrankableReasonOf(
     return 'pool partial';
   }
   // One definition with `poolCoverage`: an empty slot makes the class unrankable under every recipe.
-  return isEmptyPool(pools.prefix) || isEmptyPool(pools.suffix) ? RECIPE_UNREACHABLE : undefined;
+  return isEmptyPool(pools.prefix) || isEmptyPool(pools.suffix) ? 'pool empty' : undefined;
 }
 
 interface RankableClass {
@@ -198,7 +191,7 @@ interface CostedRecipe {
   readonly cost: CraftCostResult;
 }
 
-/** Where one class's outcome lands: ranked rows, unpriced rows, unreachable pairs, or the recipeless group. */
+/** Where one class's outcome lands: ranked rows, unpriced rows, failed pairs, or the recipeless group. */
 interface RankedClasses {
   readonly surviving: RankedRow[];
   readonly unpricedCrafted: CraftedRankedRow[];
@@ -252,11 +245,11 @@ function rankCraftedClass(
   for (const { recipe, cost: recipeCost } of costed) {
     const cost = isJewel && recipeCost.ok ? JEWEL_CRAFT_COST : recipeCost;
     const row = craftedRow({ first, recipe, cost, pools, keyed, byKey, activeLeague: input.activeLeague, threshold: input.threshold, now: input.now });
-    if (row === undefined) {
+    if (row.kind === 'pair-failure') {
       out.unrankable.set(JSON.stringify([classKeyOf(first.categoryId, first.className), recipe.id]), {
         categoryId: first.categoryId,
         className: first.className,
-        reason: RECIPE_UNREACHABLE,
+        reason: row.reason,
         recipeId: recipe.id,
       });
     } else if (isUnpriced(row)) {

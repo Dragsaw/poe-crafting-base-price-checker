@@ -207,7 +207,7 @@ describe('listStatement with crafted rows (Story 3.4)', () => {
       ordering: [craftedRow(1, 'perfect'), craftedRow(1, 'greater')],
       unrankable: [
         { categoryId: 'a', className: 'A', reason: 'pool partial' },
-        { categoryId: 'b', className: 'B', reason: 'recipe cannot reach this class', recipeId: 'perfect' },
+        { categoryId: 'b', className: 'B', reason: 'augment exhausted', recipeId: 'perfect' },
       ],
     };
     const active = forRecipe(ranking, greater);

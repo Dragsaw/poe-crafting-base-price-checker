@@ -40,7 +40,7 @@ const nextSerial = ((): (() => number) => {
   };
 })();
 
-/** One pool tier; a shared `modGroup` makes the recipe floor act on the tiers together (AD-17). */
+/** One pool tier; a shared `modGroup` and line set make one modifier, which the recipe floor acts on together (AD-17). */
 export function tier(statId: string, weight: number, itemLevelMin: number, group?: string): ModifierWeight {
   const serial = nextSerial();
   return {
@@ -71,18 +71,22 @@ export function hybridTier(statIds: readonly string[], weight: number, itemLevel
 }
 
 export const TARGET = 'explicit.stat_1';
-export const FILLER = 'explicit.stat_2';
-export const LOW = 'explicit.stat_3';
+const FILLER = 'explicit.stat_2';
 export const SUFFIX = 'explicit.stat_4';
 
 export type Pools = readonly [readonly ModifierWeight[], readonly ModifierWeight[]];
 
+/** A tier of TARGET's modifier with values outside every band: the recipe floor acts on it with the target (AD-17). */
+export function outsideBand(weight: number, itemLevelMin: number, group: string): ModifierWeight {
+  return { ...tier(TARGET, weight, itemLevelMin, group), lines: [{ statId: TARGET, ranges: [[11, 20]] }] };
+}
+
 /** At floor 44 the target is half the prefix pool; at floor 70 it is all of it. */
-export const BOWS: Pools = [[tier(TARGET, 10, 75, 'bows'), tier(FILLER, 10, 50, 'bows'), tier(LOW, 80, 1, 'bows')], [tier(SUFFIX, 10, 80)]];
-/** Floor 44: the target is half the prefix pool; floor 70: a quarter. None in reach: a reason. */
+export const BOWS: Pools = [[tier(TARGET, 10, 75, 'bows'), outsideBand(10, 50, 'bows'), outsideBand(80, 1, 'bows')], [tier(SUFFIX, 10, 80)]];
+/** Floor 44: the target is half the prefix pool; floor 70: a quarter. */
 export const STAVES: Pools = [[tier(TARGET, 50, 50, 'staves'), tier(TARGET, 25, 75, 'staves'), tier(FILLER, 75, 75)], [tier(SUFFIX, 10, 80)]];
-/** The target shares a group with a tier at 75, so both floors remove it: no such recipe reaches it (state 36). */
-export const WANDS: Pools = [[tier(TARGET, 10, 1, 'wands'), tier(FILLER, 10, 75, 'wands')], [tier(SUFFIX, 10, 1)]];
+/** The target's modifier has a tier at 75 outside the band, so the perfect floor removes the target: it is not counted. */
+export const WANDS: Pools = [[tier(TARGET, 10, 1, 'wands'), outsideBand(10, 75, 'wands')], [tier(SUFFIX, 10, 1)]];
 
 export function chase(categoryId: string, className: string): CraftedTrackedEntry {
   return {

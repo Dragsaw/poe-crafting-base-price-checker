@@ -4,9 +4,9 @@
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
-import { canonicalKey, compareByCodeUnit, compareCanonicalKeys, parseEnvelope, RecipesFileSchema } from '@poe/contracts';
+import { canonicalKey, compareCanonicalKeys, parseEnvelope, RecipesFileSchema } from '@poe/contracts';
 import type { ConfigFile, CraftedTrackedEntry, FilesystemPort, RecipesFile, TrackedEntry, WeightsFile } from '@poe/contracts';
-import { craftedClassesOf, crossFileChecks, isPoolCheckable, poolOf, recipeReach, type Slot, type UnvalidatedMark } from '@poe/core';
+import { CRAFTING_ITEM_LEVELS, craftedClassesOf, crossFileChecks, isPoolCheckable, poolOf, recipeReach, type UnvalidatedMark } from '@poe/core';
 
 import { loadCatalogueIds } from '../catalogue/catalogue-ids.ts';
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
@@ -36,7 +36,7 @@ export interface CheckStatus {
   readonly check: CheckName;
   /**
    * `skipped` when the schema check failed, so there are no entries to check; for `cross-file`, when the weights file
-   * is absent; for `recipe-reach`, when the recipes file is absent or the weights file is absent or refused.
+   * is absent; for `recipe-reach`, when the recipes file is absent or lists no recipe, or the weights file is absent or refused.
    */
   readonly status: 'passed' | 'failed' | 'skipped';
 }
@@ -46,11 +46,9 @@ export interface CheckUnvalidated extends UnvalidatedMark {
   readonly path?: string;
 }
 
-/** One `(entry, recipe)` pair that AD-17 makes unreachable, once per slot that `recipeReach` names. */
+/** A crafted entry that no recipe reaches at any offered Crafting Item Level (AD-17, FR-38). */
 export interface CheckUnreachable {
   readonly entryKey: string;
-  readonly recipeId: string;
-  readonly slot: Slot;
   readonly path?: string;
 }
 
@@ -61,7 +59,7 @@ export interface TrackedCheckReport {
   readonly issues: readonly CheckIssue[];
   /** One mark per unvalidated crafted entry, sorted by canonical key. Listed, never a failure. */
   readonly unvalidated: readonly CheckUnvalidated[];
-  /** Every unreachable pair, by canonical key, then recipe, then slot. A non-empty list makes `ok` `false`. */
+  /** Every unreachable entry, by canonical key. A non-empty list makes `ok` `false`. */
   readonly unreachable: readonly CheckUnreachable[];
 }
 
@@ -216,17 +214,15 @@ function classUnreachable(members: readonly CraftedTrackedEntry[], weights: Weig
   if (lookup?.ok !== true || !isPoolCheckable(lookup.pools)) {
     return [];
   }
-  const found: CheckUnreachable[] = [];
-  for (const entry of members) {
+  const { pools } = lookup;
+  const isReached = (entry: CraftedTrackedEntry) =>
+    recipes.recipes.some(({ modifierLevelMin }) =>
+      CRAFTING_ITEM_LEVELS.some((itemLevel) => recipeReach(pools, entry, { itemLevel, modifierLevelMin }).reached),
+    );
+  return members.filter((entry) => !isReached(entry)).map((entry) => {
     const entryKey = canonicalKey(entry);
-    for (const recipe of recipes.recipes) {
-      const reach = recipeReach(lookup.pools, entry, recipe.modifierLevelMin);
-      if (!reach.reached) {
-        found.push(...reach.slots.map((slot) => ({ entryKey, recipeId: recipe.id, slot, ...pathOf(entryKey) })));
-      }
-    }
-  }
-  return found;
+    return { entryKey, ...pathOf(entryKey) };
+  });
 }
 
 function unreachableOf(
@@ -239,12 +235,7 @@ function unreachableOf(
     .values()
     .flatMap((members) => classUnreachable(members, weights, recipes, pathOf))
     .toArray()
-    .toSorted(
-      (left, right) =>
-        compareCanonicalKeys(left.entryKey, right.entryKey) ||
-        compareByCodeUnit(left.recipeId, right.recipeId) ||
-        compareByCodeUnit(left.slot, right.slot),
-    );
+    .toSorted((left, right) => compareCanonicalKeys(left.entryKey, right.entryKey));
 }
 
 function recipeReachOutcome(
@@ -256,7 +247,7 @@ function recipeReachOutcome(
   if (!recipes.ok) {
     return { status: 'failed', issues: [{ check: 'recipe-reach', message: recipes.error.message }], unreachable: [] };
   }
-  if (entries === undefined || recipes.value === undefined || !weights.ok || weights.value === undefined) {
+  if (entries === undefined || recipes.value === undefined || recipes.value.recipes.length === 0 || !weights.ok || weights.value === undefined) {
     return { status: 'skipped', issues: [], unreachable: [] };
   }
   const unreachable = unreachableOf(entries, weights.value, recipes.value, pathOf);

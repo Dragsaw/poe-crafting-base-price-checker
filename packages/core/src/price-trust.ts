@@ -91,7 +91,7 @@ export interface CraftedTrustEntry {
 
 export interface CraftedTrustInput {
   readonly uncostable: boolean;
-  /** Every non-pruned entry of the class, below-threshold ones included. */
+  /** Every non-pruned entry the recipe reaches, below-threshold ones included (AD-17). */
   readonly entries: readonly CraftedTrustEntry[];
 }
 

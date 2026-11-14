@@ -1,4 +1,4 @@
-import { RECIPE_UNREACHABLE, type UnrankableClass, type UnrankableReason } from '@poe/core';
+import type { UnrankableClass, UnrankableReason } from '@poe/core';
 import type { JSX } from 'react';
 
 import { plural, JOINER } from '../shared/text';
@@ -10,7 +10,7 @@ export const APPENDIX_TITLE = 'Appendix: Unrankable — ';
 /** The non-empty appendix's one lead line (EXPERIENCE.md Copy Deck). */
 export const APPENDIX_LEAD = 'Tracked, but kept out of the ordering.';
 
-/** The notes of states 14, 15 and 15a; state 36's reason takes none (EXPERIENCE.md Copy Deck). */
+/** The notes of states 14, 15 and 15a (EXPERIENCE.md Copy Deck); the other reasons have no Copy Deck words yet (AD-17; docs/stories/deferred-work.md). */
 export const APPENDIX_NOTES: Readonly<Partial<Record<UnrankableReason, string>>> = {
   'pool partial': 'ranks once the weights file covers its whole pool',
   'class absent from weights file': 'may return after the next weights run',
@@ -32,9 +32,6 @@ export function appendixClassKey(item: Pick<UnrankableClass, 'categoryId' | 'cla
 
 /** The row's note: its reason's note, then state 16's. */
 function appendixNote(item: UnrankableClass, hasRankingBases: boolean): string {
-  if (item.reason === RECIPE_UNREACHABLE) {
-    return '';
-  }
   const notes = [APPENDIX_NOTES[item.reason], hasRankingBases ? RAW_RANKS_NOTE : undefined];
   return notes.filter((note) => note !== undefined).join(JOINER);
 }

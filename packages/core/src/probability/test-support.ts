@@ -1,6 +1,6 @@
 import type { ModifierReference, ModifierWeight, WeightsClassPools, WeightsLine } from '@poe/contracts';
 
-import type { ProbabilityResult } from '../probability.ts';
+import type { ProbabilityResult, RecipeScope } from '../probability.ts';
 
 export const STAT = 'explicit.stat_1';
 export const OTHER = 'explicit.stat_2';
@@ -63,6 +63,9 @@ export function pools(prefix: readonly ModifierWeight[], suffix: readonly Modifi
     suffix: { poolCoverage: 'complete', entries: [...suffix] },
   };
 }
+
+/** A recipe scope at item level 82. */
+export const scope82 = (modifierLevelMin: number): RecipeScope => ({ itemLevel: 82, modifierLevelMin });
 
 export function pOf(result: ProbabilityResult): number {
   if (!result.ok) {

@@ -36,7 +36,7 @@ interface CraftedRowOptions {
 interface SummandScan {
   readonly summands: CraftedSummand[];
   readonly combinations: CraftedCombination[];
-  /** Every entry of the pair, for the share rule of *Price trust*. */
+  /** Every entry of the pair that the recipe reaches, for the share rule of *Price trust*. */
   readonly trusted: CraftedTrustEntry[];
   readonly stamps: string[];
 }
@@ -51,20 +51,30 @@ export function compareCombinations(left: CraftedCombination, right: CraftedComb
   );
 }
 
-/** `undefined`: the recipe cannot reach the class. P is computed priced or not, so no threshold. */
-function scanSummands({ recipe, pools, keyed, byKey, activeLeague, threshold, now }: CraftedRowOptions): SummandScan | undefined {
+/** A pair `core` cannot rank under one recipe, with the cause it observed (AD-17, FR-4). */
+export interface PairFailure {
+  readonly kind: 'pair-failure';
+  readonly reason: 'pool empty' | 'augment exhausted';
+}
+
+/** An entry the recipe cannot reach is not a summand and stays out of the trust sums (AD-17, FR-26). */
+function scanSummands({ recipe, pools, keyed, byKey, activeLeague, threshold, now }: CraftedRowOptions): SummandScan | PairFailure {
   const summands: CraftedSummand[] = [];
   const combinations: CraftedCombination[] = [];
   const trusted: CraftedTrustEntry[] = [];
   // Summands only: the rates' asOf is not a timestamp input (AD-10).
   const stamps: string[] = [];
   for (const { entry, entryKey } of keyed) {
-    const probability = combinationProbability(pools, entry, recipe.modifierLevelMin);
-    if (!probability.ok || probability.p === 0) {
-      return undefined;
+    const probability = combinationProbability(pools, entry, { itemLevel: entry.itemLevelMin, modifierLevelMin: recipe.modifierLevelMin });
+    if (!probability.ok && probability.reason.kind !== 'empty-contained') {
+      return { kind: 'pair-failure', reason: probability.reason.kind === 'augment-exhausted' ? 'augment exhausted' : 'pool empty' };
     }
     const published = byKey.get(entryKey);
     const trust = entryTrust(entry, published, activeLeague, now);
+    if (!probability.ok || probability.p === 0) {
+      combinations.push({ entryKey, trust });
+      continue;
+    }
     const price = resolvedPrice(published, activeLeague);
     if (price.state !== 'priced') {
       trusted.push({ trust });
@@ -84,20 +94,20 @@ function scanSummands({ recipe, pools, keyed, byKey, activeLeague, threshold, no
   return { summands, combinations: combinations.toSorted(compareCombinations), trusted, stamps };
 }
 
-function weakestProvenance({ first, recipe, pools, keyed }: CraftedRowOptions): CraftedRankedRow['provenance'] {
-  let provenance = foldPair(pools, first, recipe.modifierLevelMin);
-  for (const { entry } of keyed.slice(1)) {
-    provenance = weakest(provenance, foldPair(pools, entry, recipe.modifierLevelMin));
+function weakestProvenance({ recipe, pools, keyed }: CraftedRowOptions): CraftedRankedRow['provenance'] {
+  let provenance: CraftedRankedRow['provenance'] = 'measured';
+  for (const { entry } of keyed) {
+    provenance = weakest(provenance, foldPair(pools, { itemLevel: entry.itemLevelMin, modifierLevelMin: recipe.modifierLevelMin }));
   }
   return provenance;
 }
 
-/** One `(Item Class, recipe)` pair (AD-17), or `undefined` if unreachable. */
-export function craftedRow(options: CraftedRowOptions): CraftedRankedRow | undefined {
+/** One `(Item Class, recipe)` pair (AD-17), or the failure that makes it unrankable. */
+export function craftedRow(options: CraftedRowOptions): CraftedRankedRow | PairFailure {
   const { first, recipe, cost, keyed, byKey } = options;
   const scan = scanSummands(options);
-  if (scan === undefined) {
-    return undefined;
+  if ('kind' in scan) {
+    return scan;
   }
   const ordered = scan.summands.toSorted(compareSummands);
   const asOf = oldestOf(scan.stamps);

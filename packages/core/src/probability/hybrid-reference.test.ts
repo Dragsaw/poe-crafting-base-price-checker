@@ -13,7 +13,7 @@ import {
   isUntrackable,
   untrackableReason,
 } from '../probability.ts';
-import { band, isCloseRelative, line, OTHER, pOf, pools, STAT, tier, unresolvedLine } from './test-support.ts';
+import { band, isCloseRelative, line, OTHER, pOf, pools, scope82, STAT, tier, unresolvedLine } from './test-support.ts';
 
 const THIRD = 'explicit.stat_3';
 
@@ -31,9 +31,9 @@ describe('a hybrid reference', () => {
     const rest = tier([line(THIRD, [1, 2])], 350);
     const classPools = pools([h1, h2, pure1, pure2, rest], []);
     const reference = hybrid(lineBand(10, 15), lineBand(4, 9, OTHER));
-    expect(pOf(affixProbability(classPools, 'prefix', reference, { itemLevelMin: 82, modifierLevelMin: 0 }))).toBeCloseTo(150 / 1000, 10);
+    expect(pOf(affixProbability(classPools, 'prefix', reference, scope82(0)))).toBeCloseTo(150 / 1000, 10);
     // The single-line band on the shared statId still admits both families.
-    expect(pOf(affixProbability(classPools, 'prefix', band(10, 15), { itemLevelMin: 82, modifierLevelMin: 0 }))).toBeCloseTo(650 / 1000, 10);
+    expect(pOf(affixProbability(classPools, 'prefix', band(10, 15), scope82(0)))).toBeCloseTo(650 / 1000, 10);
   });
 
   it('does not contain a tier whose line set is a superset of the reference statIds', () => {
@@ -50,8 +50,8 @@ describe('a hybrid reference', () => {
     const referenceAC = hybrid(lineBand(10, 12), lineBand(1, 2, THIRD));
     expect(isContaining(referenceAB, ac)).toBe(false);
     expect(isContaining(referenceAC, ab)).toBe(false);
-    expect(pOf(affixProbability(classPools, 'prefix', referenceAB, { itemLevelMin: 82, modifierLevelMin: 0 }))).toBeCloseTo(100 / 1000, 10);
-    expect(pOf(affixProbability(classPools, 'prefix', referenceAC, { itemLevelMin: 82, modifierLevelMin: 0 }))).toBeCloseTo(300 / 1000, 10);
+    expect(pOf(affixProbability(classPools, 'prefix', referenceAB, scope82(0)))).toBeCloseTo(100 / 1000, 10);
+    expect(pOf(affixProbability(classPools, 'prefix', referenceAC, scope82(0)))).toBeCloseTo(300 / 1000, 10);
   });
 
   it('computes the two-order sum by hand for a hybrid prefix and a suffix in its modGroup', () => {
@@ -65,8 +65,8 @@ describe('a hybrid reference', () => {
     const p = pOf(
       combinationProbability(
         pools([h, b], [c, d, tierE]),
-        { itemLevelMin: 82, prefix: hybrid(lineBand(10, 12), lineBand(4, 6, OTHER)), suffix: band(1, 4, THIRD) },
-        0,
+        { prefix: hybrid(lineBand(10, 12), lineBand(4, 6, OTHER)), suffix: band(1, 4, THIRD) },
+        scope82(0),
       ),
     );
     expect(isCloseRelative(p, 75 / 1400)).toBe(true);
@@ -95,7 +95,7 @@ describe('a hybrid reference', () => {
     expect(isContaining(reference, zero)).toBe(false);
     const classPools = pools([zero, live, rest], []);
     expect(eligible(classPools.prefix, 82, 0)).toContain(zero);
-    expect(pOf(affixProbability(classPools, 'prefix', reference, { itemLevelMin: 82, modifierLevelMin: 0 }))).toBe(100 / 400);
+    expect(pOf(affixProbability(classPools, 'prefix', reference, scope82(0)))).toBe(100 / 400);
   });
 
   it('applies the null-line rule: untrackable reads the entry and its pool coverage alone', () => {

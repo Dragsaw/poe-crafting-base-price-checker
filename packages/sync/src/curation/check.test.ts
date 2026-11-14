@@ -105,21 +105,15 @@ describe('checkTracked', () => {
     expect(report.issues).toEqual([]);
     expect(report.checks).toContainEqual({ check: 'recipe-reach', status: 'failed' });
     expect(report.unreachable).toEqual([
-      {
-        entryKey: expect.stringContaining('"accessory.amulet","Amulets",75') as unknown,
-        recipeId: 'perfect',
-        slot: 'prefix',
-        path: 'entries.1',
-      },
+      { entryKey: expect.stringContaining('"accessory.amulet","Amulets",75') as unknown, path: 'entries.1' },
     ]);
   });
 
-  it('sorts unreachable rows by key, then recipe, then slot', () => {
+  it('lists one row per entry, whatever the number of recipes and slots', () => {
     const suffix = { poolCoverage: 'complete' as const, entries: floored(SUFFIX_STAT, [3, 3], [5, 5]) };
     const recipes: RecipesFile = { ...RECIPES, recipes: [PERFECT, { ...PERFECT, id: 'alpha' }] };
-    const weights = { ok: true, value: flooredWeights(suffix) } as const;
-    const report = checkTracked(inputsOf([crafted], { weights, recipes: { ok: true, value: recipes } }));
-    expect(report.unreachable.map((row) => [row.recipeId, row.slot])).toEqual([['alpha', 'prefix'], ['alpha', 'suffix'], ['perfect', 'prefix'], ['perfect', 'suffix']]);
+    const report = checkTracked(inputsOf([crafted], { weights: { ok: true, value: flooredWeights(suffix) }, recipes: { ok: true, value: recipes } }));
+    expect(report.unreachable.map((row) => row.path)).toEqual(['entries.0']);
   });
 
   it('does not reach-check a class with a partial slot', () => {
