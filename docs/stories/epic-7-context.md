@@ -1,6 +1,6 @@
 # Epic 7 Context: League-start crafting levels
 
-<!-- Generated from planning artifacts. Regenerate with compile-epic-context if planning docs change. -->
+<!-- Compiled from planning artifacts. Edit freely. Regenerate with compile-epic-context if planning docs change. -->
 
 ## Goal
 
@@ -30,7 +30,11 @@ The player chooses the item level he crafts at (79 or 82), and the crafted ranki
 - **One value `L` per ranking (AD-17, AD-1, AD-4).** The Crafting Item Level enters `rank` and the purpose function only as a passed-in value, never as hidden state. Every summand of one `(itemClass, recipe, L)` is normalised against the same pool.
 - **Eligible-pool order (AD-17):** scope to `L` first. Then apply the recipe floor to each modifier of each slot on its own. Then renormalise, exclude and renormalise again. A modifier is one `modGroup` together with one set of stat ids, so two modifiers in one `modGroup` are floored apart. `modGroup` takes part only in exclusivity. The highest tier of a modifier is its best tier at or below `L`, also when that tier is below the floor. `modifierLevelMin = 0` uses the same code path and changes nothing.
 - **Reach (AD-17):** `core` exposes one reach verdict per `(entry, recipe, L)`. The `reached` flag of `pnpm tracked:lookup tiers` uses the same verdict. Remove the unreachable-entry cause from `RECIPE_UNREACHABLE` in `packages/core/src/rank.ts`. An augment with no eligible entry, or a slot with an empty pool, stays unrankable under its own reason.
-- **Per-entry floor (AD-5).** Remove the shared-floor load check in `packages/contracts/src/envelopes/tracked-file-checks.ts`. `pairOverlap` in `packages/core/src/cross-file.ts` must check pairs with different floors at the highest offered level. The pool only grows with the level, so that verdict holds at every level. Edge alignment runs at the entry's own floor, so it gives the same verdict at every level.
+- **Per-entry floor (AD-5).** Remove the shared-floor load check in `packages/contracts/src/envelopes/tracked-file-checks.ts`.
+- **Cross-file check scope (AD-17).** The pool only gains tiers as the level rises. So each check runs at one fixed level, and its verdict holds at every offered level. Neither level is the player's `L`: the `sync` gate runs with no `L`.
+  - At the entry's own floor: edge alignment, the empty containment set and the co-rollable combination. A wider pool cannot undo a pass of theirs.
+  - At the highest offered level, or at a higher floor of the entry or pair: `coOccur` for every hybrid pair (same floor or not), line-set completeness and kind agreement. Each one searches the pool for a violating tier. This stops two hybrid entries below 82 that co-occur only on a tier above their floor from passing the gate and double-counting in `rank` at 82.
+  - Edge alignment is not a general bound on containment loss. A band that clips an uncontained, overlapping tier escapes it at any scope. This is the accepted FR-29 residual.
 - **Tracked List regeneration (AD-3, NFR-5):** a script derives every entry from `core`'s `needs` and the Weights File's tier ranges. No floor or band is typed by hand, and no app package writes `data/tracked.json`. An entry's floor is the higher of its two `needs`. Delete the replaced span entries (no prune tombstone), and name this exception in the commit message. Follow the `tracked-json` skill and *Parallel worktrees* in `AGENT-WORKFLOW.md`. Split entries get new canonical keys, which orphans their price history. That is acceptable, because the league reset wipes prices.
 - **Persistence (AD-15):** the level persists in browser storage next to the recipe. A storage access that throws must leave the page working at the first-visit values (FR-7).
 
@@ -48,6 +52,6 @@ The player chooses the item level he crafts at (79 or 82), and the crafted ranki
 - Do the stories strictly in order: 7.1, 7.2, 7.3, 7.4. Each story is green alone.
 - 7.1 can land alone, because it corrects the perfect-recipe EVs at once. Until 7.2, `rank` passes each entry's own floor as `L`.
 - 7.2 lands its `contracts` change alone and first, and the `core` work rebases onto it. Until 7.4, `web` passes the first-visit level (82). The golden filter text may change only in the blocks for Item Classes whose crafted floors are below 82. The report lists each changed block with its cause, and the story updates the golden text in the same change.
-- 7.3 changes only `data/tracked.json`. Raw Bases stay unchanged. The report states the active crafted row count, read from the file, the time of a full refresh rotation against UJ-6 and the time of one ranking pass against NFR-6. If the rotation time misses UJ-6, the curator decides which rows to prune. The story prunes none.
-- 7.4 is the only story the player sees. It builds on the header bar (Epic 4) and the filter modal (Epic 6).
+- 7.3 changes only `data/tracked.json`. It is the first story that adds entries with floors below 82, so it relies on the AD-17 cross-file scope above being in force in `core`. Raw Bases stay unchanged. The report states the active crafted row count, read from the file, the time of a full refresh rotation against UJ-6 and the time of one ranking pass against NFR-6. If the rotation time misses UJ-6, the curator decides which rows to prune. The story prunes none.
+- 7.4 is the only story the player sees. It builds on the header bar (Epic 4) and the filter modal (Epic 6). It also takes the open work that 7.1 left for later: the not-counted marker and its ordering (state 49), the `nothing rolls at ilvl <level>` reason for a class with no counted entry, and the transcription of `level-toggle` and the revision 34 Copy Deck strings.
 - This epic supersedes the shared-floor criteria of Stories 6.1 and 6.4 and the recipe-floor rule of Story 4.7. Those specs stay unedited as records.
