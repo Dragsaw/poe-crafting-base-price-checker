@@ -2,7 +2,7 @@
 title: 'Story 7.1: The recipe floor per modifier, after the level scope'
 type: 'bugfix'
 created: '2026-11-14'
-status: 'in-review'
+status: 'done'
 baseline_revision: '124ff7b2c014dff406d1ad55d0984ed62da9d5c0'
 review_loop_iteration: 0
 followup_review_recommended: false
@@ -171,3 +171,43 @@ deferred:
 - **A not-counted line carries no price.** It is `{entryKey, trust}` in `combinations`, because `web` reads a priced combination as a below-threshold line. The state 49 treatment belongs to 7.2 and 7.4.
 - **Revision pins.** `tokens.test.ts` and `trust-words.test.ts` pinned DESIGN.md revision 23 and EXPERIENCE.md revision 33, and both failed from `15575f7` (DESIGN 24, EXPERIENCE 34). Every content assertion in both files passes against the current revisions, so both pins now name 24 and 34 and `pnpm check` is green. Story 7.4 still transcribes `level-toggle`, and 7.2's new reason kind meets the `trust-words` sampling test when it is added.
 - **Filter golden.** `filter-text.test.ts` did not change.
+
+### Agent browser checks (after review)
+
+Session `poe-79ae64f4395d`, run 2026-11-14 18:55–18:58 WEST against HEAD `6b91e0d2cf6f6d307804257e42d20044a442b8e4`, tree clean. `pnpm dev` ran on port 5173 and was stopped with `pnpm dev:stop` (port free).
+
+1. **Perfect list:** pass. Perfect was the active recipe. Crafted rows rendered (Emerald, Body Armours (Str/Dex/Int), Sapphire, Foci and more), with no page error and no `recipe cannot reach this class` text. The appendix read `Appendix: Unrankable — 0 Item Classes`. Screenshot: `C:/Users/ilyal/AppData/Local/Temp/claude/26e3858fb0c54881/aa3fa5ff-a9e4-4711-8d65-7d9edb3265ba/scratchpad/7-1-after-1-perfect.png`.
+2. **Greater list:** pass. After a switch to greater, the list re-ranked (Body Armours (Str/Dex/Int) moved to rank 8 at 0.76). No page error, no retired reason text, and the appendix showed 0 Item Classes. Screenshot: `C:/Users/ilyal/AppData/Local/Temp/claude/26e3858fb0c54881/aa3fa5ff-a9e4-4711-8d65-7d9edb3265ba/scratchpad/7-1-after-2-greater.png`.
+3. **A Wand row:** pass. Back on perfect, Wands was rank 24 with EV `< 0.01`, a figure. The expansion listed its combinations with prices and trade links (`T1-T2 % Cold · T1 Spells` 50.00, `T1 Spell Dmg · T1-T2 Cold Spells` 12.50, and more). No page error. Screenshot: `C:/Users/ilyal/AppData/Local/Temp/claude/26e3858fb0c54881/aa3fa5ff-a9e4-4711-8d65-7d9edb3265ba/scratchpad/7-1-after-3-wands-perfect.png`.
+
+## Auto Run Result
+
+Status: done
+
+**Change.** `eligible` scopes to the Crafting Item Level first, then floors each modifier (`[modGroup, lineSet]`) on its own (AD-17, FR-26). The scope is an explicit `RecipeScope`, and `rank` passes the entry's own floor until 7.2. An entry that a recipe cannot reach is not a summand and stays out of the trust sums. The pair still ranks. `RECIPE_UNREACHABLE` and the state 36 path are gone. An empty pool and an exhausted augment stay unrankable as `pool empty` and `augment exhausted`. `tracked:check` lists only the entries that no recipe reaches at any `CRAFTING_ITEM_LEVELS` value. `tracked:lookup tiers` reports `reached` per (recipe, level).
+
+**Files.**
+- `packages/core/src/probability.ts`: the per-modifier floor after the scope, and `RecipeScope`. `floored` is removed.
+- `packages/core/src/crafting-item-level.ts`: the offered levels `[79, 82]`.
+- `packages/core/src/rank-crafted-row.ts` and `rank.ts`: an entry is counted, not counted, or a pair failure. The new reasons are here.
+- `packages/core/src/provenance.ts`: `foldPair(pools, scope)`.
+- `packages/sync/src/curation/check.ts`: `unreachable` per entry across recipes and levels. An empty recipe list is `skipped`.
+- `.claude/skills/tracked-json/scripts/lookup-mods.ts` and `SKILL.md`: `reached` per (recipe, level), with the per-tier caveat.
+- `packages/web/src/list/UnrankableAppendix.tsx`: the state 36 branch is removed.
+- `test/fixtures/wands-weights.json`: the real Wands pools. Tests are under core, sync, web and the skill scripts.
+- `packages/web/src/theme/tokens.test.ts` and `list/row/trust-words.test.ts`: the revision pins now name 24 and 34.
+- `docs/stories/deferred-work.md`: the reason-words entry, with a note for UX.
+
+**Review.** 33 findings: high 0, medium 6, low 19, false 8.
+- **Patched (8 rows, 6 fixes):** the skill caveat on per-tier `reached` (medium; Intent b, Edge 4, Blind 5), the `CRAFTING_ITEM_LEVELS` JSDoc (low; Edge 1, Blind 1), `skipped` for an empty recipe list (low), the hybrid-modifier `eligible` test (low), the `APPENDIX_NOTES` citation (low), and the ledger note for UX (low).
+- **Deferred (frontmatter):** the not-counted marker and display (medium), the reason `nothing rolls at ilvl` for a pair with nothing reachable (medium), and the revision-pin tripwire for 7.4 (low).
+- **Rejected:** every remaining row, with its reason in the Review Triage Log.
+
+**Follow-up review:** false. One medium patched entry and no high.
+
+**Verification.** `pnpm check` passes, 8 of 8 gates. `pnpm tracked:check` exits 0 with `unreachable: []`. `pnpm tracked:lookup tiers explicit.stat_2254480358 --class Wands` shows T2 reached under perfect at 79 and not at 82, and T1 at 82. A live-data script found 0 of 2096 checkable entries unreached at their own floor, and 0 modifier keys that merge distinct line shapes. The I/O matrix audit passes. The agent browser checks after review pass.
+
+**Residual risks.**
+- Until 7.2, `rank` scopes each entry at its own floor, so entries of one class are normalised against different pools.
+- The words `pool empty` and `augment exhausted` are not approved copy (ledger).
+- A not-counted line looks like an unpriced line until 7.4.
