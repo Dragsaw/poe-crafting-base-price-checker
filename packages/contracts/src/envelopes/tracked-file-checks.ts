@@ -34,29 +34,6 @@ function checkUniqueKeys(entries: TrackedEntries, context: z.RefinementCtx): voi
   }
 }
 
-function checkSharedFloors(entries: TrackedEntries, context: z.RefinementCtx): void {
-  const firstFloorByClass = new Map<string, { readonly index: number; readonly floor: number }>();
-  for (const [index, entry] of entries.entries()) {
-    if (entry.kind !== 'crafted' || entry.status === 'pruned') {
-      continue;
-    }
-    const classKey = JSON.stringify([entry.categoryId, entry.className]);
-    const first = firstFloorByClass.get(classKey);
-    if (first === undefined) {
-      firstFloorByClass.set(classKey, { index, floor: entry.itemLevelMin });
-      continue;
-    }
-    if (first.floor === entry.itemLevelMin) {
-      continue;
-    }
-    context.addIssue({
-      code: 'custom',
-      path: ['entries', index, 'itemLevelMin'],
-      message: `item class ${entry.categoryId}/${entry.className} declares itemLevelMin ${String(entry.itemLevelMin)} here and ${String(first.floor)} at entries.${String(first.index)}; the crafted entries of one item class share one floor (AD-17)`,
-    });
-  }
-}
-
 function checkWithinFileOverlap(entries: TrackedEntries, context: z.RefinementCtx): void {
   const earlierByClass = new Map<string, { readonly index: number; readonly key: string; readonly entry: CraftedTrackedEntry }[]>();
   for (const [index, entry] of entries.entries()) {
@@ -139,7 +116,6 @@ function checkLineKinds(entries: TrackedEntries, context: z.RefinementCtx): void
 
 export function checkTrackedEntries(entries: TrackedEntries, context: z.RefinementCtx): void {
   checkUniqueKeys(entries, context);
-  checkSharedFloors(entries, context);
   checkWithinFileOverlap(entries, context);
   checkLineKinds(entries, context);
 }

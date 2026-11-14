@@ -79,7 +79,7 @@ export const CraftedRankedRowSchema = z
       .describe('The serialised Item Class key, `["crafted", categoryId, className]`: the canonical key’s class prefix.'),
     categoryId: z.string().min(1),
     className: z.string().min(1),
-    itemLevelMin: ItemLevelSchema.describe('The one floor every crafted entry on the class declares (AD-17).'),
+    itemLevelMin: ItemLevelSchema.describe('The lowest floor among the class’s non-pruned crafted entries (AD-17, FR-36).'),
     recipeId: z.string().min(1),
     grossPayout: z.number().min(0).describe('Σ contribution over `summands`.'),
     craftCost: z
