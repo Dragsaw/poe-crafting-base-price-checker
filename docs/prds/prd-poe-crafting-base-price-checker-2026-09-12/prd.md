@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 37
+revision: 38
 created: 2026-09-12
-updated: 2026-11-02
+updated: 2026-11-14
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -13,6 +13,7 @@ sources:
   - docs/stories/archive/spec-poesessid-sync/SPEC.md
   - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
   - docs/forge/loot-filter-integration/forged-idea.md
+  - docs/sprint-change-proposal-2026-11-14.md
 inherits:
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/WEIGHTS-FILE-SCHEMA.md
@@ -31,7 +32,7 @@ This PRD is the requirements layer for a single-player tool that answers one que
 
 **Inheritance.** `ARCHITECTURE-SPINE.md` is settled and its decisions are inherited, not re-decided. A citation `(AD-n)` names the decision and its rationale. Under **AD-0**, a companion section an AD delegates to binds exactly as that AD, so a citation to `WEIGHTS-FILE-SCHEMA.md` is a citation to the architecture. The spine's *Retired AD map* is the authority for any id that no longer resolves.
 
-**Conventions.** §3 defines every domain noun and the rest of the document uses those terms verbatim. FRs are numbered globally, FR-1 to FR-37, and a number is never reused or reassigned. A bullet marked *(PRD-owned)* is a product decision this document owns, and the architecture does not adjudicate it. A heading marked *Architecture-owned* names a capability whose acceptance conditions live in the cited decision rather than here; a workflow turning this document into stories reads the cited decision for acceptance rather than the bullets below it. Revision history lives in `.memlog.md` and git, not here.
+**Conventions.** §3 defines every domain noun and the rest of the document uses those terms verbatim. FRs are numbered globally, FR-1 to FR-38, and a number is never reused or reassigned. A bullet marked *(PRD-owned)* is a product decision this document owns, and the architecture does not adjudicate it. A heading marked *Architecture-owned* names a capability whose acceptance conditions live in the cited decision rather than here; a workflow turning this document into stories reads the cited decision for acceptance rather than the bullets below it. Revision history lives in `.memlog.md` and git, not here.
 
 ## 1. Vision
 
@@ -67,7 +68,7 @@ There is a single operator, a single role, no authentication and no multi-device
 - **UJ-3. The drill-down.** The player is unsure why an unfamiliar Item Class ranks third. He expands that row and reads the full tracked Combination list. The list shows which Combinations have a price, at what price, whether each price can be trusted, and which Combinations returned no listings.
 - **UJ-4. The trust check.** The player notices a row that ranks suspiciously high. The row itself says that its price is not current enough to act on, and that its odds are estimated. He discounts that row rather than acting on it.
 - **UJ-5. The curation pass.** The player reviews deliberately after a few weeks, working through the Combinations he tracks against each Item Class. He sees three Combinations that have returned no listings all league, and one Combination flagged unresolvable since the last patch. He opens `data/tracked.json`, tombstones the dead Combinations with a reason, pins one Combination he wants watched closely, and commits. The next sync run reflects the edit.
-- **UJ-6. The league reset.** A new league starts. The player edits the active league in `data/config.json` and commits. The ranking goes honestly empty rather than quietly serving last league's numbers, and the ranking refills over the following day.
+- **UJ-6. The league reset.** A new league starts. The player edits the active league in `data/config.json` and commits. The ranking goes honestly empty rather than quietly serving last league's numbers, and the ranking refills within a day when sync uses the optional session cookie, or in about a day and a half without it (FR-20, SM-C1).
 - **UJ-7. The filter refresh.** After the pre-session read, the Payout Threshold and Craft Recipe stay where he left them. The player saves a fresh Pick-up Filter over last session's and reloads it in the game. For the rest of the session, his Base Filter hides what he never wants. The bases worth picking up show in a treatment that says whether to craft on them, sell them raw or identify them and check the rolls. He reads no list in the middle of a map.
 
 ## 3. Glossary
@@ -87,8 +88,9 @@ Downstream readers and workflows use these terms exactly. A synonym introduced a
 - **Combination** — the outcome a Tracked Entry describes: this Item Class carrying this prefix and this suffix. A Raw Base describes the degenerate Combination of an uncrafted base, and the Payout Threshold applies to it exactly as to any other (FR-3, AD-17).
 - **Chase Combination** — one of the Combinations on an Item Class that contribute most to its EV. The collapsed ranked row shows it, so the player knows what to look for without expanding the row (FR-2).
 - **Tracked List** — the complete curated set of Tracked Entries, held in `data/tracked.json`. It is at once what the tool watches and the tool's entire request budget (AD-12).
-- **Item Level Floor** — the item level a Tracked Entry is valued at, which scopes the modifiers that can roll on it, declared per entry by the curator from the tier worth chasing (FR-22). Crafted entries on one Item Class share one floor; a Raw Base is exempt (AD-17).
-- **Accepted Tier** — for a modifier, the tier or run of adjacent tiers worth chasing, expressed as the Modifier Reference's band and labelled beside it as a string such as `T1` or `T1–T2` (AD-5, AD-11). The label is display-only: nothing derives it, validates it, joins it to the Weights File, or keys on it (FR-22).
+- **Item Level Floor** — the lowest item level at which a Tracked Entry's outcome can roll, declared per entry by the curator from its Accepted Tier (FR-22). A crafted entry counts toward its Item Class's EV only when its floor is at or below the Crafting Item Level (FR-38). A Raw Base's floor scopes its price (FR-3).
+- **Crafting Item Level** — the item level the player crafts at, chosen in the view. It scopes the Eligible Pool of every crafted EV and decides which crafted entries count (FR-38, AD-17).
+- **Accepted Tier** — for a modifier, the one tier worth chasing, expressed as the Modifier Reference's band and labelled beside it as a string such as `T1` or `T2` (AD-5, AD-11). The label is display-only: nothing derives it, validates it, joins it to the Weights File, or keys on it (FR-22).
 - **Curation Status** — exactly one of `active`, `pinned` or `pruned` (AD-12). A `pinned` entry is refreshed ahead of the rotation as AD-7 orders it, within the cap AD-7 sets; a `pruned` entry is a tombstone carrying its reason, excluded from sync and from the ranking (AD-7, FR-15).
 - **Refresh Rotation** — the deterministic order in which Chunks refresh the Tracked List over many runs (AD-7, FR-17).
 - **Price Observation** — an observed price for a Tracked Entry, normalised to Divine and stamped with its observation time, league and exchange observation (AD-16, AD-19, AD-20). It exists only where there is an observation; attempt-scoped facts live on the Dataset entry instead (AD-9).
@@ -97,18 +99,18 @@ Downstream readers and workflows use these terms exactly. A synonym introduced a
 - **Payout Threshold** — the player-set gross price, in Divine, below which a Combination's outcome contributes nothing to a ranking (AD-17).
 - **Craft Recipe** — a named crafting currency composition. Which recipe is active changes the ordering, not only the cost. v1 ships two: greater transmute plus greater augment, and perfect transmute plus perfect augment *(PRD-owned; FR-26)*.
 - **Craft Cost** — the Divine cost of one Craft Recipe attempt, computed from synced exchange rates and paid on every attempt including failures (AD-20).
-- **Expected Value (EV)** — the ranking figure: the threshold-truncated expected payout of an Item Class under a Craft Recipe, less Craft Cost (FR-1, AD-17). A Raw Base's EV is its price (FR-3).
+- **Expected Value (EV)** — the ranking figure: the threshold-truncated expected payout of an Item Class under a Craft Recipe at the Crafting Item Level, less Craft Cost (FR-1, AD-17). A Raw Base's EV is its price (FR-3).
 - **Stat Line** — one trade-API-visible stat that a game modifier publishes; a modifier may publish several, and they roll together as one draw (AD-11). A Modifier Reference names one Stat Line, or every Stat Line of a Hybrid Modifier (FR-34).
 - **Modifier Weight** — one entry of the Weights File: one tier of one modifier in one Item Class and affix slot, carrying its spawn weight and its Stat Lines as published (AD-11, `WEIGHTS-FILE-SCHEMA.md`).
 - **Weights File** — the externally produced file of Modifier Weights that `WEIGHTS-FILE-SCHEMA.md` defines. It is a v1 prerequisite, not an enrichment: it is the only source of pool membership, tier value ranges and item-level availability (AD-11, FR-30).
 - **Trade Catalogue** — the committed mirror of the trade API's own data endpoints, refreshed on command at patch cadence. It is an identity and validation authority only and contributes nothing to the Eligible Pool (AD-25).
-- **Eligible Pool** — the set of Modifier Weights that can roll in one Item Class and slot, scoped to a Tracked Entry's Item Level Floor before any probability is computed (AD-11, AD-17). A pool declared anything other than `complete` makes its Item Class Unrankable.
+- **Eligible Pool** — the set of Modifier Weights that can roll in one Item Class and slot, scoped to the Crafting Item Level before any probability is computed (AD-11, AD-17). A pool declared anything other than `complete` makes its Item Class Unrankable.
 - **Provenance** — what a derived figure rests on, in a three-value order from weakest to strongest: `absent` (an upper bound from a partial pool, not an estimate), `uniform-prior` (an invented weight), `measured` (a weight someone measured, never ground truth; R-3) (AD-10). Every derived figure carries the weakest Provenance and the oldest timestamp of its inputs.
 - **Unrankable** — an Item Class the tool excludes from the ordering because its Eligible Pool is incomplete or absent, or because its Tracked List entries contradict the Weights File; it appears in a separate group with the reason (AD-17, FR-4).
 - **Chunk** — one bounded, resumable unit of sync work, sized at runtime and never configured (AD-7).
 - **Dataset** — the published snapshot of the latest Price Observation per Tracked Entry, together with the current exchange rates (AD-19, AD-20).
 - **Base Filter** — the player's own third-party item filter, which decides everything the Pick-up Filter does not name. The tool neither reads nor edits it.
-- **Pick-up Filter** — the in-game item filter the view generates from the ranking under the current Payout Threshold and Craft Recipe. It names bases and says what each is for, never Combinations (FR-35).
+- **Pick-up Filter** — the in-game item filter the view generates from the ranking under the current Payout Threshold, Craft Recipe and Crafting Item Level. It names bases and says what each is for, never Combinations (FR-35).
 - **Sync Report** — the published structured record of a sync run: requests consumed per source, unresolvable entries, entries not reached in this Chunk *(PRD-owned)*, pinned-starvation records, the measured pool-coverage fraction with its denominator, and the date of the last Tracked List edit (AD-7, AD-12, AD-27, FR-25).
 
 ## 4. Features
@@ -121,7 +123,7 @@ Downstream readers and workflows use these terms exactly. A synonym introduced a
 
 #### FR-1: Rank by threshold-truncated expected value
 
-The player sees one list, spanning both ranked units FR-3 defines, ordered by EV under the active Craft Recipe and the current Payout Threshold. Realises UJ-1.
+The player sees one list, spanning both ranked units FR-3 defines, ordered by EV under the active Craft Recipe, the current Payout Threshold and the Crafting Item Level (FR-38). Realises UJ-1.
 
 **Consequences (testable):**
 - For a crafted Item Class, the ranking figure is (AD-17):
@@ -138,7 +140,7 @@ EV = ( Σ P(combo) × price(combo) over Combinations that are priced and whose p
 - **No Base Type outside the Item Class contributes to that price** *(PRD-owned)*. An Item Class is valued against its own Base Types alone, so an Item Class the player would never craft on can neither inflate nor depress one he would. The spread above is therefore bounded by a single Item Class, and the ranking separates two Item Classes that a coarser unit would have averaged into one row (AD-16, AD-17).
 - Changing the Payout Threshold reorders the list without a sync (AD-4).
 - The player chooses which Craft Recipe is active, and changing it reorders the list without a sync, as the Payout Threshold does. The ranking is read under one recipe at a time and is not recipe-invariant: the same Item Class can sit at a different rank under each recipe *(PRD-owned)* (FR-26, AD-17).
-- The price of a Combination is the asking price of any item in the Item Class whose rolls satisfy the Combination, at any item level, because a buyer pays for rolled values and not for item level *(PRD-owned)*. The probability of the Combination is scoped to the Tracked Entry's Item Level Floor, because the floor sets what can roll (AD-17, FR-22).
+- The price of a Combination is the asking price of any item in the Item Class whose rolls satisfy the Combination, at any item level, because a buyer pays for rolled values and not for item level *(PRD-owned)*. The probability of the Combination is scoped to the Crafting Item Level, because the level the player crafts at sets what can roll. A Combination whose Item Level Floor is above the Crafting Item Level contributes nothing to the sum — not zero, nothing (AD-17, FR-22, FR-38).
 - A Tracked List in which two Tracked Entries on one Item Class could be satisfied by a single item is refused at load, because the sum is over a partition (AD-17, FR-16).
 
 #### FR-2: Show Chase Combinations on each collapsed row
@@ -323,7 +325,6 @@ Exactly three declared sources may generate a trade API request, and nothing els
 - Overlap covers Hybrid Modifiers and a Stat Line named in both affixes (FR-34; AD-17).
 - A curator cannot track two Stat Lines of one game modifier as two entries in one slot: the two always roll together, so one item would be counted twice. The curator tracks that modifier as one Hybrid Modifier reference instead (FR-34).
 - Where the Weights File cannot answer the co-occurrence question, the Tracked List still loads; the affected Item Class is already Unrankable (AD-17, FR-4).
-- The crafted entries on one Item Class share one Item Level Floor; a Raw Base is exempt (AD-17, FR-22).
 - The check runs wherever the list is read: the view, `sync` and the curator's check (AD-17, AD-12).
 
 #### FR-17: Refresh the Tracked List in a defined, deterministic rotation
@@ -396,15 +397,16 @@ A curator can track the outcomes the game actually rolls. A Hybrid Modifier is o
 
 #### FR-22: Declare each entry's Item Level Floor from its Accepted Tier
 
-Each Tracked Entry declares the item level that scopes the modifiers it can roll. A stated curation rule gives that level, not a global constant, and the curator writes it by hand *(PRD-owned)* (AD-5).
+Each Tracked Entry declares the lowest item level at which its outcome can roll. A stated curation rule gives that level, not a global constant, and the curator writes it by hand *(PRD-owned)* (AD-5).
 
 **Consequences (testable):**
-- The Accepted Tier of a modifier is tier 1, except where tier 1 first appears at item level 81 or 82 and is too rare to chase; the curator then accepts tier 2 *(PRD-owned)*.
-- Curators track only tier 1, or the run of tiers 1 and 2. This is a curation rule, not a check: the tool does not enforce it *(PRD-owned)*.
+- The Accepted Tier of a modifier is one tier. Where a modifier's tier 1 first appears above the lower Crafting Item Level, the curator tracks tier 1 and tier 2 as separate entries, so that the Combination still ranks at the lower level *(PRD-owned)* (FR-38).
+- Where both affixes have such a tier 1, the curator tracks all four pairings of tier 1 and tier 2 *(PRD-owned)*.
+- A band covers one tier. This is a curation rule, not a check: the tool does not enforce it *(PRD-owned)*.
 - For a Hybrid Modifier, the Accepted Tier and its label apply to the modifier as a whole, never to one of its Stat Lines (FR-34).
-- Every crafted entry on an Item Class shares one floor, which AD-17 derives from the accepted bands *(PRD-owned)*. The tool enforces the shared floor at load. A Raw Base is exempt (AD-17, FR-16, FR-3).
+- Each entry's floor is the item level its bands need, so the crafted entries on one Item Class can have different floors (AD-5, AD-17). A Raw Base's floor scopes its price (FR-3).
 - Choosing the Accepted Tier and writing the Modifier Reference's band are one act. A band never contains one tier and clips another (AD-5, AD-17).
-- Spanning a tier boundary is legitimate. The tool prices the span at its cheap end, and the span carries the mass of both tiers. Below the Payout Threshold, the span can zero a jackpot (AD-17).
+- A band that spans tiers still loads. The tool prices it at its cheap end, it counts only at or above the floor of its highest tier, and below the Payout Threshold it can zero a jackpot (AD-17).
 - The Accepted Tier is also a hand-written, display-only label. It lets a ranked row read as tiers rather than value spreads. A missing label still loads and ranks, with a visibly marked fallback (AD-5).
 
 #### FR-23: Normalise every price to Divine at the sync boundary
@@ -464,6 +466,8 @@ A sync problem is visible without going to look for it.
 - While the active recipe is uncostable the player still sees each of FR-3's two ranked units in its own order, and no ordering between them. The page states that limit and never implies an order across the two that it cannot compute *(PRD-owned)* (FR-1, FR-3, FR-5).
 - A jewel's Craft Cost is 0 under every recipe: greater and perfect currency does not affect jewel mods, so jewels are crafted with basic currency *(PRD-owned)*.
 - A Craft Recipe changes which outcomes are reachable, not only what an attempt costs. Two recipes over the same Tracked List therefore produce genuinely different orderings — not one ordering shifted by a constant — and an Item Class's Chase Combinations can differ between them (AD-17).
+- A greater or perfect orb never removes a modifier from the pool. Where every tier of a modifier that can roll at the Crafting Item Level is below the orb's minimum modifier level, the best of those tiers can still roll. "Modifier" here means one modifier, not the family it shares with others *(PRD-owned)*.
+- An outcome that a recipe cannot reach at the Crafting Item Level contributes nothing under that recipe, and it is not a curation defect (AD-17).
 - Craft Cost is shown in Divine, the unit of every price and the Payout Threshold (AD-20).
 
 ### 4.8 Weights File Consumption
@@ -491,9 +495,9 @@ A producer's completeness claim and the consumer's treatment of it are two halve
 - A `partial` pool makes the Item Class Unrankable, and every probability from it carries Provenance `absent`; this is the only path to `absent` (AD-17, AD-10, FR-4).
 - No mechanical check catches a dropped tier or a dropped Stat Line. The ranking rests on the producer's `poolCoverage` assertion, and this PRD states that trust rather than implies it (AD-11).
 
-#### FR-29: Derive probabilities from the Weights File scoped to the entry's floor
+#### FR-29: Derive probabilities from the Weights File scoped to the Crafting Item Level
 
-*Architecture-owned.* Every probability in a ranking comes from the consumed Weights File, scoped to the Tracked Entry's Item Level Floor, by one derivation two implementers cannot diverge on (AD-17).
+*Architecture-owned.* Every probability in a ranking comes from the consumed Weights File, scoped to the Crafting Item Level, by one derivation two implementers cannot diverge on (AD-17).
 
 **Consequences (testable):**
 - A tier only partly covered by a curated band contributes nothing to the probability, and that is not an error (AD-11, AD-17).
@@ -567,7 +571,7 @@ The ranking treats a Price Observation from any league but the active one as abs
 
 #### FR-35: Generate a Pick-up Filter from the current ranking
 
-The player generates a Pick-up Filter from the view. The filter shows exactly what the ranking says under the Payout Threshold and Craft Recipe on screen at that moment. Realises UJ-7.
+The player generates a Pick-up Filter from the view. The filter shows exactly what the ranking says under the Payout Threshold, Craft Recipe and Crafting Item Level on screen at that moment. Realises UJ-7.
 
 **Consequences (testable):**
 - Generating the filter needs no network request and no sync, as for a Payout Threshold change (AD-15, AD-24, NFR-6).
@@ -575,7 +579,7 @@ The player generates a Pick-up Filter from the view. The filter shows exactly wh
 - The filter adds visibility and never hides an item. For an item that the filter names, the filter's treatment is final and overrides the Base Filter. Every item it does not name keeps the Base Filter's treatment *(PRD-owned; mechanism: AD-31)*.
 - The filter is a snapshot of the ranking, not a second judgement of it. A figure that FR-10 to FR-12 mark as weak or not current enters the filter unmarked. The player reads those marks in the view when he generates the filter. On the ground this gives up SM-C4's guard, which stays in the view *(PRD-owned)*.
 - The filter never names a Combination, a modifier or a price.
-- A change to the Payout Threshold, the Craft Recipe or a price reaches the game only when the player saves the filter again *(PRD-owned)*.
+- A change to the Payout Threshold, the Craft Recipe, the Crafting Item Level or a price reaches the game only when the player saves the filter again *(PRD-owned)*.
 
 #### FR-36: Name each base worth picking up, and what it is for
 
@@ -583,9 +587,9 @@ Each drop the filter names carries exactly one purpose: craft on it, sell it raw
 
 **Consequences (testable):**
 - The bases are the Raw Bases of the Tracked List that are not pruned (FR-15). A jewel kind is the one exception. Jewels never drop white, so the jewel kind itself is the base *(PRD-owned)*.
-- A drop qualifies at or above its Raw Base's own Item Level Floor. For craft and check the rolls, the drop must also reach the Item Level Floor that the crafted entries of its Item Class share, because that floor scopes the EV (FR-22, AD-17). A jewel kind uses the shared Item Level Floor of its Item Class.
+- A drop qualifies at or above its Raw Base's own Item Level Floor. The Crafting Item Level does not change which drops qualify. It changes only the EV that decides a drop's purpose, as it changes the ranking (FR-38, FR-1). A jewel kind qualifies at the lowest Item Level Floor among the non-pruned crafted entries of its Item Class *(PRD-owned)*.
 - Two Raw Bases can name one base at different Item Level Floors. A drop belongs to the Raw Base with the highest Item Level Floor that the drop reaches, and only that Raw Base gives the drop its purpose. When that Raw Base gives the drop no purpose, the filter does not name the drop *(PRD-owned)*.
-- An Item Class is worth crafting when its EV under the current Payout Threshold and Craft Recipe is above zero *(PRD-owned)*. The filter does not apply the Payout Threshold a second time as a cutoff, because the Payout Threshold already shapes EV (FR-1).
+- An Item Class is worth crafting when its EV under the current Payout Threshold, Craft Recipe and Crafting Item Level is above zero *(PRD-owned)*. The filter does not apply the Payout Threshold a second time as a cutoff, because the Payout Threshold already shapes EV (FR-1).
 - Crafting on a base forfeits its raw sale. The raw sale is worth its price at or above the Payout Threshold and nothing below it, as FR-3 truncates a Raw Base. Call that raw value(B). For a white Raw Base B of Item Class C *(PRD-owned)*:
   - **craft** when EV(C) > 0 and raw value(B) < EV(C).
   - **sell raw** when raw value(B) > 0 and raw value(B) ≥ EV(C).
@@ -604,6 +608,24 @@ The player can tell craft, sell raw and check the rolls apart at a glance. Reali
 - The treatments are quiet. The filter exists to unhide and label, not to alarm *(PRD-owned)*.
 - Each treatment carries the colour meaning that the player's Base Filter, NeverSink's filter through FilterBlade, gives that kind of item. His reading of the colours then carries over if he returns to the Base Filter alone *(PRD-owned)*. The code owns every treatment (AD-31).
 - What the game's item filter can express bounds the treatments (NFR-10).
+
+### 4.12 The Crafting Item Level
+
+**Description.** The item level the player crafts at decides which modifier tiers can roll, and so which Combinations he can chase. At league start he crafts on lower-level bases than in the endgame, and the crafted ranking follows the level he chooses. Realises UJ-1, UJ-6.
+
+**Functional Requirements:**
+
+#### FR-38: Choose the Crafting Item Level
+
+The player chooses the item level he crafts at, and the crafted ranking follows it. Realises UJ-1 and UJ-6.
+
+**Consequences (testable):**
+- The player chooses between two levels: 79, the league-start level that the last-but-one map tier gives, and 82, the endgame level *(PRD-owned)*.
+- The Crafting Item Level scopes the Eligible Pool of every crafted EV. A crafted entry counts only when its Item Level Floor is at or below the Crafting Item Level (FR-1, FR-22, AD-17).
+- Changing the level reorders the list without a sync, as the Payout Threshold and the Craft Recipe do (AD-4).
+- A Raw Base is unaffected. Its price stays scoped to its own floor (FR-3).
+- An Item Class with no entry that counts at the chosen level is treated as one with no priced Combination (FR-1).
+- The level does not change which drops the Pick-up Filter names, only the EV behind their purpose (FR-36).
 
 ## 5. Cross-Cutting NFRs
 
@@ -637,7 +659,7 @@ These are engineering and workflow requirements. The cited owner states each one
 
 ### 7.1 In Scope
 
-- Magic items — one prefix, one suffix — tracked per Item Class, at per-entry Item Level Floors derived by the Accepted Tier rule (FR-22). A tracked crafted entry names both affixes (FR-34).
+- Magic items — one prefix, one suffix — tracked per Item Class, at per-entry Item Level Floors derived by the Accepted Tier rule (FR-22), and ranked at the Crafting Item Level the player chooses (FR-38). A tracked crafted entry names both affixes (FR-34).
 - Hybrid Modifiers, and one stat summed across both affixes, priced as the player reads them (FR-34).
 - Raw Bases, threshold-truncated like any other outcome.
 - One ranked list of Item Classes and raw Base Types (FR-3), bounded for readability, with Chase Combinations, expandable to the full tracked Combination list including tombstones.
@@ -686,7 +708,7 @@ Behavioural, not numeric. There is one user, and instrumenting the tool would be
 - **SM-6: Agents ship without a human unblocking them.** Development proceeds with tests passing offline and no live API in the loop. Validates NFR-1, NFR-2, NFR-4.
 
 **Counter-metrics (do not optimise)**
-- **SM-C1: Searches per full refresh.** A larger Tracked List makes the tool appear comprehensive and makes every entry's price older, because the rate limit refreshes the list one entry at a time. Held at about 2,100 **searches**, the quantity the rate limit actually constrains, because an entry count would miss a curator who splits one entry into two bands (AD-12). Counterbalances SM-4.
+- **SM-C1: Searches per full refresh.** A larger Tracked List makes the tool appear comprehensive and makes every entry's price older, because the rate limit refreshes the list one entry at a time. Held at about 3,500 **searches**, because the player needs all of that data. With the optional session cookie, a full refresh fits within a day. Without it, the refresh takes about a day and a half, and the player accepts that (UJ-6, FR-20, AD-12). It counts searches, the quantity the rate limit actually constrains, because an entry count would miss a curator who splits one entry into two bands (AD-12, FR-22). Counterbalances SM-4.
 - **SM-C3: Number of ranked rows shown.** A longer list is not a better one. Bounded by FR-5. Counterbalances SM-2.
 - **SM-C4: Apparent confidence.** Suppose the view presents a figure on estimated odds or an old price as cleanly as a measured, current one. That would make the tool feel more authoritative and make it more dangerous. Counterbalances SM-4, and is why FR-10 to FR-12 exist.
 
