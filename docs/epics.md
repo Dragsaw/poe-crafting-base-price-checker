@@ -1,9 +1,9 @@
 ---
 stepsCompleted: ['step-01-validate-prerequisites', 'step-02-design-epics', 'step-03-create-stories', 'step-04-final-validation']
-storiesWrittenForEpics: [1, 2, 3, 4, 5, 6]
+storiesWrittenForEpics: [1, 2, 3, 4, 5, 6, 7]
 storiesPendingForEpics: []
 blockedStories: []
-revisionPass: 'Targeted revision 2026-11-01 for PRD revision 36 (FR-36: one base tracked at two floors): Story 6.4 appended to Epic 6. Before it, targeted revision 2026-11-01 for PRD revision 35, spine revision 46, EXPERIENCE.md revision 33 and DESIGN.md revision 23 (the Pick-up Filter): FR inventory to 37, UX-DR54 to UX-DR60 added, Epic 6 appended with three stories. Epics 1 to 5 are unedited records. Before it, targeted revision 2026-10-23 for weights contract 7.0.0 and spine revision 39 (blocking mod tags): Epic 5 appended with one story. Epics 1 to 4 are unedited records. Before it, targeted revision 2026-10-09 for PRD revision 27 and the Rarity Dark redesign (UX revision 24, DESIGN revision 19): FR inventory to 34, thirteen FR titles retitled, retired-direction UX-DRs marked superseded, Epic 4 appended. Epics 1 to 3 are unedited records. Before it, targeted revision 2026-09-27 of Story 3.6 and the weights-contract citations for spine revision 23 (AD-10 folds Provenance per (itemClass, recipe) pair; contract 6.1.0) and PRD revision 23. Before it, targeted revision 2026-09-27 of Epic 2 and Stories 2.7 and 2.8 (epic 2 retro item 19) for the committed weights.json 6.0.0 with recipes.json published with no recipe, which the masthead dek explains. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
+revisionPass: 'Targeted revision 2026-11-14 for PRD revision 38 (FR-38: the Crafting Item Level): FR inventory to 38, Epic 7 appended with four stories. Epics 1 to 6 are unedited records. Before it, targeted revision 2026-11-01 for PRD revision 36 (FR-36: one base tracked at two floors): Story 6.4 appended to Epic 6. Before it, targeted revision 2026-11-01 for PRD revision 35, spine revision 46, EXPERIENCE.md revision 33 and DESIGN.md revision 23 (the Pick-up Filter): FR inventory to 37, UX-DR54 to UX-DR60 added, Epic 6 appended with three stories. Epics 1 to 5 are unedited records. Before it, targeted revision 2026-10-23 for weights contract 7.0.0 and spine revision 39 (blocking mod tags): Epic 5 appended with one story. Epics 1 to 4 are unedited records. Before it, targeted revision 2026-10-09 for PRD revision 27 and the Rarity Dark redesign (UX revision 24, DESIGN revision 19): FR inventory to 34, thirteen FR titles retitled, retired-direction UX-DRs marked superseded, Epic 4 appended. Epics 1 to 3 are unedited records. Before it, targeted revision 2026-09-27 of Story 3.6 and the weights-contract citations for spine revision 23 (AD-10 folds Provenance per (itemClass, recipe) pair; contract 6.1.0) and PRD revision 23. Before it, targeted revision 2026-09-27 of Epic 2 and Stories 2.7 and 2.8 (epic 2 retro item 19) for the committed weights.json 6.0.0 with recipes.json published with no recipe, which the masthead dek explains. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
 inputDocuments:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md
@@ -23,7 +23,7 @@ This document holds the complete epic and story breakdown for PoE2 Crafting Base
 
 ### Functional Requirements
 
-`prd.md` §4 numbers thirty-seven functional requirements globally, contiguous from FR-1 to FR-37. A heading marked *Architecture-owned* keeps its acceptance conditions in the cited AD. The PRD does not hold them. Titles below follow PRD revision 27, and FR-35 to FR-37 follow PRD revision 35. FR-34 belongs to Epic 3 and is built. FR-35 to FR-37 belong to Epic 6.
+`prd.md` §4 numbers thirty-eight functional requirements globally, contiguous from FR-1 to FR-38. A heading marked *Architecture-owned* keeps its acceptance conditions in the cited AD. The PRD does not hold them. Titles below follow PRD revision 27, FR-35 to FR-37 follow PRD revision 35, and FR-29 and FR-38 follow PRD revision 38. FR-34 belongs to Epic 3 and is built. FR-35 to FR-37 belong to Epic 6. FR-38 belongs to Epic 7.
 
 FR-1: Rank by threshold-truncated expected value (AD-17, AD-4)
 FR-2: Render Chase Combinations on each collapsed row (AD-17)
@@ -53,7 +53,7 @@ FR-25: Publish a structured Sync Report, and make a sync problem visible without
 FR-26: Compute Craft Cost in valuation, from synced rates (AD-3, AD-17, AD-20, §9)
 FR-27: Consume a schema-conformant Weights File and never produce one — *Architecture-owned* (AD-11)
 FR-28: Enforce the pool-completeness contract in both directions (AD-11, AD-17, AD-10)
-FR-29: Derive probabilities from the Weights File scoped to the entry's floor — *Architecture-owned* (AD-17, §1, §2.4, §2.5)
+FR-29: Derive probabilities from the Weights File scoped to the Crafting Item Level — *Architecture-owned* (AD-17, §1, §2.4, §2.5)
 FR-30: Depend on an externally produced Weights File as a v1 prerequisite (AD-11, AD-24, AD-27)
 FR-31: Refuse to value an observation from a different league (AD-19, AD-20)
 FR-32: Validate the configured league against the live leagues endpoint — *Architecture-owned* (AD-19, AD-12, AD-7)
@@ -62,6 +62,7 @@ FR-34: Price Hybrid Modifiers and summed Stat Lines as the player reads them (AD
 FR-35: Generate a Pick-up Filter from the current ranking (AD-31, AD-15, AD-24, AD-4)
 FR-36: Name each base worth picking up, and what it is for (AD-31, AD-17)
 FR-37: Tell the three purposes apart on the ground (AD-31)
+FR-38: Choose the Crafting Item Level (AD-17, AD-4)
 
 **Superseded UX design requirements.** UX-DR1–6, 11–17, 21, 24, 30, 32 and 36 below describe the retired paper direction. `EXPERIENCE.md` revision 24 and `DESIGN.md` revision 19 supersede them. Epics 1 to 3 shipped against them and stay unedited as records. Epic 4 acceptance cites `EXPERIENCE.md` state numbers and copies no string or threshold.
 
@@ -343,7 +344,7 @@ FR-25: Epic 1 — the structured Sync Report
 FR-26: Epic 3 — Craft Cost and the Craft Recipe control
 FR-27: Epic 3 — consuming a schema-conformant Weights File
 FR-28: Epic 3 — the pool-completeness contract, both halves
-FR-29: Epic 3 — probabilities scoped to the entry's floor
+FR-29: Epic 3 — probabilities scoped to the Crafting Item Level
 FR-30: Epic 3 — the external Weights File as a v1 prerequisite. Its no-weights-file world is Epic 2's shipped state, and Epic 2 renders it
 FR-31: Epic 2 — refusing to value an observation from another league
 FR-32: Epic 1 — validating the configured league before the run spends budget
@@ -352,10 +353,13 @@ FR-34: Epic 3 — Hybrid Modifier and summed Stat Line pricing, built
 FR-35: Epic 6 — the Pick-up Filter generated from the ranking on screen, offline, as a player-started download
 FR-36: Epic 6 — each base's one purpose under the current dial
 FR-37: Epic 6 — the three treatments on the ground
+FR-38: Epic 7 — the Crafting Item Level the player chooses, and the crafted ranking that follows it
 
 Epic 4 restyles and re-words the treatment of FR-3, FR-6 to FR-13, FR-18, FR-24, FR-25 and NFR-10 for the Rarity Dark redesign. It adds no FR and changes no ownership above. A story inside Epic 4 owns the changed treatment, and the owning epic above keeps the FR.
 
 Epic 5 corrects the probability term behind FR-1 and adds a cross-file failure under FR-4's third cause. It adds no FR and changes no ownership above.
+
+Epic 7 changes the probability scope behind FR-1, FR-16, FR-22, FR-26, FR-29 and FR-36. Their owning epics keep them.
 
 ## Epic List
 
@@ -471,6 +475,26 @@ After the pre-session read, the player downloads an in-game item filter built fr
 **Depends on:** Epics 2 and 3, for the raw branch, EV under the dial, the Item Level Floor and the recipe states. It adds no artifact and no external dependency.
 
 **Standalone:** yes. It adds one header control and one modal, and changes no ranking, no sync behaviour and no artifact.
+
+### Epic 7: League-start crafting levels
+
+The player chooses the item level he crafts at, and the crafted ranking follows it. At league start he reads which Item Classes are worth crafting on the bases he can get, not on the bases only the endgame gives. A greater or perfect recipe is valued on the modifiers the game really lets it roll.
+
+**FRs covered:** FR-38
+
+**FRs retouched:** FR-1, FR-16, FR-22, FR-26, FR-29, FR-36 (ownership stays with Epics 3 and 6)
+
+**Also delivers:**
+  - the recipe floor per modifier after the level scope, and the reach verdict per `(entry, recipe, L)`, in `core`
+  - a declared Item Level Floor per crafted entry, with the shared-floor rule removed
+  - a regenerated `data/tracked.json` that tracks T1 and T2 as separate entries
+  - `{components.level-toggle}`, Interaction 1b, state 48 and the expansion panel's not-counted group, with the retirement of state 36
+
+**NFRs addressed:** NFR-1, NFR-3, NFR-5, NFR-6, NFR-10
+
+**Depends on:** Epics 3, 4 and 6, for the crafted EV, the recipe floor and reach, the header bar and the pick-up purpose. It adds no external dependency. **Deadline:** the league start of 2026-12-11.
+
+**Standalone:** yes. It adds one header control, changes no sync behaviour and changes no artifact schema.
 
 ## Epic 1: Foundations and the Background Sync
 
@@ -3068,6 +3092,212 @@ So that a high-item-level drop never shows the purpose of a cheaper tier.
 **Given** the change is done
 **When** the branch lands
 **Then** tests of this rule replace the open-case pinning test in `filter-text.test.ts`, and the last commit of the branch removes the two FR-36 entries from `docs/stories/deferred-work.md`.
+
+**Given** the change is done
+**When** `pnpm check` runs
+**Then** it passes, and no test makes a network call (NFR-1).
+
+## Epic 7: League-start crafting levels
+
+The player chooses the item level he crafts at, and the crafted ranking follows it. At league start he reads which Item Classes are worth crafting on the bases he can get, and a greater or perfect recipe is valued on the modifiers the game really lets it roll. The epic builds on Epics 3, 4 and 6, adds one header control, and changes no sync behaviour and no artifact schema.
+
+**Source of truth.** PRD revision 38 holds FR-38, the revised FR-1, FR-16, FR-22, FR-26, FR-29 and FR-36, and the Glossary entries *Item Level Floor*, *Crafting Item Level*, *Accepted Tier* and *Eligible Pool*. `ARCHITECTURE-SPINE.md` revision 47 holds AD-17: the scope to the Crafting Item Level, the recipe floor per modifier, the highest tier, the reach verdict per `(entry, recipe, L)` and edge alignment. It also holds AD-5, the floor that each entry declares. `AGENT-WORKFLOW.md` holds the `unreachable` rule of `pnpm tracked:check` and the rule for edits to `data/tracked.json` (*Parallel worktrees*). The `tracked-json` skill holds the curation steps. `EXPERIENCE.md` revision 34 holds Interaction 1b, state 48, the retired state 36, the Copy Deck *Header, list and tooltips*, *The expansion* and *What survives a reload*. `DESIGN.md` revision 24 holds `level-toggle` and the header layout. Every acceptance criterion cites these documents and copies no rule or string.
+
+**Deadline.** The next league starts on 2026-12-11. The four stories land before it.
+
+**Order.** 7.1, then 7.2, then 7.3, then 7.4. Each story is green under `pnpm check` on its own. 7.1 changes only the recipe floor and the reach verdict, so it can land alone, and it corrects the perfect-recipe EVs at once. 7.2 adds the Crafting Item Level to `core` and adds no UI. 7.3 changes only `data/tracked.json`. 7.4 is the first story the player sees.
+
+### Story 7.1: The recipe floor per modifier, after the level scope
+
+As the player,
+I want a greater or perfect recipe valued on every modifier the game lets it roll at my item level,
+So that a recipe's EV never drops a tier that the game can roll.
+
+**Note.** Story 4.7 built the recipe floor per `modGroup`, applied before the item-level scope. This story corrects that rule to the one AD-17 and FR-26 state now. Story 4.7 stays unedited as a record. Until Story 7.2 adds the Crafting Item Level to `rank`, the ranking passes each entry's own floor as the scope, so this story is green on its own.
+
+**Acceptance Criteria:**
+
+**Given** a pool, a Craft Recipe and a level that the caller passes in
+**When** `core` builds the eligible pool
+**Then** it scopes the pool to the level first, then applies the recipe floor to each modifier of each slot on its own, then renormalises, all in the order AD-17 states and before exclusion and containment
+**And** a modifier is the unit that AD-17 defines, so two modifiers of one `modGroup` are floored apart, and `modGroup` takes part only in the exclusivity rule (AD-17; FR-26).
+
+**Given** a modifier with no tier at or above the floor among the tiers that roll at the level
+**When** `core` applies the floor
+**Then** the floor does not remove the modifier, and its highest tier that rolls at the level stays at its own weight (FR-26; AD-17).
+
+**Given** a modifier whose top tier is above the level
+**When** `core` applies the floor
+**Then** its highest tier is its best tier at or below the level, also when that tier is below the floor (AD-17).
+
+**Given** a Wand fixture at the lower Crafting Item Level that FR-38 offers, under the perfect recipe
+**When** `core` computes the reach verdict and the probability of an entry on the T2 tier of `+# to Level of all Cold Spell Skills`
+**Then** the entry is reachable and its probability is above zero, as the player confirmed in game
+**And** at the higher offered level the same entry is not reachable under the perfect recipe (FR-26).
+
+**Given** a `modifierLevelMin` of `0`
+**When** `core` applies the floor
+**Then** nothing changes, through the same code path.
+
+**Given** an `(entry, recipe, L)` triple
+**When** a caller asks whether the recipe can reach the entry
+**Then** `core` returns the reach verdict for that triple, and the `reached` flag of `pnpm tracked:lookup tiers` uses the same verdict (AD-17).
+
+**Given** an entry that a recipe cannot reach at the scope
+**When** `core` ranks that `(itemClass, recipe)` pair
+**Then** the entry is not a summand, the pair still ranks, and the entry is neither a defect nor a reason for unrankability (AD-17; FR-26)
+**And** `core` no longer has the recipe-unreachable unrankable reason, and `web` no longer has a path that renders it (`EXPERIENCE.md` state 36, retired with its number kept; FR-4).
+
+**Given** an augment left with no eligible entry, or a slot whose pool is empty
+**When** `core` ranks that `(itemClass, recipe)` pair
+**Then** the pair is still unrankable, under its own reason, because the story removes only the unreachable-entry cause from `RECIPE_UNREACHABLE` in `packages/core/src/rank.ts` (AD-17; FR-4).
+
+**Given** the Tracked List
+**When** `pnpm tracked:check` or `pnpm test:data` runs
+**Then** `unreachable` lists only the crafted entries that no recipe reaches at any Crafting Item Level that FR-38 offers, `tracked:check` exits non-zero only while that list is non-empty, and `test:data` fails on the same list (`AGENT-WORKFLOW.md`)
+**And** the offered levels come from one place in the code, which the callers of `rank` read as well from Story 7.2
+**And** the `unreachable` rule of the `tracked-json` skill agrees with what the command does.
+
+**Given** a fixture with a modifier that has a tier at or above the floor, a modifier whose highest tier at the level is below the floor, a modifier whose top tier is above the level, and two modifiers that share one `modGroup`
+**When** `core` computes the perfect-recipe probabilities
+**Then** they match the per-modifier rule of AD-17.
+
+**Given** the change is done
+**When** `pnpm check` runs
+**Then** it passes, no test makes a network call (NFR-1), and `pnpm tracked:check` exits 0 on the committed `data/tracked.json`.
+
+### Story 7.2: Per-entry floors and the Crafting Item Level in `core`
+
+As the player,
+I want the crafted ranking scoped to the item level I craft at, with each entry counted only when its floor is at or below that level,
+So that the ranking values each Item Class for the bases I can really get.
+
+**Note.** This story supersedes the shared-floor wording in the criteria of Stories 6.1 and 6.4. Those stories stay unedited as records. `contracts` enforces the shared-floor rule at load today, in `packages/contracts/src/envelopes/tracked-file-checks.ts`, so this story touches `contracts` as well as `core`. The `contracts` change lands alone and first, and the `core` and `web` work rebases onto it (`AGENT-WORKFLOW.md`, *Parallel worktrees*).
+
+**Acceptance Criteria:**
+
+**Given** a Tracked List whose crafted entries on one Item Class declare different Item Level Floors
+**When** `contracts` loads it and any shell runs the cross-file checks
+**Then** it loads and passes, because no rule makes the crafted entries of one Item Class share one floor (AD-5, AD-17; FR-16, FR-22).
+
+**Given** two crafted entries on one Item Class with different floors, a hybrid among them
+**When** the overlap check runs
+**Then** the pair is still checked, and `pairOverlap` in `packages/core/src/cross-file.ts` no longer skips it because the floors differ
+**And** the pair is evaluated at the highest offered Crafting Item Level, because the pool only grows with the level, so that verdict holds at every level (AD-17; FR-16).
+
+**Given** a Crafting Item Level passed in as a value
+**When** `core` ranks the crafted branch
+**Then** every crafted EV of each `(itemClass, recipe)` pair is scoped to that level, and an entry whose floor is above the level is not a summand in FR-1's sense (FR-38, FR-1, FR-29; AD-17)
+**And** the level enters `rank` only as a passed-in value, so equal inputs give an equal ranking (NFR-3; AD-1).
+
+**Given** a Raw Base
+**When** `core` ranks at either offered level
+**Then** its price is the same at both levels, scoped to its own floor (FR-38, FR-3; AD-16).
+
+**Given** an Item Class with no crafted entry that counts at the level
+**When** `core` ranks it
+**Then** the class is treated as one with no priced Combination (FR-38, FR-1, FR-9).
+
+**Given** a crafted entry
+**When** the edge-alignment check runs
+**Then** it runs at the entry's own floor, and it gives the same verdict at every offered level (AD-17).
+
+**Given** the read-time ranking at a level, and the Tracked List
+**When** `core`'s purpose function runs
+**Then** each purpose uses the EV of its Item Class at that level, and each drop qualifies at its Raw Base's own floor whatever the level (FR-36, FR-38; AD-31)
+**And** a jewel kind qualifies at the lowest floor among the non-pruned crafted entries of its Item Class (FR-36)
+**And** the rule that Story 6.4 built for one base tracked at two floors still holds (FR-36).
+
+**Given** the committed `data/` at the start of this story and the higher offered level
+**When** the filter text is generated
+**Then** a block may differ from the text that the code before this story generates only where an Item Class whose crafted floors are below that level changes EV under the new scope (FR-36, FR-38; AD-17)
+**And** the story report lists every changed block with its cause
+**And** the story updates the golden text in the same change, so equal inputs give the new golden text again (NFR-3; FR-35).
+
+**Given** the page before Story 7.4
+**When** `web` calls `rank` and the purpose function
+**Then** it passes the first-visit level that `EXPERIENCE.md` *What survives a reload* sets.
+
+**Given** the change is done
+**When** `pnpm check` runs
+**Then** it passes, and no test makes a network call (NFR-1).
+
+### Story 7.3: Regenerate `tracked.json` for T1 and T2
+
+As the player,
+I want each Combination tracked once per tier worth chasing, with its own floor,
+So that a crafted Item Class still ranks at the league-start level.
+
+**Note.** This story edits `data/tracked.json` and no code of the app. The agent edits the file as `AGENT-WORKFLOW.md` *Parallel worktrees* sets, and follows the `tracked-json` skill.
+
+**Acceptance Criteria:**
+
+**Given** the committed `data/tracked.json` and `data/weights.json`
+**When** the regeneration runs
+**Then** each active crafted entry whose band spans more than one tier is replaced by entries that each have one Accepted Tier (FR-22)
+**And** where a modifier's tier 1 first appears above the lower Crafting Item Level that FR-38 offers, its T2 sibling is tracked as well, and where both affixes qualify all four pairings are tracked (FR-22)
+**And** each entry declares its own floor by the skill's *The floor rule* (FR-22; AD-5).
+
+**Given** the regeneration
+**When** it writes `data/tracked.json`
+**Then** a script derives every entry from `core`'s `needs` and the tier ranges of the Weights File, so no floor and no band is typed by hand
+**And** the script is not app code, and no app package writes the file (AD-3; NFR-5).
+
+**Given** a span entry that its per-tier entries replace
+**When** the regeneration writes the file
+**Then** it deletes the span entry and does not prune it, because a split span is not a dead Combination and a tombstone would mislead the curator
+**And** the commit message names the deletion as an exception to the prune tombstone of the `tracked-json` skill (FR-15), as Story 5.1 did.
+
+**Given** the Raw Bases of the Tracked List
+**When** the regeneration runs
+**Then** each Raw Base is unchanged (FR-3, FR-38).
+
+**Given** the regenerated file
+**When** `pnpm tracked:check` runs
+**Then** it exits 0, no entry is listed under `unreachable`, and no two active entries overlap (FR-16; `AGENT-WORKFLOW.md`).
+
+**Given** the regeneration is done
+**When** the agent reports
+**Then** the report names `data/tracked.json`, the change and the reason, as *Parallel worktrees* requires
+**And** it states the active crafted row count, read from the file and not copied from a planning document, the time of a full refresh rotation at the sync's request budget against UJ-6, and the time of one full ranking pass against NFR-6
+**And** where the rotation time misses UJ-6, the curator decides which rows to prune, and the story prunes none on its own.
+
+**Given** the change is done
+**When** `pnpm check` and `pnpm test:data` run
+**Then** both pass, and no test makes a network call (NFR-1).
+
+### Story 7.4: The item-level toggle
+
+As the player,
+I want to switch the item level I craft at from the header,
+So that at league start and in the endgame the list ranks for the bases I hold.
+
+**Acceptance Criteria:**
+
+**Given** the page at rest
+**When** it renders the header bar
+**Then** `{components.level-toggle}` sits where `EXPERIENCE.md` *Information Architecture* places it, with the strings of the Copy Deck *Header, list and tooltips*, in the look that `DESIGN.md` `level-toggle` sets, and the header bar never grows a second line (FR-38).
+
+**Given** the toggle
+**When** the player switches the level
+**Then** the page behaves as `EXPERIENCE.md` Interaction 1b and state 48 state, and the re-rank fits NFR-6's budget on the committed Tracked List (FR-38; AD-4)
+**And** the page makes no request, which the test setup's unhandled-request callback proves.
+
+**Given** an open row at a level
+**When** the expansion panel renders
+**Then** the entries that do not count at that level, by floor or by reach under the active recipe, come last behind the not-counted group, as `EXPERIENCE.md` *The expansion* states (FR-8, FR-38; AD-17).
+
+**Given** a chosen level
+**When** the player reloads the page
+**Then** the level and the recipe come back as `EXPERIENCE.md` *What survives a reload* states, a first visit shows the recipe and the level it names, and a storage access that throws leaves the page working at those first-visit values (FR-7, FR-38; AD-15).
+
+**Given** a switch of level, then a filter download
+**When** the page generates the filter
+**Then** it uses the purposes at the level on screen (FR-36, FR-38; `EXPERIENCE.md` Interaction 9).
+
+**Given** the built page on `pnpm dev`
+**When** an agent checks it with the agent-browser skill in a named session
+**Then** the header with the toggle matches `DESIGN.md` `level-toggle` and the header layout at the page's frame width, and colour alone carries no distinction (NFR-10).
 
 **Given** the change is done
 **When** `pnpm check` runs
