@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 47
+revision: 48
 created: '2026-09-12'
 updated: '2026-11-14'
 binds: []
@@ -1279,12 +1279,15 @@ never import each other.
   not run and nothing is lost: AD-24's day-one state makes every crafted entry unrankable
   already, and AD-16 still builds every crafted search without consulting that file (AD-5).
 
-  Edge alignment is evaluated at the entry's own `itemLevelMin`, which is independent of
-  `L`, so the check gives one verdict whatever level the player chooses. **"Under the scope"
-  in the checks table means that scope for every check but one**: a hybrid `coOccur` pair
-  whose two entries declare different floors is evaluated at the highest offered Crafting
-  Item Level (`prd.md` FR-38), where both entries count and the pool is widest. Neither
-  scope is the player's `L`: the `sync` gate runs with no `L`. **Edge alignment is therefore not a general bound
+  **"Under the scope" in the checks table is one of two fixed levels, chosen per check so
+  that one verdict holds at every offered Crafting Item Level (`prd.md` FR-38).** The pool
+  only gains tiers as the level rises. **Edge alignment, the empty containment set and the
+  co-rollable combination are evaluated at the entry's own `itemLevelMin`**: a wider pool
+  cannot undo a pass of theirs. **`coOccur` (every hybrid pair, whatever the two floors),
+  line-set completeness and kind agreement are evaluated at the highest offered Crafting
+  Item Level**: each searches the pool for a violating tier, and a tier present at a lower
+  level is present there too. Neither scope is the player's `L`: the `sync` gate runs with
+  no `L`. **Edge alignment is therefore not a general bound
   on containment's loss** — it tests a band only against its own containment set, and the
   shapes that escape it are AD-11's accepted residual (FR-29).
 
