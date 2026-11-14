@@ -1,4 +1,4 @@
-import { canonicalKey } from '@poe/contracts';
+import { canonicalKey, compareCanonicalKeys } from '@poe/contracts';
 import type { CraftedRankedRow, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
@@ -112,6 +112,21 @@ describe('rank: the Crafting Item Level scopes the crafted branch (FR-38, FR-1; 
     expect(row?.summands.map((summand) => summand.probability)).toEqual([probabilityAt(low, 82), probabilityAt(mid, 82)]);
     expect(probabilityAt(low, 82)).not.toBe(probabilityAt(low, 75));
     expect(probabilityAt(mid, 82)).not.toBe(probabilityAt(mid, 79));
+  });
+
+  it('takes the numeric lowest floor for the row’s itemLevelMin, though the canonically first entry is higher (FR-36)', () => {
+    const nine = atFloor(chase('Bows'), 9);
+    const seventyFive = atFloor(chase('Bows', FILLER), 75);
+    // Canonical keys compare floors as text, so "75" sorts before "9".
+    expect(compareCanonicalKeys(canonicalKey(seventyFive), canonicalKey(nine))).toBeLessThan(0);
+    expect(rowAt(79, [nine, seventyFive]).ranked?.itemLevelMin).toBe(9);
+  });
+
+  it('folds the provenance at `L`, not at an entry’s floor (AD-10, AD-17)', () => {
+    const prior = { ...tierOf('explicit.stat_prior', 10, 80), weightSource: 'absent' as const };
+    const weights = poolsFile(['weapon.bow', 'Bows', [[...POOLS[0], prior], POOLS[1]]]);
+    expect(rowAt(79, [low], undefined, weights).ranked?.provenance).toBe('measured');
+    expect(rowAt(82, [low], undefined, weights).ranked?.provenance).toBe('uniform-prior');
   });
 
   it('gives deep-equal results for equal inputs, `craftingItemLevel` included (NFR-3)', () => {

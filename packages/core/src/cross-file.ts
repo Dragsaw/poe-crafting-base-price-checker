@@ -281,7 +281,6 @@ function pairOverlap(left: Keyed, right: Keyed, scopeOf: ScopeOf): string | unde
     return undefined;
   }
   const isSameFloor = right.entry.itemLevelMin === left.entry.itemLevelMin;
-  // The pool only grows with the level, so the highest offered level's verdict holds at every level (AD-17).
   const [where, level] = isSameFloor ? ['floor', left.entry.itemLevelMin] : ['item level', HIGHEST_CRAFTING_ITEM_LEVEL];
   const branches = overlapBranches(left.entry, right.entry, scopeOf(level).coOccur);
   return branches === undefined ? undefined : `at ${where} ${String(level)} on ${describeOverlap(branches)}`;

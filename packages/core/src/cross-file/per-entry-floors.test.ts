@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { CRAFTING_ITEM_LEVELS } from '../crafting-item-level.ts';
 import { rank } from '../rank.ts';
-import { band, bows, byCodeUnit, entry, failuresOf, line, OTHER, pools, STAT, T7, T8, tier } from './test-support.ts';
+import { band, bows, byPair, entry, failuresOf, line, OTHER, pools, STAT, T7, T8, tier } from './test-support.ts';
 
 const bandLine = (statId: string, valueMin: number, valueMax: number): HybridLine => ({ statId, valueMin, valueMax });
 
@@ -25,12 +25,18 @@ describe('crossFileChecks: per-entry floors (AD-5, AD-17; FR-16)', () => {
     const pure = tier([line(STAT, [30, 40])]);
     const hybridEntry = entry({ prefix: { kind: 'hybrid', lines: [bandLine(STAT, 30, 40), bandLine(OTHER, 100, 150)] } }, { itemLevelMin: 75 });
     const singleEntry = entry({ prefix: band(30, 40) });
-    const coOccurs = failuresOf([hybridEntry, singleEntry], bows(pools([hybrid, pure]))).filter(
-      (failure) => failure.check === 'co-occur',
+    const failures = failuresOf([hybridEntry, singleEntry], bows(pools([hybrid, pure])));
+    // The hybrid's own-floor check sees no tier at 75; the single band reaches the hybrid tier, as in hybrid-references.
+    expect(failures.map((failure) => [failure.check, failure.entryKey]).toSorted(byPair)).toEqual(
+      [
+        ['co-occur', canonicalKey(hybridEntry)],
+        ['empty-containment-set', canonicalKey(hybridEntry)],
+        ['co-occur', canonicalKey(singleEntry)],
+        ['line-set-completeness', canonicalKey(singleEntry)],
+      ].toSorted(byPair),
     );
-    expect(coOccurs.map((failure) => failure.entryKey).toSorted(byCodeUnit)).toEqual(
-      [canonicalKey(hybridEntry), canonicalKey(singleEntry)].toSorted(byCodeUnit),
-    );
+    expect(failures.find((failure) => failure.check === 'empty-containment-set')?.detail).toContain('at floor 75');
+    const coOccurs = failures.filter((failure) => failure.check === 'co-occur');
     for (const failure of coOccurs) {
       expect(failure.detail).toContain(`at item level ${String(Math.max(...CRAFTING_ITEM_LEVELS))}`);
     }

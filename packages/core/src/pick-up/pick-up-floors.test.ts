@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest';
 
 import { pickUpPurposes } from './pick-up.ts';
 import type { PickUpEntry } from './pick-up.ts';
-import { BOWS_POOLS, chase, FILLER, GREATER, permute, poolsFile, priced, published, rankCrafted, TARGET } from '../rank/test-support.ts';
+import type { CraftingItemLevel } from '../crafting-item-level.ts';
+import { BOWS_POOLS, chase, FILLER, GREATER, permute, poolsFile, priced, published, rankCrafted, SUFFIX_STAT, TARGET, tierOf } from '../rank/test-support.ts';
 import { B, BOW_CLASS_FLOOR, BOW_RAW_FLOOR, checkRolls, classRow, purposesOf, rawBase, rawRow, RECIPE, unranked, white } from './test-support.ts';
 
 const atFloor = (itemLevelMin: number, status: TrackedEntry['status'] = 'active'): RawTrackedEntry => ({
@@ -12,6 +13,9 @@ const atFloor = (itemLevelMin: number, status: TrackedEntry['status'] = 'active'
 });
 
 const craftedAt75 = (entry: TrackedEntry): TrackedEntry => ({ ...entry, itemLevelMin: 75 });
+
+/** Bows tiers at floor 1 only, so every offered level ranks the class. */
+const ALL_LEVELS = poolsFile(['weapon.bow', 'Bows', [[tierOf(TARGET, 10)], [tierOf(SUFFIX_STAT, 10)]]]);
 
 const HIGH_FLOOR = 86;
 const ITEM_LEVELS = Array.from({ length: 100 }, (_, index) => index + 1);
@@ -113,5 +117,30 @@ describe('pickUpPurposes through rank: per-entry crafted floors (FR-36, FR-38; A
     expect(pickUpPurposes({ ranking, tracked, recipeId: RECIPE })).toEqual([
       { baseTypeId: 'Emerald', rarity: 'magic', itemLevelMin: 75, purpose: 'check-rolls' },
     ]);
+  });
+
+  it('reads the class EV at the Crafting Item Level (FR-36, FR-38): an entry at 82 gives no craft purpose at 79', () => {
+    const top = chase('Bows');
+    const base = atFloor(75);
+    const tracked = [top, base];
+    const dataset = [published(top, priced(30)), published(base, priced(1))];
+    const at = (craftingItemLevel: CraftingItemLevel): readonly PickUpEntry[] =>
+      pickUpPurposes({ ranking: rankCrafted({ tracked, dataset, weights: ALL_LEVELS, recipes: [GREATER], craftingItemLevel }), tracked, recipeId: RECIPE });
+    expect(at(79)).toEqual([white('sell-raw', 75)]);
+    expect(at(82)).toEqual([white('craft', 75), checkRolls(75)]);
+  });
+
+  it('emits no jewel kind entry when every crafted entry is above the Crafting Item Level', () => {
+    const top = chase('Emerald', TARGET, 'active', 'jewel');
+    const tracked = [top];
+    const weights = poolsFile(['jewel', 'Emerald', [[tierOf(TARGET, 10)], [tierOf(SUFFIX_STAT, 10)]]]);
+    const at = (craftingItemLevel: CraftingItemLevel): readonly PickUpEntry[] =>
+      pickUpPurposes({
+        ranking: rankCrafted({ tracked, dataset: [published(top, priced(30))], weights, recipes: [GREATER], craftingItemLevel }),
+        tracked,
+        recipeId: RECIPE,
+      });
+    expect(at(79)).toEqual([]);
+    expect(at(82)).toEqual([{ baseTypeId: 'Emerald', rarity: 'magic', itemLevelMin: 82, purpose: 'check-rolls' }]);
   });
 });
