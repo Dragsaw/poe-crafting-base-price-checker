@@ -100,3 +100,10 @@ deferred: []
 3. **Filter download:** open the filter modal and generate the filter. Expected: the modal shows no error and the text names drops. Take a screenshot.
 
 ## Implementation Notes
+
+- Commits: `b5c74e9` (`contracts`, alone and green) and `4d75923` (`core` and `web`). `pnpm check` passed after each. `pnpm tracked:check` exits 0.
+- `HIGHEST_CRAFTING_ITEM_LEVEL` (`Math.max(...CRAFTING_ITEM_LEVELS)`) sits in `crafting-item-level.ts`. `pairOverlap` names it as `at item level 82`. A same-floor pair keeps `at floor N`.
+- `scanSummands` gets a constant `{ ok: true, p: 0 }` for an entry above `L`, so `combinationProbability` never runs for it. Provenance folds once at `L`.
+- Golden (task 9): at `L` 82, the greater and perfect filter texts for the committed `data/` are byte-identical to `before/`. No block changed. The six classes with crafted floors below 82 each have one floor, and no purpose flipped under the new scope. The old-versus-new EV figures were not measured.
+- The synthetic golden in `filter-text.test.ts` changes one block: Solar Amulet (Raw Base floor 75, class floor 82), `Rarity Magic`, `ItemLevel >= 82` becomes `>= 75`. Cause: check-rolls now qualifies at the Raw Base's own floor (FR-36).
+- Agent browser checks: perfect list, Emerald expansion (230 more combinations, EV `0.22`) and the filter modal all render with no page error. The download did not run under agent-browser (it was canceled). The filter text was checked through the golden diff above instead.
