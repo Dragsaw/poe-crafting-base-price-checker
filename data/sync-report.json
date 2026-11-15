@@ -1,18 +1,18 @@
 {
-  "runStartedAt": "2026-11-15T21:46:49.839Z",
-  "runFinishedAt": "2026-11-15T21:46:54.904Z",
+  "runStartedAt": "2026-11-15T22:59:58.208Z",
+  "runFinishedAt": "2026-11-15T23:00:06.953Z",
   "figures": {
     "requestsBySource": {
-      "tracked-list": 561,
+      "tracked-list": 218,
       "league-validation": 1,
       "session-probe": 1
     },
-    "notReachedCount": 223,
+    "notReachedCount": 2834,
     "coverage": 1,
     "rankableClassCount": 40,
     "trackedListEditedAt": {
       "source": "git-author-date",
-      "at": "2026-10-31T14:52:36.000Z"
+      "at": "2026-11-15T13:14:31.000Z"
     }
   },
   "records": [
