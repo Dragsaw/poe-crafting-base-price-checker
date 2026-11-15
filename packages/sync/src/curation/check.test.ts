@@ -166,7 +166,7 @@ describe('checkTracked', () => {
     expect(report.checks).toContainEqual({ check: 'cross-file', status: 'failed' });
     expect(report.issues).toHaveLength(1);
     expect(report.issues[0]).toMatchObject({ check: 'cross-file', path: 'entries.1' });
-    expect(report.issues[0]?.message).toContain(`edge-alignment: prefix ${PREFIX_STAT} band [0, 9999] at floor 75`);
+    expect(report.issues[0]?.message).toContain(`edge-alignment: prefix ${PREFIX_STAT} band [0, 9999] at item level 75`);
     expect(report.issues[0]?.message).toContain('"crafted","accessory.amulet","Amulets",75');
   });
 

@@ -7,7 +7,7 @@ import { formatLine, tierIds } from './reference-text.ts';
 import type { SlotScope } from './slot-scope.ts';
 
 /** Per banded line: the detail when its edges are not the extremes of the contained lines; the lower edge may be an own minimum (AD-17). */
-export function edgeAlignment(slot: Slot, reference: ModifierReference, { scoped, pool }: SlotScope, floor: number): string | undefined {
+export function edgeAlignment(slot: Slot, reference: ModifierReference, { scoped, pool }: SlotScope, level: number): string | undefined {
   const contained = containedIn(reference, scoped, pool);
   if (contained.length === 0) {
     return undefined;
@@ -22,7 +22,7 @@ export function edgeAlignment(slot: Slot, reference: ModifierReference, { scoped
       continue;
     }
     parts.push(
-      `${formatLine(slot, reference, rl)} at floor ${String(floor)}: its edges are not the extremes [${String(min)}, ${String(max)}] (own minimum ${String(ownMin)}) of the tiers it contains (${tierIds(contained)})`,
+      `${formatLine(slot, reference, rl)} at item level ${String(level)}: its edges are not the extremes [${String(min)}, ${String(max)}] (own minimum ${String(ownMin)}) of the tiers it contains (${tierIds(contained)})`,
     );
   }
   return parts.length === 0 ? undefined : parts.join('; ');

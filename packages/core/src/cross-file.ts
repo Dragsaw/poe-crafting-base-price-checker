@@ -21,7 +21,7 @@ import type {
 } from '@poe/contracts';
 
 import { craftedClassesOf } from './crafted-classes.ts';
-import { HIGHEST_CRAFTING_ITEM_LEVEL } from './crafting-item-level.ts';
+import { CRAFTING_ITEM_LEVELS, HIGHEST_CRAFTING_ITEM_LEVEL } from './crafting-item-level.ts';
 import { classDiscriminability } from './cross-file/class-discriminability.ts';
 import { coRollable } from './cross-file/co-rollable.ts';
 import { COMPLETE } from './cross-file/complete-pool.ts';
@@ -156,12 +156,11 @@ export function coOccur(scoped: ScopedPools, pools: WeightsClassPools): CoOccur 
   };
 }
 
-type ReferenceCheck = (slot: Slot, reference: ModifierReference, scope: SlotScope, floor: number) => string | undefined;
+type ReferenceCheck = (slot: Slot, reference: ModifierReference, scope: SlotScope, level: number) => string | undefined;
 
-/** A pass that a wider pool cannot undo: run at the entry's own floor (AD-17). */
+/** A pass that a wider pool cannot undo, since containment reads the level-free own interval: run at the entry's own floor (AD-17). */
 const FLOOR_CHECKS: readonly (readonly [CrossFileCheck, ReferenceCheck])[] = [
   ['empty-containment-set', emptyContainment],
-  ['edge-alignment', edgeAlignment],
 ];
 
 /** A search for a violating tier: run where the pool is widest, so no lower level hides one (AD-17). */
@@ -186,7 +185,7 @@ interface Scope {
   readonly coOccur: CoOccur;
 }
 
-type ScopeOf = (floor: number) => Scope;
+type ScopeOf = (level: number) => Scope;
 
 /** One failure for `(check, entry)`, or none when no part names a problem. */
 function failureOf({ entry, key }: Keyed, check: CrossFileCheck, parts: readonly string[]): CrossFileFailure[] {
@@ -195,17 +194,17 @@ function failureOf({ entry, key }: Keyed, check: CrossFileCheck, parts: readonly
     : [{ check, entryKey: key, categoryId: entry.categoryId, className: entry.className, detail: parts.join('; ') }];
 }
 
-/** One scope per level: an entry's own floor, or the widest level (AD-17). */
+/** One scope per level a check reads: an entry's own floor, an offered level, or the widest level (AD-17). */
 function scopeCache(pools: WeightsClassPools): ScopeOf {
   const scopes = new Map<number, Scope>();
-  return (floor) => {
-    const known = scopes.get(floor);
+  return (level) => {
+    const known = scopes.get(level);
     if (known !== undefined) {
       return known;
     }
-    const scoped = scopedPools(pools, floor);
+    const scoped = scopedPools(pools, level);
     const made = { pools, scoped, coOccur: coOccur(scoped, pools) };
-    scopes.set(floor, made);
+    scopes.set(level, made);
     return made;
   };
 }
@@ -225,19 +224,35 @@ function referenceFailures(keyed: readonly Keyed[], scopeOf: ScopeOf): CrossFile
   const failures: CrossFileFailure[] = [];
   for (const item of keyed) {
     const { entry } = item;
-    const widest = widestLevel(entry.itemLevelMin);
-    for (const [checks, level] of [[FLOOR_CHECKS, entry.itemLevelMin], [WIDEST_CHECKS, widest]] as const) {
-      const { pools, scoped } = scopeOf(level);
+    for (const [checks, level] of [[FLOOR_CHECKS, entry.itemLevelMin], [WIDEST_CHECKS, widestLevel(entry.itemLevelMin)]] as const) {
+      const scope = scopeOf(level);
       for (const [check, run] of checks) {
-        const parts = OVERLAP_SLOTS.map((slot) => run(slot, entry[slot], { scoped: scoped[slot], pool: pools[slot] }, level)).filter((part) => part !== undefined);
-        failures.push(...failureOf(item, check, parts));
+        failures.push(...failureOf(item, check, slotParts(item, run, scope, level)));
       }
     }
+    failures.push(...edgeFailures(item, scopeOf));
     const { pools, scoped } = scopeOf(entry.itemLevelMin);
     const pair = coRollable(entry, scoped, entry.itemLevelMin, pools);
     failures.push(...failureOf(item, 'co-rollable-combination', pair === undefined ? [] : [pair]));
   }
   return failures;
+}
+
+/** Both slots' details of one check at one level; a passing slot adds none. */
+function slotParts({ entry }: Keyed, run: ReferenceCheck, { pools, scoped }: Scope, level: number): string[] {
+  return OVERLAP_SLOTS.map((slot) => run(slot, entry[slot], { scoped: scoped[slot], pool: pools[slot] }, level)).filter((part) => part !== undefined);
+}
+
+/** Edge alignment at the floor and at each offered level above it, until one fails: a wider pool can contain a tier whose interval minimum sits below the band (AD-17). */
+function edgeFailures(item: Keyed, scopeOf: ScopeOf): CrossFileFailure[] {
+  const floor = item.entry.itemLevelMin;
+  for (const level of [floor, ...CRAFTING_ITEM_LEVELS.filter((offered) => offered > floor)]) {
+    const parts = slotParts(item, edgeAlignment, scopeOf(level), level);
+    if (parts.length > 0) {
+      return failureOf(item, 'edge-alignment', parts);
+    }
+  }
+  return [];
 }
 
 /** The highest offered level, or a floor above it, whose own tiers would otherwise go unchecked. */

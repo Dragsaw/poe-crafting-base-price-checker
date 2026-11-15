@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 50
+revision: 51
 created: '2026-09-12'
 updated: '2026-11-15'
 binds: []
@@ -694,6 +694,8 @@ never import each other.
   begins inside the interval of another tier of the same line set in the class's slot pool
   whose `weight` is above 0, its **own interval** begins at the first value the line can
   take above the highest such maximum. So tier N's minimum never meets tier N-1's maximum.
+  **"Below" means lower in value, whatever the two tiers' levels:** a higher-level tier whose
+  interval begins lower keeps the overlap, and the lower-level tier gives it up.
   A weight-0 tier cannot roll, so it narrows no tier; the `weight` read is the entry's own,
   never AD-17's tag exclusion. The slot pool is read unscoped, so a tier has one own
   interval at every Crafting Item Level and under every recipe. Where tiers do not overlap, the own interval is the interval, and a tier whose own
@@ -1292,14 +1294,18 @@ never import each other.
   not run and nothing is lost: AD-24's day-one state makes every crafted entry unrankable
   already, and AD-16 still builds every crafted search without consulting that file (AD-5).
 
-  **"Under the scope" in the checks table is one of two fixed levels, chosen per check so
-  that one verdict holds at every offered Crafting Item Level (`prd.md` FR-38).** The pool
-  only gains tiers as the level rises. **Edge alignment, the empty containment set and the
+  **"Under the scope" in the checks table is a set of levels chosen per check, so that one
+  verdict holds at every offered Crafting Item Level (`prd.md` FR-38).** The pool
+  only gains tiers as the level rises. **The empty containment set and the
   co-rollable combination are evaluated at the entry's own `itemLevelMin`**: a wider pool
-  cannot undo a pass of theirs. **`coOccur` (every hybrid pair, whatever the two floors),
+  cannot undo a pass of theirs. **Edge alignment is evaluated at the entry's own
+  `itemLevelMin` and at every offered Crafting Item Level above it**: a wider pool can undo
+  its pass, because a tier that
+  enters above the floor can be contained by its own interval (AD-11) while its interval
+  begins below the band. **`coOccur` (every hybrid pair, whatever the two floors),
   line-set completeness and kind agreement are evaluated at the highest offered Crafting
   Item Level**, or at a higher floor of the entry or pair: each searches the pool for a
-  violating tier, and a tier present at a lower level is present there too. Neither scope is the player's `L`: the `sync` gate runs with
+  violating tier, and a tier present at a lower level is present there too. No level of any check is the player's `L`: the `sync` gate runs with
   no `L`. **Edge alignment is therefore not a general bound
   on containment's loss** — it tests a band only against its own containment set, and the
   shapes that escape it are AD-11's accepted residual (FR-29).

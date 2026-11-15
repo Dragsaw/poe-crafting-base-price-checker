@@ -32,7 +32,7 @@ describe('edge alignment', () => {
     expect(failure?.entryKey).toBe(canonicalKey(tracked));
     expect(failure?.detail).toContain('prefix');
     expect(failure?.detail).toContain(STAT);
-    expect(failure?.detail).toContain('floor 82');
+    expect(failure?.detail).toContain('item level 82');
   });
 
   it('ignores a contained hybrid entry’s foreign statId line', () => {
