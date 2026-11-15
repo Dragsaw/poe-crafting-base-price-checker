@@ -30,7 +30,7 @@
 #   with its last story, before finish-worktree pushes (AGENT-WORKFLOW.md, Story acceptance)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 11-15-2026 15:42
+last_updated: 11-15-2026 16:16
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -98,5 +98,48 @@ development_status:
   7-5-a-tiers-own-interval-in-core: done
   7-3-regenerate-tracked-json-for-t1-and-t2: done
   7-4-the-item-level-toggle: done
-  epic-7-retrospective: optional
-action_items: []
+  epic-7-retrospective: done
+action_items:
+  - id: "epic-7-retro-item-1-edit-prd-md-uj-6-and-sm-c1-to-the-measur"
+    epic: 7
+    action: "Edit prd.md UJ-6 and SM-C1 to the measured full-refresh time (about 36
+      h with the cookie; measure the no-cookie figure) and refresh PRODUCT.md (D1)"
+    owner: "PM"
+    status: open
+    ref: "docs/stories/epic-7-retro-2026-11-15.md"
+  - id: "epic-7-retro-item-2-make-nextongrid-step-past-a-midpoint-tha"
+    epic: 7
+    action: "Make nextOnGrid step past a midpoint that is not an exact double, with
+      a test for nextOnGrid((0.7+0.1)/2, 1, 2) (ECH-1)"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-7-retro-2026-11-15.md"
+  - id: "epic-7-retro-item-3-rule-whether-weight-0-tiers-take-part-in"
+    epic: 7
+    action: "Rule whether weight-0 tiers take part in the own-interval derivation
+      (AD-11), then fix ownInterval to match with a test (ECH-2)"
+    owner: "architect"
+    status: open
+    ref: "docs/stories/epic-7-retro-2026-11-15.md"
+  - id: "epic-7-retro-item-4-skip-levels-below-the-entry-floor-in-the"
+    epic: 7
+    action: "Skip levels below the entry floor in the tracked:check reach check, with
+      a floor-82 reached-only-at-79 test (ADV-1)"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-7-retro-2026-11-15.md"
+  - id: "epic-7-retro-item-5-commit-an-nfr-6-guard-that-ranks-the-com"
+    epic: 7
+    action: "Commit an NFR-6 guard that ranks the committed tracked.json at both levels
+      and every recipe, warm and cold; take ADV-4 if the margin stays under 10 ms
+      (D2)"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-7-retro-2026-11-15.md"
+  - id: "epic-7-retro-item-6-ledger-adv-2-ech-3-architect-notes-vg-1"
+    epic: 7
+    action: "Ledger ADV-2, ECH-3 (architect notes), VG-1, ADV-3, ADV-5 and B1 (filter-modal
+      lead copy) in deferred-work.md"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-7-retro-2026-11-15.md"
