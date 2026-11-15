@@ -1,9 +1,9 @@
 /*
- * `{components.recipe-toggle}`. The active segment names the current recipe,
- * not an action, so it takes no hover and no pointer.
+ * `{components.recipe-toggle}` and `{components.level-toggle}` segments. The active
+ * segment names the current setting, not an action, so it takes no hover and no pointer.
  */
 
-.fg-recipe-segment {
+.fg-segment {
   display: inline-block;
   margin: 0;
   border: 0;
@@ -12,21 +12,21 @@
   line-height: inherit;
 }
 
-.fg-recipe-segment[data-active] {
+.fg-segment[data-active] {
   background: var(--fg-color-accent-soft);
   color: var(--fg-color-accent);
   cursor: default;
 }
 
-.fg-recipe-segment[data-inactive] {
+.fg-segment[data-inactive] {
   color: var(--fg-color-text-secondary);
   cursor: pointer;
 }
 
-.fg-recipe-segment[data-inactive]:hover {
+.fg-segment[data-inactive]:hover {
   color: var(--fg-color-text);
 }
 
-.fg-recipe-segment[data-inactive]:active {
+.fg-segment[data-inactive]:active {
   background: var(--fg-color-surface-raised);
 }

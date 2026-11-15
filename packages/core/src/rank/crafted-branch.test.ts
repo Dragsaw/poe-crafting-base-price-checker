@@ -226,7 +226,7 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
     expect(orderOf('perfect')).toEqual(['Bows']);
     expect(result.unrankable).toEqual([]);
     expect(result.unpricedCrafted.map((row) => [row.className, row.recipeId, row.trust])).toEqual([
-      ['Staves', 'perfect', { verdict: 'pending', reasons: [{ kind: 'no-prices' }] }],
+      ['Staves', 'perfect', { verdict: 'pending', reasons: [{ kind: 'nothing-counts', itemLevel: 82 }] }],
     ]);
   });
 

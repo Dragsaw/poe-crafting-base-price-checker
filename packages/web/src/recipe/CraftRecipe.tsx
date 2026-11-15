@@ -1,19 +1,12 @@
-import './recipe.css';
-
 import type { JSX } from 'react';
 
 import { DIV_UNIT } from '../shared/product';
-import { colors, headerControls, px, rounded, typeStyle } from '../theme/tokens';
+import { SegmentedGroup } from '../shared/SegmentedGroup';
+import { colors, headerControls, px, typeStyle } from '../theme/tokens';
 
 /** EXPERIENCE.md, Copy Deck: *Recipe* and *Craft Cost*. */
 export const RECIPE_LABEL = 'Orbs';
 export const RECIPE_COST_UNIT = `${DIV_UNIT} / craft`;
-
-/** `{components.recipe-toggle}.segment`: its padding and radius. */
-const SEGMENT_BOX = {
-  padding: `${px(headerControls.segmentPadY)} ${px(headerControls.segmentPadX)}`,
-  borderRadius: rounded.segment,
-} as const;
 
 /** One option: the recipe's id and the one word `recipeWord` derives for it. */
 export interface RecipeOption {
@@ -44,61 +37,13 @@ export function CraftRecipe({ recipe }: { readonly recipe: HeaderRecipe }): JSX.
         {RECIPE_LABEL}
       </span>
       {only === undefined ? (
-        <RecipeOptions options={options} activeId={activeId} onChange={onChange} />
+        <SegmentedGroup name="recipe" label={RECIPE_LABEL} segments={options} activeId={activeId} onChange={onChange} />
       ) : (
         <span data-recipe-word="" style={{ ...typeStyle('control'), color: colors.text }}>
           {only.word}
         </span>
       )}
       <RecipeCostLine cost={cost} />
-    </div>
-  );
-}
-
-function RecipeOptions({
-  options,
-  activeId,
-  onChange,
-}: {
-  readonly options: readonly RecipeOption[];
-  readonly activeId: string;
-  readonly onChange: (recipeId: string) => void;
-}): JSX.Element {
-  return (
-    <div
-      data-recipe-options=""
-      role="group"
-      aria-label={RECIPE_LABEL}
-      style={{
-        ...typeStyle('control'),
-        display: 'inline-flex',
-        background: colors.surface,
-        border: `1px solid ${colors['line-strong']}`,
-        borderRadius: rounded.control,
-        padding: px(headerControls.framePadding),
-      }}
-    >
-      {options.map((option) =>
-        option.id === activeId ? (
-          <span key={option.id} data-recipe-option={option.id} data-active="" aria-current="true" className="fg-recipe-segment" style={{ ...SEGMENT_BOX, fontWeight: 600 }}>
-            {option.word}
-          </span>
-        ) : (
-          <button
-            key={option.id}
-            type="button"
-            data-recipe-option={option.id}
-            data-inactive=""
-            className="fg-recipe-segment"
-            style={SEGMENT_BOX}
-            onClick={() => {
-              onChange(option.id);
-            }}
-          >
-            {option.word}
-          </button>
-        ),
-      )}
     </div>
   );
 }

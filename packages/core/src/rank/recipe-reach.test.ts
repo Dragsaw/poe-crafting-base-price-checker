@@ -23,18 +23,18 @@ describe('rank: the reach verdict per (entry, recipe, L) (AD-17, FR-26)', () => 
       ['perfect', [[canonicalKey(filler), expect.closeTo(10 / 20, 12)]]],
     ]);
     const perfect = rows.find((row) => row.recipeId === 'perfect');
-    expect(perfect?.combinations).toEqual([{ entryKey: canonicalKey(target), trust: { verdict: 'current', reasons: [] } }]);
+    expect(perfect?.combinations).toEqual([{ entryKey: canonicalKey(target), trust: { verdict: 'current', reasons: [] }, notCounted: { kind: 'unreached' } }]);
     expect(perfect?.trust.verdict).toBe('current');
     expect(result.unrankable).toEqual([]);
   });
 
-  it('a pair with nothing counted reads no-prices, even when every entry is broken', () => {
+  it('a pair with nothing counted reads nothing-counts, even when every entry is broken', () => {
     const target = chase('Bows');
     const weights = poolsFile(['weapon.bow', 'Bows', [[tierOf(TARGET, 10, 1, 't'), targetAbove()], [tierOf(SUFFIX_STAT, 10, 1)]]]);
     const result = rankCrafted({ tracked: [target], dataset: [published(target, { state: 'unresolvable' })], weights });
     const perfect = result.unpricedCrafted.find((row) => row.recipeId === 'perfect');
     expect(perfect?.summands).toEqual([]);
-    expect(perfect?.trust).toEqual({ verdict: 'pending', reasons: [{ kind: 'no-prices' }] });
+    expect(perfect?.trust).toEqual({ verdict: 'pending', reasons: [{ kind: 'nothing-counts', itemLevel: 82 }] });
     expect(perfect?.combinations.map((combination) => combination.entryKey)).toEqual([canonicalKey(target)]);
     expect(result.unrankable).toEqual([]);
   });

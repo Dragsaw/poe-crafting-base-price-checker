@@ -31,6 +31,7 @@ function craftedRow(overrides: Partial<ClassDisplayRow> = {}): ClassDisplayRow {
     chase: [[{ text: 'T1 Mana', verbatim: false }]],
     combinations: [],
     pruned: [],
+    notCounted: [],
     ...overrides,
   };
 }

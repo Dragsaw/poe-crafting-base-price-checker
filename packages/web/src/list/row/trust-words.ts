@@ -1,4 +1,4 @@
-import type { PriceTrust, PriceTrustReason } from '@poe/contracts';
+import type { NotCounted, PriceTrust, PriceTrustReason } from '@poe/contracts';
 import { DAY_MS, MINUTE_MS } from '@poe/core';
 
 import type { MarkedVerdict } from '../../marks/marks';
@@ -9,7 +9,7 @@ import { NO_FIGURE_YET } from '../format';
 /** The state words of EXPERIENCE.md *Price trust*. A current price has none. */
 export const VERDICT_WORDS = { rough: 'rough', pending: 'pending', broken: 'broken' } as const;
 
-type FixedReason = Exclude<PriceTrustReason['kind'], 'old' | 'thin' | 'unreliable-share'>;
+type FixedReason = Exclude<PriceTrustReason['kind'], 'old' | 'thin' | 'unreliable-share' | 'nothing-counts'>;
 
 /** *Price trust*'s Raw Base tooltip column and its crafted rules: the reasons that carry no figure. */
 export const FIXED_ROW_REASONS: Readonly<Record<FixedReason, string>> = {
@@ -35,6 +35,9 @@ export function rowReasonWords(reason: PriceTrustReason): string {
     }
     case 'unreliable-share': {
       return `${String(reason.percent)}% of this EV rests on unreliable prices`;
+    }
+    case 'nothing-counts': {
+      return `nothing rolls at ilvl ${String(reason.itemLevel)}`;
     }
     default: {
       return FIXED_ROW_REASONS[reason.kind];
@@ -74,4 +77,17 @@ export function lineReasonWords(reason: PriceTrustReason): string {
 /** An expansion line's trust cell, `<word> · <reason>`, the reasons in `core`'s order. */
 export function lineTrustParts(trust: PriceTrust): TrustParts | undefined {
   return trustParts(trust, lineReasonWords);
+}
+
+/** What a not-counted line's reason names: the active recipe's option word and the Crafting Item Level. */
+export interface NotCountedScope {
+  readonly recipeWord: string;
+  readonly itemLevel: number;
+}
+
+/** A not-counted line's reason, alone in its trust cell (state 49); the floor reason wins when both hold, so `core` marks one. */
+export function notCountedWords(notCounted: NotCounted, { recipeWord, itemLevel }: NotCountedScope): string {
+  return notCounted.kind === 'floor'
+    ? `needs ilvl ${String(notCounted.itemLevelMin)}`
+    : `${recipeWord} orbs can't roll this at ilvl ${String(itemLevel)}`;
 }

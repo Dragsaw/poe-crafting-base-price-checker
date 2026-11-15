@@ -243,7 +243,7 @@ describe('what survives a reload', () => {
       throw new Error('blocked');
     });
     const capture = captureDownloads();
-    await ready();
+    await ready(pickUpWorld(), false);
     openFilterModal();
     expect(nameField().value).toBe('');
     enterName('My');

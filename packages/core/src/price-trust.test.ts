@@ -136,58 +136,66 @@ describe('entryTrust: an entry with no price', () => {
 
 describe('craftedTrust: the ordered rules, first match wins', () => {
   it('uncostable wins over every entry being broken', () => {
-    expect(craftedTrust({ uncostable: true, entries: [{ trust: BROKEN }, { trust: BROKEN }] })).toEqual({
+    expect(craftedTrust({ uncostable: true, itemLevel: 82, entries: [{ trust: BROKEN }, { trust: BROKEN }] })).toEqual({
       verdict: 'pending',
       reasons: [{ kind: 'uncostable' }],
     });
   });
 
   it('every entry broken is broken', () => {
-    expect(craftedTrust({ uncostable: false, entries: [{ trust: BROKEN }, { trust: BROKEN }] })).toEqual({
+    expect(craftedTrust({ uncostable: false, itemLevel: 82, entries: [{ trust: BROKEN }, { trust: BROKEN }] })).toEqual({
       verdict: 'broken',
       reasons: [{ kind: 'all-broken' }],
     });
   });
 
+  it('no counted entry is pending nothing-counts at the level, after uncostable and before no-prices (FR-38)', () => {
+    expect(craftedTrust({ uncostable: false, itemLevel: 79, entries: [] })).toEqual({
+      verdict: 'pending',
+      reasons: [{ kind: 'nothing-counts', itemLevel: 79 }],
+    });
+    expect(craftedTrust({ uncostable: true, itemLevel: 79, entries: [] })).toEqual({ verdict: 'pending', reasons: [{ kind: 'uncostable' }] });
+  });
+
   it('no priced entry is pending no-prices, whether all pending or pending and broken', () => {
     const noPrices = { verdict: 'pending', reasons: [{ kind: 'no-prices' }] };
-    expect(craftedTrust({ uncostable: false, entries: [{ trust: PENDING }, { trust: PENDING }] })).toEqual(noPrices);
-    expect(craftedTrust({ uncostable: false, entries: [{ trust: PENDING }, { trust: BROKEN }] })).toEqual(noPrices);
+    expect(craftedTrust({ uncostable: false, itemLevel: 82, entries: [{ trust: PENDING }, { trust: PENDING }] })).toEqual(noPrices);
+    expect(craftedTrust({ uncostable: false, itemLevel: 82, entries: [{ trust: PENDING }, { trust: BROKEN }] })).toEqual(noPrices);
   });
 
   it('is rough when the unreliable gross share reaches the bound, the percent rounded down', () => {
-    expect(craftedTrust({ uncostable: false, entries: [{ trust: ROUGH, gross: 7 }, { trust: CURRENT, gross: 3 }] })).toEqual({
+    expect(craftedTrust({ uncostable: false, itemLevel: 82, entries: [{ trust: ROUGH, gross: 7 }, { trust: CURRENT, gross: 3 }] })).toEqual({
       verdict: 'rough',
       reasons: [{ kind: 'unreliable-share', percent: 70 }],
     });
-    expect(craftedTrust({ uncostable: false, entries: [{ trust: ROUGH, gross: 0.7 }, { trust: CURRENT, gross: 0.3 }] })).toEqual({
+    expect(craftedTrust({ uncostable: false, itemLevel: 82, entries: [{ trust: ROUGH, gross: 0.7 }, { trust: CURRENT, gross: 0.3 }] })).toEqual({
       verdict: 'rough',
       reasons: [{ kind: 'unreliable-share', percent: 70 }],
     });
-    expect(craftedTrust({ uncostable: false, entries: [{ trust: ROUGH, gross: 7.59 }, { trust: CURRENT, gross: 2.41 }] })).toEqual({
+    expect(craftedTrust({ uncostable: false, itemLevel: 82, entries: [{ trust: ROUGH, gross: 7.59 }, { trust: CURRENT, gross: 2.41 }] })).toEqual({
       verdict: 'rough',
       reasons: [{ kind: 'unreliable-share', percent: 75 }],
     });
-    expect(craftedTrust({ uncostable: false, entries: [{ trust: ROUGH, gross: 1 }] })).toEqual({
+    expect(craftedTrust({ uncostable: false, itemLevel: 82, entries: [{ trust: ROUGH, gross: 1 }] })).toEqual({
       verdict: 'rough',
       reasons: [{ kind: 'unreliable-share', percent: 100 }],
     });
   });
 
   it('prints 70 for a share just inside the tolerance, as the rule reads it rough', () => {
-    expect(craftedTrust({ uncostable: false, entries: [{ trust: ROUGH, gross: 0.6999999995 }, { trust: CURRENT, gross: 0.3000000005 }] })).toEqual({
+    expect(craftedTrust({ uncostable: false, itemLevel: 82, entries: [{ trust: ROUGH, gross: 0.6999999995 }, { trust: CURRENT, gross: 0.3000000005 }] })).toEqual({
       verdict: 'rough',
       reasons: [{ kind: 'unreliable-share', percent: 70 }],
     });
   });
 
   it('is current just under the bound', () => {
-    expect(craftedTrust({ uncostable: false, entries: [{ trust: ROUGH, gross: 69 }, { trust: CURRENT, gross: 31 }] })).toEqual(CURRENT);
+    expect(craftedTrust({ uncostable: false, itemLevel: 82, entries: [{ trust: ROUGH, gross: 69 }, { trust: CURRENT, gross: 31 }] })).toEqual(CURRENT);
   });
 
   it('leaves pending and broken entries out of both sums', () => {
     const entries = [{ trust: ROUGH, gross: 7 }, { trust: CURRENT, gross: 3 }, { trust: PENDING }, { trust: BROKEN }];
-    expect(craftedTrust({ uncostable: false, entries })).toEqual({
+    expect(craftedTrust({ uncostable: false, itemLevel: 82, entries })).toEqual({
       verdict: 'rough',
       reasons: [{ kind: 'unreliable-share', percent: 70 }],
     });

@@ -1,7 +1,8 @@
 import { canonicalKey } from '@poe/contracts';
-import type { CrossFileFailure, Ranking } from '@poe/core';
+import type { CraftingItemLevel, CrossFileFailure, Ranking } from '@poe/core';
 import { useCallback, useState, type ReactNode } from 'react';
 
+import { LevelToggle } from '../level/LevelToggle';
 import type { ArtifactSet, TolerableKey } from '../load/artifacts';
 import { PickUpFilter } from '../pick-up-filter/PickUpFilter';
 import { CraftRecipe, type RecipeCost, type RecipeOption } from '../recipe/CraftRecipe';
@@ -27,26 +28,39 @@ export function useReportToggle(): readonly [boolean, () => void] {
   return [isOpen, toggle];
 }
 
-/** The threshold control alone: the one slot the cold load fills (state 22). */
-export function pendingControls(threshold: number, onThresholdChange: (value: number) => void): Partial<Record<HeaderSlot, ReactNode>> {
-  return { threshold: <PayoutThreshold value={threshold} onChange={onThresholdChange} /> };
+/** The two dials that need no artifact: the level and the threshold, the slots the cold load fills (state 22). */
+export interface PendingControlsInput {
+  readonly threshold: number;
+  readonly onThresholdChange: (value: number) => void;
+  readonly level: CraftingItemLevel;
+  readonly onLevelChange: (level: CraftingItemLevel) => void;
 }
 
-export interface ReadyControlsInput {
+export function pendingControls({
+  threshold,
+  onThresholdChange,
+  level,
+  onLevelChange,
+}: PendingControlsInput): Partial<Record<HeaderSlot, ReactNode>> {
+  return {
+    level: <LevelToggle level={level} onChange={onLevelChange} />,
+    threshold: <PayoutThreshold value={threshold} onChange={onThresholdChange} />,
+  };
+}
+
+export interface ReadyControlsInput extends PendingControlsInput {
   readonly set: ArtifactSet;
   readonly absent: readonly TolerableKey[];
   readonly now: number;
   readonly crossFileFailures: readonly CrossFileFailure[];
   readonly ranking: Ranking;
-  readonly threshold: number;
   readonly storedRecipe: string | undefined;
-  readonly onThresholdChange: (value: number) => void;
   readonly onRecipeChange: (recipeId: string) => void;
   readonly isReportOpen: boolean;
   readonly onReportToggle: () => void;
 }
 
-/** The header's four controls, the sync report under it, and the active recipe the list reads. */
+/** The header's five controls, the sync report under it, and the active recipe the list reads. */
 export interface ReadyControls {
   readonly controls: Partial<Record<HeaderSlot, ReactNode>>;
   readonly panel: ReactNode;
@@ -82,7 +96,7 @@ export function readyControls(input: ReadyControlsInput): ReadyControls {
   ) : undefined;
   return {
     controls: {
-      ...pendingControls(input.threshold, input.onThresholdChange),
+      ...pendingControls(input),
       recipe:
         recipe === undefined || cost === undefined ? undefined : (
           <CraftRecipe recipe={{ options, activeId: recipe.id, cost, onChange: input.onRecipeChange }} />

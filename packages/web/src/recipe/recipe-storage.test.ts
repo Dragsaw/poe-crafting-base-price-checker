@@ -13,7 +13,11 @@ const throwing = {
   },
 };
 
-const recipeOf = (id: string): CraftRecipe => ({ id, currencies: [], modifierLevelMin: 0 });
+const recipeOf = (id: string, grade = id): CraftRecipe => ({
+  id,
+  currencies: [{ currencyId: `${grade}-orb-of-transmutation`, quantity: 1 }],
+  modifierLevelMin: 0,
+});
 
 afterEach(() => {
   localStorage.clear();
@@ -49,9 +53,19 @@ describe('activeRecipe', () => {
     expect(activeRecipe(recipes, 'perfect')?.id).toBe('perfect');
   });
 
-  it('falls back to the first recipe in file order for an unknown or missing id', () => {
-    expect(activeRecipe(recipes, 'vanished')?.id).toBe('greater');
-    expect(activeRecipe(recipes, undefined)?.id).toBe('greater');
+  // I/O matrix: "Saved recipe gone".
+  it('falls back to the first recipe in file order for a stored id that is gone, though `perfect` is published', () => {
+    expect(activeRecipe(recipes, 'regular')?.id).toBe('greater');
+  });
+
+  // I/O matrix: "First visit".
+  it('opens a first visit on the recipe whose option word is `perfect`, matched by word, not id', () => {
+    expect(activeRecipe(recipes, undefined)?.id).toBe('perfect');
+    expect(activeRecipe([recipeOf('perfect', 'greater'), recipeOf('top', 'perfect')], undefined)?.id).toBe('top');
+  });
+
+  it('opens a first visit on the first recipe when no recipe reads `perfect`', () => {
+    expect(activeRecipe([recipeOf('greater'), recipeOf('a', 'greater')], undefined)?.id).toBe('greater');
   });
 
   it('is undefined with no recipe', () => {

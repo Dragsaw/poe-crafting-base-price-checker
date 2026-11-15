@@ -1,6 +1,7 @@
 import type { DatasetEntry, PriceObservation, PriceState, PriceTrust, PriceTrustReason, TrackedEntry } from '@poe/contracts';
 
 import { DAY_MS, HOUR_MS, MINUTE_MS } from './clock.ts';
+import type { CraftingItemLevel } from './crafting-item-level.ts';
 
 /** EXPERIENCE.md *Price trust*: a price this many hours old or older is old. */
 export const OLD_AFTER_HOURS = 72;
@@ -91,7 +92,9 @@ export interface CraftedTrustEntry {
 
 export interface CraftedTrustInput {
   readonly uncostable: boolean;
-  /** Every non-pruned entry the recipe reaches, below-threshold ones included (AD-17). */
+  /** The Crafting Item Level of the ranking, named by the nothing-counts reason (FR-38). */
+  readonly itemLevel: CraftingItemLevel;
+  /** Every non-pruned entry that counts at the level, below-threshold ones included (AD-17). */
   readonly entries: readonly CraftedTrustEntry[];
 }
 
@@ -99,12 +102,16 @@ export interface CraftedTrustInput {
 export const NO_RECIPE_TRUST: PriceTrust = { verdict: 'pending', reasons: [{ kind: 'no-recipe' }] };
 
 /** A crafted pair's verdict: the ordered rules of *Price trust* after the no-recipe rule (`NO_RECIPE_TRUST`), first match wins (AD-17). */
-export function craftedTrust({ uncostable, entries }: CraftedTrustInput): PriceTrust {
+export function craftedTrust({ uncostable, itemLevel, entries }: CraftedTrustInput): PriceTrust {
   if (uncostable) {
     return { verdict: 'pending', reasons: [{ kind: 'uncostable' }] };
   }
   if (entries.length > 0 && entries.every(({ trust }) => trust.verdict === 'broken')) {
     return { verdict: 'broken', reasons: [{ kind: 'all-broken' }] };
+  }
+  // A crafted pair always has a non-pruned entry, so no counted entry means none counts at the level.
+  if (entries.length === 0) {
+    return { verdict: 'pending', reasons: [{ kind: 'nothing-counts', itemLevel }] };
   }
   let whole = 0;
   let unreliable = 0;

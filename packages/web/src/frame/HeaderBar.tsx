@@ -8,14 +8,15 @@ export const HEADER_TITLE = 'Worth picking up';
 /** `{components.header-bar}` layout: 22px between groups. */
 export const HEADER_GROUP_GAP = 22;
 
-export type HeaderSlot = 'recipe' | 'threshold' | 'filter' | 'sync';
+export type HeaderSlot = 'recipe' | 'level' | 'threshold' | 'filter' | 'sync';
 
 /**
  * An empty slot's reserved width, measured in the browser at `{spacing.content-min}` against the
- * widest content: two recipes with a `10.00 div / craft` cost, `3.00 div`, `Filter ▾` and `✕ 999 problems`.
+ * widest content: two recipes with a `10.00 div / craft` cost, `ilvl 79 82`, `3.00 div`, `Filter ▾` and `✕ 999 problems`.
  */
 export const HEADER_SLOT_WIDTHS: Readonly<Record<HeaderSlot, number>> = {
   recipe: 296,
+  level: 104,
   threshold: 242,
   filter: 65,
   sync: 134,
@@ -24,7 +25,7 @@ export const HEADER_SLOT_WIDTHS: Readonly<Record<HeaderSlot, number>> = {
 /** The title's full width in Inter at `{typography.title}`, measured in the browser; it cuts below this (DESIGN.md width budget). */
 export const HEADER_TITLE_WIDTH = 149;
 
-export const HEADER_SLOTS: readonly HeaderSlot[] = ['recipe', 'threshold', 'filter', 'sync'];
+export const HEADER_SLOTS: readonly HeaderSlot[] = ['recipe', 'level', 'threshold', 'filter', 'sync'];
 
 /** These slots hold their width in every state, so the controls beside them never move (state 22). */
 const FIXED_SLOTS: ReadonlySet<HeaderSlot> = new Set(['filter', 'sync']);

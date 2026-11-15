@@ -18,7 +18,7 @@ describe('rank: a tag-blocked combination (AD-17 reach rule)', () => {
     const result = rankCrafted({ tracked: [target], dataset: [published(target, priced(1))], weights });
     expect(craftedRows(result.ordering).map((row) => row.recipeId)).toEqual(['greater']);
     expect(result.unpricedCrafted.map((row) => [row.recipeId, row.summands, row.trust])).toEqual([
-      ['perfect', [], { verdict: 'pending', reasons: [{ kind: 'no-prices' }] }],
+      ['perfect', [], { verdict: 'pending', reasons: [{ kind: 'nothing-counts', itemLevel: 82 }] }],
     ]);
     expect(result.unrankable).toEqual([]);
   });

@@ -1,5 +1,7 @@
 import type { ModifierWeight } from '@poe/contracts';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
+import { RECIPE_STORAGE_KEY } from '../recipe-storage';
 
 import { settleTo, unmount } from '../../test-support/dom';
 import {
@@ -16,6 +18,11 @@ import {
   option,
   click,
 } from './test-support';
+
+// A returning player on `greater`, the recipe these figures are worked out under.
+beforeEach(() => {
+  localStorage.setItem(RECIPE_STORAGE_KEY, 'greater');
+});
 
 afterEach(() => {
   unmount();

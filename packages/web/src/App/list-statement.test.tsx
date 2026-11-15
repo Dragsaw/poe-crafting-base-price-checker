@@ -196,8 +196,8 @@ describe('the list statement', () => {
     await settleTo('ready');
     expect((recipes as { readonly recipes: readonly unknown[] }).recipes).toHaveLength(2);
     expect(frame().querySelector('[data-recipe-options]')?.textContent).toBe('greaterperfect');
-    // The committed dataset now has an orb rate: the cost line is a figure, not the no-figure one.
-    expect(frame().querySelector('[data-recipe-cost]')?.textContent).toBe(`0.01 ${RECIPE_COST_UNIT}`);
+    // The committed dataset now has an orb rate: the first visit's `perfect` cost line is a figure, not the no-figure one.
+    expect(frame().querySelector('[data-recipe-cost]')?.textContent).toBe(`0.26 ${RECIPE_COST_UNIT}`);
     expect(frame().textContent).not.toContain('recipes.json');
     toggleReport();
     expect(frame().textContent).not.toContain(absenceLine('recipes'));

@@ -23,6 +23,10 @@ export const PriceTrustReasonSchema = z
     z.strictObject({ kind: z.literal('no-recipe') }),
     z.strictObject({ kind: z.literal('uncostable') }),
     z.strictObject({ kind: z.literal('all-broken') }),
+    z.strictObject({
+      kind: z.literal('nothing-counts'),
+      itemLevel: z.int().min(1).describe('The Crafting Item Level the class has no counted entry at (FR-38).'),
+    }),
     z.strictObject({ kind: z.literal('no-prices') }),
     z.strictObject({
       kind: z.literal('unreliable-share'),

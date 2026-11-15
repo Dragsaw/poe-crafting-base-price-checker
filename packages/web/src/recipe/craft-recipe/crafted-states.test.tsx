@@ -1,5 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import { RECIPE_STORAGE_KEY } from '../recipe-storage';
 import { NO_FIGURE_YET } from '../../list/format';
 import { honestEmptyCopy, uncostableCopy } from '../../list/list-statement';
 import { RECIPE_COST_UNIT } from '../CraftRecipe';
@@ -31,6 +32,11 @@ import {
   statement,
   click,
 } from './test-support';
+
+// A returning player on `greater`, the recipe these figures are worked out under.
+beforeEach(() => {
+  localStorage.setItem(RECIPE_STORAGE_KEY, 'greater');
+});
 
 afterEach(() => {
   unmount();
@@ -186,9 +192,20 @@ describe('the crafted states', () => {
     if (wandsRow === undefined) {
       throw new Error('no Wands row');
     }
+    // State 48: the row trails under its own reason, and its panel holds only `+ 1 not counted`.
+    expect(wandsRow.querySelector('[data-cell="ev"]')?.textContent).toBe(MISSING_FIGURE);
     click(wandsRow);
-    const lines = [...frame().querySelectorAll<HTMLElement>('[data-expansion-panel] [data-expansion-line]')];
-    expect(lines).toHaveLength(1);
-    expect(lines[0]?.textContent).not.toMatch(/NaN|undefined/);
+    const panelLines = (): HTMLElement[] => [...frame().querySelectorAll<HTMLElement>('[data-expansion-panel] [data-expansion-line]')];
+    expect(panelLines()).toHaveLength(0);
+    const group = frame().querySelector<HTMLElement>('[data-expansion-panel] [data-show-more="not-counted"]');
+    expect(group?.textContent).toBe('+ 1 not counted');
+    if (group === null) {
+      throw new Error('no not-counted group');
+    }
+    click(group);
+    const [line] = panelLines();
+    expect(line?.hasAttribute('data-not-counted')).toBe(true);
+    expect(line?.querySelector('[data-cell="trust"]')?.textContent).toBe("perfect orbs can't roll this at ilvl 82");
+    expect(line?.textContent).not.toMatch(/NaN|undefined/);
   });
 });

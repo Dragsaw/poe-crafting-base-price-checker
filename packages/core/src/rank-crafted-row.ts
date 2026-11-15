@@ -6,6 +6,7 @@ import type {
   CraftedTrackedEntry,
   CraftRecipe,
   DatasetEntry,
+  NotCounted,
   WeightsClassPools,
 } from '@poe/contracts';
 
@@ -13,7 +14,7 @@ import type { CraftCostResult } from './craft-cost.ts';
 import { classKeyOf } from './crafted-classes.ts';
 import { craftedTrust, type CraftedTrustEntry, entryTrust, resolvedPrice } from './price-trust.ts';
 import type { CraftingItemLevel } from './crafting-item-level.ts';
-import { combinationProbability, type ProbabilityResult, type RecipeScope } from './probability.ts';
+import { combinationProbability, type RecipeScope } from './probability.ts';
 import { foldPair, oldestOf } from './provenance.ts';
 
 /** Contribution descending, then the entry's canonical key (AD-17). */
@@ -46,9 +47,10 @@ interface SummandScan {
 
 const COMBINATION_GROUP = { current: 0, rough: 0, pending: 1, broken: 2 } as const;
 
-/** Priced (current or rough), then pending, then broken, then the entry's canonical key (EXPERIENCE.md *The expansion*). */
+/** Counted before not counted, then priced (current or rough), pending, broken, then the entry's canonical key (EXPERIENCE.md *The expansion*). */
 export function compareCombinations(left: CraftedCombination, right: CraftedCombination): number {
   return (
+    Number(left.notCounted !== undefined) - Number(right.notCounted !== undefined) ||
     COMBINATION_GROUP[left.trust.verdict] - COMBINATION_GROUP[right.trust.verdict] ||
     compareCanonicalKeys(left.entryKey, right.entryKey)
   );
@@ -60,14 +62,23 @@ export interface PairFailure {
   readonly reason: 'pool empty' | 'augment exhausted';
 }
 
-const NOT_COUNTED: ProbabilityResult = { ok: true, p: 0 };
+const UNREACHED: NotCounted = { kind: 'unreached' };
 
-/** An entry above `L` is skipped before its probability runs, so its slot can never fail the pair (AD-17, FR-38). */
-function summandProbability(pools: WeightsClassPools, entry: CraftedTrackedEntry, scope: RecipeScope): ProbabilityResult {
-  return entry.itemLevelMin > scope.itemLevel ? NOT_COUNTED : combinationProbability(pools, entry, scope);
+/** An entry's probability at `L`, or why it does not count there; the floor wins over reach (FR-38, FR-26). */
+function countedProbability(pools: WeightsClassPools, entry: CraftedTrackedEntry, scope: RecipeScope): PairFailure | { readonly p: number } | { readonly notCounted: NotCounted } {
+  // An entry above `L` is skipped before its probability runs, so its slot can never fail the pair (AD-17).
+  if (entry.itemLevelMin > scope.itemLevel) {
+    return { notCounted: { kind: 'floor', itemLevelMin: entry.itemLevelMin } };
+  }
+  const probability = combinationProbability(pools, entry, scope);
+  if (!probability.ok && probability.reason.kind !== 'empty-contained') {
+    return { kind: 'pair-failure', reason: probability.reason.kind === 'augment-exhausted' ? 'augment exhausted' : 'pool empty' };
+  }
+  // Exactly `recipeReach` false, read off the same result.
+  return probability.ok && probability.p > 0 ? { p: probability.p } : { notCounted: UNREACHED };
 }
 
-/** An entry the recipe cannot reach, or whose floor is above `L`, is not a summand and stays out of the trust sums (AD-17, FR-26, FR-38). */
+/** An entry that does not count at `L` is not a summand and stays out of the trust sums (AD-17, FR-26, FR-38). */
 function scanSummands({ recipe, itemLevel, pools, keyed, byKey, activeLeague, threshold, now }: CraftedRowOptions): SummandScan | PairFailure {
   const summands: CraftedSummand[] = [];
   const combinations: CraftedCombination[] = [];
@@ -76,16 +87,17 @@ function scanSummands({ recipe, itemLevel, pools, keyed, byKey, activeLeague, th
   const stamps: string[] = [];
   const scope = { itemLevel, modifierLevelMin: recipe.modifierLevelMin };
   for (const { entry, entryKey } of keyed) {
-    const probability = summandProbability(pools, entry, scope);
-    if (!probability.ok && probability.reason.kind !== 'empty-contained') {
-      return { kind: 'pair-failure', reason: probability.reason.kind === 'augment-exhausted' ? 'augment exhausted' : 'pool empty' };
+    const counted = countedProbability(pools, entry, scope);
+    if ('kind' in counted) {
+      return counted;
     }
     const published = byKey.get(entryKey);
     const trust = entryTrust(entry, published, activeLeague, now);
-    if (!probability.ok || probability.p === 0) {
-      combinations.push({ entryKey, trust });
+    if ('notCounted' in counted) {
+      combinations.push({ entryKey, trust, notCounted: counted.notCounted });
       continue;
     }
+    const probability = counted;
     const price = resolvedPrice(published, activeLeague);
     if (price.state !== 'priced') {
       trusted.push({ trust });
@@ -141,6 +153,6 @@ export function craftedRow(options: CraftedRowOptions): CraftedRankedRow | PairF
     provenance: foldPair(pools, { itemLevel, modifierLevelMin: recipe.modifierLevelMin }),
     ...(asOf !== undefined && { asOf }),
     ...(lastAttemptedAt !== undefined && { lastAttemptedAt }),
-    trust: craftedTrust({ uncostable: !cost.ok, entries: scan.trusted }),
+    trust: craftedTrust({ uncostable: !cost.ok, itemLevel, entries: scan.trusted }),
   };
 }

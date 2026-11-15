@@ -3,7 +3,7 @@ import type { CraftedRankedRow, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import type { CraftingItemLevel } from '../crafting-item-level.ts';
-import { combinationProbability } from '../probability.ts';
+import { combinationProbability, recipeReach } from '../probability.ts';
 import {
   chase,
   craftedRows,
@@ -43,6 +43,9 @@ function rowAt(
   return { ranked: craftedRows(result.ordering)[0], unpriced: result.unpricedCrafted[0] };
 }
 
+const combinationOf = (row: CraftedRankedRow | undefined, entry: TrackedEntry) =>
+  row?.combinations.find((combination) => combination.entryKey === canonicalKey(entry));
+
 const greaterAt = (itemLevel: number) => ({ itemLevel, modifierLevelMin: GREATER.modifierLevelMin });
 
 function probabilityAt(entry: TrackedEntry, itemLevel: number): number {
@@ -79,11 +82,11 @@ describe('rank: the Crafting Item Level scopes the crafted branch (FR-38, FR-1; 
   });
 
   // I/O matrix: "Nothing counts".
-  it('treats a class with no entry at or below `L` as one with no priced Combination', () => {
+  it('treats a class with no entry at or below `L` as one with no priced Combination, under its own reason', () => {
     const { ranked: row, unpriced } = rowAt(79, [top, chase('Bows')]);
     expect(row).toBeUndefined();
     expect(unpriced?.summands).toEqual([]);
-    expect(unpriced?.trust).toEqual({ verdict: 'pending', reasons: [{ kind: 'no-prices' }] });
+    expect(unpriced?.trust).toEqual({ verdict: 'pending', reasons: [{ kind: 'nothing-counts', itemLevel: 79 }] });
     expect(unpriced?.combinations.every((combination) => !('priceDivine' in combination))).toBe(true);
   });
 
@@ -132,6 +135,54 @@ describe('rank: the Crafting Item Level scopes the crafted branch (FR-38, FR-1; 
   it('gives deep-equal results for equal inputs, `craftingItemLevel` included (NFR-3)', () => {
     const input = { tracked: [low, top], dataset: [published(low, priced(30))], weights: WEIGHTS, recipes: [GREATER], craftingItemLevel: 79 } as const;
     expect(rankCrafted(input)).toEqual(rankCrafted(input));
+  });
+});
+
+describe('rank: a not-counted combination carries its reason (FR-38, FR-26)', () => {
+  const low = atFloor(chase('Bows'), 75);
+  const top = chase('Bows', FILLER);
+  /** Its only prefix tier is at 80, so the recipe cannot reach it at 79 though its floor admits it. */
+  const high = atFloor(chase('Bows', HIGH), 75);
+
+  it('marks an entry whose floor is above `L` with that floor', () => {
+    expect(combinationOf(rowAt(79, [low, top]).ranked, top)?.notCounted).toEqual({ kind: 'floor', itemLevelMin: 82 });
+  });
+
+  it('marks an entry the recipe cannot reach at `L` as unreached, exactly where `recipeReach` is false', () => {
+    if (classPools === undefined || high.kind !== 'crafted') {
+      throw new Error('the fixture is a crafted Bows entry');
+    }
+    expect(recipeReach(classPools, high, greaterAt(79)).reached).toBe(false);
+    expect(combinationOf(rowAt(79, [low, high]).ranked, high)?.notCounted).toEqual({ kind: 'unreached' });
+    expect(recipeReach(classPools, high, greaterAt(82)).reached).toBe(true);
+    expect(rowAt(82, [low, high]).ranked?.summands).toHaveLength(2);
+  });
+
+  it('gives the floor reason when the floor is above `L` and the recipe cannot reach it either', () => {
+    const both = chase('Bows', HIGH);
+    expect(combinationOf(rowAt(79, [low, both]).ranked, both)?.notCounted).toEqual({ kind: 'floor', itemLevelMin: 82 });
+  });
+
+  it('leaves a counted combination unmarked and sorts the not-counted ones last', () => {
+    const cheap = atFloor(chase('Bows', FILLER), 75);
+    // `cheap` is pending and `top` is current, so by verdict alone `top` would sort first.
+    const dataset = [published(low, priced(30)), published(top, priced(30))];
+    const row = rowAt(79, [low, cheap, top], dataset).ranked;
+    expect(combinationOf(row, cheap)).not.toHaveProperty('notCounted');
+    expect(combinationOf(row, cheap)?.trust.verdict).toBe('pending');
+    expect(combinationOf(row, top)?.trust.verdict).toBe('current');
+    expect(row?.combinations.map((combination) => [combination.entryKey, combination.notCounted?.kind])).toEqual([
+      [canonicalKey(cheap), undefined],
+      [canonicalKey(top), 'floor'],
+    ]);
+  });
+
+  // I/O matrix: "Nothing counts, all broken".
+  it('reads nothing-counts, not all-broken, when every entry is broken and none counts', () => {
+    const tracked = [top, chase('Bows')];
+    const dataset = tracked.map((entry) => published(entry, { state: 'unresolvable' }));
+    expect(rowAt(79, tracked, dataset).unpriced?.trust).toEqual({ verdict: 'pending', reasons: [{ kind: 'nothing-counts', itemLevel: 79 }] });
+    expect(rowAt(82, tracked, dataset).unpriced?.trust).toEqual({ verdict: 'broken', reasons: [{ kind: 'all-broken' }] });
   });
 });
 

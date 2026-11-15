@@ -83,6 +83,7 @@ function craftedRow(index: number): ClassDisplayRow {
     chase: [parts('T1 Mana', 'T1 Cold Res'), parts('T1 Life', 'T1 Cold Res'), parts('T1 ES', 'T1 Cold Res')],
     combinations: [],
     pruned: [],
+    notCounted: [],
   };
 }
 

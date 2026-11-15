@@ -6,6 +6,7 @@ import type { CSSProperties, JSX } from 'react';
 import { TradeLinkMark, VerdictMark } from '../../marks/marks';
 import { formatDivine } from '../../shared/money';
 import { colors, expansionLineGrid, expansionLineWidths, typeStyle } from '../../theme/tokens';
+import type { NotCountedCombination } from './class-lines';
 import type { AffixPart } from '../combination-text';
 import { BELOW_THRESHOLD_NOTE, CURATION_MARKS } from '../format';
 import { MISSING_FIGURE } from '../row/ExpectedValueCell';
@@ -153,6 +154,28 @@ export function PrunedLine({ text, reason }: { readonly text: readonly AffixPart
       >
         {reason}
       </div>
+    </div>
+  );
+}
+
+/** State 49: dimmed, not struck through, `—`, the reason alone with no mark, no link and no second line. */
+export function NotCountedLine({ line }: { readonly line: NotCountedCombination }): JSX.Element {
+  return (
+    <div data-expansion-line="" data-not-counted="" style={LINE}>
+      <div data-cell="combination" style={{ ...typeStyle('line-text'), color: colors['text-tertiary'] }}>
+        {line.isPinned ? (
+          <span data-curation="pinned" style={CURATION_MARK}>
+            {CURATION_MARKS.pinned}
+          </span>
+        ) : undefined}
+        {line.isPinned && line.text.length > 0 ? ' ' : undefined}
+        <CombinationText parts={line.text} tones={{ tier: colors['text-tertiary'], joiner: colors['text-tertiary'] }} />
+      </div>
+      <PriceCell price={undefined} isDimmed />
+      <div data-cell="trust" style={{ ...typeStyle('trust'), color: colors['text-secondary'] }}>
+        <span data-not-counted-reason="">{line.reason}</span>
+      </div>
+      <div data-cell="trade-link" />
     </div>
   );
 }

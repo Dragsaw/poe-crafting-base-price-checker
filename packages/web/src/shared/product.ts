@@ -11,7 +11,7 @@ export const TOP_LINES = 8;
 /** The Payout Threshold the page starts at, in Divine (FR-7). Story 2.4 makes it editable. */
 export const DEFAULT_THRESHOLD = 0.25;
 
-/** The Crafting Item Level the page starts at (FR-38; EXPERIENCE.md *What survives a reload*). Story 7.4 makes it a toggle. */
+/** The Crafting Item Level a first visit shows, and a stored value that is no offered level (FR-38; EXPERIENCE.md *What survives a reload*). */
 export const FIRST_VISIT_CRAFTING_ITEM_LEVEL: CraftingItemLevel = 82;
 
 /** The denomination word the page prints (PRD §3, AD-24, AD-20); not read from `static.json`. */

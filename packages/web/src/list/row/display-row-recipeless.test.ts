@@ -45,7 +45,7 @@ function recipeless(
 function rowsFor(tracked: readonly TrackedEntry[], dataset: readonly DatasetEntry[], classes: readonly RecipelessClass[]): ListRow[] {
   const raw = tracked.filter((entry) => entry.kind === 'raw');
   const ranking = rank({ tracked: raw, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined, craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL });
-  return toDisplayRows({ ...ranking, recipeless: classes }, dataset, { crafted: { tracked, stats: new Map() } });
+  return toDisplayRows({ ...ranking, recipeless: classes }, dataset, { crafted: { tracked, stats: new Map(), itemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL, recipeWord: undefined } });
 }
 
 const asClass = (row: ListRow | undefined): ClassDisplayRow | undefined => (row?.unit === 'class' ? row : undefined);
