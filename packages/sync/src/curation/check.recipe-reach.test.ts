@@ -20,7 +20,7 @@ const tierOf = (statId: string, ranges: [number, number], itemLevelMin: number):
 const PERFECT: CraftRecipe = { id: 'perfect', currencies: [{ currencyId: 'perfect-orb-of-transmutation', quantity: 1 }], modifierLevelMin: 70 };
 
 /** `crafted`'s prefix band holds the tier at 30; the modifier's tier outside the band sits at `aboveAt`. */
-function inputsOf(aboveAt: number, recipes: readonly CraftRecipe[]): TrackedCheckInputs {
+function inputsOf(aboveAt: number, recipes: readonly CraftRecipe[], entryFloor = crafted.itemLevelMin): TrackedCheckInputs {
   const weights: WeightsFile = {
     schemaVersion: WEIGHTS_SCHEMA_VERSION,
     gamePatch: '0.5.5',
@@ -36,7 +36,7 @@ function inputsOf(aboveAt: number, recipes: readonly CraftRecipe[]): TrackedChec
   };
   const recipesFile: RecipesFile = { schemaVersion: '1.0.0', recipes: [...recipes] };
   return {
-    tracked: trackedText([crafted]),
+    tracked: trackedText([{ ...crafted, itemLevelMin: entryFloor }]),
     config: { ok: true, value: ConfigFileSchema.parse({ schemaVersion: '1.0.0', league: 'Test League', minChunkSearches: 2 }) },
     catalogue: {
       ok: true,
@@ -47,7 +47,7 @@ function inputsOf(aboveAt: number, recipes: readonly CraftRecipe[]): TrackedChec
   };
 }
 
-describe('checkTracked: reach under any recipe at any offered level (AD-17, FR-38)', () => {
+describe('checkTracked: reach under any recipe at any offered level at or above the floor (AD-17, FR-38)', () => {
   it('lists an entry that no recipe reaches at 79 or 82', () => {
     const report = checkTracked(inputsOf(75, [PERFECT]));
     expect(report.ok).toBe(false);
@@ -59,6 +59,26 @@ describe('checkTracked: reach under any recipe at any offered level (AD-17, FR-3
     const report = checkTracked(inputsOf(80, [PERFECT]));
     expect(report.ok).toBe(true);
     expect(report.unreachable).toEqual([]);
+  });
+
+  it('lists an entry with floor 82 that the recipe reaches at 79 only', () => {
+    // `rank` skips the entry at 79 (below its floor) and finds it unreached at 82, so it counts at no level.
+    const report = checkTracked(inputsOf(80, [PERFECT], 82));
+    expect(report.ok).toBe(false);
+    expect(report.unreachable.map((row) => row.path)).toEqual(['entries.0']);
+  });
+
+  it('does not list an entry with floor 82 that the recipe reaches at 82', () => {
+    const report = checkTracked(inputsOf(85, [PERFECT], 82));
+    expect(report.ok).toBe(true);
+    expect(report.unreachable).toEqual([]);
+  });
+
+  it('lists an entry whose floor is above every crafting level', () => {
+    // The tier at 85 is out of scope at 79 and 82, so only the floor keeps the entry from being reached.
+    const report = checkTracked(inputsOf(85, [PERFECT], 84));
+    expect(report.ok).toBe(false);
+    expect(report.unreachable.map((row) => row.path)).toEqual(['entries.0']);
   });
 
   it('does not list an entry that another recipe reaches', () => {

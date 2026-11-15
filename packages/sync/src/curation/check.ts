@@ -217,7 +217,8 @@ function classUnreachable(members: readonly CraftedTrackedEntry[], weights: Weig
   const { pools } = lookup;
   const isReached = (entry: CraftedTrackedEntry) =>
     recipes.recipes.some(({ modifierLevelMin }) =>
-      CRAFTING_ITEM_LEVELS.some((itemLevel) => recipeReach(pools, entry, { itemLevel, modifierLevelMin }).reached),
+      // `rank` never counts an entry below its floor, so reach there is no reach (FR-38, AD-17).
+      CRAFTING_ITEM_LEVELS.some((itemLevel) => entry.itemLevelMin <= itemLevel && recipeReach(pools, entry, { itemLevel, modifierLevelMin }).reached),
     );
   return members.filter((entry) => !isReached(entry)).map((entry) => {
     const entryKey = canonicalKey(entry);
