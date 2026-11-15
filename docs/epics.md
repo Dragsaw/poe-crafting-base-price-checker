@@ -487,6 +487,7 @@ The player chooses the item level he crafts at, and the crafted ranking follows 
 **Also delivers:**
   - the recipe floor per modifier after the level scope, and the reach verdict per `(entry, recipe, L)`, in `core`
   - a declared Item Level Floor per crafted entry, with the shared-floor rule removed
+  - each tier's own interval in `core`, so adjacent tiers whose values overlap can be tracked as separate entries
   - a regenerated `data/tracked.json` that tracks T1 and T2 as separate entries
   - `{components.level-toggle}`, Interaction 1b, state 48 and the expansion panel's not-counted group, with the retirement of state 36
 
@@ -3101,11 +3102,11 @@ So that a high-item-level drop never shows the purpose of a cheaper tier.
 
 The player chooses the item level he crafts at, and the crafted ranking follows it. At league start he reads which Item Classes are worth crafting on the bases he can get, and a greater or perfect recipe is valued on the modifiers the game really lets it roll. The epic builds on Epics 3, 4 and 6, adds one header control, and changes no sync behaviour and no artifact schema.
 
-**Source of truth.** PRD revision 38 holds FR-38, the revised FR-1, FR-16, FR-22, FR-26, FR-29 and FR-36, and the Glossary entries *Item Level Floor*, *Crafting Item Level*, *Accepted Tier* and *Eligible Pool*. `ARCHITECTURE-SPINE.md` revision 47 holds AD-17: the scope to the Crafting Item Level, the recipe floor per modifier, the highest tier, the reach verdict per `(entry, recipe, L)` and edge alignment. It also holds AD-5, the floor that each entry declares. `AGENT-WORKFLOW.md` holds the `unreachable` rule of `pnpm tracked:check` and the rule for edits to `data/tracked.json` (*Parallel worktrees*). The `tracked-json` skill holds the curation steps. `EXPERIENCE.md` revision 34 holds Interaction 1b, state 48, the retired state 36, the Copy Deck *Header, list and tooltips*, *The expansion* and *What survives a reload*. `DESIGN.md` revision 24 holds `level-toggle` and the header layout. Every acceptance criterion cites these documents and copies no rule or string.
+**Source of truth.** PRD revision 38 holds FR-38, the revised FR-1, FR-16, FR-22, FR-26, FR-29 and FR-36, and the Glossary entries *Item Level Floor*, *Crafting Item Level*, *Accepted Tier* and *Eligible Pool*. `ARCHITECTURE-SPINE.md` revision 47 holds AD-17: the scope to the Crafting Item Level, the recipe floor per modifier, the highest tier, the reach verdict per `(entry, recipe, L)` and edge alignment. It also holds AD-5, the floor that each entry declares. Spine revision 49 holds AD-11's own interval, the matching edge-alignment row of AD-17 and the settled unit of OQ-12, and PRD revision 39 holds the FR-29 bullet that follows from them. `AGENT-WORKFLOW.md` holds the `unreachable` rule of `pnpm tracked:check` and the rule for edits to `data/tracked.json` (*Parallel worktrees*). The `tracked-json` skill holds the curation steps. `EXPERIENCE.md` revision 34 holds Interaction 1b, state 48, the retired state 36, the Copy Deck *Header, list and tooltips*, *The expansion* and *What survives a reload*. `DESIGN.md` revision 24 holds `level-toggle` and the header layout. Every acceptance criterion cites these documents and copies no rule or string.
 
 **Deadline.** The next league starts on 2026-12-11. The four stories land before it.
 
-**Order.** 7.1, then 7.2, then 7.3, then 7.4. Each story is green under `pnpm check` on its own. 7.1 changes only the recipe floor and the reach verdict, so it can land alone, and it corrects the perfect-recipe EVs at once. 7.2 adds the Crafting Item Level to `core` and adds no UI. 7.3 changes only `data/tracked.json`. 7.4 is the first story the player sees.
+**Order.** 7.1, then 7.2, then 7.5, then 7.3, then 7.4. Each story is green under `pnpm check` on its own. 7.1 changes only the recipe floor and the reach verdict, so it can land alone, and it corrects the perfect-recipe EVs at once. 7.2 adds the Crafting Item Level to `core` and adds no UI. 7.5 adds each tier's own interval to `core` and changes no data, and 7.3 needs it to split a modifier whose T1 and T2 values overlap. 7.3 changes only `data/tracked.json`. 7.4 is the first story the player sees.
 
 ### Story 7.1: The recipe floor per modifier, after the level scope
 
@@ -3298,6 +3299,58 @@ So that at league start and in the endgame the list ranks for the bases I hold.
 **Given** the built page on `pnpm dev`
 **When** an agent checks it with the agent-browser skill in a named session
 **Then** the header with the toggle matches `DESIGN.md` `level-toggle` and the header layout at the page's frame width, and colour alone carries no distinction (NFR-10).
+
+**Given** the change is done
+**When** `pnpm check` runs
+**Then** it passes, and no test makes a network call (NFR-1).
+
+### Story 7.5: A tier's own interval in `core`
+
+As the player,
+I want tier 1 and tier 2 of a modifier whose values overlap tracked as two entries, each at its own floor,
+So that a Combination with "Adds # to # Lightning Damage" still ranks at the league-start level.
+
+**Note.** Story 7.3 is blocked without this story: its split of `explicit.stat_3336890334` on Bows, Crossbows, Spears and Quarterstaves fails `empty-containment-set` today (`spec-7-3` *Open Questions*). This story lands after 7.2 and before 7.3. It changes `core` and the `tracked:lookup` output of the `tracked-json` skill. It changes no file under `data/`, no `contracts` schema and no UI.
+
+**Acceptance Criteria:**
+
+**Given** a tier whose interval begins inside the interval of another tier of the same line set in its class's slot pool
+**When** `core` derives the tier's own interval
+**Then** one exported function, `ownInterval` in `packages/core/src/probability.ts`, derives it as AD-11 states, and the containment test and the edge-alignment test both call it (`AGENT-WORKFLOW.md`)
+**And** its edges are exact and compared with no tolerance (AD-5, AD-11)
+**And** it is the same at every offered Crafting Item Level and under every recipe, because it reads the unscoped slot pool (AD-11; FR-38)
+**And** where the tier overlaps no lower tier, or its own interval would be empty, it equals `interval`.
+
+**Given** the Bows prefix tiers of `explicit.stat_3336890334` in the committed Weights File
+**When** `core` derives their own intervals
+**Then** T2's is `[80.5, 103]` and T1's is `[103.5, 123]`.
+
+**Given** a band on a tier's own interval
+**When** `core` tests containment and computes `needs`
+**Then** the band contains that tier whole and no other tier, and `needs` gives that tier's `itemLevelMin` (AD-11, AD-17; FR-29, FR-22)
+**And** a hybrid reference contains a tier only under AD-11's line-set rule, with each line tested against its own interval.
+
+**Given** a banded line
+**When** the edge-alignment check runs
+**Then** it accepts as the lower edge the lowest contained tier's own minimum or its interval minimum, and as the upper edge the highest contained maximum, and it rejects any other edge (AD-17).
+
+**Given** two crafted entries on one Item Class that differ only in a prefix band on T1's own interval and one on T2's own interval
+**When** `contracts` loads them and `pnpm tracked:check` runs
+**Then** they load, no overlap, edge-alignment, empty-containment or co-rollable failure names them, and neither is listed under `unreachable` (FR-16, FR-38; AD-17)
+**And** `rank` counts each at its own floor, and no tier counts in both (FR-1, FR-29).
+
+**Given** the committed `data/tracked.json` and `data/weights.json`
+**When** the story compares the code before it with the code after it
+**Then** every cross-file result, every reach verdict, and every rank and EV at both offered levels under every recipe is unchanged
+**And** the report states the comparison and its result, and if anything changes, the story stops and names each change and its cause for the architect (AD-11, AD-17; NFR-3).
+
+**Given** `pnpm tracked:lookup tiers` on a banded statId
+**When** it prints a tier
+**Then** it prints the tier's own interval beside its `ranges`, so a curator reads the band to write without deriving it (`tracked-json` skill).
+
+**Given** one full ranking pass on the committed Tracked List
+**When** it is timed against NFR-6
+**Then** it stays within NFR-6 with the slot pool passed into containment.
 
 **Given** the change is done
 **When** `pnpm check` runs
