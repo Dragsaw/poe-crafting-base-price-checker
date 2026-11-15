@@ -1,13 +1,14 @@
 import { linesOf } from '@poe/contracts';
-import type { ModifierReference, ModifierWeight } from '@poe/contracts';
+import type { ModifierReference } from '@poe/contracts';
 
 import { isContaining, isCovering, lineSet, statIds, isUntrackable } from '../probability.ts';
 import type { Slot } from '../probability.ts';
 import { COMPLETE } from './complete-pool.ts';
 import { formatReference, setText } from './reference-text.ts';
+import type { SlotScope } from './slot-scope.ts';
 
 /** The entries excluded from a hybrid reference's containment set. */
-function hybridExclusions(reference: ModifierReference, scoped: readonly ModifierWeight[]): string[] {
+function hybridExclusions(reference: ModifierReference, { scoped, pool }: SlotScope): string[] {
   const named = statIds(reference);
   const lines = linesOf(reference);
   const excluded: string[] = [];
@@ -19,7 +20,7 @@ function hybridExclusions(reference: ModifierReference, scoped: readonly Modifie
       }
       continue;
     }
-    if (lines.some((rl) => entry.lines.every((line) => !isCovering(rl, line)))) {
+    if (lines.some((rl) => entry.lines.every((line) => !isCovering(rl, line, entry, pool)))) {
       continue;
     }
     // Covering every line means carrying every named statId, so only the tier's extra lines differ.
@@ -32,18 +33,13 @@ function hybridExclusions(reference: ModifierReference, scoped: readonly Modifie
 }
 
 /** The detail when no scoped entry contains the reference, never `P = 0`. */
-export function emptyContainment(
-  slot: Slot,
-  reference: ModifierReference,
-  scoped: readonly ModifierWeight[],
-  floor: number,
-): string | undefined {
-  if (scoped.some((entry) => isContaining(reference, entry))) {
+export function emptyContainment(slot: Slot, reference: ModifierReference, { scoped, pool }: SlotScope, floor: number): string | undefined {
+  if (scoped.some((entry) => isContaining(reference, entry, pool))) {
     return undefined;
   }
   const head = `${formatReference(slot, reference)} at floor ${String(floor)}: no scoped entry contains it`;
   if (reference.kind === 'hybrid') {
-    const excluded = hybridExclusions(reference, scoped);
+    const excluded = hybridExclusions(reference, { scoped, pool });
     return excluded.length === 0 ? head : `${head}; excluded: ${excluded.join(', ')}`;
   }
   const carrying = scoped.filter(

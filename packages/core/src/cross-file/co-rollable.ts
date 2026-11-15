@@ -1,4 +1,4 @@
-import type { ModifierReference, ModifierWeight } from '@poe/contracts';
+import type { ModifierReference, ModifierWeight, WeightsClassPools } from '@poe/contracts';
 
 import { containedIn, isExcludedBy } from '../probability.ts';
 import type { Slot } from '../probability.ts';
@@ -16,14 +16,16 @@ function blockText(candidate: ModifierWeight, first: ModifierWeight): string {
 /**
  * The detail when no contained prefix tier and suffix tier can be on one item in either draw
  * order, never `P = 0`. An empty containment set is that check's failure, so this passes it.
+ * `pools` are the unscoped slot pools that containment reads (AD-11).
  */
 export function coRollable(
   references: Readonly<Record<Slot, ModifierReference>>,
   scoped: Readonly<Record<Slot, readonly ModifierWeight[]>>,
   floor: number,
+  pools: WeightsClassPools,
 ): string | undefined {
-  const prefixes = containedIn(references.prefix, scoped.prefix);
-  const suffixes = containedIn(references.suffix, scoped.suffix);
+  const prefixes = containedIn(references.prefix, scoped.prefix, pools.prefix);
+  const suffixes = containedIn(references.suffix, scoped.suffix, pools.suffix);
   const [prefix] = prefixes;
   const [suffix] = suffixes;
   if (prefix === undefined || suffix === undefined) {

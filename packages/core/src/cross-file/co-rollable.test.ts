@@ -40,7 +40,7 @@ describe('the co-rollable combination check (AD-17)', () => {
   it('names a shared modGroup as the reason', () => {
     const prefix = tier([line(STAT, [10, 12])], { modGroup: 'shared' });
     const suffix = tier([line(OTHER, [1, 2])], { modGroup: 'shared' });
-    const detail = coRollable({ prefix: band(10, 12), suffix: band(1, 2, OTHER) }, { prefix: [prefix], suffix: [suffix] }, 82);
+    const detail = coRollable({ prefix: band(10, 12), suffix: band(1, 2, OTHER) }, { prefix: [prefix], suffix: [suffix] }, 82, pools([prefix], [suffix]));
     expect(detail).toContain('prefix first, shared modGroup shared; suffix first, shared modGroup shared');
   });
 

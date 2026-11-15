@@ -55,7 +55,7 @@ export {
   lineSetCompleteness,
   scopedPools,
 } from './cross-file.ts';
-export type { CrossFileFailure, CrossFileResult, ScopedPools, UnvalidatedMark } from './cross-file.ts';
+export type { CrossFileFailure, CrossFileResult, ScopedPools, SlotScope, UnvalidatedMark } from './cross-file.ts';
 
 /** The probability term (AD-11, AD-17). */
 export {
@@ -69,6 +69,7 @@ export {
   isExcludedBy,
   lineSet,
   needs,
+  ownInterval,
   poolOf,
   recipeReach,
   secondDraw,

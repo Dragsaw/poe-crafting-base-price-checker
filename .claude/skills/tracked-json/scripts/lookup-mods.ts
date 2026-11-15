@@ -1,5 +1,5 @@
 import { type CraftRecipe, type ModifierWeight, type WeightsFile, type WeightsPool } from '@poe/contracts';
-import { CRAFTING_ITEM_LEVELS, eligible, lineSet, type UntrackableReason, untrackableReason } from '@poe/core';
+import { CRAFTING_ITEM_LEVELS, eligible, interval, lineSet, ownInterval, type UntrackableReason, untrackableReason } from '@poe/core';
 
 import { absentAsNull } from './lookup-absent-as-null.ts';
 import { type ClassSelector, resolveClass, SLOTS, type Slot } from './lookup-weights.ts';
@@ -92,6 +92,25 @@ function modifierRow(slot: Slot, family: ModifierFamily, pool: WeightsPool): Mod
   };
 }
 
+export interface TierInterval {
+  readonly statId: string;
+  readonly interval: readonly [number, number];
+  readonly ownInterval: readonly [number, number];
+}
+
+function tierIntervals(entry: ModifierWeight, pool: WeightsPool): TierInterval[] {
+  const intervals: TierInterval[] = [];
+  for (const line of entry.lines) {
+    if (line.statId === null || line.ranges.length === 0) {
+      continue;
+    }
+    const derived = interval(line);
+    const own = ownInterval(line, entry, pool);
+    intervals.push({ statId: line.statId, interval: [derived.min, derived.max], ownInterval: [own.min, own.max] });
+  }
+  return intervals;
+}
+
 export interface TierRow {
   readonly slot: Slot;
   readonly tierLabel: unknown;
@@ -101,6 +120,8 @@ export interface TierRow {
   readonly modGroup: string;
   /** The entry's lines, verbatim: each `statId` with its `ranges`. */
   readonly lines: readonly unknown[];
+  /** Per banded line: `core`'s `interval` and `ownInterval` over the unscoped slot pool (AD-11), each `[min, max]`. */
+  readonly intervals: readonly TierInterval[];
   /** `core`'s line set of the entry: its non-null `statId`s, sorted. */
   readonly lineSet: readonly string[];
   /** `core`'s null-line verdict: why the tier is untrackable, or `null` when it is trackable. */
@@ -138,6 +159,7 @@ export function lookupTiers(
         weightSource: entry.weightSource,
         modGroup: entry.modGroup,
         lines: entry.lines,
+        intervals: tierIntervals(entry, pool),
         lineSet: lineSet(entry),
         untrackable: absentAsNull(untrackableReason(entry, pool)),
         ...(scopes.length > 0 && {

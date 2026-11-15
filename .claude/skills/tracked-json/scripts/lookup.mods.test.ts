@@ -137,6 +137,12 @@ describe('the null-line rule in lookupMods and lookupTiers', () => {
       { statId: JSON_NULL, ranges: [] },
     ]);
     expect(t1).toMatchObject({ lineSet: [A, B], untrackable: JSON_NULL });
+    // The null line gets no `intervals` item; nor does a valueless line on a resolved statId.
+    expect(t1?.intervals).toEqual([
+      { statId: B, interval: [5, 6], ownInterval: [5, 6] },
+      { statId: A, interval: [3, 4], ownInterval: [3, 4] },
+    ]);
+    expect(complete.find((row) => row.modGroup === 'Flagged')?.intervals).toEqual([{ statId: A, interval: [7, 8], ownInterval: [7, 8] }]);
     expect(partial.find((row) => row.modGroup === 'Mixed' && row.tierLabel === 'T1')).toMatchObject({
       lineSet: [A],
       untrackable: 'partial-pool-null-line',
@@ -164,9 +170,24 @@ describe('lookupTiers', () => {
       weightSource: 'published',
       modGroup: 'BaseSpirit',
       lines: [{ statId: SPIRIT, ranges: [[30, 33]] }],
+      intervals: [{ statId: SPIRIT, interval: [30, 33], ownInterval: [30, 33] }],
       lineSet: [SPIRIT],
       untrackable: JSON_NULL,
     });
+  });
+
+  it('prints each banded line of a hybrid tier with its interval and own interval, from core (AD-11)', () => {
+    const found = lookupTiers(WEIGHTS, EVASION, { className: 'Body_Armours_dex', category: 'armour.chest' });
+    expect(found.tiers.map((row) => row.intervals)).toEqual([
+      [
+        { statId: EVASION, interval: [14, 20], ownInterval: [14, 20] },
+        { statId: LIFE, interval: [11, 19], ownInterval: [11, 19] },
+      ],
+      [
+        { statId: EVASION, interval: [21, 26], ownInterval: [21, 26] },
+        { statId: LIFE, interval: [20, 23], ownInterval: [20, 23] },
+      ],
+    ]);
   });
 
   it('says, per tier, recipe and offered level, whether the floor keeps the tier: a modifier below the floor keeps its top tier', () => {

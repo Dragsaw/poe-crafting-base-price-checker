@@ -29,6 +29,7 @@ import { edgeAlignment } from './cross-file/edge-alignment.ts';
 import { emptyContainment } from './cross-file/empty-containment.ts';
 import { kindAgreement } from './cross-file/kind-agreement.ts';
 import { formatReference, setText } from './cross-file/reference-text.ts';
+import type { SlotScope } from './cross-file/slot-scope.ts';
 import { containedIn, isContaining, eligible, interval, lineSet, poolOf, statIds, isUntrackable } from './probability.ts';
 import type { ReferenceLine, Slot } from './probability.ts';
 
@@ -37,6 +38,7 @@ export { coRollable } from './cross-file/co-rollable.ts';
 export { edgeAlignment } from './cross-file/edge-alignment.ts';
 export { emptyContainment } from './cross-file/empty-containment.ts';
 export { kindAgreement } from './cross-file/kind-agreement.ts';
+export type { SlotScope } from './cross-file/slot-scope.ts';
 
 /** The cross-file checks and the unvalidated marks (AD-17). Pure (AD-1). */
 
@@ -88,7 +90,7 @@ function isMeeting(rl: ReferenceLine, line: WeightsLine): boolean {
 export function lineSetCompleteness(
   slot: Slot,
   reference: ModifierReference,
-  scoped: readonly ModifierWeight[],
+  { scoped, pool }: SlotScope,
   level: number,
 ): string | undefined {
   const named = statIds(reference);
@@ -123,7 +125,7 @@ export function lineSetCompleteness(
 
   if (reference.kind === 'hybrid') {
     const groups = new Map<string, string[]>();
-    for (const entry of containedIn(reference, scoped)) {
+    for (const entry of containedIn(reference, scoped, pool)) {
       groups.set(entry.modGroup, [...(groups.get(entry.modGroup) ?? []), entry.sourceModifierId]);
     }
     if (groups.size > 1) {
@@ -136,8 +138,8 @@ export function lineSetCompleteness(
   return parts.length === 0 ? undefined : parts.join('; ');
 }
 
-/** `coOccur(x, y, S)` on one slot, memoised per reference pair and `S`. */
-export function coOccur(scoped: ScopedPools): CoOccur {
+/** `coOccur(x, y, S)` on one slot, memoised per reference pair and `S`; `pools` are unscoped (AD-11). */
+export function coOccur(scoped: ScopedPools, pools: WeightsClassPools): CoOccur {
   const cache = new Map<string, boolean>();
   return (x, y, slot, summed) => {
     const key = JSON.stringify([slot, x, y, [...summed].toSorted(compareByCodeUnit)]);
@@ -148,13 +150,13 @@ export function coOccur(scoped: ScopedPools): CoOccur {
     const theirs = statIds(y);
     const isCoOccurring =
       statIds(x).some((statId) => theirs.includes(statId)) &&
-      scoped[slot].some((entry) => isContaining(x, entry, summed) && isContaining(y, entry, summed));
+      scoped[slot].some((entry) => isContaining(x, entry, pools[slot], summed) && isContaining(y, entry, pools[slot], summed));
     cache.set(key, isCoOccurring);
     return isCoOccurring;
   };
 }
 
-type ReferenceCheck = (slot: Slot, reference: ModifierReference, scoped: readonly ModifierWeight[], floor: number) => string | undefined;
+type ReferenceCheck = (slot: Slot, reference: ModifierReference, scope: SlotScope, floor: number) => string | undefined;
 
 /** A pass that a wider pool cannot undo: run at the entry's own floor (AD-17). */
 const FLOOR_CHECKS: readonly (readonly [CrossFileCheck, ReferenceCheck])[] = [
@@ -179,6 +181,7 @@ interface Keyed {
 }
 
 interface Scope {
+  readonly pools: WeightsClassPools;
   readonly scoped: ScopedPools;
   readonly coOccur: CoOccur;
 }
@@ -201,7 +204,7 @@ function scopeCache(pools: WeightsClassPools): ScopeOf {
       return known;
     }
     const scoped = scopedPools(pools, floor);
-    const made = { scoped, coOccur: coOccur(scoped) };
+    const made = { pools, scoped, coOccur: coOccur(scoped, pools) };
     scopes.set(floor, made);
     return made;
   };
@@ -224,13 +227,14 @@ function referenceFailures(keyed: readonly Keyed[], scopeOf: ScopeOf): CrossFile
     const { entry } = item;
     const widest = widestLevel(entry.itemLevelMin);
     for (const [checks, level] of [[FLOOR_CHECKS, entry.itemLevelMin], [WIDEST_CHECKS, widest]] as const) {
-      const { scoped } = scopeOf(level);
+      const { pools, scoped } = scopeOf(level);
       for (const [check, run] of checks) {
-        const parts = OVERLAP_SLOTS.map((slot) => run(slot, entry[slot], scoped[slot], level)).filter((part) => part !== undefined);
+        const parts = OVERLAP_SLOTS.map((slot) => run(slot, entry[slot], { scoped: scoped[slot], pool: pools[slot] }, level)).filter((part) => part !== undefined);
         failures.push(...failureOf(item, check, parts));
       }
     }
-    const pair = coRollable(entry, scopeOf(entry.itemLevelMin).scoped, entry.itemLevelMin);
+    const { pools, scoped } = scopeOf(entry.itemLevelMin);
+    const pair = coRollable(entry, scoped, entry.itemLevelMin, pools);
     failures.push(...failureOf(item, 'co-rollable-combination', pair === undefined ? [] : [pair]));
   }
   return failures;

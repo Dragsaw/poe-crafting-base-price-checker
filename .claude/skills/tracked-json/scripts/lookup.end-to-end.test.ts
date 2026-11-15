@@ -143,6 +143,17 @@ describe('pnpm tracked:lookup', () => {
     expect(snapshot(DATA_DIR)).toEqual(before);
   });
 
+  it('prints the Bows lightning T1 prefix with its interval and its own interval', async () => {
+    const run = await runScript(['tiers', 'explicit.stat_3336890334', '--class', 'Bows']);
+
+    expect(run.code, run.stderr).toBe(0);
+    const printed = JSON.parse(run.stdout) as {
+      tiers: { slot: string; tierLabel: string; intervals: { statId: string; interval: number[]; ownInterval: number[] }[] }[];
+    };
+    const t1 = printed.tiers.find((row) => row.slot === 'prefix' && row.tierLabel === 'T1');
+    expect(t1?.intervals).toEqual([{ statId: 'explicit.stat_3336890334', interval: [101.5, 123], ownInterval: [103.5, 123] }]);
+  });
+
   it('prints a lookup error as {error} on stdout with exit 1', async () => {
     const run = await runScript(['mods', '--class', 'Nope']);
 

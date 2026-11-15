@@ -3,6 +3,7 @@ import type { ModifierReference, ModifierWeight, WeightsLine } from '@poe/contra
 
 import type { ReferenceLine, Slot } from '../probability.ts';
 import { formatLine } from './reference-text.ts';
+import type { SlotScope } from './slot-scope.ts';
 
 /** `disagrees(rl, line)`: a valueless reference line beside a banded line, same `statId`. */
 function isDisagreeing(rl: ReferenceLine, line: WeightsLine): boolean {
@@ -13,7 +14,7 @@ function isDisagreeing(rl: ReferenceLine, line: WeightsLine): boolean {
 export function kindAgreement(
   slot: Slot,
   reference: ModifierReference,
-  scoped: readonly ModifierWeight[],
+  { scoped }: SlotScope,
   level: number,
 ): string | undefined {
   const parts: string[] = [];

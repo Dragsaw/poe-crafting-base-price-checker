@@ -95,6 +95,7 @@ export const WEIGHTS = WeightsFileSchema.parse({
 
 export const A = 'explicit.stat_a';
 export const B = 'explicit.stat_b';
+export const FLAG = 'explicit.stat_flag';
 
 export function nullLineWeights(poolCoverage: 'complete' | 'partial'): WeightsFile {
   const notInGame = {
@@ -128,6 +129,11 @@ export function nullLineWeights(poolCoverage: 'complete' | 'partial'): WeightsFi
               tier('prefix', 'Mixed', { itemLevelMin: 20, tierLabel: 'T1', text: 'a', lines: [
                 { statId: A, ranges: [[3, 4]] },
                 { statId: JSON_NULL, ranges: [] },
+              ] }),
+              // A valueless line on a resolved statId beside a banded one.
+              tier('prefix', 'Flagged', { itemLevelMin: 30, tierLabel: 'T1', text: 'a flag', lines: [
+                { statId: A, ranges: [[7, 8]] },
+                { statId: FLAG, ranges: [] },
               ] }),
             ],
           },

@@ -1,10 +1,9 @@
-import type { HybridLine, ModifierReference, ModifierWeight, WeightsPool } from '@poe/contracts';
+import type { HybridLine, ModifierReference, ModifierWeight, WeightsLine, WeightsPool } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import {
   affixProbability,
   combinationProbability,
-  isContaining,
   isCovering,
   eligible,
   lineSet,
@@ -13,7 +12,7 @@ import {
   isUntrackable,
   untrackableReason,
 } from '../probability.ts';
-import { band, isCloseRelative, line, OTHER, pOf, pools, scope82, STAT, tier, unresolvedLine } from './test-support.ts';
+import { band, isCloseRelative, isContainingAlone, line, OTHER, pOf, poolWith, pools, scope82, STAT, tier, unresolvedLine } from './test-support.ts';
 
 const THIRD = 'explicit.stat_3';
 
@@ -38,7 +37,7 @@ describe('a hybrid reference', () => {
 
   it('does not contain a tier whose line set is a superset of the reference statIds', () => {
     const superset = tier([line(STAT, [10, 12]), line(OTHER, [4, 6]), line(THIRD, [1, 2])], 100);
-    expect(isContaining(hybrid(lineBand(10, 12), lineBand(4, 6, OTHER)), superset)).toBe(false);
+    expect(isContainingAlone(hybrid(lineBand(10, 12), lineBand(4, 6, OTHER)), superset)).toBe(false);
   });
 
   it('gives each of two hybrid families in one slot only its own family', () => {
@@ -48,8 +47,8 @@ describe('a hybrid reference', () => {
     const classPools = pools([ab, ac, rest], []);
     const referenceAB = hybrid(lineBand(10, 12), lineBand(4, 6, OTHER));
     const referenceAC = hybrid(lineBand(10, 12), lineBand(1, 2, THIRD));
-    expect(isContaining(referenceAB, ac)).toBe(false);
-    expect(isContaining(referenceAC, ab)).toBe(false);
+    expect(isContainingAlone(referenceAB, ac)).toBe(false);
+    expect(isContainingAlone(referenceAC, ab)).toBe(false);
     expect(pOf(affixProbability(classPools, 'prefix', referenceAB, scope82(0)))).toBeCloseTo(100 / 1000, 10);
     expect(pOf(affixProbability(classPools, 'prefix', referenceAC, scope82(0)))).toBeCloseTo(300 / 1000, 10);
   });
@@ -77,14 +76,18 @@ describe('a hybrid reference', () => {
     const engine = tier([line(STAT, [10, 12]), unresolvedLine(), line(OTHER, [4, 6])], 100);
     expect(lineSet(engine)).toEqual([STAT, OTHER]);
     expect(isUntrackable(engine, { poolCoverage: 'complete' })).toBe(false);
-    expect(isContaining(hybrid(lineBand(10, 12), lineBand(4, 6, OTHER)), engine)).toBe(true);
+    expect(isContainingAlone(hybrid(lineBand(10, 12), lineBand(4, 6, OTHER)), engine)).toBe(true);
   });
 
   it('never covers a banded weights line with a valueless hybrid line', () => {
-    expect(isCovering({ statId: OTHER }, line(OTHER, [4, 6]))).toBe(false);
-    expect(isCovering({ statId: OTHER }, line(OTHER))).toBe(true);
+    const covers = (weightsLine: WeightsLine) => {
+      const alone = tier([weightsLine], 100);
+      return isCovering({ statId: OTHER }, weightsLine, alone, poolWith(alone));
+    };
+    expect(covers(line(OTHER, [4, 6]))).toBe(false);
+    expect(covers(line(OTHER))).toBe(true);
     const banded = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 100);
-    expect(isContaining(hybrid(lineBand(10, 12), { statId: OTHER }), banded)).toBe(false);
+    expect(isContainingAlone(hybrid(lineBand(10, 12), { statId: OTHER }), banded)).toBe(false);
   });
 
   it('never contains a weight-0 hybrid tier whose lines are covered, which stays in W', () => {
@@ -92,7 +95,7 @@ describe('a hybrid reference', () => {
     const live = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 100);
     const rest = tier([line(THIRD, [1, 2])], 300);
     const reference = hybrid(lineBand(10, 12), lineBand(4, 6, OTHER));
-    expect(isContaining(reference, zero)).toBe(false);
+    expect(isContainingAlone(reference, zero)).toBe(false);
     const classPools = pools([zero, live, rest], []);
     expect(eligible(classPools.prefix, 82, 0)).toContain(zero);
     expect(pOf(affixProbability(classPools, 'prefix', reference, scope82(0)))).toBe(100 / 400);
@@ -132,25 +135,25 @@ describe('contains with summed statIds', () => {
   it('drops the band test of a hybrid line on a summed statId and keeps the line-set test', () => {
     const entry = tier([line(STAT, [10, 12]), line(OTHER, [40, 60])], 100);
     const reference = hybrid(lineBand(10, 12), lineBand(1, 2, OTHER));
-    expect(isContaining(reference, entry)).toBe(false);
-    expect(isContaining(reference, entry, summed)).toBe(true);
+    expect(isContainingAlone(reference, entry)).toBe(false);
+    expect(isContainingAlone(reference, entry, summed)).toBe(true);
     // The line that is not summed keeps its band test.
-    expect(isContaining(hybrid(lineBand(20, 30), lineBand(1, 2, OTHER)), entry, summed)).toBe(false);
+    expect(isContainingAlone(hybrid(lineBand(20, 30), lineBand(1, 2, OTHER)), entry, summed)).toBe(false);
     // The line set still has to match exactly.
     const wider = tier([line(STAT, [10, 12]), line(OTHER, [40, 60]), line(THIRD, [1, 2])], 100);
-    expect(isContaining(reference, wider, summed)).toBe(false);
+    expect(isContainingAlone(reference, wider, summed)).toBe(false);
   });
 
   it('needs only a line on the summed statId for a single-line reference', () => {
     const entry = tier([line(OTHER, [40, 60])], 100);
-    expect(isContaining(band(1, 2, OTHER), entry)).toBe(false);
-    expect(isContaining(band(1, 2, OTHER), entry, summed)).toBe(true);
-    expect(isContaining(band(1, 2, OTHER), tier([line(STAT, [1, 2])], 100), summed)).toBe(false);
+    expect(isContainingAlone(band(1, 2, OTHER), entry)).toBe(false);
+    expect(isContainingAlone(band(1, 2, OTHER), entry, summed)).toBe(true);
+    expect(isContainingAlone(band(1, 2, OTHER), tier([line(STAT, [1, 2])], 100), summed)).toBe(false);
   });
 
   it('still never contains a weight-0 tier', () => {
     const zero = tier([line(STAT, [10, 12]), line(OTHER, [40, 60])], 0);
-    expect(isContaining(hybrid(lineBand(10, 12), lineBand(40, 60, OTHER)), zero, summed)).toBe(false);
+    expect(isContainingAlone(hybrid(lineBand(10, 12), lineBand(40, 60, OTHER)), zero, summed)).toBe(false);
   });
 });
 
