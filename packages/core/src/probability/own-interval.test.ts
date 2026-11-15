@@ -78,12 +78,40 @@ describe('ownInterval (AD-11)', () => {
     expect(ownOf(second, poolWith(first, second))).toEqual({ min: 1, max: 1 });
   });
 
-  it('reads only tiers of the same line set, and every one of them, weight-0 included', () => {
+  it('reads only tiers of the same line set', () => {
     const hybrid = tier([line(STAT, [10, 20]), line(OTHER, [1, 2])], 100);
     const single = tier([line(STAT, [15, 30])], 100);
     expect(ownOf(single, poolWith(hybrid, single))).toEqual({ min: 15, max: 30 });
+  });
+
+  it('is not narrowed by a weight-0 tier, which cannot roll (ECH-2)', () => {
     const dead = tier([line(STAT, [10, 20])], 0);
-    expect(ownOf(single, poolWith(hybrid, dead, single))).toEqual({ min: 21, max: 30 });
+    const live = tier([line(STAT, [10, 20])], 100);
+    const single = tier([line(STAT, [15, 30])], 100);
+    expect(ownOf(single, poolWith(dead, single))).toEqual({ min: 15, max: 30 });
+    expect(ownOf(single, poolWith(live, dead, single))).toEqual({ min: 21, max: 30 });
+  });
+
+  it('narrows a weight-0 tier by the tiers that can roll', () => {
+    const low = tier([line(STAT, [10, 20])], 100);
+    const dead = tier([line(STAT, [20, 30])], 0);
+    expect(ownOf(dead, poolWith(low, dead))).toEqual({ min: 21, max: 30 });
+  });
+});
+
+describe('containment beside a weight-0 tier (AD-11, ECH-2)', () => {
+  const dead = tier([line(STAT, [10, 20])], 0);
+  const single = tier([line(STAT, [15, 30])], 100);
+  const pool = poolWith(dead, single);
+  const scope = { scoped: pool.entries, pool };
+
+  it('contains the rolling tier in a band from its interval minimum, and edge alignment accepts it', () => {
+    expect(containedIn(band(15, 30), pool.entries, pool)).toEqual([single]);
+    expect(edgeAlignment('prefix', band(15, 30), scope, 82)).toBeUndefined();
+  });
+
+  it('does not contain the rolling tier in a band that starts above its low rolls', () => {
+    expect(isContaining(band(21, 30), single, pool)).toBe(false);
   });
 });
 

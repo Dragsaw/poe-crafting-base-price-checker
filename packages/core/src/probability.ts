@@ -67,14 +67,15 @@ function lineSetKey(entry: ModifierWeight): string {
   return key;
 }
 
-// Per pool: its tiers grouped by line set, and each line's own interval once derived.
+// Per pool: its tiers that can roll grouped by line set, and each line's own interval once derived.
 const ownIntervals = new WeakMap<WeightsPool, { readonly bySet: Map<string, ModifierWeight[]>; readonly own: Map<WeightsLine, Interval> }>();
 
-/** A tier's own interval on one line, over the unscoped slot pool (AD-11). */
+/** A tier's own interval on one line, over the unscoped slot pool's tiers whose weight is above 0 (AD-11). */
 export function ownInterval(line: WeightsLine, tier: ModifierWeight, pool: WeightsPool): Interval {
   let memo = ownIntervals.get(pool);
   if (memo === undefined) {
-    memo = { bySet: Map.groupBy(pool.entries, (entry) => lineSetKey(entry)), own: new Map() };
+    const rolling = pool.entries.filter((entry) => entry.weight > 0);
+    memo = { bySet: Map.groupBy(rolling, (entry) => lineSetKey(entry)), own: new Map() };
     ownIntervals.set(pool, memo);
   }
   let own = memo.own.get(line);

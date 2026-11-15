@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 49
+revision: 50
 created: '2026-09-12'
 updated: '2026-11-15'
 binds: []
@@ -691,11 +691,12 @@ never import each other.
   division is exact.
 
   **A tier's own interval gives the overlap to the tier below.** Where a tier's interval
-  begins inside the interval of another tier of the same line set in the class's slot pool,
-  its **own interval** begins at the first value the line can take above the highest such
-  maximum. So tier N's minimum never meets tier N-1's maximum. The slot pool is read
-  unscoped, so a tier has one own interval at every Crafting Item Level and under every
-  recipe. Where tiers do not overlap, the own interval is the interval, and a tier whose own
+  begins inside the interval of another tier of the same line set in the class's slot pool
+  whose `weight` is above 0, its **own interval** begins at the first value the line can
+  take above the highest such maximum. So tier N's minimum never meets tier N-1's maximum.
+  A weight-0 tier cannot roll, so it narrows no tier; the `weight` read is the entry's own,
+  never AD-17's tag exclusion. The slot pool is read unscoped, so a tier has one own
+  interval at every Crafting Item Level and under every recipe. Where tiers do not overlap, the own interval is the interval, and a tier whose own
   interval would be empty keeps its interval. The derivation is `ownInterval` in
   `packages/core/src/probability.ts`, binding under AD-0, and it is exact for the reason above.
 
