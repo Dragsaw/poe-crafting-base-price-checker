@@ -6,7 +6,10 @@
 #
 # `pnpm check` gates the build. It runs every static check, `pnpm test` and
 # `pnpm test:data`, the invariants of the live `data/`, so a failing `data/`
-# push does not deploy.
+# push does not deploy. The `pnpm check` step's `RANK_BUDGET_TIMING: 'off'`
+# turns off the NFR-6 timed cases, which
+# `packages/core/src/rank/budget.data.test.ts` reads, so runner noise does not
+# block a tick's price deploy (AD-24).
 #
 # One-time setup: Settings > Pages > Source must be "GitHub Actions".
 name: Deploy to Pages
@@ -45,6 +48,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm check
+        env:
+          RANK_BUDGET_TIMING: 'off'
 
       - run: pnpm build
 

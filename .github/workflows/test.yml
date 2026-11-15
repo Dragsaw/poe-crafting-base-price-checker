@@ -6,8 +6,8 @@
 # a required check that never reports leaves the pull request unmergeable.
 #
 # `pnpm check` is the done gate of AGENT-WORKFLOW.md, the same command the
-# pre-push hook runs. It includes `pnpm test:data`, which `deploy.yml` does not
-# run, so a player's data-only push still deploys.
+# pre-push hook runs. It includes `pnpm test:data`, which `deploy.yml` runs
+# too, with the NFR-6 timed cases off.
 name: Tests
 
 on:

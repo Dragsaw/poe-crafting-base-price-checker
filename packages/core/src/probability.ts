@@ -11,6 +11,7 @@ import type {
   WeightsPool,
 } from '@poe/contracts';
 
+import { memoByPool } from './probability/pool-memo.ts';
 import { lineDigits, nextOnGrid } from './probability/value-grid.ts';
 
 /**
@@ -252,6 +253,9 @@ function totalWeight(entries: readonly ModifierWeight[]): number {
   return total;
 }
 
+// One eligible set and its weight per pool and recipe scope `(itemLevel, modifierLevelMin)` (AD-24).
+const eligibleSets = memoByPool<WeightsPool, { readonly eligibleSet: readonly ModifierWeight[]; readonly total: number }>();
+
 /** A pool is empty when its total weight is `0`: the one definition for coverage (AD-17). */
 export function isEmptyPool(pool: WeightsPool): boolean {
   return totalWeight(pool.entries) === 0;
@@ -356,8 +360,11 @@ export function combinationProbability(
   { itemLevel, modifierLevelMin }: RecipeScope,
 ): ProbabilityResult {
   const setsOf = (slot: Slot, reference: ModifierReference): SlotSets => {
-    const eligibleSet = eligible(pools[slot], itemLevel, modifierLevelMin);
-    return { slot, eligibleSet, contained: containedIn(reference, eligibleSet, pools[slot]), total: totalWeight(eligibleSet) };
+    const { eligibleSet, total } = eligibleSets(pools[slot], `${String(itemLevel)}:${String(modifierLevelMin)}`, () => {
+      const entries = eligible(pools[slot], itemLevel, modifierLevelMin);
+      return { eligibleSet: entries, total: totalWeight(entries) };
+    });
+    return { slot, eligibleSet, contained: containedIn(reference, eligibleSet, pools[slot]), total };
   };
   const prefix = setsOf('prefix', combination.prefix);
   const suffix = setsOf('suffix', combination.suffix);
