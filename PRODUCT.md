@@ -24,7 +24,7 @@ The ranking is expected value per craft, threshold-truncated at a player-adjusta
 
 ## Operating Context
 
-- v1 is built in a four-package workspace (`contracts`, `core`, `sync`, `web`): every epic in `docs/stories/sprint-status.yaml` is done. The Pick-up Filter (PRD rev 35, AD-31) is planned and not yet built. Open work is the deferred-work ledger (`docs/stories/deferred-work.md`).
+- v1 is built in a four-package workspace (`contracts`, `core`, `sync`, `web`): every epic in `docs/stories/sprint-status.yaml` is done. The Pick-up Filter (PRD rev 35, AD-31) is built. Open work is the deferred-work ledger (`docs/stories/deferred-work.md`).
 - The player reads the ranked list before a play session or when the economy is worth a look; the list is precomputed and never blocks on a live API call (PRD §1).
 - After that read, the player saves a fresh Pick-up Filter over the last one and reloads it in the game, so the ground carries the ranking for the session and he reads no list mid-map. A later change to the Payout Threshold, the Craft Recipe or a price reaches the game only when he saves again (UJ-7, FR-35).
 - The Payout Threshold is set directly by the player, the list follows at once, and it is the only view state the PRD promises will survive a reload (FR-6, FR-7). UX persists more, including the Crafting Item Level. `EXPERIENCE.md`, *What survives a reload*, owns that list.

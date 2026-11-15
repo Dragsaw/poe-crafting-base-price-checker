@@ -77,3 +77,15 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-7-4-the-item-level-toggle.md`
   summary: Add a web test that clicks the level toggle during the cold load (state 22) and checks that the choice is stored and ranks the first ready render.
   evidence: `pendingControls` in `packages/web/src/frame/header-controls.tsx` renders a live `LevelToggle` while pending. The cold-load test in `packages/web/src/App/header-bar.test.tsx` only finds `[data-level-toggle]`, and every test in `packages/web/src/level/level-toggle.test.tsx` clicks after `ready()`. A no-op `onLevelChange` in `renderPending` (`packages/web/src/App.tsx`) would pass every test. Found by the verification-gap layer of the spec-7-4 review.
+
+## Deferred from: spec-epic-7-retro-item-1 (2026-11-15)
+
+- source_spec: `docs/stories/spec-epic-7-retro-item-1-measured-refresh-time.md`
+  summary: Measure the full-refresh time without the session cookie, then give UJ-6 and SM-C1 that figure.
+  evidence: PRD revision 40 gives UJ-6 and SM-C1 about a day and a half with the cookie and only "takes longer" without it, because no no-cookie figure was measured. The committed sync history holds only short pre-cookie runs, and every Pi session since 2026-11-08 ran with the cookie (`epic-7-retro-2026-11-15.md` D1). The inferred figure is about 70 h (about 50 searches/h under AD-8's spread), not measured. Until this lands, AD-12's no-cookie pace clause has no figure. Proof: run the Pi sync unauthenticated (`ops/pi/README.md`) long enough for a steady rate, take entries per hour from the `sync-progress.json` `completed` growth per 4 h tick, skipping any tick where a new pass restarts the completed list, and divide the Tracked List's search count by it. Cost: the run holds the only sync host at the unauthenticated pace for its duration. Afterwards, `ops/pi/set-poesessid.sh` restores the cookie. The PM then puts the figure in UJ-6 and SM-C1.
+  retry_when: never — needs a human
+
+- source_spec: `docs/stories/spec-epic-7-retro-item-1-measured-refresh-time.md`
+  summary: Recheck the Price trust rationale for the 72 h old mark against the accepted refresh cycle of about 36 h.
+  evidence: [NOTE FOR UX] `EXPERIENCE.md` *Price trust* (about lines 672-673) justifies the 72 h *old* threshold by "the partial refresh cycle of about 15 hours". PRD revision 40 accepts a full refresh of about 36 h with the cookie (UJ-6, SM-C1). A no-cookie cycle, inferred at about 70 h, would come near the 72 h *old* mark. UX owns the threshold and its rationale; a reviewer does not edit the owner document.
+  retry_when: never — needs a human

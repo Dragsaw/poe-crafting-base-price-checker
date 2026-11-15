@@ -1,7 +1,7 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 39
+revision: 40
 created: 2026-09-12
 updated: 2026-11-15
 sources:
@@ -68,7 +68,7 @@ There is a single operator, a single role, no authentication and no multi-device
 - **UJ-3. The drill-down.** The player is unsure why an unfamiliar Item Class ranks third. He expands that row and reads the full tracked Combination list. The list shows which Combinations have a price, at what price, whether each price can be trusted, and which Combinations returned no listings.
 - **UJ-4. The trust check.** The player notices a row that ranks suspiciously high. The row itself says that its price is not current enough to act on, and that its odds are estimated. He discounts that row rather than acting on it.
 - **UJ-5. The curation pass.** The player reviews deliberately after a few weeks, working through the Combinations he tracks against each Item Class. He sees three Combinations that have returned no listings all league, and one Combination flagged unresolvable since the last patch. He opens `data/tracked.json`, tombstones the dead Combinations with a reason, pins one Combination he wants watched closely, and commits. The next sync run reflects the edit.
-- **UJ-6. The league reset.** A new league starts. The player edits the active league in `data/config.json` and commits. The ranking goes honestly empty rather than quietly serving last league's numbers, and the ranking refills within a day when sync uses the optional session cookie, or in about a day and a half without it (FR-20, SM-C1).
+- **UJ-6. The league reset.** A new league starts. The player edits the active league in `data/config.json` and commits. The ranking goes honestly empty rather than quietly serving last league's numbers, and the ranking refills in about a day and a half (about 36 hours) when sync uses the optional session cookie. Without it, the refill takes longer. The player accepts both paces (FR-20, SM-C1).
 - **UJ-7. The filter refresh.** After the pre-session read, the Payout Threshold and Craft Recipe stay where he left them. The player saves a fresh Pick-up Filter over last session's and reloads it in the game. For the rest of the session, his Base Filter hides what he never wants. The bases worth picking up show in a treatment that says whether to craft on them, sell them raw or identify them and check the rolls. He reads no list in the middle of a map.
 
 ## 3. Glossary
@@ -709,7 +709,7 @@ Behavioural, not numeric. There is one user, and instrumenting the tool would be
 - **SM-6: Agents ship without a human unblocking them.** Development proceeds with tests passing offline and no live API in the loop. Validates NFR-1, NFR-2, NFR-4.
 
 **Counter-metrics (do not optimise)**
-- **SM-C1: Searches per full refresh.** A larger Tracked List makes the tool appear comprehensive and makes every entry's price older, because the rate limit refreshes the list one entry at a time. Held at about 3,500 **searches**, because the player needs all of that data. With the optional session cookie, a full refresh fits within a day. Without it, the refresh takes about a day and a half, and the player accepts that (UJ-6, FR-20, AD-12). It counts searches, the quantity the rate limit actually constrains, because an entry count would miss a curator who splits one entry into two bands (AD-12, FR-22). Counterbalances SM-4.
+- **SM-C1: Searches per full refresh.** A larger Tracked List makes the tool appear comprehensive and makes every entry's price older, because the rate limit refreshes the list one entry at a time. Held at about 3,500 **searches**, because the player needs all of that data. With the optional session cookie, a full refresh takes about a day and a half (about 36 hours). Without it, the refresh takes longer. The player accepts both paces (UJ-6, FR-20, AD-12). It counts searches, the quantity the rate limit actually constrains, because an entry count would miss a curator who splits one entry into two bands (AD-12, FR-22). Counterbalances SM-4.
 - **SM-C3: Number of ranked rows shown.** A longer list is not a better one. Bounded by FR-5. Counterbalances SM-2.
 - **SM-C4: Apparent confidence.** Suppose the view presents a figure on estimated odds or an old price as cleanly as a measured, current one. That would make the tool feel more authoritative and make it more dangerous. Counterbalances SM-4, and is why FR-10 to FR-12 exist.
 
