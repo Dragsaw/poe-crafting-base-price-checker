@@ -30,7 +30,7 @@
 #   with its last story, before finish-worktree pushes (AGENT-WORKFLOW.md, Story acceptance)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 11-15-2026 13:53
+last_updated: 11-15-2026 14:26
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -96,7 +96,7 @@ development_status:
   7-1-the-recipe-floor-per-modifier-after-the-level-scope: done
   7-2-per-entry-floors-and-the-crafting-item-level-in-core: done
   7-5-a-tiers-own-interval-in-core: done
-  7-3-regenerate-tracked-json-for-t1-and-t2: backlog
+  7-3-regenerate-tracked-json-for-t1-and-t2: review
   7-4-the-item-level-toggle: backlog
   epic-7-retrospective: optional
 action_items:

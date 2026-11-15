@@ -12,6 +12,7 @@ const SPEED = 'explicit.stat_speed';
 const CRIT = 'explicit.stat_crit';
 const BOLTS = 'explicit.stat_bolts';
 const LABELLESS = 'explicit.stat_labelless';
+const MANA = 'explicit.stat_mana';
 const CATEGORY = 'weapon.bow';
 const CLASS = 'Bows';
 
@@ -64,6 +65,8 @@ const WEIGHTS = WeightsFileSchema.parse({
             tier('suffix', 'LifeSuffix', { itemLevelMin: 1, tierLabel: 'T1', lines: [{ statId: LIFE, ranges: [[1, 5]] }] }),
             tier('suffix', 'Bolts', { itemLevelMin: 82, tierLabel: 'T1', lines: [{ statId: BOLTS, ranges: [[1, 1]] }] }),
             tier('suffix', 'Labelless', { itemLevelMin: 10, lines: [{ statId: LABELLESS, ranges: [[1, 2]] }] }),
+            tier('suffix', 'Mana', { itemLevelMin: 50, tierLabel: 'T2', lines: [{ statId: MANA, ranges: [[1, 4]] }] }),
+            tier('suffix', 'Mana', { itemLevelMin: 79, tierLabel: 'T1', lines: [{ statId: MANA, ranges: [[5, 9]] }] }),
           ],
         },
       },
@@ -191,6 +194,25 @@ describe('regenerateEntries', () => {
 
   it('throws, naming the entry, when a contained tier has no label', () => {
     expect(() => run(RAW, crafted(LIFE_T1, banded(LABELLESS, 1, 2)))).toThrow(/entries\.1\.suffix/u);
+  });
+
+  it('adds no sibling for a T1 at exactly the low level', () => {
+    const result = run(crafted(LIFE_T1, banded(MANA, 5, 9, 'T1')));
+
+    expect(result.file.entries).toHaveLength(1);
+    expect(result.summary.sibling).toBe(0);
+  });
+
+  it('passes an active crafted entry on a class absent from the weights through as the same object', () => {
+    const absent: TrackedEntry = { ...crafted(LIFE_T1, CRIT_T1), categoryId: 'weapon.wand', className: 'Wands' };
+
+    expect(run(absent).file.entries[0]).toBe(absent);
+  });
+
+  it('keeps a reference banded outside every tier, at its source floor', () => {
+    const outside = crafted(banded(LIFE, 100, 200, 'T1'), CRIT_T1, 77);
+
+    expect(run(outside).file.entries).toStrictEqual([outside]);
   });
 
   it('names a T1-only reference whose family has no T2, and adds no sibling', () => {

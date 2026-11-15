@@ -8,7 +8,7 @@ import { createJsonReader, REPO_ROOT } from './lookup.ts';
 import { loadWeights } from './lookup-weights.ts';
 import { isTrackedFile, regenerateEntries } from './regenerate-entries.ts';
 
-export const TRACKED_PATH = 'data/tracked.json';
+const TRACKED_PATH = 'data/tracked.json';
 
 function main(): void {
   const read = createJsonReader(REPO_ROOT);

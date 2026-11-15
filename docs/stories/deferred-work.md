@@ -73,3 +73,9 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-7-1-the-recipe-floor-per-modifier-after-the-level-scope.md`
   summary: Transcribe `level-toggle` and the revision 34 Copy Deck strings in Story 7.4. The DESIGN.md and EXPERIENCE.md revision pins no longer trip for them.
   evidence: spec-7-1 raised the pins in `packages/web/src/theme/tokens.test.ts` and `packages/web/src/list/row/trust-words.test.ts` to DESIGN.md 24 and EXPERIENCE.md 34. Every content assertion passed against those revisions, and commit `15575f7` had left the pins failing for 7.4. With the pins green, nothing fails until 7.4 adds the `level-toggle` component and the new strings (`needs ilvl <floor>`, `<recipe> orbs can't roll this at ilvl <level>`, `nothing rolls at ilvl <level>`).
+
+## Deferred from: spec-7-3 review (2026-11-15)
+
+- source_spec: `docs/stories/spec-7-3-regenerate-tracked-json-for-t1-and-t2.md`
+  summary: Add an end-to-end test that spawns `pnpm tracked:regenerate` against a temp copy of the data and checks the fixed point, the output format and the schema-failure exit.
+  evidence: `regenerate.test.ts` imports only `regenerateEntries` and `isTrackedFile`. `main` in `.claude/skills/tracked-json/scripts/regenerate.ts` (the schema guard, `JSON.stringify(file, undefined, 2) + '\n'`, exit code) has no test. `lookup.end-to-end.test.ts` spawns its CLI with `execFile`. The script writes a fixed `data/tracked.json` path, so the test first needs an injectable path or a temp root. Found by the verification-gap layer of the spec-7-3 review.

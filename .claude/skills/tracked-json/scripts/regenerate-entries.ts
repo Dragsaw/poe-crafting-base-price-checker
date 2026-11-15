@@ -136,7 +136,7 @@ export function isTrackedFile(value: unknown): value is TrackedFile {
   return TrackedFileSchema.safeParse(value).success;
 }
 
-/** An active crafted entry on a class in `weights`, other than a summed pair, whose split is undefined. */
+/** An active crafted entry on a class in `weights` that is not a summed pair: a summed pair has no defined split. */
 function isRegenerable(entry: TrackedEntry, weights: WeightsFile): entry is CraftedTrackedEntry {
   return entry.kind === 'crafted' && entry.status === 'active' && poolOf(weights, entry.categoryId, entry.className).ok && !isSummedPair(entry);
 }
