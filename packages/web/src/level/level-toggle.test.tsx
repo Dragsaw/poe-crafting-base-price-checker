@@ -4,10 +4,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   blocksOf,
   captureDownloads,
+  clickClose,
   clickOn,
   downloadAction,
   enterName,
   expectedFilterText,
+  inModal,
   openFilterModal,
   ready,
 } from '../App/pick-up-filter-support';
@@ -268,5 +270,20 @@ describe('the filter at the level on screen (Interaction 9)', () => {
     clickOn(downloadAction());
     expect(await capture.downloads[0]?.text).toBe(at79);
     expect(localStorage.getItem(RECIPE_STORAGE_KEY)).toBeNull();
+  });
+
+  // Spec AC: the lead names the level on screen (EXPERIENCE.md Copy Deck, modal lead).
+  it('names the level on screen in the lead, at 82 and after a switch to 79', async () => {
+    await ready(levelWorld(), false);
+    openFilterModal();
+    expect(inModal('[data-filter-lead]').textContent).toBe(
+      'Shows the bases worth picking up at your threshold of 0.25 div with perfect orbs at ilvl 82. Your NeverSink filter handles everything else.',
+    );
+    clickClose();
+    click(segment('79'));
+    openFilterModal();
+    expect(inModal('[data-filter-lead]').textContent).toBe(
+      'Shows the bases worth picking up at your threshold of 0.25 div with perfect orbs at ilvl 79. Your NeverSink filter handles everything else.',
+    );
   });
 });

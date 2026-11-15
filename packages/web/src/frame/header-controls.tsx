@@ -106,6 +106,7 @@ export function readyControls(input: ReadyControlsInput): ReadyControls {
           ranking={input.ranking}
           tracked={set.tracked.entries}
           threshold={input.threshold}
+          level={input.level}
           recipe={active}
           isUncostable={isUncostable}
         />

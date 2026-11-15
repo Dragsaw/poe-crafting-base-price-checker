@@ -1,5 +1,7 @@
 /** The filter button's and the filter modal's strings (EXPERIENCE.md Copy Deck, *Pick-up Filter*). */
 
+import type { CraftingItemLevel } from '@poe/core';
+
 import { formatThreshold } from '../shared/money';
 import { DIV_UNIT } from '../shared/product';
 import { GENERATED_FILE_NAME, type FilterNameError } from './filter-name';
@@ -39,9 +41,9 @@ export const NOTHING_QUALIFIES_LINE = 'Nothing qualifies right now. The filter h
 /** The lead's opening, which the Copy Deck owns. */
 export const LEAD_OPENING = 'Shows the bases worth picking up';
 
-/** The modal's lead: the live threshold, and the recipe's word unless none is published (state 43). */
-export function filterLead(threshold: number, recipeWord: string | undefined): string {
-  const recipe = recipeWord === undefined ? '' : ` with ${recipeWord} orbs`;
+/** The modal's lead: the live threshold, and the recipe's word and the level unless no recipe is published (state 43). */
+export function filterLead(threshold: number, recipeWord: string | undefined, level: CraftingItemLevel): string {
+  const recipe = recipeWord === undefined ? '' : ` with ${recipeWord} orbs at ilvl ${String(level)}`;
   return `${LEAD_OPENING} at your threshold of ${formatThreshold(threshold)} ${DIV_UNIT}${recipe}. Your NeverSink filter handles everything else.`;
 }
 

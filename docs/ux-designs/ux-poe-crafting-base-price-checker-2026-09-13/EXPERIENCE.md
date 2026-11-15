@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 34
+revision: 35
 created: 2026-09-13
-updated: 2026-11-14
+updated: 2026-11-15
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
@@ -483,7 +483,7 @@ below print it literally.
 |---|---|
 | `{components.filter-button}` | `Filter ▾` |
 | Modal title | `Pick-up filter` |
-| Modal lead | `Shows the bases worth picking up at your threshold of <threshold> div with <recipe> orbs. Your NeverSink filter handles everything else.` With no recipe published (state 43): `…at your threshold of <threshold> div. Your NeverSink…` |
+| Modal lead | `Shows the bases worth picking up at your threshold of <threshold> div with <recipe> orbs at ilvl <level>. Your NeverSink filter handles everything else.` `<level>` is the Crafting Item Level on screen. With no recipe published (state 43): `…at your threshold of <threshold> div. Your NeverSink…` |
 | Step 1 | `Download your NeverSink filter from FilterBlade for offline use, and save it in this folder:` |
 | Folder path | `%UserProfile%\Documents\My Games\Path of Exile 2` |
 | Copy action | `Copy`; after a click, `Copied` for about 2 s |

@@ -2,7 +2,7 @@ import './pick-up-filter.css';
 
 import { Modal, type ModalProps } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
-import { pickUpPurposes, type PickUpInput } from '@poe/core';
+import { pickUpPurposes, type CraftingItemLevel, type PickUpInput } from '@poe/core';
 import { useCallback, useId, useMemo, useState, type CSSProperties, type JSX, type ReactNode } from 'react';
 
 import { OpenSignMark, VerdictMark } from '../marks/marks';
@@ -37,6 +37,8 @@ export interface PickUpFilterProperties {
   readonly tracked: PickUpInput['tracked'];
   /** The lead's text only; it must be the value that built `ranking`. */
   readonly threshold: number;
+  /** The lead's text only; it must be the Crafting Item Level that built `ranking`. */
+  readonly level: CraftingItemLevel;
   /** The active Craft Recipe, or `undefined` under state 43. */
   readonly recipe: { readonly id: string; readonly word: string } | undefined;
   /** The active recipe is uncostable (state 35). */
@@ -180,6 +182,7 @@ function FilterModalBody({
   ranking,
   tracked,
   threshold,
+  level,
   recipe,
   isUncostable,
   field,
@@ -199,9 +202,7 @@ function FilterModalBody({
   }, [check, entries, onDownloaded]);
   return (
     <>
-      <p data-filter-lead="" style={{ margin: '0 0 12px' }}>
-        {filterLead(threshold, recipe?.word)}
-      </p>
+      <p data-filter-lead="" style={{ margin: '0 0 12px' }}>{filterLead(threshold, recipe?.word, level)}</p>
       <ol className="fg-filter-steps" style={{ margin: 0, paddingLeft: '20px' }}>
         <Step text={FILTER_STEPS[0]}>
           <FolderPath />
