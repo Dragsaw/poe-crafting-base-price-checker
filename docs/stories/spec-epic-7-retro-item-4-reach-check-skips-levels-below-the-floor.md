@@ -34,6 +34,7 @@ context:
 - `docs/stories/sprint-status.yaml` -- action item 4 → `done`, `last_updated` refreshed.
 - `docs/stories/deferred-work.md` -- one `[NOTE FOR ARCHITECT]` entry: AD-17 and AGENT-WORKFLOW.md do not name the floor in the gate sentence. Those files are architect-owned (Review brief rule 2).
 - `pnpm check` -- 8 passed, 0 failed before review and again after the review fixes (`test:data` included).
+- Follow-up after review -- the `CheckUnreachable` JSDoc in `check.ts` names the floor, and the skill cites FR-38 by id only. `recipeReach` has no other non-test caller. `tracked:lookup` prints per-tier advice rows only, and `tracked:regenerate` does not prune by reach, so no other tool can pass an entry the gate refuses.
 
 ## Review Triage Log
 

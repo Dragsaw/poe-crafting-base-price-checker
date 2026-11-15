@@ -46,7 +46,7 @@ export interface CheckUnvalidated extends UnvalidatedMark {
   readonly path?: string;
 }
 
-/** A crafted entry that no recipe reaches at any offered Crafting Item Level (AD-17, FR-38). */
+/** A crafted entry that no recipe reaches at any offered Crafting Item Level at or above its floor (AD-17, FR-38). */
 export interface CheckUnreachable {
   readonly entryKey: string;
   readonly path?: string;
