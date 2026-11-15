@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 38
+revision: 39
 created: 2026-09-12
-updated: 2026-11-14
+updated: 2026-11-15
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -500,10 +500,11 @@ A producer's completeness claim and the consumer's treatment of it are two halve
 *Architecture-owned.* Every probability in a ranking comes from the consumed Weights File, scoped to the Crafting Item Level, by one derivation two implementers cannot diverge on (AD-17).
 
 **Consequences (testable):**
+- Where adjacent tiers of a modifier share values, the shared values belong to the lower tier. A band on tier N therefore starts above tier N-1's maximum and still counts tier N whole, and tier N's rolls among the shared values are priced with tier N-1's band *(PRD-owned)* (AD-11).
 - A tier only partly covered by a curated band contributes nothing to the probability, and that is not an error (AD-11, AD-17).
 - A Tracked Entry a Weights File cannot support is reported at load with the offending entry named, rather than ranked on a guess (AD-17).
 - The view reports such a failure at load and still renders the unaffected rows; a sync run treats the same check as a run-start gate and aborts before spending budget (AD-17, AD-12).
-- Whole-tier containment understates probabilities unevenly and can reorder the list. The player accepts this: a band that only partly covers a tier is rare, it occurs mostly on modifiers with two values, such as added damage, and no band choice can avoid it (AD-11).
+- Whole-tier containment understates probabilities unevenly and can reorder the list. The player accepts this: a band that only partly covers a tier is rare, and a band on the tiers it tracks avoids it (AD-11).
 - A Combination's probability follows one crafting act on the Item Class (AD-17).
 
 #### FR-30: Depend on an externally produced Weights File as a v1 prerequisite
@@ -689,7 +690,7 @@ One dependency sits outside this repository and gates the release rather than en
 
 - **The Weights File, from the external scraper project (FR-30).** It supplies pool membership, tier value ranges, item-level availability and weights, none of which the trade API exposes (AD-11, AD-25). Until a conforming file exists, every Item Class is Unrankable and what remains is a Raw Base price list, not the product (FR-4). The dependency is accepted rather than worked around: a locally generated file cannot honestly source the fields that matter. The version a file must satisfy is whatever `WEIGHTS-FILE-SCHEMA.md` currently declares; that file, not this one, is where the producer reads it.
 - **Its first test is a measurement.** Pool coverage across the Tracked List is measured before any view work and re-measured on every regeneration, published with its denominator (FR-4, AD-27). A file that arrives is not the same as a file that covers enough. The figure informs the release judgement; no threshold and no layout binds to it.
-- **Its second gate is a set of open questions owned with the producer.** §10 OQ-12 and OQ-19 are facts about the trade API and the source data that the producer must verify before its file's edges mean what `sync` thinks they mean. Both block correctness, not building.
+- **Its second gate is an open question owned with the producer.** §10 OQ-19 is a fact about the source data that the producer must verify before its file's edges mean what `sync` thinks they mean. It blocks correctness, not building.
 - **It recurs on GGG patch cadence**, alongside the Trade Catalogue refresh (FR-24). Neither is on the Chunk path; a stale file degrades Provenance or display text and surfaces as a reviewable diff rather than a break. **`partial` pools are a recurring state, not a transitional one**: a patch can make freshly scraped Item Classes Unrankable until the source catches up. That is the accepted cost of declining an anonymous-weight escape hatch, and why coverage is re-measured and published rather than measured once (FR-4, FR-25).
 
 ## 8. Success Metrics
@@ -730,7 +731,7 @@ Spine-owned questions are stated in full in `ARCHITECTURE-SPINE.md` *Open Questi
 
 **Owned by the spine or the weights producer**
 
-- **OQ-12** — How a stat filter compares a modifier that publishes several values. Owners: the weights scraper project, and the sync builder.
+- **OQ-12** — The wire shape of a stat filter for a modifier with no value. Owner: the sync builder.
 - **OQ-19** — Whether any Stat Line's shape makes a derived band edge inexact. Owner: the weights scraper project.
 - **OQ-20** — What a search must declare about listing status. Owner: the sync builder.
 

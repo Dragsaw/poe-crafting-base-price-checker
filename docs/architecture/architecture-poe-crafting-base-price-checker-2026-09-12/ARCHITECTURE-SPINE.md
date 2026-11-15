@@ -6,9 +6,9 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 48
+revision: 49
 created: '2026-09-12'
-updated: '2026-11-14'
+updated: '2026-11-15'
 binds: []
 sources:
   - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
@@ -683,20 +683,31 @@ never import each other.
   partition the tier axis.
 
   **A line's filter-comparable interval is derived, and `core` derives it the one way, in
-  one place — `interval` in `packages/core/src/probability.ts`, binding under AD-0.** The unit is whatever
-  quantity the trade stat filter compares, and no other — that is one empirical fact about
-  the trade API, not a modelling decision (OQ-12). The derivation must be **exactly
+  one place — `interval` in `packages/core/src/probability.ts`, binding under AD-0.** The unit is the
+  quantity the trade stat filter compares: for a two-`#` line, the **average** of its two
+  values (OQ-12). The derivation must be **exactly
   representable**, because AD-17 compares a curator's declared edge against a derived edge
   for exact equality, and a line carries at most two `#` (`WEIGHTS-FILE-SCHEMA.md`), so the
   division is exact.
 
-  **Containment is whole-tier.** A tier whose derived interval lies wholly inside a
+  **A tier's own interval gives the overlap to the tier below.** Where a tier's interval
+  begins inside the interval of another tier of the same line set in the class's slot pool,
+  its **own interval** begins at the first value the line can take above the highest such
+  maximum. So tier N's minimum never meets tier N-1's maximum. The slot pool is read
+  unscoped, so a tier has one own interval at every Crafting Item Level and under every
+  recipe. Where tiers do not overlap, the own interval is the interval, and a tier whose own
+  interval would be empty keeps its interval. The derivation is `ownInterval` in
+  `packages/core/src/probability.ts`, binding under AD-0, and it is exact for the reason above.
+
+  **Containment is whole-tier, over the tier's own interval.** A tier whose own interval lies wholly inside a
   tracked band contributes its **whole weight, once**; a tier only **partly** covered
   contributes **nothing** to that band's numerator, and that is not an error. It still
   enters the denominator like any other entry in scope. **A hybrid reference contains a tier
   only when the tier's line set equals the reference's and every line is covered.** The
   `contains` predicate and the rules that ride with it are `isCovering` and `isContaining` in
-  `packages/core/src/probability.ts`, binding under AD-0.
+  `packages/core/src/probability.ts`, binding under AD-0. **A roll of tier N inside tier
+  N-1's interval counts in tier N's probability, and the search of tier N-1's band finds it.**
+  That is part of the accepted residual below (FR-29).
 
   Every overlapping tier contributing its full weight would over-count, inflating that
   base's `ΣP` above 1 and handing it the top of the ranking.
@@ -949,8 +960,7 @@ never import each other.
   carries `query.type` **except as its `jewel` discriminator**, which is the one place the
   two shapes legitimately meet; passing the band's
   `max` as well as its `min` is what keeps the priced population the one AD-17 weighed;
-  and a multi-`#` stat filters on one derived value whose identity is a measurement, not
-  a choice (OQ-12).
+  and a multi-`#` stat filters on one derived value, the average (AD-11).
 
   **A summed `statId` — one named by both affixes — is sent as one filter over the sum of
   the two bands.** The trade site sums one `statId` across the item's mods, so two per-slot
@@ -1243,7 +1253,7 @@ never import each other.
 
   | Check | Fails when | Mechanics |
   | --- | --- | --- |
-  | **Edge alignment** | a `banded` reference's or a banded `hybrid` line's edges are not exactly the extremes of its containment set under the scope — which is what closes the sentinel loophole that mere `valueMax` presence leaves open, and additionally catches a band that reaches into a tier it does not contain | `packages/core/src/cross-file/edge-alignment.ts` |
+  | **Edge alignment** | a `banded` reference's or a banded `hybrid` line's edges are not exactly the extremes of its containment set under the scope — the highest contained maximum, and the lowest contained tier's own minimum or its interval minimum (AD-11) — which is what closes the sentinel loophole that mere `valueMax` presence leaves open, and additionally catches a band that reaches into a tier it does not contain | `packages/core/src/cross-file/edge-alignment.ts` |
   | **Empty containment set** | a reference contains no entry under the scope — a validation error, never a `P = 0` | `packages/core/src/cross-file/empty-containment.ts` |
   | **`coOccur`** | two entries overlap under AD-17's predicate and any of their four references is hybrid, so a single item satisfies both and the partition is not a partition | `coOccur` in `packages/core/src/cross-file.ts`, `packages/contracts/src/overlap.ts` |
   | **Line-set completeness** | a reference names fewer lines than a tier its search reaches — a hybrid naming a subset of a tier's lines, or a single-line band reaching into a hybrid tier — or a hybrid's contained tiers span more than one `modGroup` | `lineSetCompleteness` in `packages/core/src/cross-file.ts` |
@@ -1291,10 +1301,12 @@ never import each other.
   on containment's loss** — it tests a band only against its own containment set, and the
   shapes that escape it are AD-11's accepted residual (FR-29).
 
-  **A tier cannot be isolated, and a band spanning adjacent tiers is legitimate.** Because
-  tiers overlap, a band on one tier necessarily admits the neighbour's tail into the priced
-  sample, and the trade search cannot exclude it either. A curator may therefore write a
-  single tier's own interval, or **a run of whole adjacent tiers**; what a curator may not
+  **Adjacent tiers can be tracked apart, and a band spanning adjacent tiers is legitimate.**
+  Tier N's own interval and tier N-1's interval are disjoint (AD-11), so two entries that
+  differ only in those two tiers pass the overlap predicate, and each counts at its own
+  floor (`prd.md` FR-22). The trade search cannot exclude tier N's lowest rolls from tier
+  N-1's band, which is AD-11's residual. A curator may write a single tier's own interval,
+  its interval, or **a run of whole adjacent tiers**; what a curator may not
   write is a band that contains one tier and clips another, which edge alignment rejects.
   **Prefer a single tier by default.** AD-16 prices a reference from the cheapest ten
   listings it matches, so a span is priced at the cheap end of the *whole* span while
@@ -1984,18 +1996,12 @@ poe-crafting-base-price-checker/
 
 ## Open Questions
 
-- **OQ-12 — the filter unit for a multi-`#` stat.** Exactly one fact defines it: which
-  single quantity the `trade2` stat filter compares for a stat whose text carries two `#`.
-  The producer's evidence points at the **average**, because a 56.5 range edge can only
-  arise from averaging two integers, but nobody has confirmed it against a live search.
-  **The non-integer half of this question is settled** (2026-09-19): the minimum request
-  body captured on that date carries `"value": {"min": 4.5}`, so the filter
-  accepts a non-integer edge and AD-16's no-rounding obligation is satisfiable rather than
-  merely stated. What remains is the identity of the quantity. Under `5.0.0` the unit
-  binds **two parties independently** — the producer, which publishes `ranges`, and `core`,
-  which derives an interval from them — so a disagreement now fails **loudly**, as
-  edge-alignment errors, rather than silently as a wrong population. **A third unverified
-  edge sits beside these two: the wire shape of a `valueless` stat filter.** AD-16 says it
+- **OQ-12 — the wire shape of a `valueless` stat filter.** **The unit is settled**
+  (2026-11-15, the operator): for a stat whose text carries two `#`, the `trade2` stat
+  filter compares the **average** of the two values (AD-11). **The non-integer edge is settled**
+  (2026-09-19): the minimum request body captured on that date carries
+  `"value": {"min": 4.5}`, so AD-16's no-rounding obligation is satisfiable. **What remains
+  is the wire shape of a `valueless` stat filter.** AD-16 says it
   carries *"the stat id and no edges at all"*, but whether the filter object omits `value`,
   carries `"value": {}`, or is rejected by the API is unconfirmed against a live payload;
   the wrong shape raises no error and returns nothing or the wrong population. The captured
@@ -2003,9 +2009,8 @@ poe-crafting-base-price-checker/
   (2026-09-19) is Awakened PoE Trade against PoE1's `/api/trade/`, which always emits a
   `value` object and serialises a flat stat as `"value": {}`; nothing was found for
   `trade2` or for omitting `value`, so the fixture should try `{}` first. **Owner for
-  that edge: `sync`'s builder**, by live verification recorded as a fixture (AD-13). **Owner
-  for the unit: the weights
-  scraper project**, by live verification. *Blocking for correctness, not for building.*
+  that edge: `sync`'s builder**, by live verification recorded as a fixture (AD-13).
+  *Blocking for correctness, not for building.*
 - **OQ-26 — do AD-30's two premises hold beyond one sample?** The first premise is that a live
   `POESESSID` adds a rule name to `X-Rate-Limit-Rules`, measured once (research [30]). The
   second is that a dead cookie gets `401` or `403` on trade2, which is assumed. A capture of
