@@ -30,7 +30,8 @@
     "catalogue:refresh": "node --env-file-if-exists=.env packages/sync/src/catalogue-refresh.ts",
     "currencies:refresh": "node tools/currencies-refresh/currencies-refresh.ts",
     "tracked:lookup": "node .claude/skills/tracked-json/scripts/lookup.ts",
-    "tracked:check": "node packages/sync/src/curation/check.ts"
+    "tracked:check": "node packages/sync/src/curation/check.ts",
+    "tracked:regenerate": "node .claude/skills/tracked-json/scripts/regenerate.ts"
   },
   "dependencies": {
     "@poe/contracts": "workspace:*",

@@ -5,10 +5,11 @@ description: Seed, add, change or remove entries in data/tracked.json, the curat
 
 # tracked.json curation
 
-You edit `data/tracked.json` in a loop: look up, edit, check. The two scripts print JSON to stdout. They only read.
+You edit `data/tracked.json` in a loop: look up, edit, check. The scripts print JSON to stdout. `tracked:lookup` and `tracked:check` only read.
 
 - `pnpm tracked:lookup stat|base|class|mods|tiers ...` finds the ids and the tiers. Run it with no arguments to see the usage.
 - `pnpm tracked:check` validates the file: the contracts schema, the pinned cap, catalogue resolvability and the cross-file checks against `data/weights.json` (AD-17). It prints `{ok, checks, issues, unvalidated, unreachable}` and exits 0 when the file passes. Exit 0 does not mean every check ran, so read `checks` and `unvalidated`, not only the exit code. `cross-file` is `skipped`, and the exit is still 0, when `data/weights.json` is absent. `unvalidated` lists each crafted entry that no pool check covered, with its reason (`weights-absent` or `partial-pool`; `UnvalidatedMark` in `packages/core/src/cross-file.ts`). That list never fails the run, so an entry in it is unconfirmed: say so in the report. A class that is absent from the weights file, or that has a `partial` slot, gets no edge, containment or line-set check.
+- `pnpm tracked:regenerate` rewrites every active crafted entry of `data/tracked.json` from `core` and the weights file: one entry per contained tier on its own interval, the T2 siblings (step 4c) and each floor by *The floor rule*. It is the one script that writes the file and reads `data/weights.json` directly. Raw entries, tombstones and summed pairs stay as they are. It prints a summary, then run `pnpm tracked:check`.
 - `unreachable` lists each crafted entry that AD-17 makes unreachable under every recipe at every offered Crafting Item Level (`prd.md` FR-38), one `{entryKey, path}` row per entry, by canonical key. `tracked:check` exits non-zero while the list is not empty, and `pnpm test:data` fails on the same list (AD-17). An entry that only some `(recipe, L)` pairs reach is not listed.
 
 ## Rules for all steps
