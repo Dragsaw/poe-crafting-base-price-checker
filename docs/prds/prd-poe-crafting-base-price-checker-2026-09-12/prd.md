@@ -500,7 +500,7 @@ A producer's completeness claim and the consumer's treatment of it are two halve
 *Architecture-owned.* Every probability in a ranking comes from the consumed Weights File, scoped to the Crafting Item Level, by one derivation two implementers cannot diverge on (AD-17).
 
 **Consequences (testable):**
-- Where adjacent tiers of a modifier share values, the shared values belong to the lower tier. A band on tier N therefore starts above tier N-1's maximum and still counts tier N whole, and tier N's rolls among the shared values are priced with tier N-1's band *(PRD-owned)* (AD-11).
+- Where adjacent tiers share values, a band on one tier still counts it whole, and its rolls among the shared values are priced with the tier below (AD-11).
 - A tier only partly covered by a curated band contributes nothing to the probability, and that is not an error (AD-11, AD-17).
 - A Tracked Entry a Weights File cannot support is reported at load with the offending entry named, rather than ranked on a guess (AD-17).
 - The view reports such a failure at load and still renders the unaffected rows; a sync run treats the same check as a run-start gate and aborts before spending budget (AD-17, AD-12).

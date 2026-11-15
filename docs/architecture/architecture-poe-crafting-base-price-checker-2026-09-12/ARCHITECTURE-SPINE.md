@@ -712,9 +712,11 @@ never import each other.
   Every overlapping tier contributing its full weight would over-count, inflating that
   base's `ΣP` above 1 and handing it the top of the ranking.
 
-  **What whole-tier containment costs, stated rather than implied.** Every affected
-  probability is an **understatement**, and the error is **uneven** across base types, so it
-  **reorders** rather than shifts. Two things blunt it. AD-16 sorts ascending and takes the
+  **What whole-tier containment costs, stated rather than implied.** Every probability that a
+  partly covered tier affects is an **understatement**, and the error is **uneven** across base types, so it
+  **reorders** rather than shifts. The own interval adds the opposite error on a smaller
+  scale: tier N counts whole while its rolls among the shared values sit in tier N-1's
+  search, never in its own. Two things blunt it. AD-16 sorts ascending and takes the
   cheapest ten, while a tier excluded for reaching past the band's ceiling sits at the top of
   the band by construction — so the population dropped from the numerator is largely the
   population the price estimate never sees, and the two errors do not compound. AD-17's edge
