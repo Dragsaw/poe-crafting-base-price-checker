@@ -13,7 +13,7 @@ import {
 } from '@poe/contracts';
 import { contains, CRAFTING_ITEM_LEVELS, lineSet, needs, ownInterval, poolOf, statIds, untrackable } from '@poe/core';
 
-/** What one run changed, by count; `noT2` names each T1-only reference left without a sibling. */
+/** What one run changed, by count; `noT2` names each T1-only reference left without a sibling that counts at the low level. */
 export interface RegenerateSummary {
   readonly split: number;
   readonly sibling: number;
@@ -105,6 +105,9 @@ function variantsOf(reference: ModifierReference, pool: WeightsPool, where: stri
     const siblings = pool.entries.filter((tier) => isTrackable(tier, pool) && tier.tierLabel === 'T2' && isSameList(lineSet(tier), family));
     if (siblings.length > 0) {
       counts.sibling += 1;
+      if (siblings.every((tier) => tier.itemLevelMin > LOW_LEVEL)) {
+        counts.noT2.push(where);
+      }
       return [single, ...siblings.map((tier) => referenceOn(reference, tier, pool))];
     }
     counts.noT2.push(where);

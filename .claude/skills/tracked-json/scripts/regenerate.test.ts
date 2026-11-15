@@ -13,6 +13,9 @@ const CRIT = 'explicit.stat_crit';
 const BOLTS = 'explicit.stat_bolts';
 const LABELLESS = 'explicit.stat_labelless';
 const MANA = 'explicit.stat_mana';
+const COLD = 'explicit.stat_cold';
+const CHAOS = 'explicit.stat_chaos';
+const FIRE = 'explicit.stat_fire';
 const CATEGORY = 'weapon.bow';
 const CLASS = 'Bows';
 
@@ -54,6 +57,13 @@ const WEIGHTS = WeightsFileSchema.parse({
             tier('prefix', 'Life', { itemLevelMin: 75, tierLabel: 'T1', lines: [{ statId: LIFE, ranges: [[20, 29]] }] }),
             tier('prefix', 'Hybrid', { itemLevelMin: 40, tierLabel: 'T2', lines: [{ statId: HYBRID_A, ranges: [[5, 9]] }, { statId: HYBRID_B, ranges: [[30, 39]] }] }),
             tier('prefix', 'Hybrid', { itemLevelMin: 81, tierLabel: 'T1', lines: [{ statId: HYBRID_A, ranges: [[10, 14]] }, { statId: HYBRID_B, ranges: [[40, 49]] }] }),
+            tier('prefix', 'Cold', { itemLevelMin: 81, tierLabel: 'T2', lines: [{ statId: COLD, ranges: [[10, 19]] }] }),
+            tier('prefix', 'Cold', { itemLevelMin: 83, tierLabel: 'T1', lines: [{ statId: COLD, ranges: [[20, 29]] }] }),
+            tier('prefix', 'Fire', { itemLevelMin: 79, tierLabel: 'T2', lines: [{ statId: FIRE, ranges: [[10, 19]] }] }),
+            tier('prefix', 'Fire', { itemLevelMin: 83, tierLabel: 'T1', lines: [{ statId: FIRE, ranges: [[20, 29]] }] }),
+            tier('prefix', 'Chaos', { itemLevelMin: 75, tierLabel: 'T2', lines: [{ statId: CHAOS, ranges: [[10, 14]] }] }),
+            tier('prefix', 'Chaos', { itemLevelMin: 81, tierLabel: 'T2', lines: [{ statId: CHAOS, ranges: [[15, 19]] }] }),
+            tier('prefix', 'Chaos', { itemLevelMin: 83, tierLabel: 'T1', lines: [{ statId: CHAOS, ranges: [[20, 29]] }] }),
           ],
         },
         suffix: {
@@ -220,6 +230,39 @@ describe('regenerateEntries', () => {
 
     expect(result.file.entries).toHaveLength(1);
     expect(result.summary.noT2).toStrictEqual(['entries.0.suffix']);
+  });
+
+  // I/O matrix: "ADV-3".
+  it('keeps a T2 sibling above the low level, and names its reference, which counts at no low-level variant', () => {
+    const result = run(crafted(banded(COLD, 20, 29, 'T1'), CRIT_T1));
+
+    expect(affixes(result)).toStrictEqual([
+      [banded(COLD, 20, 29, 'T1'), CRIT_T1, 83],
+      [banded(COLD, 10, 19, 'T2'), CRIT_T1, 81],
+    ]);
+    expect(result.summary).toMatchObject({ sibling: 1, noT2: ['entries.0.prefix'] });
+  });
+
+  it('names no reference whose only T2 sibling sits exactly at the low level', () => {
+    const result = run(crafted(banded(FIRE, 20, 29, 'T1'), CRIT_T1));
+
+    expect(affixes(result)).toStrictEqual([
+      [banded(FIRE, 20, 29, 'T1'), CRIT_T1, 83],
+      [banded(FIRE, 10, 19, 'T2'), CRIT_T1, 79],
+    ]);
+    expect(result.summary).toMatchObject({ sibling: 1, noT2: [] });
+  });
+
+  // I/O matrix: "ADV-3 mixed".
+  it('keeps every T2 sibling, and names no reference when one sibling sits at or below the low level', () => {
+    const result = run(crafted(banded(CHAOS, 20, 29, 'T1'), CRIT_T1));
+
+    expect(affixes(result)).toStrictEqual([
+      [banded(CHAOS, 20, 29, 'T1'), CRIT_T1, 83],
+      [banded(CHAOS, 10, 14, 'T2'), CRIT_T1, 75],
+      [banded(CHAOS, 15, 19, 'T2'), CRIT_T1, 81],
+    ]);
+    expect(result.summary).toMatchObject({ sibling: 1, noT2: [] });
   });
 
   it('passes raw entries and tombstones through as the same objects', () => {
