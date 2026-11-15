@@ -52,12 +52,12 @@ describe('rank: Provenance and the oldest timestamp (AD-10)', () => {
     }
   });
 
-  it('does not count an invented tier the recipe floor removes from its group, and follows the recipe', () => {
-    // One group at 50 and 75: the greater floor keeps both, the perfect floor keeps 75 alone.
+  it('does not count an invented tier the recipe floor removes from its modifier, and follows the recipe', () => {
+    // One modifier at 50 and 75: the greater floor keeps both, the perfect floor keeps 75 alone.
     const weights = poolsFile([
       'weapon.bow',
       'Bows',
-      [[tierOf(TARGET, 10, 75, 'shared'), invented(tierOf(FILLER, 10, 50, 'shared'))], [tierOf(SUFFIX_STAT, 10, 80)]],
+      [[tierOf(TARGET, 10, 75, 'shared'), invented({ ...tierOf(TARGET, 10, 50, 'shared'), lines: [{ statId: TARGET, ranges: [[11, 20]] }] })], [tierOf(SUFFIX_STAT, 10, 80)]],
     ]);
     const rows = craftedRows(rankCrafted({ tracked: [target], dataset: priced1, weights }).ordering);
     expect(rows.map((row) => [row.recipeId, row.provenance]).toSorted(byPair)).toEqual([
@@ -125,16 +125,16 @@ describe('rank: Provenance and the oldest timestamp (AD-10)', () => {
     ]);
   });
 
-  it('reports a complete pool with no entries as one recipe-free unreachable row, never pool partial', () => {
+  it('reports a complete pool with no entries as one recipe-free pool empty row, never pool partial', () => {
     const weights = poolsFile(['weapon.bow', 'Bows', [[], []]]);
     const result = rankCrafted({ tracked: [target], dataset: priced1, weights, recipes: [GREATER, PERFECT] });
     expect(result.ordering).toEqual([]);
     expect(result.unrankable).toEqual([
-      { categoryId: 'weapon.bow', className: 'Bows', reason: 'recipe cannot reach this class' },
+      { categoryId: 'weapon.bow', className: 'Bows', reason: 'pool empty' },
     ]);
   });
 
-  it('reports a complete pool of only weight-0 tiers as one recipe-free unreachable row', () => {
+  it('reports a complete pool of only weight-0 tiers as one recipe-free pool empty row', () => {
     const weights = poolsFile([
       'weapon.bow',
       'Bows',
@@ -143,7 +143,7 @@ describe('rank: Provenance and the oldest timestamp (AD-10)', () => {
     const result = rankCrafted({ tracked: [target], dataset: priced1, weights, recipes: [GREATER, PERFECT] });
     expect(result.ordering).toEqual([]);
     expect(result.unrankable).toEqual([
-      { categoryId: 'weapon.bow', className: 'Bows', reason: 'recipe cannot reach this class' },
+      { categoryId: 'weapon.bow', className: 'Bows', reason: 'pool empty' },
     ]);
   });
 
@@ -151,11 +151,11 @@ describe('rank: Provenance and the oldest timestamp (AD-10)', () => {
     ['empty suffix beside a populated prefix', [[tierOf(TARGET, 5)], []]],
     ['weight-0 suffix beside a populated prefix', [[tierOf(TARGET, 5)], [tierOf(SUFFIX_STAT, 0)]]],
     ['both slots empty', [[], []]],
-  ] as const)('reports %s as one recipe-free unreachable row, and poolCoverage agrees', (_label, pools) => {
+  ] as const)('reports %s as one recipe-free pool empty row, and poolCoverage agrees', (_label, pools) => {
     const weights = poolsFile(['weapon.bow', 'Bows', pools]);
     const result = rankCrafted({ tracked: [target], dataset: priced1, weights, recipes: [GREATER] });
     expect(result.unrankable).toEqual([
-      { categoryId: 'weapon.bow', className: 'Bows', reason: 'recipe cannot reach this class' },
+      { categoryId: 'weapon.bow', className: 'Bows', reason: 'pool empty' },
     ]);
     expect(poolCoverage([target], weights)?.coverage).toBe(0);
   });

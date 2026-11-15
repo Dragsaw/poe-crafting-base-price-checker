@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 33
+revision: 35
 created: 2026-09-13
-updated: 2026-11-01
+updated: 2026-11-15
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
@@ -55,7 +55,7 @@ document records only the behavioural deltas. DESIGN.md records the visual ones.
 |---|---|
 | `Collapse` animates height on open | Every expansion and the sync report open **in place, instantly**. |
 | `Accordion` ships chevrons, padding and its own hover | Not used. A ranked row opens on its own click (Interaction 2). |
-| `SegmentedControl` animates its indicator | `{components.recipe-toggle}` is a segmented control. Its indicator moves instantly or by a fast linear step. |
+| `SegmentedControl` animates its indicator | `{components.recipe-toggle}` and `{components.level-toggle}` are segmented controls. Their indicator moves instantly or by a fast linear step. |
 | `NumberInput` fires `onChange` on every keystroke | Kept, because FR-6 needs it. Re-ranking is debounced (Interaction 1). |
 | `Slider` shows a floating value label while dragged | Off. The typed figure beside the slider shows the value. Snapping: Interaction 1. |
 | `Tooltip` may wrap any element | Three kinds only (Interaction 8). A tooltip never holds a control. |
@@ -89,8 +89,6 @@ the commit that made each decision, not in this document.
 
 - Strings drafted at build (Copy Deck).
 - Two Combinations that read identically (`[NOTE FOR UX]`, Domain Vocabulary).
-- The reason string that a recipe-scoped Unrankable would need (state 36). The PRD
-  owns that extension.
 
 ## Information Architecture
 
@@ -98,7 +96,7 @@ One surface. Everything below is a region of it, in fixed vertical order.
 
 | Region | Reached from | Purpose |
 |---|---|---|
-| `{components.header-bar}` | Always visible, sticky | League eyebrow and title on the left. On the right: `{components.recipe-toggle}` with Craft Cost beside it, `{components.threshold-control}`, `{components.filter-button}` and `{components.sync-button}`. It never grows a second line. Problems speak through the sync button |
+| `{components.header-bar}` | Always visible, sticky | League eyebrow and title on the left. On the right: `{components.recipe-toggle}` with Craft Cost beside it, `{components.level-toggle}`, `{components.threshold-control}`, `{components.filter-button}` and `{components.sync-button}`. The bar never grows a second line. Problems speak through the sync button |
 | `{components.sync-report-panel}` | Interaction 5 | The Sync Report, the attribution facts and any absence lines (FR-24, FR-25, FR-4, FR-18). Content: Epistemics, *The sync report* |
 | `{components.list-statement}` | States 23, 25 and 35 | One plain declarative above the column header |
 | `{components.column-header}` + twenty `{components.ranked-row}` | Always visible | The product. Crafted rows name an **Item Class**, and Raw Base rows name a **Base Type**, in one list (FR-3). UJ-1, UJ-2, UJ-4 |
@@ -135,7 +133,8 @@ coverage fraction with its denominator is one click down, in the sync report.
 
 ### The ranked list
 
-- **Order.** EV under the active threshold and the active recipe (FR-1, FR-26).
+- **Order.** EV under the active threshold, the active recipe and the Crafting
+  Item Level (FR-1, FR-26, FR-38).
   Columns are not sortable. The list shows the active recipe's rows only. `core`
   orders the cross product, FR-5's bound applies after the recipe filter, and a
   Raw Base renders under every recipe (AD-17). A Raw Base under the Payout
@@ -149,7 +148,7 @@ coverage fraction with its denominator is one click down, in the sync report.
   still printed as a real figure (state 21). For a missing figure, see
   Epistemics, *Missing figures*.
 - **Best combinations, crafted.** The Combinations that contribute most to EV
-  under the active threshold and recipe. Each prints as tier plus short form, one
+  under the active threshold, recipe and Crafting Item Level. Each prints as tier plus short form, one
   per cell, in three cells or two (Responsive & Platform). Fewer qualifying
   Combinations leave cells empty. None leaves every cell empty (state 21).
 - **Raw Base rows.** The sell-as-is line replaces the chase cells. The EV is the
@@ -165,16 +164,21 @@ coverage fraction with its denominator is one click down, in the sync report.
   When the row carries ≈, the line continues with the ≈ sentence (Copy Deck).
   A jewel row with a figure then continues with the jewel clause (Copy Deck). Where the jewel row's EV is `—`, it has no clause, as with ≈.
 There is no title and no sub-line, because the sticky header always shows the
-  threshold and the recipe that the figures depend on.
+  threshold, the recipe and the Crafting Item Level that the figures depend on.
 - **Lines.** One line per Combination. The line holds the
   Combination (tier plus short form, led by `* pinned` when pinned), the price in
   Divine or `—`, the trust cell, then the trade link (Interaction 6). An age
   prints only when there is a problem, inside the reason. Only a pruned line takes
-  a second line, for its prune reason. Line treatments: states 1–10 and 20.
+  a second line, for its prune reason. Line treatments: states 1–10, 20 and 49.
 - **Line order**. Priced lines come first, by their contribution to
   EV, largest first. Then come below-threshold lines, then pending, then broken.
-  Pruned lines come last, behind `+ N pruned` (Interaction 3). A panel whose
-  every line is pruned cannot occur (spec-4-4, Design Notes).
+  Pruned lines come next, behind `+ N pruned` (Interaction 3). Not-counted lines
+  come last, behind `+ N not counted` (Interaction 3a). A not-counted line is an
+  entry whose Item Level Floor is above the Crafting Item Level, or that the
+  active recipe cannot reach at that level (FR-38, FR-26). A pruned entry is a
+  pruned line, whatever its floor. A panel whose every line is pruned cannot
+  occur (spec-4-4, Design Notes). A panel whose every line is not counted can
+  (state 48).
 - **Top lines.** The panel opens on the top 8 lines of that order (state 39).
 - **A Raw Base** expands to one line. The line has no Combination
   text, because the context line names the base. It holds the price or `—`, the
@@ -198,6 +202,7 @@ not ship.
 | Payout Threshold | The threshold label, figure and unit |
 | Craft Recipe | The recipe label and the option word (*Recipe option words*) |
 | Craft Cost | The Craft Cost figure beside the recipe |
+| Crafting Item Level | The level label and its two figures (Copy Deck) |
 | Expected Value (EV) | The EV column header and the EV tooltip |
 | Divine | Spelled out in the EV header. `div` after a figure in the header bar and the tooltip. A row figure carries no unit |
 | Item Level Floor | The floor that FR-3 fixes, inside the sell-as-is line |
@@ -229,7 +234,7 @@ prints is the curator's declaration.
 | Write this | Never this | Why |
 |---|---|---|
 | The EV header carries the unit, and the row cell holds the figure alone | `div` after every row figure | Twenty copies of an invariant unit are noise in `{spacing.col-ev}` |
-| `item level 82+` | `ilvl 82`, `ILVL` | An abbreviation that the player must decode at a glance |
+| `item level 82+` in the sell-as-is line | `ilvl 82`, `ILVL` | An abbreviation that the player must decode at a glance. The header's level label `ilvl` is the one abbreviation, because it sits in front of its two figures and the header has a width budget (Copy Deck) |
 | **entries not reached in the last sync pass** | "in this Chunk" | *Chunk* is back-end only |
 | `no published weight for one mod tier` | "prior", "uniform prior", "weight source" | The cue speaks about roll odds in the player's words |
 | No `Price trust` label | a `PRICE TRUST` column header or legend heading | The marks sit in the EV slot, and the legend names each one by its word |
@@ -357,10 +362,11 @@ Truncation is legitimate only where the text has somewhere to go.
 - **Nothing in an expansion line is cut.** There is no ellipsis, and no tooltip
   stands in for text that did not fit. The trust cell is wide enough for the
   longest reason to clear the ↗.
-- **The header title may end in an ellipsis in a frame narrower than the target.**
-  It is the one exception to the rule above. The title is fixed text, so nothing is
-  lost. No header control is ever cut. DESIGN.md, *The header's width budget*,
-  measures whether the title prints in full on the target monitor.
+- **The header title may end in an ellipsis, the target monitor included.** It is
+  the one exception to the rule above. The title is fixed text, so nothing is
+  lost. **The league eyebrow is never cut**, because it is the one signal that the
+  page reads last league (UJ-6). No header control is ever cut. DESIGN.md, *The
+  header's width budget*, measures the bar.
 - **Never cut:** a trust mark, ≈, the EV figure and a column-header label.
 Each mark *is* its non-colour cue. A long name yields before the EV
   cell does.
@@ -433,6 +439,8 @@ places. **Placeholders** are in angle brackets inside code:
 | `<word>`, `<reason>` | a trust word and its reason (Epistemics, *Price trust*) |
 | `<file>` | an artifact's file name |
 | `<recipe>` | the active recipe's option word |
+| `<level>` | the active Crafting Item Level, `79` or `82` |
+| `<floor>` | a Tracked Entry's Item Level Floor |
 
 Braces in this document always mean a DESIGN.md token, never a placeholder.
 
@@ -444,6 +452,7 @@ Braces in this document always mean a DESIGN.md token, never a placeholder.
 | Header title | `Worth picking up` |
 | Recipe | `Orbs` · the option word (`greater`, `perfect`, `regular`). One recipe published: `Orbs` · its word, as plain text (state 42). None published: nothing (state 43) |
 | Craft Cost | `N.NN div / craft`; uncostable: `no figure yet` (state 35) |
+| Item level | `ilvl` · the segments `79` and `82` |
 | Threshold | `Items worth ≥` · `N.NN div` |
 | Sync button, healthy | `Synced <age> ▾` |
 | Sync button, sync time unknown | `Not synced yet ▾` |
@@ -457,8 +466,9 @@ Braces in this document always mean a DESIGN.md token, never a placeholder.
 | Chase cell, cut | the cell's full Combination text on hover; no other string |
 | Expansion context line | `<name>`, e.g. `Body Armours (Str/Dex/Int)`. With ≈ it continues: `<name> · ≈ Some roll odds are estimated: no published weight for one mod tier. All prices below come from real listings.` A jewel row with a figure ends with ` · No Craft Cost: jewels craft with basic orbs.`, after the ≈ sentence when both apply |
 | Expansion line, below threshold | `below threshold` |
+| Expansion line, not counted (state 49) | Floor above the level: `needs ilvl <floor>`. Not reachable under the active recipe at the level: `<recipe> orbs can't roll this at ilvl <level>`. The floor reason wins when both hold |
 | Curation marks | `* pinned` · `† pruned` |
-| `{components.show-more}` | `+ N more combinations` / `− show fewer` · `+ N pruned` · `+ Read the remaining N rows` / `− Show only the top 20` · `+ Try again` |
+| `{components.show-more}` | `+ N more combinations` / `− show fewer` · `+ N pruned` · `+ N not counted` · `+ Read the remaining N rows` / `− Show only the top 20` · `+ Try again` |
 | Footer legend | Nine items, in this order: (1) `■ craft this class` (2) `■ sell this base as is` (3) `no mark = current price` (4) `◐ rough unreliable price (a row: 70%+ of its EV)` (5) `○ pending no price yet` (6) `✕ broken can no longer be priced` (7) `† pruned · * pinned` (8) `≈ some roll odds estimated` (9) `Prices are live asking prices, not sales. Read-only. Curation lives in data/tracked.json.` |
 | List statement, state 23 | `In canonical order, not ranked: no tracked unit has a price from <league> yet.` (without `yet` when every listed row is broken) |
 | List statement, state 25 | `Nothing clears your Payout Threshold of N.NN div.` |
@@ -473,7 +483,7 @@ below print it literally.
 |---|---|
 | `{components.filter-button}` | `Filter ▾` |
 | Modal title | `Pick-up filter` |
-| Modal lead | `Shows the bases worth picking up at your threshold of <threshold> div with <recipe> orbs. Your NeverSink filter handles everything else.` With no recipe published (state 43): `…at your threshold of <threshold> div. Your NeverSink…` |
+| Modal lead | `Shows the bases worth picking up at your threshold of <threshold> div with <recipe> orbs at ilvl <level>. Your NeverSink filter handles everything else.` `<level>` is the Crafting Item Level on screen. With no recipe published (state 43): `…at your threshold of <threshold> div. Your NeverSink…` |
 | Step 1 | `Download your NeverSink filter from FilterBlade for offline use, and save it in this folder:` |
 | Folder path | `%UserProfile%\Documents\My Games\Path of Exile 2` |
 | Copy action | `Copy`; after a click, `Copied` for about 2 s |
@@ -558,6 +568,7 @@ that this table names. DESIGN.md, Components, owns its look under the same name.
 |---|---|---|
 | `{components.header-bar}` | Top of the page, sticky | Information Architecture |
 | `{components.recipe-toggle}` | Header bar | Interaction 1a; states 34, 35, 42 and 43; *What survives a reload*; Domain Vocabulary, *Recipe option words* |
+| `{components.level-toggle}` | Header bar | Interaction 1b; state 48; *What survives a reload* |
 | `{components.threshold-control}` | Header bar | Interaction 1 |
 | `{components.filter-button}` | Header bar, before the sync button | Interaction 9; Copy Deck, *Pick-up Filter* |
 | `{components.filter-modal}` | Over the page, when open | Interaction 9; states 44–47; *What survives a reload*; Copy Deck, *Pick-up Filter* |
@@ -571,11 +582,11 @@ that this table names. DESIGN.md, Components, owns its look under the same name.
 | `{components.estimate-mark}` | Before a crafted row's EV | Epistemics, *Estimated odds* |
 | `{components.mark-tooltip}` | Hover on a row's trust mark | Interaction 8; Copy Deck |
 | `{components.chase-cell}` | Crafted rows | Information Architecture, *The ranked list*; Responsive & Platform; Interaction 8 |
-| `{components.expansion-panel}` | Below an open row | Information Architecture, *The expansion*; Interactions 2 and 7; state 39 |
-| `{components.expansion-line}` | Inside the expansion | Information Architecture, *The expansion*; states 1–10 and 20 |
-| `{components.show-more}` | List foot, expansion, pruned lines and retry | Interactions 3, 4 and 7; state 28 |
+| `{components.expansion-panel}` | Below an open row | Information Architecture, *The expansion*; Interactions 2, 3a and 7; states 39 and 48 |
+| `{components.expansion-line}` | Inside the expansion | Information Architecture, *The expansion*; states 1–10, 20 and 49 |
+| `{components.show-more}` | List foot, expansion, pruned and not-counted lines, and retry | Interactions 3, 3a, 4 and 7; state 28 |
 | `{components.trade-link}` | Expansion lines | Interaction 6 |
-| `{components.unrankable-appendix}` | Foot, above the footer | States 13–16, 36 and 37 |
+| `{components.unrankable-appendix}` | Foot, above the footer | States 13–16 and 37 |
 | `{components.footer-legend}` | Foot | Information Architecture; Copy Deck |
 | `{components.failure-screen}` | Replaces the whole page | States 26 and 28 |
 
@@ -700,6 +711,8 @@ decides:
   every rule below, all-broken included.
 - **Every entry is broken** → ✕ `broken`, EV cell `—`, reason
   `all combinations gone after a patch` (state 41).
+- **No entry counts at the Crafting Item Level** → ○ `pending`, EV cell `—`,
+  reason `nothing rolls at ilvl <level>` (FR-38; state 48).
 - **No priced combination** → ○ `pending`, EV cell `—`, reason `no prices yet`
   (state 18).
 - **At least 70% of the row's EV rests on unreliable prices** → ◐ `rough`.
@@ -735,9 +748,10 @@ odds are estimated*. ≈ and ◐ share one colour and differ in shape (DESIGN.md
 
 - **It is not a price-trust state.** Price trust speaks about price only. A row can
   carry ≈ and ◐ at once, because they answer different questions.
-- **One cue per `(Item Class, recipe)` pair**. Two recipes on one Item
-  Class can differ. A recipe switch swaps the ≈ silently, in the same synchronous
-  pass as rank, EV and chase cells. There is no transition, no highlight and no
+- **One cue per `(Item Class, recipe)` pair at the Crafting Item Level**. Two
+  recipes on one Item Class can differ, and so can two levels, because the level
+  scopes the eligible set (AD-17). A recipe or level switch swaps the ≈ silently,
+  in the same synchronous pass as rank, EV and chase cells (states 34 and 48). There is no transition, no highlight and no
   note.
 - **Per row only, with no global banner**. ≈ stays on every affected
   row, even when every crafted row carries it. A mark that is true on every row
@@ -764,8 +778,8 @@ term itself.
 A missing price never holds a number-shaped placeholder.
 
 - **`—` stands for a missing price wherever a mark and its word sit beside it.**
-  This covers an expansion line's price cell, beside its trust cell or
-  `† pruned`. It also covers the EV cell of a pending or broken row, Raw Base or
+  This covers an expansion line's price cell, beside its trust cell, `† pruned` or a
+  not-counted reason (state 49). It also covers the EV cell of a pending or broken row, Raw Base or
   crafted. That includes every crafted row while the recipe is uncostable or none
   is published (its mark, with the word one hover away). The mark says
   *which* question is open, so the dash cannot read as worthless (FR-9).
@@ -854,7 +868,7 @@ number.
 | 15a | Unrankable, `class disagrees with weights file` | Appendix | Reason verbatim, **one string for every cross-file check** (state 27, FR-4). This class's pool is `complete` and published. Thus this is the Unrankable row that the player can fix without help, and its note says so (Copy Deck). The note never names the check, the entry or its key, which are diagnosis |
 | 16 | Unrankable class whose Base Types still rank | Appendix + ranked list | The class sits in the appendix with its reason. Its note **names the fact, not a rank** (Copy Deck). Those Base Types rank normally as Raw Base rows |
 | 17 | Rough row | Ranked row | ◐ in the mark slot, and the reason in `{components.mark-tooltip}`. Crafted: the 70% rule. Raw Base: its own price is old or thin (*Price trust*) |
-| 18 | Pending row | Ranked row | ○ in the mark slot, EV `—`. Raw Base: its entry is pending, and the tooltip carries the entry's reason. Crafted: no combination is priced, reason `no prices yet`. This holds in every state, not only in state 23. States 35 and 43 take their own reasons (*Price trust*). **Outside states 23, 35 and 43, a pending or broken row has no rank numeral and sits after every ranked row**, in tier 3 (FR-1). The trail order is pending crafted rows, pending Raw Bases (no listings, then not yet synced), broken crafted rows (state 41), broken Raw Bases (state 40). Each block keeps `core`'s key order |
+| 18 | Pending row | Ranked row | ○ in the mark slot, EV `—`. Raw Base: its entry is pending, and the tooltip carries the entry's reason. Crafted: no combination is priced, reason `no prices yet`, or no entry counts at the Crafting Item Level, reason `nothing rolls at ilvl <level>` (state 48). This holds in every state, not only in state 23. States 35 and 43 take their own reasons (*Price trust*). **Outside states 23, 35 and 43, a pending or broken row has no rank numeral and sits after every ranked row**, in tier 3 (FR-1). The trail order is pending crafted rows, pending Raw Bases (no listings, then not yet synced), broken crafted rows (state 41), broken Raw Bases (state 40). Each block keeps `core`'s key order |
 | 19 | Retired | — | The global estimated-odds banner, its dismiss control and its copy are retired. ≈ is per row only (state 12) |
 | 20 | Below-threshold entry | Expansion line | **Dimmed**, with `below threshold` in the trust cell and no mark. Shown, never hidden (FR-8). **It prints only `below threshold`**, even when its price is also unreliable |
 | 21 | Item Class whose priced Combinations all fall below the threshold | Ranked row | Chase cells empty. Its EV is negative by its Craft Cost and prints at 2 decimal places, **dimmed**, or `< 0.00` when it rounds to zero (*Money*). A jewel subtracts no Craft Cost, so its EV is `0.00`, dimmed the same way. It is a known figure and bad news, not missing news. Thus it is never `—` and never a phrase. It is **ranked, not Unrankable** (FR-1) |
@@ -872,10 +886,10 @@ number.
 | 33 | Ranked list grown past 20 | Ranked list | Interaction 4 grows it. The list holds every ranked unit. Ranks 21+ are plain. The appendix and footer stay below. A click caused the growth, so it may scroll the page |
 | 34 | Craft Recipe switched | Whole list + `{components.recipe-toggle}` | Interaction 1a. A row's ≈ swaps silently when the new pair differs |
 | 35 | Active recipe uncostable | `{components.recipe-toggle}` + ranked list | A recipe that names a currency with no current rate is **uncostable**. It is never costed at zero (FR-26, AD-20). Craft Cost reads `no figure yet`. **Every row stays**, and no class becomes Unrankable. **Each branch keeps its own order, and no rank numeral spans the two.** Rank numerals are suppressed, and the top-five emphasis runs **per branch**. A list statement names the active recipe. It says that the two branches are not comparable while the state holds. Every crafted row reads ○ with EV `—` (*Price trust*). **FR-5's bound applies per branch**: up to 20 rows of each, with one list affordance under each. Thus the resting page can hold 40 rows and scroll. **The branch boundary has no chrome of its own**: the raw branch's list affordance ends it, and the crafted branch follows. The rank cell stays reserved and blank (spec-4-6, Decision 2) |
-| 36 | An Item Class unrankable under one recipe only | Appendix or list | AD-17 makes that pair unrankable only when a tracked entry of the class cannot be reached under that recipe. `pnpm tracked:check` rejects such an entry, so this state is a backstop. The class is Unrankable while that recipe is active, and it ranks under the other. **FR-4's reason enum is not extended**. `[NOTE FOR UX]` If it ever fires, neither string describes it, and the enum is the PRD's to extend |
+| 36 | Retired | — | The recipe-scoped Unrankable is retired (FR-26). An entry that the active recipe cannot reach is a not-counted line (Information Architecture, *The expansion*) |
 | 37 | Unrankable appendix with no rows | `{components.unrankable-appendix}` | No recipe published (state 43), or `recipes.json` absent. The appendix keeps its place and shows its title alone, `Appendix: Unrankable — 0 Item Classes`, with a neutral count. **It does not say why it is empty.** It never prints `class absent from weights file` while a weights envelope is loaded |
 | 38 | A tolerable file absent | `{components.sync-report-panel}` | One plain `Not published` line per absent file in the Built from column, with no mark and no colour. **Not a counted problem.** The line gives the reason once. Nothing else on the page repeats it: not the appendix (state 37) and not the `unknown` fields. An absent `weights.json` also turns the *Weights File* fields to `unknown`. An absent `recipes.json` also gives state 43 |
-| 39 | Expansion on its top lines | `{components.expansion-panel}` | A panel opens on the **top 8 lines** of its line order (Information Architecture, *The expansion*). It ends with `+ N more combinations`, where N counts the hidden lines without the pruned lines. Interaction 7 shows the rest and hides them again. A panel of 8 lines or fewer shows them all, with no affordance. Every Tracked Entry stays one click away (FR-8, by reachability) |
+| 39 | Expansion on its top lines | `{components.expansion-panel}` | A panel opens on the **top 8 lines** of its line order (Information Architecture, *The expansion*). It ends with `+ N more combinations`, where N counts the hidden lines without the pruned and not-counted lines. Interaction 7 shows the rest and hides them again. A panel of 8 lines or fewer shows them all, with no affordance. Every Tracked Entry stays one click away (FR-8, by reachability) |
 | 40 | Broken Raw Base row | Ranked row | A listed Raw Base whose entry is broken (always under state 23). It shows ✕ in the mark slot, EV `—`, and the entry's reason in the tooltip |
 | 41 | Broken crafted row | Ranked row | A crafted row whose every entry is broken: ✕ in the mark slot, EV `—`, reason per *Price trust*. Its expansion shows each broken line (state 4). It has no rank numeral and trails as state 18 states. Under state 35 or 43 the row reads as that state instead |
 | 42 | One recipe published | `{components.recipe-toggle}` + ranked list | The header prints `Recipe` and the one option word as plain text, with no toggle, and Craft Cost beside them. There is nothing to switch (Interaction 1a). The list ranks as usual |
@@ -884,6 +898,8 @@ number.
 | 45 | Filter modal, a name it cannot use | `{components.filter-modal}` | The name holds a double quote (`"`), `/` or `\`, or, after `.filter` is added and ignoring case, it is `crafting-bases.filter` itself, so the generated filter would import itself. The error prints under the field (Copy Deck). While the name is unusable, the download action is disabled. The error shows on blur, never on each keystroke. A name without `.filter` is not an error: the page adds `.filter` at generation, and the field shows what the player typed |
 | 46 | Filter with no EV | `{components.filter-modal}` | Under state 35 or 43, no Item Class has an EV, so the filter holds only sell-as-is bases (FR-36). One line above the download action says so (Copy Deck). The download stays enabled |
 | 47 | Filter with nothing to name | `{components.filter-modal}` | No base qualifies, for example under state 23 or 25. The file holds only the `Import` line. The download stays enabled, and one line above it says so (Copy Deck). Its line replaces state 46's line when both hold |
+| 48 | Crafting Item Level switched | Whole list + `{components.level-toggle}` | Interaction 1b. A row's ≈ swaps silently when the new pair differs. In each open panel, the lines that stop or start counting move into or out of `+ N not counted`. A crafted Item Class with no entry that counts at the level reads as one with no priced Combination (FR-38): a pending row that trails as state 18 states, with the reason `nothing rolls at ilvl <level>` in place of `no prices yet` (*Price trust*). Its panel holds only `+ N not counted` |
+| 49 | Not-counted entry | Inside the expansion, behind `+ N not counted` | Collapsed by default (Interaction 3a). When opened: the Combination and its tiers **dimmed**, not struck through, because nothing was decided against it. Price `—`, because it adds nothing to EV at this level. The trust cell holds its reason alone, with no mark (Copy Deck). One line, no second line. No trade link, as on a pruned line |
 
 ## Interaction Primitives
 
@@ -927,6 +943,14 @@ The numbers are stable identifiers.
    their place away. With one recipe published, there is nothing to switch
    (state 42). With none, there is no toggle (state 43).
 
+1b. **Switch the Crafting Item Level**. The level toggle is the page's **third
+   ranking dial** (FR-38). It behaves as Interaction 1a: click the inactive
+   segment, and the ranking re-runs synchronously, with no network, no sync and
+   no debounce. Ranks, EV figures, trust verdicts **and Best combinations**
+   change together. A Raw Base keeps its own price (FR-3), but its rank can move
+   as crafted rows move around it. **Open panels stay open** and re-render
+   (state 48).
+
 2. **Expand a ranked row.** Click anywhere on `{components.ranked-row}`. Click it
    again to close. The panel opens in place, instantly, below the row. **Many
    panels may be open at once**, because the player reads them against each other.
@@ -935,12 +959,15 @@ The numbers are stable identifiers.
 3. **Show the pruned lines.** `+ N pruned` inside an open panel. It is local to
    that panel and resets when the panel closes.
 
+3a. **Show the not-counted lines.** `+ N not counted` inside an open panel shows
+   the not-counted lines (state 49). It works as Interaction 3: local to that panel, and reset when the panel closes.
+
 4. **Read the remainder of the list.** The list affordance below row 20 is
    `+ Read the remaining N rows` / `− Show only the top 20`. It names no unit,
    because the remainder holds both units. It is reversible. It grows the list in
    place to the full ranked length, and a second click restores the top 20
    exactly. `core` ranks the full Tracked List and the page truncates. Thus the
-   threshold and the recipe reorder across everything (FR-5). A list of 20 rows or
+   threshold, the recipe and the item level reorder across everything (FR-5). A list of 20 rows or
    fewer shows them all, with no affordance, and the appendix follows the last row,
    as a short panel does (state 39).
 
@@ -994,8 +1021,8 @@ Click again to close.
      a clipboard write, not a file write. The path is also selectable text.
    - **The field** holds the Base Filter's file name, which becomes the target of the generated filter's last `Import` line (AD-31). It opens filled with the saved name, or
      empty (state 44). A name it cannot use gives state 45.
-   - **The download action** generates the filter from the ranking that the threshold and recipe on screen
-     produce, and hands it to the browser as
+   - **The download action** generates the filter from the ranking that the threshold, recipe and Crafting
+     Item Level on screen produce (FR-36), and hands it to the browser as
      `crafting-bases.filter` (AD-15, AD-31). It makes no request. The modal then
      closes. The page shows no confirmation. The browser's own save
      is the feedback.
@@ -1012,7 +1039,7 @@ DESIGN.md specifies each look.
 | Dotted underline + help cursor | Hover for an explanation | `EV (Divine)`. A row's trust mark takes the help cursor alone |
 | Accent ▾ + outline on hover | Click to open | `{components.sync-button}`, `{components.filter-button}` |
 | Accent text | Show more, or act | `{components.show-more}` in all its uses, and the filter modal's download and copy actions. ↗ turns accent on hover |
-| Accent-filled control | A setting | `{components.recipe-toggle}`, `{components.threshold-control}` |
+| Accent-filled control | A setting | `{components.recipe-toggle}`, `{components.level-toggle}`, `{components.threshold-control}` |
 | Row hover highlight + open-row bar | A ranked row opens on click | `{components.ranked-row}` |
 
 **Hover and persistent states.** Nothing lifts, glows or bounces. DESIGN.md owns
@@ -1029,27 +1056,29 @@ the tones.
 | `{components.filter-modal}` download action | Cursor pointer, while enabled | Disabled under states 44 and 45 |
 | `{components.filter-modal}` field | The field invites typing | While editing, the field shows its editing look |
 | `{components.filter-modal}` copy action | Cursor pointer | Copy Deck, *Pick-up Filter* |
-| `{components.recipe-toggle}` inactive segment | Cursor pointer | The active segment is not a target |
+| `{components.recipe-toggle}` and `{components.level-toggle}`, inactive segment | Cursor pointer | The active segment is not a target |
 | `{components.threshold-control}` | The figure invites typing. The thumb invites a drag | While editing, the figure shows its editing look |
 | `{components.show-more}` | Cursor pointer | — |
 | `{components.trade-link}` | Turns accent, with cursor pointer. Nothing else in the line responds | — |
 | `{components.expansion-line}`, appendix rows, panel contents | **No hover state.** They are not interactive | — |
 
 **Pointer-down**. A pressed `{components.ranked-row}`,
-`{components.sync-button}`, `{components.filter-button}` or inactive `{components.recipe-toggle}` segment shows
+`{components.sync-button}`, `{components.filter-button}`, or inactive `{components.recipe-toggle}` or `{components.level-toggle}` segment shows
 its pressed look until release (DESIGN.md). Text-only targets
 (`{components.show-more}`, `{components.trade-link}`) and the slider have no
 pressed state. Any colour change is instantaneous or at most a fast linear step.
 
 **What survives a reload** (FR-7). **The Payout Threshold, the active Craft
-Recipe and the Base Filter's file name** persist, in the viewer's own browser
-storage (FR-7, AD-15). The file name saves on each edit that leaves a
-usable name (not state 44 or 45). Everything else resets. The filter modal, open panels, the lines revealed and the pruned lines shown inside
+Recipe, the Crafting Item Level and the Base Filter's file name** persist, in the
+viewer's own browser storage (FR-7, AD-15). The file name saves on each edit that leaves a
+usable name (not state 44 or 45). Everything else resets. The filter modal, open panels, the lines revealed and the pruned and not-counted lines shown inside
 them, the grown list and the sync report all start closed. The test: a value that
 the player deliberately sets persists, and a value that records how far the player
 read does not. The recipe is a deliberate setting, like the threshold.
 FR-7 hands that decision to this document by name. **If a saved recipe is no
 longer published, the page silently uses the first published recipe**.
+**A first visit shows the recipe whose option word is `perfect`** when one is
+published, otherwise the first published recipe, **and item level `82`**.
 
 **Out of scope, explicitly:** focus-visible styling, `Tab` traversal, keyboard
 shortcuts, access keys, right-click menus and touch gestures. Input is mouse-only, except as this section's opening paragraph states.
@@ -1151,7 +1180,8 @@ singular voice carries the concreteness that a name would add.
 2. The header bar and skeleton rows paint in the final layout and resolve in one
    transition `[ASSUMPTION]`.
 3. The player's eye crosses the header bar in passing. It sees the league, and the
-   recipe and threshold they left last session (both persist, FR-7). It sees the
+   recipe, item level and threshold they left last session (all three persist,
+   FR-7). It sees the
    sync button reading its age, not a count. The button says that nothing is
    wrong. It is not silent.
 4. They read the top five. Blue names are Item Classes they craft on. Grey names
@@ -1211,8 +1241,8 @@ is already under their hand in the header.
 2. They click anywhere on its `{components.ranked-row}`.
 3. `{components.expansion-panel}` opens in place. Its first line names the class in
    full. Then it says in plain words that some roll odds are estimated and that
-   every price below comes from real listings. The threshold and recipe that the figures
-   depend on are in the sticky header above.
+   every price below comes from real listings. The threshold, recipe and item level that
+   the figures depend on are in the sticky header above.
 4. They read its top 8 lines. First come the priced Combinations, by what each adds
    to the EV. They are quiet where the price is current, and one reads
    `◐ rough · priced 5 days ago`. Then a dimmed line reads `below threshold`. It
@@ -1317,9 +1347,13 @@ AD-3). The player does this a handful of times a league.
    has no figure yet.
 4. The footer legend still renders. The page explains itself even with nothing to
    say.
-5. Over the following day, rows lose their ○ as the sync rotation reaches them. The
-   ranking takes shape row by row, because the refresh is long and partial.
-6. **Climax:** the ranking refills in front of the player rather than appearing
+5. Their bases now drop at item level 79, so they click `79` in
+   `{components.level-toggle}` (FR-38). Nothing visible changes yet, because no
+   row has a figure. The setting persists into every later session.
+6. Over the following day, rows lose their ○ as the sync rotation reaches them. The
+   ranking takes shape row by row, because the refresh is long and partial. It
+   ranks each crafted class for the bases they have.
+7. **Climax:** the ranking refills in front of the player rather than appearing
    finished. They watch the recovery happen. At no point does the page serve last
    league's numbers as this league's.
 
@@ -1330,7 +1364,7 @@ the fix.
 
 ### UJ-7 — The filter refresh
 
-1. The player finishes the pre-session read (UJ-1). The threshold and the recipe are where they left them, so the ranking on screen is the one they want to
+1. The player finishes the pre-session read (UJ-1). The threshold, the recipe and the item level are where they left them, so the ranking on screen is the one they want to
    play with.
 2. They click `Filter ▾`. The modal opens over the page with their filter's file
    name already filled in from last session.
@@ -1361,12 +1395,13 @@ download again.
   with numbered steps, a climax beat and a failure path. UJ-5's
   partial support and UJ-6's honest-empty landing are stated as such. The
   protagonist is "the player" by override.
-- **State coverage: 49 numbered rows, 48 live.** States 1–47 plus 12a and 15a.
-  State 19 is retired. States 42 and 43 cover one published recipe
-  and none. States 44–47 cover the filter modal.
+- **State coverage: 51 numbered rows, 49 live.** States 1–49 plus 12a and 15a.
+  States 19 and 36 are retired. States 42 and 43 cover one published recipe
+  and none. States 44–47 cover the filter modal. State 48 covers a switch of the
+  Crafting Item Level, and state 49 a not-counted line.
 - **Component coverage.** Every component in DESIGN.md's token sheet has a row in
   the Component Patterns index under the same name: header-bar, recipe-toggle,
-  threshold-control, filter-button, filter-modal, sync-button, sync-report-panel, list-statement, column-header,
+  level-toggle, threshold-control, filter-button, filter-modal, sync-button, sync-report-panel, list-statement, column-header,
   ev-tooltip, ranked-row, trust-mark, estimate-mark, mark-tooltip, chase-cell,
   expansion-panel, expansion-line, show-more, trade-link, unrankable-appendix,
   footer-legend and failure-screen.

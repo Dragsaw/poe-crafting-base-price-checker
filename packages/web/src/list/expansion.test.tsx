@@ -8,9 +8,18 @@ import { hoursBefore, many, priced, rawEntry } from '../test-support/list-fixtur
 import { colors, expansionLineGrid, spacing } from '../theme/tokens';
 import { PageProvider } from '../theme/PageProvider';
 import type { AffixPart } from './combination-text';
-import type { ClassDisplayRow, CraftedCombination, PrunedCombination } from './display-rows';
+import type { ClassDisplayRow, CraftedCombination, NotCountedCombination, PrunedCombination } from './display-rows';
 import { ClassExpansionPanel } from './ExpansionPanel';
-import { BELOW_THRESHOLD_NOTE, CURATION_MARKS, ESTIMATED_ODDS_CONTEXT, FEWER_LINES_COPY, JEWEL_CONTEXT, moreLinesCopy, prunedCopy } from './format';
+import {
+  BELOW_THRESHOLD_NOTE,
+  CURATION_MARKS,
+  ESTIMATED_ODDS_CONTEXT,
+  FEWER_LINES_COPY,
+  JEWEL_CONTEXT,
+  moreLinesCopy,
+  notCountedCopy,
+  prunedCopy,
+} from './format';
 import { RankedList } from './RankedList';
 import { NAME_COLORS } from './RankedRow';
 import { MISSING_FIGURE } from './row/ExpectedValueCell';
@@ -38,6 +47,10 @@ function pruned(index: number): PrunedCombination {
   return { key: `pruned-${String(index)}`, text: affix(`T2 Gone ${String(index)}`), reason: `reason ${String(index)}` };
 }
 
+function notCounted(index: number, reason: string): NotCountedCombination {
+  return { key: `not-counted-${String(index)}`, text: affix(`T1 Out ${String(index)}`), isPinned: false, reason };
+}
+
 function classRow(lines: number, prunedCount: number, overrides: Partial<ClassDisplayRow> = {}): ClassDisplayRow {
   return {
     key: '["crafted","accessory.ring","Rings"]',
@@ -53,6 +66,7 @@ function classRow(lines: number, prunedCount: number, overrides: Partial<ClassDi
     chase: [],
     combinations: Array.from({ length: lines }, (_, index) => combination(index)),
     pruned: Array.from({ length: prunedCount }, (_, index) => pruned(index)),
+    notCounted: [],
     ...overrides,
   };
 }
@@ -194,6 +208,29 @@ describe('the expansion panel', () => {
     expect(showMore(view, 'lines')?.getAttribute('aria-expanded')).toBe('true');
     click(showMore(view, 'lines'));
     expect(linesIn(view)).toHaveLength(TOP_LINES);
+  });
+
+  // Interaction 3a, state 49: not-counted lines come last, behind their own toggle, and `+ N more` ignores them.
+  it('puts + N not counted after + N pruned, counts only the counted lines in + N more, and prints the not-counted lines last', () => {
+    const view = mount(panel(classRow(11, 2, { notCounted: [notCounted(0, 'needs ilvl 82'), notCounted(1, "greater orbs can't roll this at ilvl 79")] })));
+    expect(showMore(view, 'lines')?.textContent).toBe(moreLinesCopy(3));
+    expect(showMore(view, 'not-counted')?.textContent).toBe(notCountedCopy(2, false));
+    expect(showMore(view, 'pruned')?.compareDocumentPosition(showMore(view, 'not-counted') as Node)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(view.querySelectorAll('[data-not-counted]')).toHaveLength(0);
+    click(showMore(view, 'pruned'));
+    click(showMore(view, 'not-counted'));
+    expect(showMore(view, 'not-counted')?.textContent).toBe(notCountedCopy(2, true));
+    const lines = [...view.querySelectorAll<HTMLElement>('[data-not-counted]')];
+    expect(lines.map((line) => line.querySelector('[data-cell="trust"]')?.textContent)).toEqual(['needs ilvl 82', "greater orbs can't roll this at ilvl 79"]);
+    const lastPruned = [...view.querySelectorAll('[data-pruned-line]')].at(-1);
+    expect(lastPruned?.compareDocumentPosition(lines[0] as Node)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    for (const line of lines) {
+      expect(line.querySelector<HTMLElement>('[data-cell="combination"]')?.style.color).toBe(rgb(colors['text-tertiary']));
+      expect(line.querySelector<HTMLElement>('[data-tier]')?.style.color).toBe(rgb(colors['text-tertiary']));
+      expect(line.querySelector<HTMLElement>('[data-cell="trust"]')?.style.color).toBe(rgb(colors['text-secondary']));
+      expect(line.querySelector('[data-cell="price"]')?.textContent).toBe(MISSING_FIGURE);
+      expect(line.querySelector('[data-struck], [data-line-mark], a, [data-prune-reason]')).toBeNull();
+    }
   });
 
   it('shows every line and no affordance on a panel of 8 lines or fewer', () => {

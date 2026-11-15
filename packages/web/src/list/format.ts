@@ -55,7 +55,17 @@ export function moreLinesCopy(hidden: number): string {
 /** The remainder affordance, open (Interaction 7). */
 export const FEWER_LINES_COPY = `${glyphs.close} show fewer`;
 
-/** The pruned affordance (Interaction 3), its sign `+` closed and `−` open (DESIGN.md `show-more`). */
+/** A counted group's affordance, its sign `+` closed and `−` open (DESIGN.md `show-more`). */
+function groupCopy(count: number, isOpen: boolean, word: string): string {
+  return `${isOpen ? glyphs.close : glyphs.open} ${String(count)} ${word}`;
+}
+
+/** The pruned affordance (Interaction 3). */
 export function prunedCopy(count: number, isOpen: boolean): string {
-  return `${isOpen ? glyphs.close : glyphs.open} ${String(count)} pruned`;
+  return groupCopy(count, isOpen, 'pruned');
+}
+
+/** The not-counted affordance (Interaction 3a). */
+export function notCountedCopy(count: number, isOpen: boolean): string {
+  return groupCopy(count, isOpen, 'not counted');
 }

@@ -184,11 +184,11 @@ describe('hybrid references', () => {
       const scoped = { prefix: [], suffix: [SL1] };
       const summedB = new Set([B]);
 
-      const emptyFirst = coOccur(scoped);
+      const emptyFirst = coOccur(scoped, pools([], [SL1]));
       expect(emptyFirst(x, y, 'suffix', new Set())).toBe(false);
       expect(emptyFirst(x, y, 'suffix', summedB)).toBe(true);
 
-      const summedFirst = coOccur(scoped);
+      const summedFirst = coOccur(scoped, pools([], [SL1]));
       expect(summedFirst(x, y, 'suffix', summedB)).toBe(true);
       expect(summedFirst(x, y, 'suffix', new Set())).toBe(false);
     });

@@ -26,7 +26,7 @@ export interface PickUpInput {
   readonly recipeId: string | undefined;
 }
 
-/** A class with an EV under the active recipe, and the floor its crafted entries share (AD-17). */
+/** A class with an EV under the active recipe, and the lowest floor among its crafted entries (FR-36). */
 interface ClassValue {
   readonly classKey: string;
   readonly categoryId: string;
@@ -80,26 +80,23 @@ function whitePurpose(value: ClassValue | undefined, rawValue: number | undefine
   return rawValue !== undefined && rawValue > 0 ? 'sell-raw' : undefined;
 }
 
+/** Every purpose qualifies at the Raw Base's own floor, whatever the Crafting Item Level (FR-36, AD-31). */
 function rawBaseEntries(
   entry: RawTrackedEntry,
   value: ClassValue | undefined,
   rawValue: number | undefined,
   itemLevelMax: number | undefined,
 ): PickUpEntry[] {
-  const { baseTypeId } = entry;
-  const classFloor = Math.max(entry.itemLevelMin, value?.itemLevelMin ?? entry.itemLevelMin);
+  const { baseTypeId, itemLevelMin } = entry;
   const out: PickUpEntry[] = [];
   const purpose = whitePurpose(value, rawValue);
   if (purpose !== undefined) {
-    const itemLevelMin = purpose === 'craft' ? classFloor : entry.itemLevelMin;
     out.push({ baseTypeId, rarity: 'normal', itemLevelMin, purpose });
   }
   if (isWorthCrafting(value)) {
-    out.push({ baseTypeId, rarity: 'magic', itemLevelMin: classFloor, unidentifiedTierMin: 4, purpose: 'check-rolls' });
+    out.push({ baseTypeId, rarity: 'magic', itemLevelMin, unidentifiedTierMin: 4, purpose: 'check-rolls' });
   }
-  return itemLevelMax === undefined
-    ? out
-    : out.filter((pickUp) => pickUp.itemLevelMin <= itemLevelMax).map((pickUp) => ({ ...pickUp, itemLevelMax }));
+  return itemLevelMax === undefined ? out : out.map((pickUp) => ({ ...pickUp, itemLevelMax }));
 }
 
 /** Each Raw Base's last item level before the next higher floor of its base type (FR-36); absent for the highest. */

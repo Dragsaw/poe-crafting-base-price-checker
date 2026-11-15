@@ -33,8 +33,13 @@ afterEach(() => {
   localStorage.clear();
 });
 
+/** A saved `greater`: the page reopens on it, not on the first-visit `perfect`. */
+function savedGreater(): void {
+  localStorage.setItem(RECIPE_STORAGE_KEY, 'greater');
+}
+
 describe('the Craft Recipe control', () => {
-  it('prints one segment per recipe in the header slot, the first recipe active, and the Craft Cost once', async () => {
+  it('prints one segment per recipe in the header slot, `perfect` active on a first visit, and the Craft Cost once', async () => {
     serveWorld(standardWorld());
     mount();
     await settleTo('ready');
@@ -50,22 +55,22 @@ describe('the Craft Recipe control', () => {
     expect(toggle?.style.borderRadius).toBe(rounded.control);
     expect(toggle?.style.padding).toBe(px(headerControls.framePadding));
     // NFR-10: the active segment reads by its weight, not its colour alone.
-    expect(option('greater').className).toBe('fg-recipe-segment');
-    expect(option('greater').style.fontWeight).toBe('600');
-    expect(option('perfect').style.fontWeight).toBe('');
+    expect(option('perfect').className).toBe('fg-segment');
+    expect(option('perfect').style.fontWeight).toBe('600');
+    expect(option('greater').style.fontWeight).toBe('');
     for (const id of ['greater', 'perfect']) {
       expect(option(id).style.padding).toBe(`${px(headerControls.segmentPadY)} ${px(headerControls.segmentPadX)}`);
       expect(option(id).style.borderRadius).toBe(rounded.segment);
     }
     // The active word is not a target; the inactive one is the only button.
-    expect(option('greater').tagName).toBe('SPAN');
-    expect(option('greater').getAttribute('aria-current')).toBe('true');
-    expect(option('perfect').tagName).toBe('BUTTON');
+    expect(option('perfect').tagName).toBe('SPAN');
+    expect(option('perfect').getAttribute('aria-current')).toBe('true');
+    expect(option('greater').tagName).toBe('BUTTON');
     expect(control().querySelectorAll('button')).toHaveLength(1);
     // No form control of any kind.
     expect(control().querySelectorAll('input, select, [role="radio"], [role="switch"]')).toHaveLength(0);
-    expect(costLine()).toBe(`0.03 ${RECIPE_COST_UNIT}`);
-    expect(control().querySelector('[data-recipe-cost-figure]')?.textContent).toBe('0.03');
+    expect(costLine()).toBe(`0.30 ${RECIPE_COST_UNIT}`);
+    expect(control().querySelector('[data-recipe-cost-figure]')?.textContent).toBe('0.30');
     expect(control().querySelector<HTMLElement>('[data-recipe-cost]')?.style.color).toBe(rgb(colors['text-secondary']));
     // Craft Cost prints nowhere else.
     expect(frame().textContent.split(RECIPE_COST_UNIT)).toHaveLength(2);
@@ -84,7 +89,16 @@ describe('the Craft Recipe control', () => {
     expect(costLine()).toBe(`0.03 ${RECIPE_COST_UNIT}`);
   });
 
+  // *What survives a reload*: a first visit with no `perfect` published shows the first recipe.
+  it('opens on the first recipe in file order on a first visit when no recipe reads `perfect`', async () => {
+    serveWorld(standardWorld({ recipes: [{ id: 'regular', currencies: [{ currencyId: 'divine', quantity: 0.01 }], modifierLevelMin: 0 }, RECIPES[0]] }));
+    mount();
+    await settleTo('ready');
+    expect(option('regular').getAttribute('aria-current')).toBe('true');
+  });
+
   it('ranks crafted rows with the Item Class name in magic blue and the EV, beside raw rows', async () => {
+    savedGreater();
     serveWorld(standardWorld());
     mount();
     await settleTo('ready');
@@ -98,6 +112,7 @@ describe('the Craft Recipe control', () => {
   });
 
   it('a click re-ranks in the same pass, raw rows keep their relative order, and the choice survives a reload', async () => {
+    savedGreater();
     serveWorld(standardWorld());
     mount();
     await settleTo('ready');
@@ -121,9 +136,9 @@ describe('the Craft Recipe control', () => {
     serveWorld(standardWorld());
     mount();
     await settleTo('ready');
-    click(option('greater'));
+    click(option('perfect'));
     expect(localStorage.getItem(RECIPE_STORAGE_KEY)).toBeNull();
-    expect(names()).toEqual(['Staves', 'Bows', 'Wide Belt', 'Gold Amulet']);
+    expect(names()).toEqual(['Bows', 'Wide Belt', 'Gold Amulet', 'Staves']);
   });
 
   it('falls back to the first recipe in file order when the stored id is unknown', async () => {
@@ -136,6 +151,7 @@ describe('the Craft Recipe control', () => {
   });
 
   it('keeps an open panel open across a switch, on the same row', async () => {
+    savedGreater();
     serveWorld(standardWorld());
     mount();
     await settleTo('ready');
@@ -190,6 +206,7 @@ const boldFigures = (tooltip: HTMLElement | null): string[] =>
 
 describe('the EV tooltip the page renders', () => {
   it('states the active recipe’s Craft Cost and the live threshold, then the uncostable variant, then a typed threshold', async () => {
+    savedGreater();
     serveWorld(standardWorld({ rates: RATES.slice(0, 2) }));
     mount();
     await settleTo('ready');

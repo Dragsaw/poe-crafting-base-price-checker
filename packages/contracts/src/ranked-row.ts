@@ -61,13 +61,22 @@ export const CraftedSummandSchema = z
   })
   .describe('One summand of a crafted EV (AD-17).');
 
+/** Why an entry does not count at the level: its floor is above it, or the recipe cannot reach it there. The floor wins when both hold. */
+export const NotCountedSchema = z
+  .discriminatedUnion('kind', [
+    z.strictObject({ kind: z.literal('floor'), itemLevelMin: ItemLevelSchema.describe('The entry’s Item Level Floor, above the level.') }),
+    z.strictObject({ kind: z.literal('unreached') }),
+  ])
+  .describe('A not-counted combination’s reason (FR-38, FR-26).');
+
 export const CraftedCombinationSchema = z
   .strictObject({
     entryKey: z.string().min(1).describe('The tracked entry’s canonical key.'),
     trust: PriceTrustSchema.describe('The combination entry’s own verdict (AD-17, *Price trust*).'),
     priceDivine: DivineAmountSchema.optional().describe('The active-league observed price, verbatim; set only when the entry is priced.'),
+    notCounted: NotCountedSchema.optional().describe('Set exactly when the entry does not count at the ranking’s Crafting Item Level (FR-38, FR-26).'),
   })
-  .describe('A non-pruned entry of the class that is not a summand: below the threshold, pending or broken (AD-17).');
+  .describe('A non-pruned entry of the class that is not a summand: below the threshold, pending, broken or not counted (AD-17).');
 
 /** An uncostable recipe has `ev` null and still orders by `grossPayout` (EXPERIENCE.md 35). */
 export const CraftedRankedRowSchema = z
@@ -79,7 +88,7 @@ export const CraftedRankedRowSchema = z
       .describe('The serialised Item Class key, `["crafted", categoryId, className]`: the canonical key’s class prefix.'),
     categoryId: z.string().min(1),
     className: z.string().min(1),
-    itemLevelMin: ItemLevelSchema.describe('The one floor every crafted entry on the class declares (AD-17).'),
+    itemLevelMin: ItemLevelSchema.describe('The lowest floor among the class’s non-pruned crafted entries (AD-17, FR-36).'),
     recipeId: z.string().min(1),
     grossPayout: z.number().min(0).describe('Σ contribution over `summands`.'),
     craftCost: z
@@ -89,7 +98,7 @@ export const CraftedRankedRowSchema = z
     summands: z.array(CraftedSummandSchema).describe('By contribution descending, then canonical key.'),
     combinations: z
       .array(CraftedCombinationSchema)
-      .describe('Below-threshold, then pending, then broken, then canonical key.'),
+      .describe('Counted before not counted; then below-threshold, pending, broken; then canonical key.'),
     provenance: ProvenanceSchema.exclude(['absent']).describe(
       'The weakest Provenance over the pair’s inputs: the recipe’s eligible set over both slots (AD-10). A ranked row is never absent.',
     ),
@@ -121,5 +130,6 @@ export type RawRankedRow = z.infer<typeof RawRankedRowSchema>;
 export type CraftedRankedRow = z.infer<typeof CraftedRankedRowSchema>;
 export type CraftedSummand = z.infer<typeof CraftedSummandSchema>;
 export type CraftedCombination = z.infer<typeof CraftedCombinationSchema>;
+export type NotCounted = z.infer<typeof NotCountedSchema>;
 export type Uncostable = z.infer<typeof UncostableSchema>;
 export type RankedRow = z.infer<typeof RankedRowSchema>;

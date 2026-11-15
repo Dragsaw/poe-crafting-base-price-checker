@@ -12,16 +12,16 @@ import {
 } from './filter-copy';
 
 describe('the filter modal copy', () => {
-  it('leads with the live threshold at 2dp and the recipe word', () => {
-    expect(filterLead(0.25, 'greater')).toBe(
-      'Shows the bases worth picking up at your threshold of 0.25 div with greater orbs. Your NeverSink filter handles everything else.',
+  it('leads with the live threshold at 2dp, the recipe word and the level', () => {
+    expect(filterLead(0.25, 'greater', 82)).toBe(
+      'Shows the bases worth picking up at your threshold of 0.25 div with greater orbs at ilvl 82. Your NeverSink filter handles everything else.',
     );
-    expect(filterLead(3, 'perfect')).toContain('threshold of 3.00 div with perfect orbs.');
+    expect(filterLead(3, 'perfect', 79)).toContain('threshold of 3.00 div with perfect orbs at ilvl 79.');
   });
 
   // Matrix: state 43.
-  it('drops the recipe from the lead when no recipe is published (state 43)', () => {
-    expect(filterLead(0.5, undefined)).toBe(
+  it('drops the recipe and the level from the lead when no recipe is published (state 43)', () => {
+    expect(filterLead(0.5, undefined, 79)).toBe(
       'Shows the bases worth picking up at your threshold of 0.50 div. Your NeverSink filter handles everything else.',
     );
   });

@@ -1,6 +1,8 @@
 import { compareByCodeUnit } from '@poe/contracts';
 import type { CraftedTrackedEntry } from '@poe/contracts';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
+import { RECIPE_STORAGE_KEY } from '../recipe-storage';
 
 import { BELOW_THRESHOLD_NOTE } from '../../list/format';
 import { SHORT_FORMS } from '../../list/short-forms';
@@ -34,6 +36,11 @@ import {
   panelRows,
   panelCell,
 } from './test-support';
+
+// A returning player on `greater`, the recipe these figures are worked out under.
+beforeEach(() => {
+  localStorage.setItem(RECIPE_STORAGE_KEY, 'greater');
+});
 
 afterEach(() => {
   unmount();

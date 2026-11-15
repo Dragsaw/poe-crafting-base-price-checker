@@ -249,7 +249,7 @@ describe('filterText: AC 5, deterministic text and the golden file', () => {
         'Show\n\tBaseType == "Gold Amulet"\n\tRarity Magic\n\tItemLevel >= 82\n\tUnidentifiedItemTier >= 4\n\tSetFontSize 40\n\tSetTextColor 0 240 190 255\n\tMinimapIcon 2 Cyan Diamond\n\n',
         'Show\n\tBaseType == "Ruby Ring"\n\tRarity Normal\n\tItemLevel >= 82\n\tSetFontSize 40\n\tSetTextColor 0 70 255 255\n\tSetBorderColor 0 70 255 255\n\tSetBackgroundColor 30 0 70 255\n\tMinimapIcon 2 Blue Diamond\n\n',
         'Show\n\tBaseType == "Solar Amulet"\n\tRarity Normal\n\tItemLevel >= 75\n\tSetFontSize 40\n\tSetTextColor 0 70 255 255\n\tSetBorderColor 0 70 255 255\n\tSetBackgroundColor 30 0 70 255\n\tMinimapIcon 2 Blue Diamond\n\n',
-        'Show\n\tBaseType == "Solar Amulet"\n\tRarity Magic\n\tItemLevel >= 82\n\tUnidentifiedItemTier >= 4\n\tSetFontSize 40\n\tSetTextColor 0 240 190 255\n\tMinimapIcon 2 Cyan Diamond\n\n',
+        'Show\n\tBaseType == "Solar Amulet"\n\tRarity Magic\n\tItemLevel >= 75\n\tUnidentifiedItemTier >= 4\n\tSetFontSize 40\n\tSetTextColor 0 240 190 255\n\tMinimapIcon 2 Cyan Diamond\n\n',
         'Import "very strict.filter"\n',
       ].join(''),
     );

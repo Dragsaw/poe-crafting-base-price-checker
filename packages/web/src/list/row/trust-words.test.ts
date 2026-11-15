@@ -1,7 +1,7 @@
 import { PriceTrustReasonSchema, type PriceTrustReason } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { FIXED_ROW_REASONS, lineReasonWords, lineTrustParts, markTooltipParts, NO_LISTINGS_LINE, rowReasonWords, VERDICT_WORDS } from './trust-words';
+import { FIXED_ROW_REASONS, lineReasonWords, lineTrustParts, markTooltipParts, NO_LISTINGS_LINE, notCountedWords, rowReasonWords, VERDICT_WORDS } from './trust-words';
 import { JOINER } from '../../shared/text';
 
 const experience = Object.values(
@@ -12,9 +12,9 @@ const experience = Object.values(
   }),
 )[0] ?? '';
 
-/** A string the Copy Deck or *Price trust* writes in backticks, with `N` for a count. */
-function isWrittenInExperience(text: string, count?: number): boolean {
-  const template = count === undefined ? text : text.replace(String(count), 'N');
+/** A string the Copy Deck or *Price trust* writes in backticks, with `N` for a count or a named placeholder. */
+function isWrittenInExperience(text: string, count?: number, placeholder = 'N'): boolean {
+  const template = count === undefined ? text : text.replace(String(count), () => placeholder);
   return experience.includes(`\`${text}\``) || experience.includes(`\`${template}\``);
 }
 
@@ -27,7 +27,8 @@ function isTriedWrittenInExperience(text: string): boolean {
 const byName = (a: string, b: string): number => a.localeCompare(b);
 
 /** One sample of each reason kind; a kind with a figure takes 5, 1 or 74. */
-const SAMPLES: Readonly<Record<PriceTrustReason['kind'], { readonly reason: PriceTrustReason; readonly count?: number }>> = {
+const SAMPLES: Readonly<Record<PriceTrustReason['kind'], { readonly reason: PriceTrustReason; readonly count?: number; readonly placeholder?: string }>> = {
+  'nothing-counts': { reason: { kind: 'nothing-counts', itemLevel: 79 }, count: 79, placeholder: '<level>' },
   old: { reason: { kind: 'old', days: 5 }, count: 5 },
   thin: { reason: { kind: 'thin', listings: 1 } },
   'no-listings': { reason: { kind: 'no-listings', minutes: 2 * 1440 } },
@@ -43,8 +44,8 @@ const SAMPLES: Readonly<Record<PriceTrustReason['kind'], { readonly reason: Pric
 };
 
 describe('the reason words of a ranked row', () => {
-  it('reads EXPERIENCE.md revision 33', () => {
-    expect(experience).toMatch(/^revision: 33$/m);
+  it('reads EXPERIENCE.md revision 35', () => {
+    expect(experience).toMatch(/^revision: 35$/m);
   });
 
   it('samples every reason kind core can return', () => {
@@ -52,9 +53,18 @@ describe('the reason words of a ranked row', () => {
     expect(Object.keys(SAMPLES).toSorted(byName)).toEqual(kinds.toSorted(byName));
   });
 
-  it.each(Object.entries(SAMPLES))('words %s as EXPERIENCE.md writes it', (_kind, { reason, count }) => {
+  it.each(Object.entries(SAMPLES))('words %s as EXPERIENCE.md writes it', (_kind, { reason, count, placeholder }) => {
     const words = rowReasonWords(reason);
-    expect(isWrittenInExperience(words, count), words).toBe(true);
+    expect(isWrittenInExperience(words, count, placeholder), words).toBe(true);
+  });
+
+  it('words each not-counted reason as the Copy Deck writes it (state 49)', () => {
+    const scope = { recipeWord: 'greater', itemLevel: 79 };
+    expect(notCountedWords({ kind: 'floor', itemLevelMin: 82 }, scope)).toBe('needs ilvl 82');
+    expect(isWrittenInExperience('needs ilvl 82', 82, '<floor>')).toBe(true);
+    const unreached = notCountedWords({ kind: 'unreached' }, scope);
+    expect(unreached).toBe("greater orbs can't roll this at ilvl 79");
+    expect(experience).toContain(`\`${unreached.replace('greater', '<recipe>').replace('79', '<level>')}\``);
   });
 
   it('prints no-listings with no age: the Raw Base tooltip column', () => {
@@ -108,9 +118,9 @@ describe('the mark tooltip', () => {
 });
 
 describe('the reason words of an expansion line', () => {
-  it.each(Object.entries(SAMPLES))('words %s as EXPERIENCE.md writes it', (_kind, { reason, count }) => {
+  it.each(Object.entries(SAMPLES))('words %s as EXPERIENCE.md writes it', (_kind, { reason, count, placeholder }) => {
     const words = lineReasonWords(reason);
-    const isWritten = reason.kind === 'no-listings' ? isTriedWrittenInExperience(words) : isWrittenInExperience(words, count);
+    const isWritten = reason.kind === 'no-listings' ? isTriedWrittenInExperience(words) : isWrittenInExperience(words, count, placeholder);
     expect(isWritten, words).toBe(true);
   });
 

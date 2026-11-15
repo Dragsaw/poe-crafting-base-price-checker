@@ -2,14 +2,14 @@ import { canonicalKey } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { edgeAlignment, emptyContainment } from './cross-file.ts';
-import { band, bows, checksOf, entry, failuresOf, line, OTHER, pools, STAT, T7, T8, tier, valueless } from './cross-file/test-support.ts';
+import { band, bows, checksOf, entry, failuresOf, line, OTHER, pools, slotScope, STAT, T7, T8, tier, valueless } from './cross-file/test-support.ts';
 
 describe('edge alignment', () => {
   const scoped = [T7(), T8()];
 
   it('counts a valueless line as [1, 1] in the extremes', () => {
-    expect(edgeAlignment('prefix', band(1, 2), [tier([line(STAT)]), tier([line(STAT, [2, 2])])], 82)).toBeUndefined();
-    expect(edgeAlignment('prefix', band(0, 1), [tier([line(STAT)])], 82)).toContain('extremes [1, 1]');
+    expect(edgeAlignment('prefix', band(1, 2), slotScope([tier([line(STAT)]), tier([line(STAT, [2, 2])])]), 82)).toBeUndefined();
+    expect(edgeAlignment('prefix', band(0, 1), slotScope([tier([line(STAT)])]), 82)).toContain('extremes [1, 1]');
   });
 
   it.each([
@@ -17,7 +17,7 @@ describe('edge alignment', () => {
     ['56.0–80.0', 56, 80],
     ['43.0–80.0', 43, 80],
   ])('accepts %s over T7 and T8', (_label, min, max) => {
-    expect(edgeAlignment('prefix', band(min, max), scoped, 82)).toBeUndefined();
+    expect(edgeAlignment('prefix', band(min, max), slotScope(scoped), 82)).toBeUndefined();
     expect(failuresOf([entry({ prefix: band(min, max) })], bows(pools(scoped)))).toEqual([]);
   });
 
@@ -32,12 +32,12 @@ describe('edge alignment', () => {
     expect(failure?.entryKey).toBe(canonicalKey(tracked));
     expect(failure?.detail).toContain('prefix');
     expect(failure?.detail).toContain(STAT);
-    expect(failure?.detail).toContain('floor 82');
+    expect(failure?.detail).toContain('item level 82');
   });
 
   it('ignores a contained hybrid entry’s foreign statId line', () => {
     const hybrid = tier([line(STAT, [43, 56.5]), line(OTHER, [1, 500])]);
-    expect(edgeAlignment('prefix', band(43, 56.5), [hybrid], 82)).toBeUndefined();
+    expect(edgeAlignment('prefix', band(43, 56.5), slotScope([hybrid]), 82)).toBeUndefined();
   });
 
   it('fails at the floor when a band aligns only above it', () => {
@@ -48,7 +48,7 @@ describe('edge alignment', () => {
   });
 
   it('skips a valueless reference', () => {
-    expect(edgeAlignment('prefix', valueless(), [tier([line(STAT)])], 82)).toBeUndefined();
+    expect(edgeAlignment('prefix', valueless(), slotScope([tier([line(STAT)])]), 82)).toBeUndefined();
   });
 });
 
@@ -66,7 +66,7 @@ describe('empty containment set', () => {
 
   it('fails when only weight-0 tiers match, never P = 0', () => {
     const scoped = [tier([line(STAT, [43, 56.5])], { weight: 0 })];
-    expect(emptyContainment('prefix', band(43, 56.5), scoped, 82)).toContain('no scoped entry contains it');
+    expect(emptyContainment('prefix', band(43, 56.5), slotScope(scoped), 82)).toContain('no scoped entry contains it');
   });
 
   it('fails a tier that sits above the floor', () => {

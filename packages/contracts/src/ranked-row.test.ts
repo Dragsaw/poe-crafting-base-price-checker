@@ -161,3 +161,22 @@ describe('RankedRowSchema, the price trust', () => {
     expect(PriceTrustSchema.safeParse({ verdict: 'rough', reasons: [{ kind: 'unreliable-share', percent: 101 }] }).success).toBe(false);
   });
 });
+
+describe('RankedRowSchema, the not-counted marks (FR-38)', () => {
+  it('parses a floor and an unreached combination, and refuses an unknown kind or a missing floor', () => {
+    const floor = { ...COMBINATION, notCounted: { kind: 'floor', itemLevelMin: 82 } };
+    const unreached = { ...COMBINATION, notCounted: { kind: 'unreached' } };
+    const parsed = { ...craftedRow, combinations: [floor, unreached] };
+    expect(RankedRowSchema.parse(parsed)).toEqual(parsed);
+    expect(RankedRowSchema.safeParse({ ...craftedRow, combinations: [{ ...COMBINATION, notCounted: { kind: 'floor' } }] }).success).toBe(false);
+    expect(RankedRowSchema.safeParse({ ...craftedRow, combinations: [{ ...COMBINATION, notCounted: { kind: 'pruned' } }] }).success).toBe(false);
+    expect(RankedRowSchema.safeParse({ ...craftedRow, combinations: [{ ...COMBINATION, notCounted: 'floor' }] }).success).toBe(false);
+  });
+
+  it('parses the nothing-counts reason with its level, and refuses one without', () => {
+    const nothing = { verdict: 'pending', reasons: [{ kind: 'nothing-counts', itemLevel: 79 }] };
+    expect(PriceTrustSchema.parse(nothing)).toEqual(nothing);
+    expect(PriceTrustSchema.safeParse({ verdict: 'pending', reasons: [{ kind: 'nothing-counts' }] }).success).toBe(false);
+    expect(PriceTrustSchema.safeParse({ verdict: 'pending', reasons: [{ kind: 'nothing-counts', itemLevel: 79.5 }] }).success).toBe(false);
+  });
+});

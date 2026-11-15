@@ -7,7 +7,7 @@ import { BASE_FILTER, blocksOf, classRow, isCaughtBy, purposesOf, rawRow } from 
 const BASE = 'Solar Amulet';
 const low = rawEntry(BASE, 75);
 const high = rawEntry(BASE, 82);
-/** The Amulets class worth crafting (EV 2) at the given shared floor. */
+/** The Amulets class worth crafting (EV 2), whose lowest crafted floor is `itemLevelMin` (FR-36). */
 const amulets = (itemLevelMin: number) => classRow(low.categoryId, low.className, 2, itemLevelMin);
 const ITEM_LEVELS = Array.from({ length: 100 }, (_, index) => index + 1);
 
@@ -31,7 +31,7 @@ describe('filterText of pickUpPurposes: Story 6.4, one base tracked at two floor
     const text = filterText(purposesOf([amulets(78), rawRow(low, 3), rawRow(high, 1)], [high, low]), BASE_FILTER);
     for (const itemLevel of ITEM_LEVELS) {
       expect(blocksCatching(text, 'Normal', itemLevel)).toHaveLength(itemLevel >= 75 ? 1 : 0);
-      expect(blocksCatching(text, 'Magic', itemLevel)).toHaveLength(itemLevel >= 78 ? 1 : 0);
+      expect(blocksCatching(text, 'Magic', itemLevel)).toHaveLength(itemLevel >= 75 ? 1 : 0);
     }
     expect(blocksCatching(text, 'Normal', 81)[0]).toContain('\tItemLevel <= 81');
     expect(blocksCatching(text, 'Magic', 81)[0]).toContain('\tItemLevel <= 81');
@@ -47,9 +47,10 @@ describe('filterText of pickUpPurposes: Story 6.4, one base tracked at two floor
     expect(blocksCatching(text, 'Normal', 100)).toEqual([]);
   });
 
-  it('AC 3: a lower craft tier whose class floor reaches the higher floor writes no block; the higher purpose catches the drop', () => {
+  it('AC 3: a lower craft tier keeps its Raw Base’s own floor below a higher crafted floor; the higher purpose catches the drop above it', () => {
     const text = filterText(purposesOf([amulets(84), rawRow(low, 1), rawRow(high, 3)], [low, high]), BASE_FILTER);
-    expect(blocksOf(text).some((block) => block.includes('\tItemLevel >= 75'))).toBe(false);
+    expect(blocksCatching(text, 'Normal', 75)).toHaveLength(1);
+    expect(blocksCatching(text, 'Normal', 75)[0]).toContain('\tItemLevel <= 81');
     expect(blocksCatching(text, 'Normal', 84)).toHaveLength(1);
     expect(blocksCatching(text, 'Normal', 84)[0]).toContain('\tItemLevel >= 82');
   });

@@ -1,13 +1,13 @@
-# Runs the full gate on a pull request that changes code or the config that
-# code builds with.
+# Runs the full gate on a pull request that changes code, the config that
+# code builds with, or `data/`, whose invariants `pnpm test:data` checks.
 #
 # The workflow starts on every pull request and the filter step skips the rest
 # when nothing relevant changed. A `paths:` trigger would skip the whole run, and
 # a required check that never reports leaves the pull request unmergeable.
 #
 # `pnpm check` is the done gate of AGENT-WORKFLOW.md, the same command the
-# pre-push hook runs. It includes `pnpm test:data`, which `deploy.yml` does not
-# run, so a player's data-only push still deploys.
+# pre-push hook runs. It includes `pnpm test:data`, which `deploy.yml` runs
+# too, with the NFR-6 timed cases off.
 name: Tests
 
 on:
@@ -49,6 +49,7 @@ jobs:
               - '.jscpd.json'
               - '.githooks/**'
               - '.github/workflows/test.yml'
+              - 'data/**'
 
       # Reads the version from `packageManager` in package.json.
       - if: steps.changes.outputs.code == 'true'

@@ -2,7 +2,7 @@ import type { ModifierWeight } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { combinationProbability, isExcludedBy, recipeReach, secondDraw } from '../probability.ts';
-import { band, isCloseRelative, line, OTHER, pOf, pools, STAT, tier } from './test-support.ts';
+import { band, isCloseRelative, line, OTHER, pOf, pools, scope82, STAT, tier } from './test-support.ts';
 import {
   ALL_SPELL_LEVEL,
   damageStat,
@@ -51,10 +51,10 @@ describe('the second draw on Wands (AD-17, research doc)', () => {
     const coldFirst = (PREFIX_WEIGHT.damage * SUFFIX_WEIGHT.ailment) / (suffixTotal - 4 * SUFFIX_WEIGHT.level - 2 * SUFFIX_WEIGHT.ailment);
     // Freeze first: the fire, lightning and chaos damage prefixes leave the prefix pool.
     const freezeFirst = (SUFFIX_WEIGHT.ailment * PREFIX_WEIGHT.damage) / (prefixTotal - 3 * PREFIX_WEIGHT.damage);
-    const combination = { itemLevelMin: 82, prefix: band(10, 20, damageStat('cold')), suffix: band(10, 20, FREEZE) };
-    const p = pOf(combinationProbability(wands, combination, 0));
+    const combination = { prefix: band(10, 20, damageStat('cold')), suffix: band(10, 20, FREEZE) };
+    const p = pOf(combinationProbability(wands, combination, scope82(0)));
     expect(isCloseRelative(p, (coldFirst + freezeFirst) / (prefixTotal + suffixTotal))).toBe(true);
-    expect(p).not.toBe(pOf(combinationProbability(untagged(wands), combination, 0)));
+    expect(p).not.toBe(pOf(combinationProbability(untagged(wands), combination, scope82(0))));
   });
 
   it('keys the second-draw sums by every tag of the first affix, not by its modGroup alone', () => {
@@ -67,8 +67,8 @@ describe('the second draw on Wands (AD-17, research doc)', () => {
     const p = pOf(
       combinationProbability(
         pools([coldTier, fireTier], [coldBlocked, fireBlocked, filler]),
-        { itemLevelMin: 82, prefix: band(10, 15), suffix: band(1, 4, OTHER) },
-        0,
+        { prefix: band(10, 15), suffix: band(1, 4, OTHER) },
+        scope82(0),
       ),
     );
     expect(isCloseRelative(p, (60 + 100 + 200 + 600) / 1600)).toBe(true);
@@ -77,11 +77,11 @@ describe('the second draw on Wands (AD-17, research doc)', () => {
 
 describe('a combination blocked in both draw orders', () => {
   const wands = wandPools();
-  const blocked = { itemLevelMin: 82, prefix: band(10, 20, damageStat('cold')), suffix: band(1, 2, levelStat('fire')) };
+  const blocked = { prefix: band(10, 20, damageStat('cold')), suffix: band(1, 2, levelStat('fire')) };
 
   it('has P = 0, which the reach verdict reads as unreachable on both slots', () => {
-    expect(combinationProbability(wands, blocked, 0)).toEqual({ ok: true, p: 0 });
-    expect(recipeReach(wands, blocked, 0)).toEqual({ reached: false, slots: ['prefix', 'suffix'] });
+    expect(combinationProbability(wands, blocked, scope82(0))).toEqual({ ok: true, p: 0 });
+    expect(recipeReach(wands, blocked, scope82(0))).toEqual({ reached: false, slots: ['prefix', 'suffix'] });
   });
 
   it('is reachable when one order is open: the predicate is not symmetric', () => {
@@ -89,10 +89,10 @@ describe('a combination blocked in both draw orders', () => {
     const suffix = tier([line(OTHER, [1, 2])], 100, { blockedByTags: [tagOf('cold')] });
     const fillers = [tier([line('explicit.p', [1, 1])], 100), tier([line('explicit.s', [1, 1])], 100)] as const;
     const classPools = pools([prefix, fillers[0]], [suffix, fillers[1]]);
-    const combination = { itemLevelMin: 82, prefix: band(10, 12), suffix: band(1, 2, OTHER) };
+    const combination = { prefix: band(10, 12), suffix: band(1, 2, OTHER) };
     // Prefix first is blocked; suffix first: 100 · 100 / 200.
-    expect(isCloseRelative(pOf(combinationProbability(classPools, combination, 0)), 50 / 400)).toBe(true);
-    expect(recipeReach(classPools, combination, 0)).toEqual({ reached: true });
+    expect(isCloseRelative(pOf(combinationProbability(classPools, combination, scope82(0))), 50 / 400)).toBe(true);
+    expect(recipeReach(classPools, combination, scope82(0))).toEqual({ reached: true });
   });
 
   it('is unreachable under a recipe whose floor leaves only blocked pairs, and reachable without it', () => {
@@ -100,10 +100,10 @@ describe('a combination blocked in both draw orders', () => {
     const low = tier([line(OTHER, [1, 2])], 100, { itemLevelMin: 1, modGroup: 's' });
     const high = tier([line(OTHER, [1, 2])], 100, { itemLevelMin: 75, modGroup: 's', addsTags: [tagOf('fire')], blockedByTags: [tagOf('cold')] });
     const classPools = pools([prefix, tier([line('explicit.p', [1, 1])], 100)], [low, high, tier([line('explicit.s', [1, 1])], 100)]);
-    const combination = { itemLevelMin: 82, prefix: band(10, 12), suffix: band(1, 2, OTHER) };
-    expect(recipeReach(classPools, combination, 0)).toEqual({ reached: true });
-    expect(combinationProbability(classPools, combination, 70)).toEqual({ ok: true, p: 0 });
-    expect(recipeReach(classPools, combination, 70)).toEqual({ reached: false, slots: ['prefix', 'suffix'] });
+    const combination = { prefix: band(10, 12), suffix: band(1, 2, OTHER) };
+    expect(recipeReach(classPools, combination, scope82(0))).toEqual({ reached: true });
+    expect(combinationProbability(classPools, combination, scope82(70))).toEqual({ ok: true, p: 0 });
+    expect(recipeReach(classPools, combination, scope82(70))).toEqual({ reached: false, slots: ['prefix', 'suffix'] });
   });
 });
 
@@ -144,10 +144,10 @@ describe('classes where no tag crosses the slots (research doc, *Not affected*)'
     ['jewel, untagged suffix', jewelPools(), band(2, 4, 'explicit.jewel_life'), band(1, 3, 'explicit.jewel_speed')],
   ] as const)('gives a %s combination exactly the probability of the same pools without tags', (_label, classPools, prefix, suffix) => {
     for (const modifierLevelMin of [0, 50]) {
-      const combination = { itemLevelMin: 82, prefix, suffix };
-      const tagged = pOf(combinationProbability(classPools, combination, modifierLevelMin));
+      const combination = { prefix, suffix };
+      const tagged = pOf(combinationProbability(classPools, combination, scope82(modifierLevelMin)));
       expect(tagged).toBeGreaterThan(0);
-      expect(tagged).toBe(pOf(combinationProbability(untagged(classPools), combination, modifierLevelMin)));
+      expect(tagged).toBe(pOf(combinationProbability(untagged(classPools), combination, scope82(modifierLevelMin))));
     }
   });
 });

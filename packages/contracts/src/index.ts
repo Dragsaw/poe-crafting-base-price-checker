@@ -126,12 +126,13 @@ export {
   CraftedCombinationSchema,
   CraftedRankedRowSchema,
   CraftedSummandSchema,
+  NotCountedSchema,
   ProvenanceSchema,
   RankedRowSchema,
   RawRankedRowSchema,
   UncostableSchema,
 } from './ranked-row.ts';
-export type { CraftedCombination, CraftedRankedRow, CraftedSummand, Provenance, RankedRow, RawRankedRow, Uncostable } from './ranked-row.ts';
+export type { CraftedCombination, CraftedRankedRow, CraftedSummand, NotCounted, Provenance, RankedRow, RawRankedRow, Uncostable } from './ranked-row.ts';
 
 export {
   filterOptionIds,

@@ -1,6 +1,7 @@
-import type { ModifierReference, ModifierWeight, WeightsClassPools, WeightsLine } from '@poe/contracts';
+import type { ModifierReference, ModifierWeight, WeightsClassPools, WeightsLine, WeightsPool } from '@poe/contracts';
 
-import type { ProbabilityResult } from '../probability.ts';
+import { isContaining } from '../probability.ts';
+import type { ProbabilityResult, RecipeScope } from '../probability.ts';
 
 export const STAT = 'explicit.stat_1';
 export const OTHER = 'explicit.stat_2';
@@ -57,12 +58,23 @@ export const band = (valueMin: number, valueMax: number, statId = STAT): Modifie
   valueMax,
 });
 
+/** A complete slot pool of `entries`: containment reads it unscoped (AD-11). */
+export const poolWith = (...entries: readonly ModifierWeight[]): WeightsPool => ({ poolCoverage: 'complete', entries: [...entries] });
+
+/** Containment in a pool of the tier alone, where the own interval is the interval. */
+export function isContainingAlone(reference: ModifierReference, entry: ModifierWeight, summed?: ReadonlySet<string>): boolean {
+  return isContaining(reference, entry, poolWith(entry), summed);
+}
+
 export function pools(prefix: readonly ModifierWeight[], suffix: readonly ModifierWeight[]): WeightsClassPools {
   return {
     prefix: { poolCoverage: 'complete', entries: [...prefix] },
     suffix: { poolCoverage: 'complete', entries: [...suffix] },
   };
 }
+
+/** A recipe scope at item level 82. */
+export const scope82 = (modifierLevelMin: number): RecipeScope => ({ itemLevel: 82, modifierLevelMin });
 
 export function pOf(result: ProbabilityResult): number {
   if (!result.ok) {

@@ -91,7 +91,7 @@ export const white = (purpose: 'craft' | 'sell-raw', itemLevelMin: number): Pick
   purpose,
 });
 
-export const checkRolls = (itemLevelMin = BOW_CLASS_FLOOR): PickUpEntry => ({
+export const checkRolls = (itemLevelMin = BOW_RAW_FLOOR): PickUpEntry => ({
   baseTypeId: B.baseTypeId,
   rarity: 'magic',
   itemLevelMin,

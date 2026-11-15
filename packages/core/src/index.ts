@@ -8,7 +8,11 @@ export { chunkOrder, pinnedToKeep, UNRESOLVABLE_RETRY_MS } from './chunk-order.t
 export type { ChunkOrder, ChunkOrderInput } from './chunk-order.ts';
 
 /** The ranking, both branches (AD-17): computed at read time, league-scoped, over every recipe. */
-export { compareRankedRows, rank, RECIPE_UNREACHABLE } from './rank.ts';
+export { compareRankedRows, rank } from './rank.ts';
+
+/** The Crafting Item Levels on offer (FR-38). */
+export { CRAFTING_ITEM_LEVELS } from './crafting-item-level.ts';
+export type { CraftingItemLevel } from './crafting-item-level.ts';
 export { classKeyOf, craftedClassesOf } from './crafted-classes.ts';
 export type {
   NotYetSyncedEntry,
@@ -51,7 +55,7 @@ export {
   lineSetCompleteness,
   scopedPools,
 } from './cross-file.ts';
-export type { CrossFileFailure, CrossFileResult, ScopedPools, UnvalidatedMark } from './cross-file.ts';
+export type { CrossFileFailure, CrossFileResult, ScopedPools, SlotScope, UnvalidatedMark } from './cross-file.ts';
 
 /** The probability term (AD-11, AD-17). */
 export {
@@ -60,12 +64,12 @@ export {
   isContaining as contains,
   isCovering as covers,
   eligible,
-  floored,
   interval,
   isEmptyPool,
   isExcludedBy,
   lineSet,
   needs,
+  ownInterval,
   poolOf,
   recipeReach,
   secondDraw,
@@ -80,6 +84,7 @@ export type {
   ProbabilityReason,
   ProbabilityResult,
   RecipeReach,
+  RecipeScope,
   ReferenceLine,
   Slot,
   UntrackableReason,

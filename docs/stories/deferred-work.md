@@ -54,3 +54,62 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Check in game whether a pick-up filter with a `BaseType ==` block for a base the game does not know loads, skips that block, or fails as a whole.
   evidence: FR-36 (PRD revision 37) keeps craft and check-the-rolls blocks for an unresolvable Raw Base, and the player accepted the risk. Unverified, severity medium to high if true: if the game rejects the whole file, every block fails and the filter adds no visibility (FR-35). 0 unresolvable Raw Bases in `data/dataset.json` today. Proof: import a filter that names a made-up base in a `BaseType ==` line and observe the game.
   retry_when: never — needs a human
+
+## Deferred from: spec-7-1 (2026-11-14)
+
+- source_spec: `docs/stories/spec-7-1-the-recipe-floor-per-modifier-after-the-level-scope.md`
+  summary: Name the words for the pair failures `pool empty` and `augment exhausted`: FR-4 and the `EXPERIENCE.md` Copy Deck name none, and AD-17 calls that gap a PRD finding.
+  evidence: `UnrankableReason` in `packages/core/src/rank.ts` reports the causes `core` observed as `pool empty` (an empty class pool, or a slot the scope leaves empty, with `recipeId`) and `augment exhausted` (with `recipeId`). The appendix prints them verbatim with no reason note (`APPENDIX_NOTES` in `packages/web/src/list/UnrankableAppendix.tsx`). The committed data hits neither cause today. The PRD owner adds the FR-4 members, and UX adds the Copy Deck strings; then `core` and `web` adopt those words. [NOTE FOR UX] The appendix prints a recipe-scoped pair failure (with `recipeId`) the same as a class-wide one, so the player cannot tell that the row may go away on a recipe switch: the words should tell a recipe-scoped failure from a class-wide one.
+  retry_when: never — needs a human
+
+## Deferred from: spec-7-3 review (2026-11-15)
+
+- source_spec: `docs/stories/spec-7-3-regenerate-tracked-json-for-t1-and-t2.md`
+  summary: Add an end-to-end test that spawns `pnpm tracked:regenerate` against a temp copy of the data and checks the fixed point, the output format and the schema-failure exit.
+  evidence: `regenerate.test.ts` imports only `regenerateEntries` and `isTrackedFile`. `main` in `.claude/skills/tracked-json/scripts/regenerate.ts` (the schema guard, `JSON.stringify(file, undefined, 2) + '\n'`, exit code) has no test. `lookup.end-to-end.test.ts` spawns its CLI with `execFile`. The script writes a fixed `data/tracked.json` path, so the test first needs an injectable path or a temp root. Found by the verification-gap layer of the spec-7-3 review.
+
+## Deferred from: spec-7-4 (2026-11-15)
+
+- source_spec: `docs/stories/spec-7-4-the-item-level-toggle.md`
+  summary: Decide how the header gives the league eyebrow back its full width now that the level toggle overruns the bar's width budget (UX decision).
+  evidence: With the level toggle (103.3px wide, plus its 22px gap) the controls measure 913px in Inter in agent-browser. The brand block yields as before (`minWidth: 0` in `packages/web/src/frame/HeaderBar.tsx`, the human's option A in spec-7-4 Decisions). At the 1063px target viewport the brand block is 80px, so the 148px title and the 111px eyebrow `Forbidden Rites` both cut with an ellipsis. At the 1000px content-min viewport the brand block is 17px. DESIGN.md `header-bar.layout` says the eyebrow never cuts and the brand block never narrows below it, and its width budget asks for an overrun report. `App/header-bar.test.tsx` now asserts the reserved-width title room is above 0 and below the title width at both frames.
+
+- source_spec: `docs/stories/spec-7-4-the-item-level-toggle.md`
+  summary: Add a web test that clicks the level toggle during the cold load (state 22) and checks that the choice is stored and ranks the first ready render.
+  evidence: `pendingControls` in `packages/web/src/frame/header-controls.tsx` renders a live `LevelToggle` while pending. The cold-load test in `packages/web/src/App/header-bar.test.tsx` only finds `[data-level-toggle]`, and every test in `packages/web/src/level/level-toggle.test.tsx` clicks after `ready()`. A no-op `onLevelChange` in `renderPending` (`packages/web/src/App.tsx`) would pass every test. Found by the verification-gap layer of the spec-7-4 review.
+
+## Deferred from: spec-epic-7-retro-item-1 (2026-11-15)
+
+- source_spec: `docs/stories/spec-epic-7-retro-item-1-measured-refresh-time.md`
+  summary: Measure the full-refresh time without the session cookie, then give UJ-6 and SM-C1 that figure.
+  evidence: PRD revision 40 gives UJ-6 and SM-C1 about a day and a half with the cookie and only "takes longer" without it, because no no-cookie figure was measured. The committed sync history holds only short pre-cookie runs, and every Pi session since 2026-11-08 ran with the cookie (`epic-7-retro-2026-11-15.md` D1). The inferred figure is about 70 h (about 50 searches/h under AD-8's spread), not measured. Until this lands, AD-12's no-cookie pace clause has no figure. Proof: run the Pi sync unauthenticated (`ops/pi/README.md`) long enough for a steady rate, take entries per hour from the `sync-progress.json` `completed` growth per 4 h tick, skipping any tick where a new pass restarts the completed list, and divide the Tracked List's search count by it. Cost: the run holds the only sync host at the unauthenticated pace for its duration. Afterwards, `ops/pi/set-poesessid.sh` restores the cookie. The PM then puts the figure in UJ-6 and SM-C1.
+  retry_when: never — needs a human
+
+- source_spec: `docs/stories/spec-epic-7-retro-item-1-measured-refresh-time.md`
+  summary: Recheck the Price trust rationale for the 72 h old mark against the accepted refresh cycle of about 36 h.
+  evidence: [NOTE FOR UX] `EXPERIENCE.md` *Price trust* (about lines 672-673) justifies the 72 h *old* threshold by "the partial refresh cycle of about 15 hours". PRD revision 40 accepts a full refresh of about 36 h with the cookie (UJ-6, SM-C1). A no-cookie cycle, inferred at about 70 h, would come near the 72 h *old* mark. Two more `EXPERIENCE.md` lines state the old one-day refill: the league-reset row of the state table (about line 876, "The list refills over the following day") and the league-reset journey step 6 (about line 1353, "Over the following day, rows lose their ○"). UX owns the threshold, its rationale and these lines; a reviewer does not edit the owner document.
+  retry_when: never — needs a human
+
+## Deferred from: spec-epic-7-retro-item-2 (2026-11-15)
+
+- source_spec: `docs/stories/spec-epic-7-retro-item-2-inexact-midpoint-step.md`
+  summary: Make `tools/dev-stop/stop-listeners.test.ts` deterministic: one `pnpm check` run failed it on a control character in the live process-list JSON.
+  evidence: On 2026-11-15 one full `pnpm check` on Windows failed two tests in that file, "snapshot > reads this process as the listener of a real port, then no listener once it closes" and "snapshot with an unreadable listener list > throws instead of passing a non-PID listener on", with `SyntaxError: Bad control character in string literal in JSON at position 94651 (line 1 column 94652)`. The second test expected `/unexpected listener query result/`. The file passed twice when run alone, and the next full `pnpm check` passed. The done gate therefore holds a nondeterministic failure that depends on the machine's live process state. The JSON comes from PowerShell `ConvertTo-Json` output parsed with `JSON.parse` (`tools/dev-stop/development-stop.ts:186-187`, or the snapshot path the test exercises). Done when the test no longer reads unescaped process text, or the parser tolerates it, and a test feeds it a control character.
+
+## Deferred from: spec-epic-7-retro-item-4 (2026-11-15)
+
+- source_spec: `docs/stories/spec-epic-7-retro-item-4-reach-check-skips-levels-below-the-floor.md`
+  summary: [NOTE FOR ARCHITECT] Say "at or above the entry's floor" in the AD-17 gate sentence and in AGENT-WORKFLOW.md's `unreachable` rule, to match `tracked:check` after retro item 4.
+  evidence: `ARCHITECTURE-SPINE.md` AD-17 ("fails only for an entry that no recipe in `data/recipes.json` reaches at any offered `L` ... because such an entry can never count") and `AGENT-WORKFLOW.md` ("unreachable under every recipe at every offered Crafting Item Level") do not name the floor. Since retro item 4, `isReached` in `packages/sync/src/curation/check.ts` skips levels below `entry.itemLevelMin`, as `countedProbability` in `rank` does (FR-38). The AD-17 reason clause already implies this, but the literal text allows the old reading. The Review brief forbids an implementer from editing these architect-owned files. The `tracked-json` SKILL.md is already updated.
+
+## Deferred from: spec-epic-7-retro-item-6 (2026-11-15)
+
+- source_spec: `docs/stories/spec-epic-7-retro-item-6-build-the-ledgered-findings.md`
+  summary: [NOTE FOR UX] EXPERIENCE.md calls `ilvl` the header's one abbreviation, but Copy Deck strings use `ilvl <level>` too.
+  evidence: The Fixed wordings table (`EXPERIENCE.md`, about line 237) says `ilvl` is "the one abbreviation". The Copy Deck strings of states 48 and 49 (rev 34) and the modal lead (rev 35, about line 486) print `ilvl <level>`. Narrow the fixed wording or accept the other uses. UX owns the wording (AGENT-WORKFLOW.md Review brief rule 2).
+  retry_when: never — needs a human
+
+- source_spec: `docs/stories/spec-epic-7-retro-item-6-build-the-ledgered-findings.md`
+  summary: [NOTE FOR UX] `mockups/key-filter-modal.html` names `at ilvl 82` in the lead, but its header draws no level toggle.
+  evidence: The header of the mock (`mockups/key-filter-modal.html`, about lines 160-177) predates `{components.level-toggle}` (`ilvl` · `79` `82`, EXPERIENCE.md rev 34), and no mockup draws that toggle. The mock also has no state-43 lead. UX owns the mockups.
+  retry_when: never — needs a human

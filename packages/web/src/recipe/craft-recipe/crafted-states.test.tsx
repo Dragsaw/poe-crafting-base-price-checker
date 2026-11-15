@@ -1,5 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import { RECIPE_STORAGE_KEY } from '../recipe-storage';
 import { NO_FIGURE_YET } from '../../list/format';
 import { honestEmptyCopy, uncostableCopy } from '../../list/list-statement';
 import { RECIPE_COST_UNIT } from '../CraftRecipe';
@@ -31,6 +32,11 @@ import {
   statement,
   click,
 } from './test-support';
+
+// A returning player on `greater`, the recipe these figures are worked out under.
+beforeEach(() => {
+  localStorage.setItem(RECIPE_STORAGE_KEY, 'greater');
+});
 
 afterEach(() => {
   unmount();
@@ -157,7 +163,7 @@ describe('the crafted states', () => {
     expect(statement()?.textContent).toBe(honestEmptyCopy(TEST_LEAGUE));
   });
 
-  it('state 36: a pair the recipe cannot reach is Unrankable under that recipe only', async () => {
+  it('an entry the recipe cannot reach is not counted, and is no Unrankable reason (AD-17; state 36 retired)', async () => {
     const now = Date.now();
     const wands = chase('weapon.wand', 'Wands');
     serveWorld(
@@ -179,11 +185,27 @@ describe('the crafted states', () => {
     expect(names()).toEqual(['Wands', 'Bows']);
     expect(frame().querySelector('[data-appendix-row]')).toBeNull();
     click(option('perfect'));
-    expect(names()).toEqual(['Bows']);
-    const rows = Array.from(frame().querySelectorAll('[data-appendix-row]'), (row) => [
-      row.querySelector('[data-appendix-class]')?.textContent,
-      row.querySelector('[data-cell="reason"]')?.textContent,
-    ]);
-    expect(rows).toEqual([['Wands', 'recipe cannot reach this class']]);
+    // Nothing of Wands counts under perfect, so it reads as a row with no priced Combination (FR-1).
+    expect(names()).toEqual(['Bows', 'Wands']);
+    expect(frame().querySelector('[data-appendix-row]')).toBeNull();
+    const wandsRow = [...frame().querySelectorAll<HTMLElement>('[data-ranked-row]')].find((row) => row.textContent.includes('Wands'));
+    if (wandsRow === undefined) {
+      throw new Error('no Wands row');
+    }
+    // State 48: the row trails under its own reason, and its panel holds only `+ 1 not counted`.
+    expect(wandsRow.querySelector('[data-cell="ev"]')?.textContent).toBe(MISSING_FIGURE);
+    click(wandsRow);
+    const panelLines = (): HTMLElement[] => [...frame().querySelectorAll<HTMLElement>('[data-expansion-panel] [data-expansion-line]')];
+    expect(panelLines()).toHaveLength(0);
+    const group = frame().querySelector<HTMLElement>('[data-expansion-panel] [data-show-more="not-counted"]');
+    expect(group?.textContent).toBe('+ 1 not counted');
+    if (group === null) {
+      throw new Error('no not-counted group');
+    }
+    click(group);
+    const [line] = panelLines();
+    expect(line?.hasAttribute('data-not-counted')).toBe(true);
+    expect(line?.querySelector('[data-cell="trust"]')?.textContent).toBe("perfect orbs can't roll this at ilvl 82");
+    expect(line?.textContent).not.toMatch(/NaN|undefined/);
   });
 });

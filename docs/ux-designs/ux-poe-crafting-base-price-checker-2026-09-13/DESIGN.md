@@ -6,9 +6,9 @@ description: >-
   The game's rarity colours say what each row is, bronze marks what the player
   can operate, and every other colour appears only when a price needs attention.
 status: final
-revision: 23
+revision: 24
 created: 2026-09-13
-updated: 2026-11-01
+updated: 2026-11-14
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
@@ -147,8 +147,8 @@ typography:
 
 rounded:
   none: '0px'        # rows, panels, the expansion, the appendix
-  control: '6px'     # the recipe toggle frame, the threshold figure box, the sync button
-  segment: '4px'     # one recipe segment inside the toggle
+  control: '6px'     # the recipe and level toggle frames, the threshold figure box, the sync button
+  segment: '4px'     # one segment inside a toggle
   tooltip: '6px'
 
 spacing:
@@ -174,7 +174,7 @@ components:
     position: 'sticky at the top of the viewport, above the list'
     background: '{colors.ground}'
     borderBottom: '1px solid {colors.line-strong}'
-    layout: 'one flex row, items centred, 22px between groups, no control wraps or shrinks: brand block (takes the free space; the title cuts with an ellipsis when the free space is too narrow) · {components.recipe-toggle} · {components.threshold-control} · {components.filter-button} · {components.sync-button}'
+    layout: 'one flex row, items centred, 22px between groups, no control wraps or shrinks: brand block (takes the free space and never narrows below the eyebrow; the title cuts with an ellipsis when the free space is too narrow; the eyebrow never cuts) · {components.recipe-toggle} · {components.level-toggle} · {components.threshold-control} · {components.filter-button} · {components.sync-button}'
     eyebrow: '{typography.eyebrow}, uppercase, {colors.text-secondary}. Never the accent'
     title: '{typography.title} in {colors.text}'
     brandLineHeight: '1.15, eyebrow above title'
@@ -189,6 +189,13 @@ components:
     none: 'no published recipe: label, toggle and Craft Cost are absent'
     craftCost: '{typography.craft-cost} in {colors.text-secondary}, 10px after the toggle, tabular figures'
     craftCostUncostable: 'the uncostable phrase in the same role and colour, never a number'
+  level-toggle:
+    label: '{typography.label} in {colors.text-secondary}, 10px before the toggle'
+    frame: '{colors.surface} fill, 1px solid {colors.line-strong}, radius {rounded.control}, 2px padding'
+    segment: '{typography.control} in {colors.text-secondary}, padding 4px 10px, radius {rounded.segment}, cursor pointer'
+    segmentActive: '{colors.accent-soft} fill, {colors.accent} text, weight 600, cursor default'
+    segmentHover: 'inactive segment only: text goes to {colors.text}'
+    segmentPressed: 'inactive segment only: {colors.surface-raised} fill until release'
   threshold-control:
     label: '{typography.label} in {colors.text-secondary}, 10px before the figure. Its ≥ is an angle pointing right over one horizontal bar, drawn as {components.trust-mark} marks are'
     figureBox: '{colors.surface} fill, 1px solid {colors.line-strong}, radius {rounded.control}, padding 3px 8px, min-width 64px, right-aligned'
@@ -343,6 +350,7 @@ components:
     broken: 'price — in {colors.text-tertiary} at weight 400; trust cell: the broken mark, word, reason'
     belowThreshold: 'combination, its tiers and its price in {colors.text-tertiary}, price at weight 400; trust cell holds the reason alone in {colors.text-secondary}, no mark'
     pruned: 'combination struck through in {colors.text-tertiary}, led by its curation mark; price — in {colors.text-tertiary} at weight 400; trust cell empty; no trade link; a second line in {typography.note} {colors.text-tertiary} carries the prune reason across the line''s width'
+    notCounted: 'combination and its tiers in {colors.text-tertiary}, not struck through; price — in {colors.text-tertiary} at weight 400; trust cell holds the reason alone in {colors.text-secondary}, no mark; no trade link; no second line'
     pinnedMark: 'leads the combination cell, {colors.text-tertiary} at weight 600, at the line size'
     fallback: 'combination cell in {typography.stack-mono.fontFamily} at the line size; colour unchanged'
   show-more:
@@ -497,7 +505,7 @@ each of those weights. The page sets no italic.
 |---|---|
 | `{typography.title}` | header title, failure-screen title |
 | `{typography.eyebrow}` | the league name, failure-screen eyebrow |
-| `{typography.control}` | recipe segments, a single recipe's word |
+| `{typography.control}` | recipe and level segments, a single recipe's word |
 | `{typography.control-figure}` | threshold figure |
 | `{typography.craft-cost}` | Craft Cost beside the recipe |
 | `{typography.label}` | control labels, the sync button, the threshold unit, the list statement |
@@ -626,24 +634,30 @@ where EXPERIENCE.md, *What may be cut*, allows it.
   combination cell at `{spacing.content-min}` (about 464px).
 - The longest reason (EXPERIENCE.md, *Price trust*) against
   `{spacing.expansion-trust-cell}`.
-- The header bar against its width budget, below.
+- The header bar against its width budget, below: the controls plus the full
+  league eyebrow, at the target and at `{spacing.content-min}`.
 - Each mark's drawing against its line: ◐ and ○ at one diameter.
 
-**The header's width budget**. The controls never wrap or shrink. The title takes
-what is left and cuts with an ellipsis when that is too little. These figures come
-from the browser, with `Orbs`, `Items worth ≥`, a 75px slider and `{components.filter-button}`
-(64.4px, plus its gap). They are the controls alone, gaps included, without the title:
+**The header's width budget**. The controls never wrap or shrink. The eyebrow
+never cuts, so the brand block never narrows below it. The title takes what is
+left and cuts with an ellipsis when that is too little. The figures without the
+level toggle come from the browser, with `Orbs`, `Items worth ≥`, a 75px slider
+and `{components.filter-button}` (64.4px, plus its gap). The level toggle with
+`ilvl` and its gap adds about 121px, measured in the system-ui fallback. They are
+the controls alone, gaps included, without the brand block:
 
-| Craft Cost slot | Controls |
-|---|---|
-| `no figure yet` | 795.6px |
-| `0.42 div / craft` | 809.0px |
-| `10.00 div / craft` | 817.4px |
-| `< 0.01 div / craft`, the widest form | 820.9px |
+| Craft Cost slot | Controls, without the level toggle | Controls, with it |
+|---|---|---|
+| `no figure yet` | 795.6px | about 917px |
+| `0.42 div / craft` | 809.0px | about 930px |
+| `10.00 div / craft` | 817.4px | about 938px |
+| `< 0.01 div / craft`, the widest form | 820.9px | about 942px |
 
-The target frame leaves 1015px inside the gutters, so `Worth picking up` prints in
-full on the target monitor `[ASSUMPTION — measure the title at build]`. At
-`{spacing.content-min}` (952px inside the gutters) the title cuts.
+`[ASSUMPTION — re-measure the whole bar in Inter at build]` The target frame
+leaves 1015px inside the gutters, so `Worth picking up` cuts on the target
+monitor too. The eyebrow must still print in full there and at
+`{spacing.content-min}` (952px inside the gutters). Report an overrun if it does
+not.
 
 The sync button keeps one 134px slot across its age and problem forms, so the
 Craft Cost slot is the only text that moves the controls. A wider cost takes its
@@ -674,7 +688,7 @@ Depth is tonal, in three steps: `{colors.ground}` → `{colors.surface}` →
 `{colors.surface-raised}`. A row that is hovered, pressed or open steps up to the
 surface. An expansion is the surface, joined flush to its row. Only a tooltip
 rests on the raised step. A pressed sync button or recipe segment takes the raised
-step until release.
+step until release. A pressed level segment does the same.
 
 **Shadows are for floating layers only.** The tooltips and `{components.filter-modal}`
 carry a soft drop shadow, because they float over the rows and need an edge against
@@ -713,7 +727,8 @@ The YAML specifies the looks on these parts:
   outline on hover
 - the download and copy actions of `{components.filter-modal}`: accent text
 - `{components.show-more}`: accent text
-- the active segment of `{components.recipe-toggle}` and the slider of
+- the active segment of `{components.recipe-toggle}` and of
+  `{components.level-toggle}`, and the slider of
   `{components.threshold-control}`: accent fill
 - `{components.ranked-row}`: hover tone, then the open-row bar
 
@@ -722,8 +737,8 @@ A mark takes the help cursor alone, with no underline under it.
 ### Header bar
 
 The brand block takes the free space and pushes the controls right. No control
-wraps or shrinks. Only the title gives way, with an ellipsis, in a frame narrower than the target
-(Layout & Spacing). Attribution and the sync time are not in the bar. They are in the sync
+wraps or shrinks. Only the title gives way, with an ellipsis, the target frame
+included. The eyebrow never gives way (Layout & Spacing). Attribution and the sync time are not in the bar. They are in the sync
 report.
 
 ### Recipe toggle
@@ -733,6 +748,11 @@ nothing to choose. **Craft Cost** sits beside the recipe and nowhere
 else. It is a property of the recipe, not of a row: `core` subtracts the same
 figure from every crafted EV (AD-17). An uncostable recipe prints a phrase in that
 slot and never a number. A zero would look free and inflate every crafted EV.
+
+### Level toggle
+
+It takes the recipe toggle's look, because it is the same kind of setting. It has
+no single, empty or Craft Cost form, because both levels are always offered.
 
 ### Threshold control
 
@@ -812,7 +832,7 @@ tertiary joiner fall under the floor on the raised step.
 ### Expansion panel and expansion line
 
 The panel has no title and no sub-line, because the sticky header always shows the
-threshold and the recipe. A below-threshold line is dimmed, tiers
+threshold, the recipe and the item level. A below-threshold line is dimmed, tiers
 included, and not hidden. The strike, the dagger and the tone
 identify a pruned line. A pruned line carries no removal date.
 

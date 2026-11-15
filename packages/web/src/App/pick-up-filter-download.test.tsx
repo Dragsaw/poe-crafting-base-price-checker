@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { filterLead } from '../pick-up-filter/filter-copy';
 import { GENERATED_FILE_NAME } from '../pick-up-filter/filter-name';
 import { option, RATES } from '../recipe/craft-recipe/test-support';
+import { FIRST_VISIT_CRAFTING_ITEM_LEVEL } from '../shared/product';
 import { flush, unmount } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry } from '../test-support/list-fixtures';
 import { blur, pastDebounce, typeInto } from '../test-support/threshold-input';
@@ -107,7 +108,7 @@ describe('the download', () => {
     blur(payoutField());
     expect(filterButton().outerHTML).toBe(button);
     openFilterModal();
-    expect(inModal('[data-filter-lead]').textContent).toBe(filterLead(0.35, 'greater'));
+    expect(inModal('[data-filter-lead]').textContent).toBe(filterLead(0.35, 'greater', FIRST_VISIT_CRAFTING_ITEM_LEVEL));
     clickOn(downloadAction());
     expect(await Promise.all(capture.downloads.map(async (download) => download.text))).toEqual([before, after]);
   });
@@ -128,7 +129,7 @@ describe('the download', () => {
     clickOn(option('perfect'));
     expect(filterButton().outerHTML).toBe(button);
     openFilterModal();
-    expect(inModal('[data-filter-lead]').textContent).toBe(filterLead(0.25, 'perfect'));
+    expect(inModal('[data-filter-lead]').textContent).toBe(filterLead(0.25, 'perfect', FIRST_VISIT_CRAFTING_ITEM_LEVEL));
     expect(stateLine()).toBeUndefined();
     clickOn(downloadAction());
     expect(await Promise.all(capture.downloads.map(async (download) => download.text))).toEqual([greater, perfect]);

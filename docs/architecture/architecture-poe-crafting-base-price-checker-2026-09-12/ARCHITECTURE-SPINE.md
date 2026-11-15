@@ -6,9 +6,9 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 46
+revision: 51
 created: '2026-09-12'
-updated: '2026-11-01'
+updated: '2026-11-15'
 binds: []
 sources:
   - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
@@ -20,6 +20,7 @@ sources:
   - docs/research/technical-poesessid-vs-oauth-for-trade-api-rate-li-2026-10-02/research.md
   - docs/research/technical-poe2-no-tag-mod-blocking-2026-10-23/research.md
   - docs/forge/loot-filter-integration/forged-idea.md
+  - docs/sprint-change-proposal-2026-11-14.md
   - .memlog.md
 companions:
   - WEIGHTS-FILE-SCHEMA.md
@@ -185,8 +186,8 @@ never import each other.
   **The pass spans the cross product AD-17 orders**, not only the active recipe's pairs —
   which is what makes a recipe switch a filter over an ordering already computed rather
   than a second pass. NFR-6's read-time budget is therefore measured **against the cross
-  product**, and it is a threshold change, not a recipe switch, that has to come in under
-  it. Computing the inactive recipe's pairs inside that pure pass is **not** the
+  product**, and it is a threshold change or a Crafting Item Level change (AD-17), not a
+  recipe switch, that has to come in under it. Computing the inactive recipe's pairs inside that pure pass is **not** the
   precomputation this AD forbids: what is forbidden is a rank, a score or an ordering
   persisted into an artifact.
 
@@ -301,17 +302,18 @@ never import each other.
   states the derivation, and it binds under AD-0 as a property the artifact either has or lacks — a
   file whose floors do not satisfy it is a defective file, whoever produced it and whatever
   they intended. **One direction of that property is unchecked and this AD says so:** a floor
-  that is too *low* is caught at load by AD-17's edge-alignment and empty-containment checks, and floors that disagree across one
-  base by AD-17's shared-floor check, but a floor set *higher* than `needs` derives is conforming
-  to every mechanical check in the system while scoping a wider pool than the curator chose.
+  that is too *low* is caught at load by AD-17's edge-alignment and empty-containment checks,
+  but a floor set *higher* than `needs` derives is conforming
+  to every mechanical check in the system while withholding the entry at a Crafting Item Level
+  where it could count.
   That is a trust surface, recorded here rather than implied.
 
   No component performs the derivation — the file states the result and the code reads it.
   The derivation takes the
   **tier an affix band names**, never the `acceptedTier` label: a derivation reading the
   label would be the label-to-weights join the four prohibitions above exist to close.
-  What the code does with the declared number is AD-17's — it scopes the pool and it
-  enforces one shared crafted floor per **item class**.
+  What the code does with the declared number is AD-17's — it decides whether the entry
+  counts at the player's Crafting Item Level (AD-17).
 
 ### AD-7 — Sync is a bounded, resumable, single-instance chunk runner with a defined rotation
 
@@ -597,16 +599,17 @@ never import each other.
 
   **A probability's inputs are exactly the entries its formula sums, numerator and
   denominator alike:** the recipe's eligible set of both slots, `E_P ∪ E_S`
-  (`eligible` and `affixProbability` in `packages/core/src/probability.ts`), for each tracked entry of the `(itemClass, recipe)`
-  pair. The scope is stated here because "every input" has several readings that give
+  (`eligible` and `affixProbability` in `packages/core/src/probability.ts`), for each tracked entry that is a summand of the
+  `(itemClass, recipe, L)` triple (AD-17). The scope is stated here because "every input" has several readings that give
   different labels. A tier below the recipe's floor is not an input, because the figure
   does not rest on it. A `weightSource: "absent"` tier inside the eligible set weakens the
   denominator **in fact** and not merely in label, so the containment-set-only reading
   would understate what the figure rests on. **The consequence is deliberate and is not a
   defect:** one invented tier anywhere in the eligible set makes every probability of that
-  pair read `uniform-prior`, so the provenance badge discriminates **between ranked rows**
-  rather than within one. The label belongs to the pair, so **two recipes on one Item Class
-  may carry different labels**, and a recipe switch may change the mark on a class's row.
+  triple read `uniform-prior`, so the provenance badge discriminates **between ranked rows**
+  rather than within one. The label belongs to the triple, so **two recipes on one Item Class
+  may carry different labels**, and a recipe or Crafting Item Level switch may change the
+  mark on a class's row.
   The `absent` rank is not scoped this way: a `partial` pool gives `absent` under every
   recipe, because coverage is read on the unrestricted pool (AD-17). `web` must render a
   figure resting on anything below `measured` visibly differently from one resting on
@@ -680,27 +683,43 @@ never import each other.
   partition the tier axis.
 
   **A line's filter-comparable interval is derived, and `core` derives it the one way, in
-  one place — `interval` in `packages/core/src/probability.ts`, binding under AD-0.** The unit is whatever
-  quantity the trade stat filter compares, and no other — that is one empirical fact about
-  the trade API, not a modelling decision (OQ-12). The derivation must be **exactly
+  one place — `interval` in `packages/core/src/probability.ts`, binding under AD-0.** The unit is the
+  quantity the trade stat filter compares: for a two-`#` line, the **average** of its two
+  values (OQ-12). The derivation must be **exactly
   representable**, because AD-17 compares a curator's declared edge against a derived edge
   for exact equality, and a line carries at most two `#` (`WEIGHTS-FILE-SCHEMA.md`), so the
   division is exact.
 
-  **Containment is whole-tier.** A tier whose derived interval lies wholly inside a
+  **A tier's own interval gives the overlap to the tier below.** Where a tier's interval
+  begins inside the interval of another tier of the same line set in the class's slot pool
+  whose `weight` is above 0, its **own interval** begins at the first value the line can
+  take above the highest such maximum. So tier N's minimum never meets tier N-1's maximum.
+  **"Below" means lower in value, whatever the two tiers' levels:** a higher-level tier whose
+  interval begins lower keeps the overlap, and the lower-level tier gives it up.
+  A weight-0 tier cannot roll, so it narrows no tier; the `weight` read is the entry's own,
+  never AD-17's tag exclusion. The slot pool is read unscoped, so a tier has one own
+  interval at every Crafting Item Level and under every recipe. Where tiers do not overlap, the own interval is the interval, and a tier whose own
+  interval would be empty keeps its interval. The derivation is `ownInterval` in
+  `packages/core/src/probability.ts`, binding under AD-0, and it is exact for the reason above.
+
+  **Containment is whole-tier, over the tier's own interval.** A tier whose own interval lies wholly inside a
   tracked band contributes its **whole weight, once**; a tier only **partly** covered
   contributes **nothing** to that band's numerator, and that is not an error. It still
   enters the denominator like any other entry in scope. **A hybrid reference contains a tier
   only when the tier's line set equals the reference's and every line is covered.** The
   `contains` predicate and the rules that ride with it are `isCovering` and `isContaining` in
-  `packages/core/src/probability.ts`, binding under AD-0.
+  `packages/core/src/probability.ts`, binding under AD-0. **A roll of tier N inside tier
+  N-1's interval counts in tier N's probability, and the search of tier N-1's band finds it.**
+  That is part of the accepted residual below (FR-29).
 
   Every overlapping tier contributing its full weight would over-count, inflating that
   base's `ΣP` above 1 and handing it the top of the ranking.
 
-  **What whole-tier containment costs, stated rather than implied.** Every affected
-  probability is an **understatement**, and the error is **uneven** across base types, so it
-  **reorders** rather than shifts. Two things blunt it. AD-16 sorts ascending and takes the
+  **What whole-tier containment costs, stated rather than implied.** Every probability that a
+  partly covered tier affects is an **understatement**, and the error is **uneven** across base types, so it
+  **reorders** rather than shifts. The own interval adds the opposite error on a smaller
+  scale: tier N counts whole while its rolls among the shared values sit in tier N-1's
+  search, never in its own. Two things blunt it. AD-16 sorts ascending and takes the
   cheapest ten, while a tier excluded for reaching past the band's ceiling sits at the top of
   the band by construction — so the population dropped from the numerator is largely the
   population the price estimate never sees, and the two errors do not compound. AD-17's edge
@@ -832,11 +851,13 @@ never import each other.
   surfaces the tracked list's age, so a list running unattended is visible as such.
 
   **The ceiling is denominated in searches, not in entries.** A full refresh is held to
-  SM-C1's figure; the remainder of the measured 2,400 searches per day (about 300) serves
-  retries, the catalogue refresh, the per-run leagues check and the session probe — the only
-  other three of AD-12's four request sources. The ceiling stays denominated against the
-  unauthenticated budget: AD-30's cookie is opt-in and may drop mid-run, so a refresh must fit
-  without it. One tracked entry always costs one search. Currency rates
+  `prd.md` SM-C1's figure. The same search limit also serves retries, the catalogue refresh,
+  the per-run leagues check and the session probe — the only other three of AD-12's four
+  request sources — and the limit is the one the trade API publishes in its rate-limit
+  headers (AD-8), never a number this spine fixes; `sync-report.json` reports what each
+  source spends. The ceiling stays denominated against the
+  unauthenticated budget: AD-30's cookie is opt-in and may drop mid-run, so a full refresh
+  must complete without it, at the pace `prd.md` SM-C1 and UJ-6 accept for that case. One tracked entry always costs one search. Currency rates
   (AD-20) and a recipe's ranking effect (AD-4, AD-17) cost nothing at sync time: rates are
   hand-maintained, never fetched, and a second recipe changes only what `core` computes at
   read time against prices already synced. **`pinned` entries spend from that
@@ -944,8 +965,7 @@ never import each other.
   carries `query.type` **except as its `jewel` discriminator**, which is the one place the
   two shapes legitimately meet; passing the band's
   `max` as well as its `min` is what keeps the priced population the one AD-17 weighed;
-  and a multi-`#` stat filters on one derived value whose identity is a measurement, not
-  a choice (OQ-12).
+  and a multi-`#` stat filters on one derived value, the average (AD-11).
 
   **A summed `statId` — one named by both affixes — is sent as one filter over the sum of
   the two bands.** The trade site sums one `statId` across the item's mods, so two per-slot
@@ -1048,12 +1068,13 @@ never import each other.
   branches over two different units** — a crafted row is an item class, a raw row is a
   base type (AD-5). One ordering holds both, and every row states which unit it names.
 
-  For an `(itemClass, recipe)` pair — `itemClass` being the `(categoryId, className)`
-  pair of AD-5, and the pair's entries being `crafted`:
+  For an `(itemClass, recipe)` pair at the Crafting Item Level `L` — `itemClass` being the
+  `(categoryId, className)` pair of AD-5, and the pair's entries being `crafted`:
 
   ```
   EV = ( Σ  P(combo) × price(combo) )  −  craftCost(recipe)
-        combo ∈ tracked(class), state = priced, price(combo) ≥ threshold
+        combo ∈ tracked(class), combo.itemLevelMin ≤ L, reachable(combo, recipe, L),
+        state = priced, price(combo) ≥ threshold
   ```
 
   The threshold compares against a combination's **gross** price, not the price net of
@@ -1080,7 +1101,7 @@ never import each other.
   **A class whose summands all fall below the threshold ranks at `EV = −craftCost`** with
   an empty summand list — it is ranked, not unrankable, because the threshold excluding
   every outcome is an answer about that class and not an absence of data. **A class with no
-  priced entry is outside the ordering** (FR-1): `core` returns it in its own group, sorted
+  priced entry that counts at `L` is outside the ordering** (FR-1, `prd.md` FR-38): `core` returns it in its own group, sorted
   by the tie-break above. `EXPERIENCE.md` state 18 places it.
 
   **The ordering spans the cross product; the view renders one recipe's rows.** `core`
@@ -1130,8 +1151,8 @@ never import each other.
     ```
 
     The row is rough when `unreliable%` reaches the share bound. `priced(class, recipe)` is
-    **every** `priced` non-pruned crafted entry of the item class, **including those below
-    the threshold**. So the verdict does not move when the player moves the threshold. The
+    **every** `priced` non-pruned crafted entry of the item class that counts at `L` under
+    the recipe, **including those below the threshold**. So the verdict does not move when the player moves the threshold. The
     sums are gross, before craft cost. Pending and broken entries are in neither sum.
   - **The zero-gross fallback has no case.** A `priced` entry's price is strictly positive
     (`DivineAmountSchema`), and a ranked pair's probabilities are positive. So the
@@ -1158,14 +1179,14 @@ never import each other.
   double-count cannot reorder anything. `core` therefore answers `false`, renders, and
   reports the class's unrankability as it already would.
 
-  **The crafted entries on one item class must share one `itemLevelMin`.** `EV` is an
-  expectation over one crafting act on one item population, and entries at different floors
-  are normalised against differently-scoped pools. A raw entry is exempt, because it is
-  never a summand — and it is exempt **by construction now rather than by exception**, since
-  it names a base type and takes no part in any class's floor.
+  **The scope of every crafted `EV` is the player's Crafting Item Level `L`, one value per
+  ranking (`prd.md` FR-38).** `EV` is an expectation over one crafting act on one item
+  population, so every summand of one `(itemClass, recipe, L)` is normalised against the
+  same pool. A crafted entry with `itemLevelMin > L` is not a summand. A raw entry takes no
+  part: its `itemLevelMin` scopes only its price search (AD-16).
 
   **Probability is a ratio over a pool scoped by item level, and the same scope applies to
-  both halves.** With `L = entry.itemLevelMin` and `cat` the entry's `(categoryId,
+  both halves.** With `L` the Crafting Item Level and `cat` the entry's `(categoryId,
   className)` pair — **the item class, not its category half**:
 
   ```
@@ -1183,7 +1204,7 @@ never import each other.
 
   **The denominator is a plain sum over entries** — one entry is one tier is one source
   row, counted once (AD-11), so the double-counting reading is unreachable. `ModifierReference` itself carries no item level: the scope comes from
-  the entry's floor and the weights entry's `itemLevelMin`, and from no third source.
+  `L` and the weights entry's `itemLevelMin`, and from no third source.
   `P(combination)` is the probability that one crafting act lands both references: a
   transmute rolls one affix and an augment adds the other, **and the second draw is
   conditioned on the first by mod-group and blocking-tag exclusion** (`WEIGHTS-FILE-SCHEMA.md` *The
@@ -1194,17 +1215,15 @@ never import each other.
   `modGroup`, or whose `blockedByTags` meets its `addsTags`, removed, and renormalises the rest. **A hybrid reference is one modifier in
   this formula**: its probability is the weight of the tiers it contains, never a product
   across its lines. The formula,
-  and its order with the recipe floor below (floor over the unscoped pool, then scope, renormalise, exclude, renormalise; the scope can drop a group the floor kept), are `affixProbability` and `combinationProbability` in
+  and its order with the recipe floor below (scope to `L`, then the floor per modifier, renormalise, exclude, renormalise), are `affixProbability` and `combinationProbability` in
   `packages/core/src/probability.ts`, binding under AD-0.
 
   **Where no `modGroup` spans both slots of a class and no entry's `addsTags` meets an
   entry of the other slot's `blockedByTags`, the result is exactly `P(prefix) × P(suffix)`**;
   the exclusion exists so such a class is valued correctly rather than overstated. **An augment left with no eligible entry makes that `(itemClass,
-  recipe)` pair unrankable with a reason, never a zero**, on the same ruling as an entry a
-  recipe cannot reach below.
+  recipe)` pair unrankable with a reason, never a zero.**
 
-  *[ASSUMPTION]* The model treats the crafting act as occurring at **exactly** the entry's
-  floor. The crafted search sends no item-level filter and prices every item level by
+  *[ASSUMPTION]* The model treats the crafting act as occurring at **exactly** `L`. The crafted search sends no item-level filter and prices every item level by
   choice, not by an API limit (`prd.md` FR-1).
 
   **The cross-file checks are defined once in `core`, and every shell holding both files
@@ -1239,12 +1258,12 @@ never import each other.
 
   | Check | Fails when | Mechanics |
   | --- | --- | --- |
-  | **Edge alignment** | a `banded` reference's or a banded `hybrid` line's edges are not exactly the extremes of its containment set under the scope — which is what closes the sentinel loophole that mere `valueMax` presence leaves open, and additionally catches a band that reaches into a tier it does not contain | `packages/core/src/cross-file/edge-alignment.ts` |
+  | **Edge alignment** | a `banded` reference's or a banded `hybrid` line's edges are not exactly the extremes of its containment set under the scope — the highest contained maximum, and the lowest contained tier's own minimum or its interval minimum (AD-11) — which is what closes the sentinel loophole that mere `valueMax` presence leaves open, and additionally catches a band that reaches into a tier it does not contain | `packages/core/src/cross-file/edge-alignment.ts` |
   | **Empty containment set** | a reference contains no entry under the scope — a validation error, never a `P = 0` | `packages/core/src/cross-file/empty-containment.ts` |
   | **`coOccur`** | two entries overlap under AD-17's predicate and any of their four references is hybrid, so a single item satisfies both and the partition is not a partition | `coOccur` in `packages/core/src/cross-file.ts`, `packages/contracts/src/overlap.ts` |
   | **Line-set completeness** | a reference names fewer lines than a tier its search reaches — a hybrid naming a subset of a tier's lines, or a single-line band reaching into a hybrid tier — or a hybrid's contained tiers span more than one `modGroup` | `lineSetCompleteness` in `packages/core/src/cross-file.ts` |
   | **Class discriminability** | the entry's `categoryId` carries **more than one** `className` in `weights.json`, and the entry's own `className` yields no class discriminator under `WEIGHTS-FILE-SCHEMA.md`'s `className` grammar — so AD-16 would price the entry across sibling classes while FR-1 guarantees it does not. **This is the only check that reads the weights file for something other than a pool** | `packages/core/src/cross-file/class-discriminability.ts` |
-  | **Kind agreement** | **per line**: a **valueless** reference line has a **banded** scoped line on its `statId` — a line's kind is read from **whether its `ranges` is empty**, since the weights contract has no `kind` field. **A banded reference line never disagrees**, because a tier that rolls no number reads as the value 1, the band `[1, 1]`: one `statId` may carry a valueless tier beside a banded one (*"Loads an additional bolt"* is 1 beside the `[2, 2]` tier). The quantifier stays **universal, not existential** for that case: one banded line is a defect however many valueless lines agree. `contracts` separately owns the **within-file** half, which a per-file schema sees on its own | `kindAgreement` in `packages/core/src/cross-file.ts` |
+  | **Kind agreement** | **per line**: a **valueless** reference line has a **banded** scoped line on its `statId` — a line's kind is read from **whether its `ranges` is empty**, since the weights contract has no `kind` field. **A banded reference line never disagrees**, because a tier that rolls no number reads as the value 1, the band `[1, 1]`: one `statId` may carry a valueless tier beside a banded one (*"Loads an additional bolt"* is 1 beside the `[2, 2]` tier). The quantifier stays **universal, not existential** for that case: one banded line is a defect however many valueless lines agree. `contracts` separately owns the **within-file** half, which a per-file schema sees on its own | `packages/core/src/cross-file/kind-agreement.ts` |
   | **Co-rollable combination** | no prefix tier and suffix tier of the entry's containment sets under the scope can be on one item in either draw order: in each order the two share a `modGroup`, or the first's `addsTags` meets the second's `blockedByTags`. This is a validation error, never a `P = 0` | `packages/core/src/cross-file/co-rollable.ts` |
 
   **One null-line rule, reading only the weights file, decides every `statId: null` line**,
@@ -1275,16 +1294,28 @@ never import each other.
   not run and nothing is lost: AD-24's day-one state makes every crafted entry unrankable
   already, and AD-16 still builds every crafted search without consulting that file (AD-5).
 
-  Edge alignment is evaluated **under the scope, at the entry's own floor**, and is
-  floor-dependent by design; AD-17 gives an item class exactly one crafted floor, so `core`
-  evaluates it once per class. **Edge alignment is therefore not a general bound
+  **"Under the scope" in the checks table is a set of levels chosen per check, so that one
+  verdict holds at every offered Crafting Item Level (`prd.md` FR-38).** The pool
+  only gains tiers as the level rises. **The empty containment set and the
+  co-rollable combination are evaluated at the entry's own `itemLevelMin`**: a wider pool
+  cannot undo a pass of theirs. **Edge alignment is evaluated at the entry's own
+  `itemLevelMin` and at every offered Crafting Item Level above it**: a wider pool can undo
+  its pass, because a tier that
+  enters above the floor can be contained by its own interval (AD-11) while its interval
+  begins below the band. **`coOccur` (every hybrid pair, whatever the two floors),
+  line-set completeness and kind agreement are evaluated at the highest offered Crafting
+  Item Level**, or at a higher floor of the entry or pair: each searches the pool for a
+  violating tier, and a tier present at a lower level is present there too. No level of any check is the player's `L`: the `sync` gate runs with
+  no `L`. **Edge alignment is therefore not a general bound
   on containment's loss** — it tests a band only against its own containment set, and the
   shapes that escape it are AD-11's accepted residual (FR-29).
 
-  **A tier cannot be isolated, and a band spanning adjacent tiers is legitimate.** Because
-  tiers overlap, a band on one tier necessarily admits the neighbour's tail into the priced
-  sample, and the trade search cannot exclude it either. A curator may therefore write a
-  single tier's own interval, or **a run of whole adjacent tiers**; what a curator may not
+  **Adjacent tiers can be tracked apart, and a band spanning adjacent tiers is legitimate.**
+  Tier N's own interval and tier N-1's interval are disjoint (AD-11), so two entries that
+  differ only in those two tiers pass the overlap predicate, and each counts at its own
+  floor (`prd.md` FR-22). The trade search cannot exclude tier N's lowest rolls from tier
+  N-1's band, which is AD-11's residual. A curator may write a single tier's own interval,
+  its interval, or **a run of whole adjacent tiers**; what a curator may not
   write is a band that contains one tier and clips another, which edge alignment rejects.
   **Prefer a single tier by default.** AD-16 prices a reference from the cheapest ten
   listings it matches, so a span is priced at the cheap end of the *whole* span while
@@ -1317,28 +1348,30 @@ never import each other.
   to FR-4's enum; if that enum has no member for the empty pool, that is a finding for the
   PRD and not a licence for `core` to relabel it as `partial`.
 
-  **A recipe restricts the pool from below, one modifier group at a time, and that is its
+  **A recipe restricts the pool from below, one modifier at a time, and that is its
   whole distribution term.** A `CraftRecipe` declares a **`modifierLevelMin`** — the game's
   *Minimum Modifier Level*, which a greater or perfect orb imposes and a plain orb does not.
-  Before AD-5's scope, `core` takes each `modGroup` of each slot of the unscoped pool on its
-  own. **Where the group has a tier at or above the floor, its tiers below the floor are
-  removed. Where the group's highest tier is below the floor, that tier alone survives at
-  its own weight**, because the floor never removes a modifier type entirely. AD-5's scope
-  runs next, and it can drop a group the floor kept. `core` then renormalises the
-  surviving weights, before AD-11's containment and this AD's probability term run. The
-  transform is a truncation and a renormalisation; it is never a reweighting, and `core`
-  invents no numbers. The predicate is `eligible` in `packages/core/src/probability.ts`,
-  binding under AD-0.
+  After the scope to `L`, `core` takes each **modifier** of each slot of the scoped pool on
+  its own. A modifier is one `modGroup` together with one set of stat ids. **Where the
+  modifier has a tier at or above the floor, its tiers below the floor are removed. Where
+  its highest tier in the scoped pool is below the floor, that tier alone survives at its
+  own weight**, because the floor never removes a modifier (`prd.md` FR-26). `core` then
+  renormalises the surviving weights, before AD-11's containment and this AD's probability
+  term run. The `modGroup` keeps its role in the exclusivity rule and plays no part in the
+  floor. The transform is a truncation and a renormalisation; it is never a reweighting,
+  and `core` invents no numbers. The predicate is `eligible` in
+  `packages/core/src/probability.ts`, binding under AD-0.
 
-  **The highest tier is the group's highest tier in the unscoped pool, not the highest the
-  item level allows.** A group whose top tier is above the entry's item level, and whose
-  other tiers are below the floor, contributes nothing under that recipe.
+  **The highest tier is the modifier's highest tier that can roll at `L`.** A modifier
+  whose top tier is above `L` keeps its best tier at or below `L`, even when that tier is
+  below the floor.
 
-  **An entry that a recipe cannot reach is a curation defect, not a ranking input.** `core`
-  exposes the reach verdict for each `(entry, recipe)` pair. A pair whose probability is `0` is unreachable. `pnpm tracked:check` fails
-  while any entry is unreachable under any recipe in `data/recipes.json`
-  (`AGENT-WORKFLOW.md`). Ranking keeps the backstop: an unreachable entry makes its
-  `(itemClass, recipe)` pair unrankable.
+  **Reach is a verdict per `(entry, recipe, L)`.** `core` exposes the reach verdict for each
+  `(entry, recipe, L)`. An entry that a recipe cannot reach at `L` is not a summand of that
+  `(itemClass, recipe, L)`, and it is neither a defect nor a reason for unrankability
+  (`prd.md` FR-26). `pnpm tracked:check` fails only for an entry that no recipe in
+  `data/recipes.json` reaches at any offered `L` (`prd.md` FR-38), because such an entry
+  can never count (`AGENT-WORKFLOW.md`).
 
   **Ordering is therefore recipe-dependent**, and the cross product AD-3 ranks is a real
   cross product rather than one distribution repeated at different cost offsets. The floors
@@ -1692,7 +1725,8 @@ never import each other.
   kind matches by its own `baseTypeId`. No block matches by `Class`.
 
   **`core` decides, `web` writes the text.** The purpose of each base is a pure `core`
-  function over the read-time ranking under the current dial (AD-1, AD-4), so FR-36 is
+  function over the read-time ranking under the current dials, the Crafting Item Level
+  among them (AD-1, AD-4, AD-17), so FR-36 is
   evaluated in one place. `web` serialises its output to filter text and starts the
   download that AD-15 permits. Generation uses only the artifacts already loaded (AD-24's
   set is unchanged) and makes no request. `web`'s filter serialiser and its tests own
@@ -1713,7 +1747,7 @@ AD-14 → AD-19; AD-18 → AD-17; AD-21, AD-22 → AD-3; AD-23 → AD-12; AD-26 
 | Ids | `statId`, `baseTypeId` and `categoryId` are the trade API's own identifiers and no component re-encodes them; `baseTypeId` is the `type` string exactly as `data/items` spells it, and `categoryId` is spelled exactly as the trade category filter list in `filters.json` spells it. **`className` is the one identifier in the system that is not the trade API's** — it is a poe2db pool name, carried verbatim, validated only by the cross-file gate against `weights.json`, and **never sent to the trade site** (AD-5, AD-25). **`sync` reads its grammar** — the defence suffix, or a jewel base name — to derive AD-16's class discriminator. The grammar is normative in `WEIGHTS-FILE-SCHEMA.md`; a `className` that satisfies no arm is a load error, never a fall back to a category-wide search; nothing derives a `className`, and nothing derives a `categoryId` or `baseTypeId` from one except the catalogue-validated `jewel` arm. Internal surrogate ids are forbidden, and every id is validated against the committed catalogue (AD-25). `sourceModifierId` (weights entries only; producer-owned, opaque, scoped to one `(baseTypeId, slot)`) and `lastSearchId` (dataset entries only; the trade site's search id, stored verbatim, never parsed) are Neither is ever a modifier or entity identity. |
 | Bands | A modifier reference is `banded` — `(statId, valueMin, valueMax)` with **inclusive, always-present** edges — `valueless` — `(statId)` with no edges — or `hybrid` — two or more such lines (AD-5). **Weights-file tiers overlap freely in value space** (AD-11). Edges sit on the lattice the trade filter compares against, which may be finer than the integers. |
 | Entity keys | A `TrackedEntry`'s canonical key follows its kind (AD-5): a `crafted` entry keys on `(categoryId, className, itemLevelMin, prefixBand, suffixBand)` and a `raw` entry on `(baseTypeId, itemLevelMin)`, each serialised in that field order, with each affix encoded in one of three distinguishable forms — banded, valueless, hybrid — so no two kinds can collide (encoding: `canonicalKey` in `packages/contracts/src/canonical-key.ts`, binding under AD-0). **The serialisation carries the kind**, so the two spaces cannot collide and a mixed ordering is total. **Keys compare by UTF-8 code unit, never by locale collation** — every tie-break in the system resolves on this ordering (AD-7's rotation, AD-17's summands), and at cold start, when every entry is equally stale, it is the *only* ordering, so a locale-sensitive comparison would have two builders sync different entries in the first chunk. **`acceptedTier`, `lastSearchId` and `lastSearchLeague` are never part of the key** — a key admitting any of them would make a relabelling or a re-search orphan an entry's price history. |
-| Item level | `itemLevelMin` is a declared floor, uniform across an item class's crafted tracked entries (AD-17) and present on every weights **entry** (AD-11). No component infers or adjusts it; the curator derives it per AD-5. |
+| Item level | `itemLevelMin` is a declared floor per tracked entry (AD-5); the crafted scope is the Crafting Item Level (AD-17). It is present on every weights **entry** (AD-11). No component infers or adjusts it; the curator derives it per AD-5. |
 | Dates & time | ISO-8601 UTC strings in all persisted data. Time enters `core` only as a passed-in value (AD-1). |
 | Units | Divine for all currency (AD-20). Band edges and item levels are raw game numbers. No field name implies a unit on its own — schemas name the unit. |
 | Numeric precision | **Band edges are `number`, never `integer`** — the lattice the trade filter compares on may be finer than the integers, and which lattice it is, is a producer-side fact the schema must not pre-empt. AD-17's alignment and containment rules compare edges for **exact equality**, so a producer emits values exact on the lattice and never a rounded approximation. Every persisted divine value — `PriceObservation` and `CurrencyRate` alike — is rounded to **4 decimal places** at the point of normalisation, in `sync`, once; `core` never re-rounds. The figure binds both sides deliberately: a coarser grid would round a cheap crafting currency toward zero and silently collapse AD-17's `craftCost` term. |
@@ -1842,8 +1876,7 @@ erDiagram
 `web` derives `RankedRow` in the browser and no component persists it (AD-4). **A
 `TrackedEntry` is `crafted` or `raw` by what it names, never by what it omits** — a
 `crafted` entry names an `ItemClass` and carries both affixes, a `raw` entry names
-a `BaseType` and carries no affix members at all (AD-5). Every crafted entry on one
-`ItemClass` shares that class's `itemLevelMin` (AD-17). **An `ItemClass` is the
+a `BaseType` and carries no affix members at all (AD-5). **An `ItemClass` is the
 pair `(categoryId, className)` and only its `categoryId` half is catalogue-validatable**;
 the `className` half is checked against `weights.json` by the cross-file gate and nowhere
 else (AD-25, AD-12). A `ModifierReference` is a bounded band, a valueless stat reference, or a
@@ -1914,6 +1947,7 @@ poe-crafting-base-price-checker/
 | Ranked list with chase modifiers — item classes crafted, base types raw | `web` + `core` | AD-4, AD-17, AD-10, AD-5 |
 | Expandable full combination list | `web` | AD-3, AD-9 |
 | Player-set payout threshold | `web` + `core` | AD-17, AD-4, AD-15 |
+| Player-chosen Crafting Item Level (FR-38) | `web` + `core` | AD-17, AD-4 |
 | Price estimation from listings | `sync` + `core` | AD-16, AD-20 |
 | Background sync, rate-limit aware | `sync` | AD-7, AD-8, AD-12 |
 | Optional session cookie for sync | `sync` | AD-30, AD-8, AD-12 |
@@ -1945,13 +1979,8 @@ poe-crafting-base-price-checker/
   introduces a dependency the product currently has none of. **Revisit if** the player's
   refresh cadence proves slower than the rates move, which AD-10's propagated `asOf` is
   what makes observable.
-- **`itemLevelMin` as a ranking key.** Ranking `(baseTypeId, itemLevelMin, recipe)` as
-  distinct rows would be strictly more expressive and remains sound, because each key is its
-  own partition over its own scoped pool. Deferred because it multiplies rows, spends from
-  AD-12's ceiling, and contradicts the PRD's per-base-type floor. **Revisit if** the
-  uniformity rule forces a real choice between two floors worth tracking.
 - **Per-band conditional item level.** AD-17 models the craft as occurring at exactly the
-  entry's floor, and the crafted price spans every item level (`prd.md` FR-1). **Revisit
+  Crafting Item Level, and the crafted price spans every item level (`prd.md` FR-1). **Revisit
   only if** `prd.md` FR-1 scopes the crafted price to item level again.
 - **Unidentified pool weight.** A per-`(base, slot)` scalar carrying the weight of modifiers
   the source publishes unnamed, entering the denominator but never a numerator. Rejected
@@ -1976,18 +2005,12 @@ poe-crafting-base-price-checker/
 
 ## Open Questions
 
-- **OQ-12 — the filter unit for a multi-`#` stat.** Exactly one fact defines it: which
-  single quantity the `trade2` stat filter compares for a stat whose text carries two `#`.
-  The producer's evidence points at the **average**, because a 56.5 range edge can only
-  arise from averaging two integers, but nobody has confirmed it against a live search.
-  **The non-integer half of this question is settled** (2026-09-19): the minimum request
-  body captured on that date carries `"value": {"min": 4.5}`, so the filter
-  accepts a non-integer edge and AD-16's no-rounding obligation is satisfiable rather than
-  merely stated. What remains is the identity of the quantity. Under `5.0.0` the unit
-  binds **two parties independently** — the producer, which publishes `ranges`, and `core`,
-  which derives an interval from them — so a disagreement now fails **loudly**, as
-  edge-alignment errors, rather than silently as a wrong population. **A third unverified
-  edge sits beside these two: the wire shape of a `valueless` stat filter.** AD-16 says it
+- **OQ-12 — the wire shape of a `valueless` stat filter.** **The unit is settled**
+  (2026-11-15, the operator): for a stat whose text carries two `#`, the `trade2` stat
+  filter compares the **average** of the two values (AD-11). **The non-integer edge is settled**
+  (2026-09-19): the minimum request body captured on that date carries
+  `"value": {"min": 4.5}`, so AD-16's no-rounding obligation is satisfiable. **What remains
+  is the wire shape of a `valueless` stat filter.** AD-16 says it
   carries *"the stat id and no edges at all"*, but whether the filter object omits `value`,
   carries `"value": {}`, or is rejected by the API is unconfirmed against a live payload;
   the wrong shape raises no error and returns nothing or the wrong population. The captured
@@ -1995,9 +2018,8 @@ poe-crafting-base-price-checker/
   (2026-09-19) is Awakened PoE Trade against PoE1's `/api/trade/`, which always emits a
   `value` object and serialises a flat stat as `"value": {}`; nothing was found for
   `trade2` or for omitting `value`, so the fixture should try `{}` first. **Owner for
-  that edge: `sync`'s builder**, by live verification recorded as a fixture (AD-13). **Owner
-  for the unit: the weights
-  scraper project**, by live verification. *Blocking for correctness, not for building.*
+  that edge: `sync`'s builder**, by live verification recorded as a fixture (AD-13).
+  *Blocking for correctness, not for building.*
 - **OQ-26 — do AD-30's two premises hold beyond one sample?** The first premise is that a live
   `POESESSID` adds a rule name to `X-Rate-Limit-Rules`, measured once (research [30]). The
   second is that a dead cookie gets `401` or `403` on trade2, which is assumed. A capture of

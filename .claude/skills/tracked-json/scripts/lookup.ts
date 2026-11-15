@@ -1,4 +1,4 @@
-/** `pnpm tracked:lookup`: read-only JSON; `core` owns the interval and line set. */
+/** `pnpm tracked:lookup`: read-only JSON; `core` owns the interval, the own interval (AD-11) and the line set. */
 
 import { readFileSync } from 'node:fs';
 import nodePath from 'node:path';

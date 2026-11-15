@@ -1,5 +1,5 @@
 import { createFakeClockPort } from '@poe/contracts';
-import type { CraftedTrackedEntry, CurrencyRate, HttpPort, ModifierWeight, TrackedEntry } from '@poe/contracts';
+import type { CraftedTrackedEntry, CurrencyRate, HttpPort, ModifierWeight, TrackedEntry, WeightsPool } from '@poe/contracts';
 import { contains } from '@poe/core';
 import { http, HttpResponse } from 'msw';
 import type { SetupServer } from 'msw/node';
@@ -232,8 +232,10 @@ describe('createPricingStep: a summed statId against an MSW trade server (CAP-6)
     const prefixT1 = rarityTier('ItemFoundRarityIncreasePrefix47', 16, 19);
     const prefixT2 = rarityTier('ItemFoundRarityIncreasePrefix29', 12, 15);
     const suffixT1 = rarityTier('ItemFoundRarityIncrease40', 15, 18);
-    expect(contains(RARITY_ENTRY.prefix, prefixT1)).toBe(true);
-    expect(contains(RARITY_ENTRY.prefix, prefixT2)).toBe(false);
-    expect(contains(RARITY_ENTRY.suffix, suffixT1)).toBe(true);
+    const prefixPool: WeightsPool = { poolCoverage: 'complete', entries: [prefixT1, prefixT2] };
+    const suffixPool: WeightsPool = { poolCoverage: 'complete', entries: [suffixT1] };
+    expect(contains(RARITY_ENTRY.prefix, prefixT1, prefixPool)).toBe(true);
+    expect(contains(RARITY_ENTRY.prefix, prefixT2, prefixPool)).toBe(false);
+    expect(contains(RARITY_ENTRY.suffix, suffixT1, suffixPool)).toBe(true);
   });
 });

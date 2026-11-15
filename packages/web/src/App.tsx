@@ -1,12 +1,13 @@
 import { crossFileChecks, rank } from '@poe/core';
-import type { CrossFileFailure, Ranking } from '@poe/core';
+import type { CraftingItemLevel, CrossFileFailure, Ranking } from '@poe/core';
 import { useCallback, useEffect, useMemo, useState, type JSX, type ReactNode } from 'react';
 
 import { FailureScreen } from './frame/FailureScreen';
 import { Frame } from './frame/Frame';
 import { HeaderBar } from './frame/HeaderBar';
-import { pendingControls, readyControls, useReportToggle, type ReadyControlsInput } from './frame/header-controls';
+import { pendingControls, readyControls, useReportToggle, type PendingControlsInput, type ReadyControlsInput } from './frame/header-controls';
 import { RowSlots } from './frame/RowSlots';
+import { readStoredLevel, writeStoredLevel } from './level/level-storage';
 import { forRecipe, type ListRecipe } from './list/active-ranking';
 import { statTexts } from './list/combination-text';
 import { toListBranches } from './list/display-rows';
@@ -33,23 +34,24 @@ export function App(): JSX.Element {
   const [view, retry] = useLoadedView();
   const [threshold, changeThreshold] = usePersistedThreshold();
   const [storedRecipe, changeRecipe] = usePersistedRecipe();
-  const ranking = useRanking(view, threshold);
+  const [level, changeLevel] = usePersistedLevel();
+  const ranking = useRanking(view, threshold, level);
   const [isReportOpen, toggleReport] = useReportToggle();
+  const dials = { threshold, onThresholdChange: changeThreshold, level, onLevelChange: changeLevel };
 
   switch (view.kind) {
     case 'pending': {
-      return renderPending({ threshold, onThresholdChange: changeThreshold });
+      return renderPending(dials);
     }
     case 'ready': {
       if (ranking === undefined) {
         throw new Error('a ready view always has a ranking');
       }
       return renderReady({
+        ...dials,
         view,
         ranking,
-        threshold,
         storedRecipe,
-        onThresholdChange: changeThreshold,
         onRecipeChange: changeRecipe,
         isReportOpen,
         onReportToggle: toggleReport,
@@ -134,8 +136,18 @@ function usePersistedRecipe(): readonly [string | undefined, (recipeId: string) 
   return [storedRecipe, changeRecipe];
 }
 
+/** The Crafting Item Level survives a reload beside the recipe (EXPERIENCE.md *What survives a reload*). */
+function usePersistedLevel(): readonly [CraftingItemLevel, (level: CraftingItemLevel) => void] {
+  const [level, setLevel] = useState(() => readStoredLevel());
+  const changeLevel = useCallback((next: CraftingItemLevel) => {
+    setLevel(next);
+    writeStoredLevel(next);
+  }, []);
+  return [level, changeLevel];
+}
+
 /** `core` ranks every (Item Class, recipe) pair at once: a recipe switch re-filters only. */
-function useRanking(view: ViewState, threshold: number): Ranking | undefined {
+function useRanking(view: ViewState, threshold: number, level: CraftingItemLevel): Ranking | undefined {
   const readySet = view.kind === 'ready' ? view.set : undefined;
   const readyFailures = view.kind === 'ready' ? view.crossFileFailures : undefined;
   const readyNow = view.kind === 'ready' ? view.now : undefined;
@@ -153,22 +165,17 @@ function useRanking(view: ViewState, threshold: number): Ranking | undefined {
             crossFileFailures: readyFailures,
             recipes: readySet.recipes?.recipes ?? [],
             currencyRates: readySet.dataset.currencyRates,
+            craftingItemLevel: level,
           }),
-    [readySet, readyFailures, readyNow, threshold],
+    [readySet, readyFailures, readyNow, threshold, level],
   );
 }
 
 /** A plain call, not a component: the frame and header bar keep their identity into ready. */
-function renderPending({
-  threshold,
-  onThresholdChange,
-}: {
-  readonly threshold: number;
-  readonly onThresholdChange: (value: number) => void;
-}): JSX.Element {
+function renderPending(dials: PendingControlsInput): JSX.Element {
   return (
     <Frame state="pending">
-      <HeaderBar league={undefined} controls={pendingControls(threshold, onThresholdChange)} />
+      <HeaderBar league={undefined} controls={pendingControls(dials)} />
       <RowSlots />
       <PageTail />
     </Frame>
@@ -196,6 +203,7 @@ function renderReady({
       <ReadyBody
         set={set}
         threshold={rest.threshold}
+        level={rest.level}
         ranking={rest.ranking}
         recipe={active}
         note={{ threshold: rest.threshold, cost: expectedValueCost(cost) }}
@@ -208,12 +216,14 @@ function renderReady({
 function ReadyBody({
   set,
   threshold,
+  level,
   ranking,
   recipe,
   note,
 }: {
   readonly set: ArtifactSet;
   readonly threshold: number;
+  readonly level: CraftingItemLevel;
   readonly ranking: Ranking;
   /** The active Craft Recipe, or `undefined` when no recipe is loaded. */
   readonly recipe: ListRecipe | undefined;
@@ -224,12 +234,12 @@ function ReadyBody({
   const { branches, statement, unrankable, rawRanks } = useMemo(() => {
     const active = forRecipe(ranking, recipe);
     return {
-      branches: toListBranches(active, set.dataset.entries, { tracked: set.tracked.entries, stats }),
+      branches: toListBranches(active, set.dataset.entries, { tracked: set.tracked.entries, stats, itemLevel: level, recipeWord: recipe?.word }),
       statement: listStatement(active, threshold, set.config.league),
       unrankable: active.unrankable,
       rawRanks: new Set(active.ordering.filter((row) => row.kind === 'raw').map((row) => appendixClassKey(row))),
     };
-  }, [ranking, recipe, set, threshold, stats]);
+  }, [ranking, recipe, set, threshold, stats, level]);
   return (
     <>
       <ListStatement statement={statement} />

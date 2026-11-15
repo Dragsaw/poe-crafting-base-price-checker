@@ -1,5 +1,5 @@
 import { type CraftRecipe, type ModifierWeight, type WeightsFile, type WeightsPool } from '@poe/contracts';
-import { floored, lineSet, type UntrackableReason, untrackableReason } from '@poe/core';
+import { CRAFTING_ITEM_LEVELS, eligible, interval, lineSet, ownInterval, type UntrackableReason, untrackableReason } from '@poe/core';
 
 import { absentAsNull } from './lookup-absent-as-null.ts';
 import { type ClassSelector, resolveClass, SLOTS, type Slot } from './lookup-weights.ts';
@@ -92,6 +92,25 @@ function modifierRow(slot: Slot, family: ModifierFamily, pool: WeightsPool): Mod
   };
 }
 
+export interface TierInterval {
+  readonly statId: string;
+  readonly interval: readonly [number, number];
+  readonly ownInterval: readonly [number, number];
+}
+
+function tierIntervals(entry: ModifierWeight, pool: WeightsPool): TierInterval[] {
+  const intervals: TierInterval[] = [];
+  for (const line of entry.lines) {
+    if (line.statId === null || line.ranges.length === 0) {
+      continue;
+    }
+    const derived = interval(line);
+    const own = ownInterval(line, entry, pool);
+    intervals.push({ statId: line.statId, interval: [derived.min, derived.max], ownInterval: [own.min, own.max] });
+  }
+  return intervals;
+}
+
 export interface TierRow {
   readonly slot: Slot;
   readonly tierLabel: unknown;
@@ -101,12 +120,19 @@ export interface TierRow {
   readonly modGroup: string;
   /** The entry's lines, verbatim: each `statId` with its `ranges`. */
   readonly lines: readonly unknown[];
+  /** Per banded line: `core`'s `interval` and `ownInterval` over the unscoped slot pool (AD-11), each `[min, max]`. */
+  readonly intervals: readonly TierInterval[];
   /** `core`'s line set of the entry: its non-null `statId`s, sorted. */
   readonly lineSet: readonly string[];
   /** `core`'s null-line verdict: why the tier is untrackable, or `null` when it is trackable. */
   readonly untrackable: UntrackableReason | null;
-  /** Whether each recipe's floor keeps this tier in the unscoped pool (`floored`, AD-17). Absent when `data/recipes.json` is unusable. */
-  readonly recipes?: readonly { readonly recipeId: string; readonly modifierLevelMin: number; readonly reached: boolean }[];
+  /** Per (recipe, offered level): whether `eligible` keeps this tier, the reach verdict's pool (AD-17). Absent when `data/recipes.json` is unusable. */
+  readonly recipes?: readonly {
+    readonly recipeId: string;
+    readonly modifierLevelMin: number;
+    readonly itemLevel: number;
+    readonly reached: boolean;
+  }[];
 }
 
 /** Per slot, every tier of the class with a line carrying `statId`, in ascending `itemLevelMin`. */
@@ -115,13 +141,15 @@ export function lookupTiers(
   statId: string,
   selector: ClassSelector & { readonly recipes?: readonly CraftRecipe[] },
 ): { categoryId: string; className: string; statId: string; tiers: TierRow[] } {
-  const recipes = selector.recipes ?? [];
+  const scopes = (selector.recipes ?? []).flatMap(({ id, modifierLevelMin }) =>
+    CRAFTING_ITEM_LEVELS.map((itemLevel) => ({ recipeId: id, modifierLevelMin, itemLevel })),
+  );
   const resolved = resolveClass(weights, selector);
   const tiers: TierRow[] = [];
   for (const slot of SLOTS) {
     const pool = resolved.pools[slot];
     const carrying = pool.entries.filter((entry) => entry.lines.some((line) => line.statId === statId));
-    const kept = recipes.map((recipe) => new Set(floored(pool, recipe.modifierLevelMin)));
+    const kept = scopes.map(({ itemLevel, modifierLevelMin }) => new Set(eligible(pool, itemLevel, modifierLevelMin)));
     for (const entry of carrying.toSorted(byItemLevel)) {
       tiers.push({
         slot,
@@ -131,14 +159,11 @@ export function lookupTiers(
         weightSource: entry.weightSource,
         modGroup: entry.modGroup,
         lines: entry.lines,
+        intervals: tierIntervals(entry, pool),
         lineSet: lineSet(entry),
         untrackable: absentAsNull(untrackableReason(entry, pool)),
-        ...(recipes.length > 0 && {
-          recipes: recipes.map((recipe, index) => ({
-            recipeId: recipe.id,
-            modifierLevelMin: recipe.modifierLevelMin,
-            reached: kept[index]?.has(entry) === true,
-          })),
+        ...(scopes.length > 0 && {
+          recipes: scopes.map((scope, index) => ({ ...scope, reached: kept[index]?.has(entry) === true })),
         }),
       });
     }

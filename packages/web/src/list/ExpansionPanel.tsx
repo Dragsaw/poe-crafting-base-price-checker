@@ -1,13 +1,20 @@
-import { useState, type JSX } from 'react';
+import { useState, type JSX, type ReactNode } from 'react';
 
 import { EstimateMark } from '../marks/marks';
 import { TOP_LINES } from '../shared/product';
 import { ShowMore } from '../shared/ShowMore';
 import { colors, spacing, typeStyle } from '../theme/tokens';
 import { combinationString } from './combination-text';
-import { hasEstimate, type ClassDisplayRow, type CraftedCombination, type DisplayRow, type PrunedCombination } from './display-rows';
-import { ExpansionLine, PrunedLine, type LineView } from './expansion/ExpansionLine';
-import { ESTIMATED_ODDS_CONTEXT, FEWER_LINES_COPY, JEWEL_CONTEXT, moreLinesCopy, prunedCopy } from './format';
+import {
+  hasEstimate,
+  type ClassDisplayRow,
+  type CraftedCombination,
+  type DisplayRow,
+  type NotCountedCombination,
+  type PrunedCombination,
+} from './display-rows';
+import { ExpansionLine, NotCountedLine, PrunedLine, type LineView } from './expansion/ExpansionLine';
+import { ESTIMATED_ODDS_CONTEXT, FEWER_LINES_COPY, JEWEL_CONTEXT, moreLinesCopy, notCountedCopy, prunedCopy } from './format';
 import { NAME_COLORS } from './RankedRow';
 import { tradeSearchHref } from './trade-link';
 import { JOINER } from '../shared/text';
@@ -70,21 +77,54 @@ function ContextLine({ row }: { readonly row: DisplayRow | ClassDisplayRow }): J
   );
 }
 
+/** Lines behind one show-more, printed above it once open (Interactions 3 and 3a). None: no affordance. */
+function RevealedLines({
+  name,
+  count,
+  copy,
+  children,
+}: {
+  readonly name: string;
+  readonly count: number;
+  readonly copy: (count: number, isOpen: boolean) => string;
+  readonly children: ReactNode;
+}): JSX.Element | undefined {
+  const [isShown, setShown] = useState(false);
+  if (count === 0) {
+    return undefined;
+  }
+  return (
+    <>
+      {isShown ? children : undefined}
+      <ShowMore
+        name={name}
+        isOpen={isShown}
+        onToggle={() => {
+          setShown((current) => !current);
+        }}
+      >
+        {copy(count, isShown)}
+      </ShowMore>
+    </>
+  );
+}
+
 // `{components.expansion-panel}`: flush under its open row, the row's bar continued down its edge.
-// Its two toggles are local state, so they reset when the row closes and unmounts the panel.
+// Its three toggles are local state, so they reset when the row closes and unmounts the panel.
 function ExpansionPanel({
   row,
   lines,
   pruned,
+  notCounted,
   last,
 }: {
   readonly row: DisplayRow | ClassDisplayRow;
   readonly lines: readonly LineView[];
   readonly pruned: readonly PrunedCombination[];
+  readonly notCounted: readonly NotCountedCombination[];
   readonly last: boolean;
 }): JSX.Element {
   const [isGrown, setGrown] = useState(false);
-  const [isPrunedShown, setPrunedShown] = useState(false);
   const hidden = lines.length - TOP_LINES;
   const visible = isGrown ? lines : lines.slice(0, TOP_LINES);
   return (
@@ -113,18 +153,16 @@ function ExpansionPanel({
           {isGrown ? FEWER_LINES_COPY : moreLinesCopy(hidden)}
         </ShowMore>
       ) : undefined}
-      {isPrunedShown ? pruned.map((line) => <PrunedLine key={line.key} text={line.text} reason={line.reason} />) : undefined}
-      {pruned.length > 0 ? (
-        <ShowMore
-          name="pruned"
-          isOpen={isPrunedShown}
-          onToggle={() => {
-            setPrunedShown((current) => !current);
-          }}
-        >
-          {prunedCopy(pruned.length, isPrunedShown)}
-        </ShowMore>
-      ) : undefined}
+      <RevealedLines name="pruned" count={pruned.length} copy={prunedCopy}>
+        {pruned.map((line) => (
+          <PrunedLine key={line.key} text={line.text} reason={line.reason} />
+        ))}
+      </RevealedLines>
+      <RevealedLines name="not-counted" count={notCounted.length} copy={notCountedCopy}>
+        {notCounted.map((line) => (
+          <NotCountedLine key={line.key} line={line} />
+        ))}
+      </RevealedLines>
     </div>
   );
 }
@@ -140,7 +178,7 @@ export function RawExpansionPanel({
   /** Under the list's last row, or the row above show-more: no rule (DESIGN.md *Density*). */
   readonly last?: boolean;
 }): JSX.Element {
-  return <ExpansionPanel row={row} lines={[rawLine(row, activeLeague)]} pruned={[]} last={last} />;
+  return <ExpansionPanel row={row} lines={[rawLine(row, activeLeague)]} pruned={[]} notCounted={[]} last={last} />;
 }
 
 /** The panel under an open crafted row: one line per entry in `core`'s order, then the pruned. */
@@ -159,6 +197,7 @@ export function ClassExpansionPanel({
       row={row}
       lines={row.combinations.map((combination) => craftedLine(combination, row.label, activeLeague))}
       pruned={row.pruned}
+      notCounted={row.notCounted}
       last={last}
     />
   );

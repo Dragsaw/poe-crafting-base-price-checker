@@ -11,6 +11,7 @@ import type {
 import { WEIGHTS_SCHEMA_VERSION } from '@poe/contracts';
 
 import { crossFileChecks } from '../cross-file.ts';
+import type { SlotScope } from '../cross-file.ts';
 import { band, line, STAT, tier as weightTier } from '../probability/test-support.ts';
 
 export { band, line, OTHER, STAT } from '../probability/test-support.ts';
@@ -35,6 +36,9 @@ export const T7 = () => tier([line(STAT, [40, 53], [46, 60])], { itemLevelMin: 6
 export const T8 = () => tier([line(STAT, [56, 80])], { itemLevelMin: 75 });
 /** A suffix pool one reference aligns on. */
 export const SUFFIX_TIER = tier([line(SUFFIX_STAT, [1, 2])]);
+
+/** One slot's scope whose unscoped pool is the scoped entries themselves. */
+export const slotScope = (scoped: readonly ModifierWeight[]): SlotScope => ({ scoped, pool: { poolCoverage: 'complete', entries: [...scoped] } });
 
 export function pools(
   prefix: readonly ModifierWeight[],

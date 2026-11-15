@@ -3,7 +3,7 @@ import { rank, type Ranking } from '@poe/core';
 import type { CraftedRankedRow, DatasetEntry, RawTrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { DENOMINATION, DIV_UNIT } from '../shared/product';
+import { DENOMINATION, DIV_UNIT, FIRST_VISIT_CRAFTING_ITEM_LEVEL } from '../shared/product';
 import { TEST_LEAGUE } from '../test-support/artifact-server';
 import { NOW, NOW_ISO } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
@@ -15,7 +15,7 @@ function statementFor(
   dataset: readonly DatasetEntry[],
   threshold = 0.25,
 ): ReturnType<typeof listStatement> {
-  return listStatement(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold, weights: undefined }), threshold, TEST_LEAGUE);
+  return listStatement(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold, weights: undefined, craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL }), threshold, TEST_LEAGUE);
 }
 
 const belt = rawEntry('Wide Belt');
@@ -65,7 +65,7 @@ describe('listStatement', () => {
       priced(ring, 0.8, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
       unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
     ];
-    const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: 0.25, weights: undefined });
+    const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: 0.25, weights: undefined, craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL });
     expect(ranking.noListings).toHaveLength(1);
     expect(ranking.notYetSynced).toHaveLength(2);
     expect(isHonestEmpty(ranking)).toBe(true);
@@ -136,7 +136,7 @@ describe('listStatement', () => {
       },
     ];
     const rankingOf = (dataset: readonly DatasetEntry[]): Ranking => ({
-      ...rank({ tracked: dataset.length > 0 ? [belt] : [], dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: 0.25, weights: undefined }),
+      ...rank({ tracked: dataset.length > 0 ? [belt] : [], dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: 0.25, weights: undefined, craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL }),
       recipeless,
     });
     const alone = rankingOf([]);
@@ -207,7 +207,7 @@ describe('listStatement with crafted rows (Story 3.4)', () => {
       ordering: [craftedRow(1, 'perfect'), craftedRow(1, 'greater')],
       unrankable: [
         { categoryId: 'a', className: 'A', reason: 'pool partial' },
-        { categoryId: 'b', className: 'B', reason: 'recipe cannot reach this class', recipeId: 'perfect' },
+        { categoryId: 'b', className: 'B', reason: 'augment exhausted', recipeId: 'perfect' },
       ],
     };
     const active = forRecipe(ranking, greater);

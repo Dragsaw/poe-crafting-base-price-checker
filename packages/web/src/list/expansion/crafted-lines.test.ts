@@ -66,7 +66,7 @@ describe('the lines of a crafted row', () => {
     };
     const tracked = [prunedLate, top, gone, elsewhere, cheap, waiting, second, prunedEarly];
     const [only] = toDisplayRows(ranking, [priced(cheap, 0.1, hoursBefore(NOW, 1))], {
-      crafted: { tracked, stats: new Map() },
+      crafted: { tracked, stats: new Map(), itemLevel: 82, recipeWord: 'greater' },
     });
     if (only?.unit !== 'class') {
       throw new Error('no crafted row');

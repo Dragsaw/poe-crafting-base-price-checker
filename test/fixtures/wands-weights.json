@@ -1,0 +1,4545 @@
+{
+  "schemaVersion": "7.0.0",
+  "gamePatch": "0.5.5.4.2",
+  "producer": {
+    "id": "poe-mod-weights-producer",
+    "version": "7.0.0",
+    "generatedAt": "2026-10-24T11:00:21.012Z"
+  },
+  "bases": {
+    "weapon.wand": {
+      "Wands": {
+        "prefix": {
+          "poolCoverage": "complete",
+          "entries": [
+            {
+              "sourceModifierId": "prefix\u0000ColdDamage\u000016\u0000Gain #% of Damage as Extra Cold Damage",
+              "modGroup": "ColdDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 16,
+              "tierLabel": "T5",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2505884597",
+                  "ranges": [
+                    [
+                      16,
+                      18
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000ColdDamage\u000033\u0000Gain #% of Damage as Extra Cold Damage",
+              "modGroup": "ColdDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 33,
+              "tierLabel": "T4",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2505884597",
+                  "ranges": [
+                    [
+                      19,
+                      21
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000ColdDamage\u000046\u0000Gain #% of Damage as Extra Cold Damage",
+              "modGroup": "ColdDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 46,
+              "tierLabel": "T3",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2505884597",
+                  "ranges": [
+                    [
+                      22,
+                      24
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000ColdDamage\u00005\u0000Gain #% of Damage as Extra Cold Damage",
+              "modGroup": "ColdDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 5,
+              "tierLabel": "T6",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2505884597",
+                  "ranges": [
+                    [
+                      13,
+                      15
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000ColdDamage\u000060\u0000Gain #% of Damage as Extra Cold Damage",
+              "modGroup": "ColdDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 60,
+              "tierLabel": "T2",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2505884597",
+                  "ranges": [
+                    [
+                      25,
+                      27
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000ColdDamage\u000080\u0000Gain #% of Damage as Extra Cold Damage",
+              "modGroup": "ColdDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 80,
+              "tierLabel": "T1",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2505884597",
+                  "ranges": [
+                    [
+                      28,
+                      30
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000FireDamage\u000016\u0000Gain #% of Damage as Extra Fire Damage",
+              "modGroup": "FireDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 16,
+              "tierLabel": "T5",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3015669065",
+                  "ranges": [
+                    [
+                      16,
+                      18
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000FireDamage\u000033\u0000Gain #% of Damage as Extra Fire Damage",
+              "modGroup": "FireDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 33,
+              "tierLabel": "T4",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3015669065",
+                  "ranges": [
+                    [
+                      19,
+                      21
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000FireDamage\u000046\u0000Gain #% of Damage as Extra Fire Damage",
+              "modGroup": "FireDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 46,
+              "tierLabel": "T3",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3015669065",
+                  "ranges": [
+                    [
+                      22,
+                      24
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000FireDamage\u00005\u0000Gain #% of Damage as Extra Fire Damage",
+              "modGroup": "FireDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 5,
+              "tierLabel": "T6",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3015669065",
+                  "ranges": [
+                    [
+                      13,
+                      15
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000FireDamage\u000060\u0000Gain #% of Damage as Extra Fire Damage",
+              "modGroup": "FireDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 60,
+              "tierLabel": "T2",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3015669065",
+                  "ranges": [
+                    [
+                      25,
+                      27
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000FireDamage\u000080\u0000Gain #% of Damage as Extra Fire Damage",
+              "modGroup": "FireDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 80,
+              "tierLabel": "T1",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3015669065",
+                  "ranges": [
+                    [
+                      28,
+                      30
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000IncreasedMana\u00001\u0000+# to maximum Mana",
+              "modGroup": "IncreasedMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 1,
+              "tierLabel": "T11",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      10,
+                      14
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000IncreasedMana\u000016\u0000+# to maximum Mana",
+              "modGroup": "IncreasedMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 16,
+              "tierLabel": "T9",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      25,
+                      34
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000IncreasedMana\u000025\u0000+# to maximum Mana",
+              "modGroup": "IncreasedMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 25,
+              "tierLabel": "T8",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      35,
+                      54
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000IncreasedMana\u000033\u0000+# to maximum Mana",
+              "modGroup": "IncreasedMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 33,
+              "tierLabel": "T7",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      55,
+                      64
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000IncreasedMana\u000038\u0000+# to maximum Mana",
+              "modGroup": "IncreasedMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 38,
+              "tierLabel": "T6",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      65,
+                      79
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000IncreasedMana\u000046\u0000+# to maximum Mana",
+              "modGroup": "IncreasedMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 46,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      80,
+                      89
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000IncreasedMana\u000054\u0000+# to maximum Mana",
+              "modGroup": "IncreasedMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 54,
+              "tierLabel": "T4",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      90,
+                      104
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000IncreasedMana\u00006\u0000+# to maximum Mana",
+              "modGroup": "IncreasedMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 6,
+              "tierLabel": "T10",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      15,
+                      24
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000IncreasedMana\u000060\u0000+# to maximum Mana",
+              "modGroup": "IncreasedMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 60,
+              "tierLabel": "T3",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      105,
+                      124
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000IncreasedMana\u000065\u0000+# to maximum Mana",
+              "modGroup": "IncreasedMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 65,
+              "tierLabel": "T2",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      125,
+                      149
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000IncreasedMana\u000070\u0000+# to maximum Mana",
+              "modGroup": "IncreasedMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 70,
+              "tierLabel": "T1",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      150,
+                      164
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000LightningDamage\u000016\u0000Gain #% of Damage as Extra Lightning Damage",
+              "modGroup": "LightningDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 16,
+              "tierLabel": "T5",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3278136794",
+                  "ranges": [
+                    [
+                      16,
+                      18
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000LightningDamage\u000033\u0000Gain #% of Damage as Extra Lightning Damage",
+              "modGroup": "LightningDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 33,
+              "tierLabel": "T4",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3278136794",
+                  "ranges": [
+                    [
+                      19,
+                      21
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000LightningDamage\u000046\u0000Gain #% of Damage as Extra Lightning Damage",
+              "modGroup": "LightningDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 46,
+              "tierLabel": "T3",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3278136794",
+                  "ranges": [
+                    [
+                      22,
+                      24
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000LightningDamage\u00005\u0000Gain #% of Damage as Extra Lightning Damage",
+              "modGroup": "LightningDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 5,
+              "tierLabel": "T6",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3278136794",
+                  "ranges": [
+                    [
+                      13,
+                      15
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000LightningDamage\u000060\u0000Gain #% of Damage as Extra Lightning Damage",
+              "modGroup": "LightningDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 60,
+              "tierLabel": "T2",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3278136794",
+                  "ranges": [
+                    [
+                      25,
+                      27
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000LightningDamage\u000080\u0000Gain #% of Damage as Extra Lightning Damage",
+              "modGroup": "LightningDamage",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 80,
+              "tierLabel": "T1",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3278136794",
+                  "ranges": [
+                    [
+                      28,
+                      30
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000SpellDamageAndMana\u000011\u0000#% increased Spell Damage\n+# to maximum Mana",
+              "modGroup": "SpellDamageAndMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 11,
+              "tierLabel": "T6",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      20,
+                      24
+                    ]
+                  ]
+                },
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      21,
+                      24
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000SpellDamageAndMana\u00002\u0000#% increased Spell Damage\n+# to maximum Mana",
+              "modGroup": "SpellDamageAndMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 2,
+              "tierLabel": "T7",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      15,
+                      19
+                    ]
+                  ]
+                },
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      17,
+                      20
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000SpellDamageAndMana\u000023\u0000#% increased Spell Damage\n+# to maximum Mana",
+              "modGroup": "SpellDamageAndMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 23,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      25,
+                      29
+                    ]
+                  ]
+                },
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      25,
+                      28
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000SpellDamageAndMana\u000038\u0000#% increased Spell Damage\n+# to maximum Mana",
+              "modGroup": "SpellDamageAndMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 38,
+              "tierLabel": "T4",
+              "weight": 600,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      30,
+                      34
+                    ]
+                  ]
+                },
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      29,
+                      33
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000SpellDamageAndMana\u000046\u0000#% increased Spell Damage\n+# to maximum Mana",
+              "modGroup": "SpellDamageAndMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 46,
+              "tierLabel": "T3",
+              "weight": 400,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      35,
+                      39
+                    ]
+                  ]
+                },
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      34,
+                      37
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000SpellDamageAndMana\u000060\u0000#% increased Spell Damage\n+# to maximum Mana",
+              "modGroup": "SpellDamageAndMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 60,
+              "tierLabel": "T2",
+              "weight": 200,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      40,
+                      44
+                    ]
+                  ]
+                },
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      38,
+                      41
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000SpellDamageAndMana\u000080\u0000#% increased Spell Damage\n+# to maximum Mana",
+              "modGroup": "SpellDamageAndMana",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 80,
+              "tierLabel": "T1",
+              "weight": 100,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      45,
+                      49
+                    ]
+                  ]
+                },
+                {
+                  "statId": "explicit.stat_1050105434",
+                  "ranges": [
+                    [
+                      42,
+                      45
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponCasterDamagePrefix\u00001\u0000#% increased Spell Damage",
+              "modGroup": "WeaponCasterDamagePrefix",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 1,
+              "tierLabel": "T8",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      25,
+                      34
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponCasterDamagePrefix\u000016\u0000#% increased Spell Damage",
+              "modGroup": "WeaponCasterDamagePrefix",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 16,
+              "tierLabel": "T6",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      45,
+                      54
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponCasterDamagePrefix\u000033\u0000#% increased Spell Damage",
+              "modGroup": "WeaponCasterDamagePrefix",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 33,
+              "tierLabel": "T5",
+              "weight": 600,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      55,
+                      64
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponCasterDamagePrefix\u000046\u0000#% increased Spell Damage",
+              "modGroup": "WeaponCasterDamagePrefix",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 46,
+              "tierLabel": "T4",
+              "weight": 400,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      65,
+                      74
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponCasterDamagePrefix\u000060\u0000#% increased Spell Damage",
+              "modGroup": "WeaponCasterDamagePrefix",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 60,
+              "tierLabel": "T3",
+              "weight": 200,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      75,
+                      89
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponCasterDamagePrefix\u000070\u0000#% increased Spell Damage",
+              "modGroup": "WeaponCasterDamagePrefix",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 70,
+              "tierLabel": "T2",
+              "weight": 100,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      90,
+                      104
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponCasterDamagePrefix\u00008\u0000#% increased Spell Damage",
+              "modGroup": "WeaponCasterDamagePrefix",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 8,
+              "tierLabel": "T7",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      35,
+                      44
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponCasterDamagePrefix\u000080\u0000#% increased Spell Damage",
+              "modGroup": "WeaponCasterDamagePrefix",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 80,
+              "tierLabel": "T1",
+              "weight": 50,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2974417149",
+                  "ranges": [
+                    [
+                      105,
+                      119
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000016\u0000#% increased Chaos Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_chaos_spell_mods"
+              ],
+              "itemLevelMin": 16,
+              "tierLabel": "T6",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_736967255",
+                  "ranges": [
+                    [
+                      45,
+                      54
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000016\u0000#% increased Cold Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 16,
+              "tierLabel": "T6",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3291658075",
+                  "ranges": [
+                    [
+                      45,
+                      54
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000016\u0000#% increased Fire Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 16,
+              "tierLabel": "T6",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3962278098",
+                  "ranges": [
+                    [
+                      45,
+                      54
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000016\u0000#% increased Lightning Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 16,
+              "tierLabel": "T6",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2231156303",
+                  "ranges": [
+                    [
+                      45,
+                      54
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000016\u0000#% increased Spell Physical Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_physical_spell_mods"
+              ],
+              "itemLevelMin": 16,
+              "tierLabel": "T6",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2768835289",
+                  "ranges": [
+                    [
+                      45,
+                      54
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u00002\u0000#% increased Chaos Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_chaos_spell_mods"
+              ],
+              "itemLevelMin": 2,
+              "tierLabel": "T8",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_736967255",
+                  "ranges": [
+                    [
+                      25,
+                      34
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u00002\u0000#% increased Cold Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 2,
+              "tierLabel": "T8",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3291658075",
+                  "ranges": [
+                    [
+                      25,
+                      34
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u00002\u0000#% increased Fire Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 2,
+              "tierLabel": "T8",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3962278098",
+                  "ranges": [
+                    [
+                      25,
+                      34
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u00002\u0000#% increased Lightning Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 2,
+              "tierLabel": "T8",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2231156303",
+                  "ranges": [
+                    [
+                      25,
+                      34
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u00002\u0000#% increased Spell Physical Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_physical_spell_mods"
+              ],
+              "itemLevelMin": 2,
+              "tierLabel": "T8",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2768835289",
+                  "ranges": [
+                    [
+                      25,
+                      34
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000033\u0000#% increased Chaos Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_chaos_spell_mods"
+              ],
+              "itemLevelMin": 33,
+              "tierLabel": "T5",
+              "weight": 400,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_736967255",
+                  "ranges": [
+                    [
+                      55,
+                      64
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000033\u0000#% increased Cold Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 33,
+              "tierLabel": "T5",
+              "weight": 400,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3291658075",
+                  "ranges": [
+                    [
+                      55,
+                      64
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000033\u0000#% increased Fire Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 33,
+              "tierLabel": "T5",
+              "weight": 400,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3962278098",
+                  "ranges": [
+                    [
+                      55,
+                      64
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000033\u0000#% increased Lightning Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 33,
+              "tierLabel": "T5",
+              "weight": 400,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2231156303",
+                  "ranges": [
+                    [
+                      55,
+                      64
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000033\u0000#% increased Spell Physical Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_physical_spell_mods"
+              ],
+              "itemLevelMin": 33,
+              "tierLabel": "T5",
+              "weight": 400,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2768835289",
+                  "ranges": [
+                    [
+                      55,
+                      64
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000046\u0000#% increased Chaos Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_chaos_spell_mods"
+              ],
+              "itemLevelMin": 46,
+              "tierLabel": "T4",
+              "weight": 300,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_736967255",
+                  "ranges": [
+                    [
+                      65,
+                      74
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000046\u0000#% increased Cold Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 46,
+              "tierLabel": "T4",
+              "weight": 300,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3291658075",
+                  "ranges": [
+                    [
+                      65,
+                      74
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000046\u0000#% increased Fire Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 46,
+              "tierLabel": "T4",
+              "weight": 300,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3962278098",
+                  "ranges": [
+                    [
+                      65,
+                      74
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000046\u0000#% increased Lightning Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 46,
+              "tierLabel": "T4",
+              "weight": 300,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2231156303",
+                  "ranges": [
+                    [
+                      65,
+                      74
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000046\u0000#% increased Spell Physical Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_physical_spell_mods"
+              ],
+              "itemLevelMin": 46,
+              "tierLabel": "T4",
+              "weight": 300,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2768835289",
+                  "ranges": [
+                    [
+                      65,
+                      74
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000060\u0000#% increased Chaos Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_chaos_spell_mods"
+              ],
+              "itemLevelMin": 60,
+              "tierLabel": "T3",
+              "weight": 200,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_736967255",
+                  "ranges": [
+                    [
+                      75,
+                      89
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000060\u0000#% increased Cold Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 60,
+              "tierLabel": "T3",
+              "weight": 200,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3291658075",
+                  "ranges": [
+                    [
+                      75,
+                      89
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000060\u0000#% increased Fire Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 60,
+              "tierLabel": "T3",
+              "weight": 200,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3962278098",
+                  "ranges": [
+                    [
+                      75,
+                      89
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000060\u0000#% increased Lightning Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 60,
+              "tierLabel": "T3",
+              "weight": 200,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2231156303",
+                  "ranges": [
+                    [
+                      75,
+                      89
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000060\u0000#% increased Spell Physical Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_physical_spell_mods"
+              ],
+              "itemLevelMin": 60,
+              "tierLabel": "T3",
+              "weight": 200,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2768835289",
+                  "ranges": [
+                    [
+                      75,
+                      89
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000070\u0000#% increased Chaos Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_chaos_spell_mods"
+              ],
+              "itemLevelMin": 70,
+              "tierLabel": "T2",
+              "weight": 100,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_736967255",
+                  "ranges": [
+                    [
+                      90,
+                      104
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000070\u0000#% increased Cold Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 70,
+              "tierLabel": "T2",
+              "weight": 100,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3291658075",
+                  "ranges": [
+                    [
+                      90,
+                      104
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000070\u0000#% increased Fire Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 70,
+              "tierLabel": "T2",
+              "weight": 100,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3962278098",
+                  "ranges": [
+                    [
+                      90,
+                      104
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000070\u0000#% increased Lightning Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 70,
+              "tierLabel": "T2",
+              "weight": 100,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2231156303",
+                  "ranges": [
+                    [
+                      90,
+                      104
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000070\u0000#% increased Spell Physical Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_physical_spell_mods"
+              ],
+              "itemLevelMin": 70,
+              "tierLabel": "T2",
+              "weight": 100,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2768835289",
+                  "ranges": [
+                    [
+                      90,
+                      104
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u00008\u0000#% increased Chaos Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_chaos_spell_mods"
+              ],
+              "itemLevelMin": 8,
+              "tierLabel": "T7",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_736967255",
+                  "ranges": [
+                    [
+                      35,
+                      44
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u00008\u0000#% increased Cold Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 8,
+              "tierLabel": "T7",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3291658075",
+                  "ranges": [
+                    [
+                      35,
+                      44
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u00008\u0000#% increased Fire Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 8,
+              "tierLabel": "T7",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3962278098",
+                  "ranges": [
+                    [
+                      35,
+                      44
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u00008\u0000#% increased Lightning Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 8,
+              "tierLabel": "T7",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2231156303",
+                  "ranges": [
+                    [
+                      35,
+                      44
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u00008\u0000#% increased Spell Physical Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_physical_spell_mods"
+              ],
+              "itemLevelMin": 8,
+              "tierLabel": "T7",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2768835289",
+                  "ranges": [
+                    [
+                      35,
+                      44
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000081\u0000#% increased Chaos Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_chaos_spell_mods"
+              ],
+              "itemLevelMin": 81,
+              "tierLabel": "T1",
+              "weight": 50,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_736967255",
+                  "ranges": [
+                    [
+                      105,
+                      119
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000081\u0000#% increased Cold Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 81,
+              "tierLabel": "T1",
+              "weight": 50,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3291658075",
+                  "ranges": [
+                    [
+                      105,
+                      119
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000081\u0000#% increased Fire Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 81,
+              "tierLabel": "T1",
+              "weight": 50,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3962278098",
+                  "ranges": [
+                    [
+                      105,
+                      119
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000081\u0000#% increased Lightning Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 81,
+              "tierLabel": "T1",
+              "weight": 50,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2231156303",
+                  "ranges": [
+                    [
+                      105,
+                      119
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000WeaponDamageTypePrefix\u000081\u0000#% increased Spell Physical Damage",
+              "modGroup": "WeaponDamageTypePrefix",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_physical_spell_mods"
+              ],
+              "itemLevelMin": 81,
+              "tierLabel": "T1",
+              "weight": 50,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2768835289",
+                  "ranges": [
+                    [
+                      105,
+                      119
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "suffix": {
+          "poolCoverage": "complete",
+          "entries": [
+            {
+              "sourceModifierId": "suffix\u0000CriticalStrikeMultiplier\u000021\u0000#% increased Critical Spell Damage Bonus",
+              "modGroup": "CriticalStrikeMultiplier",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 21,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_274716455",
+                  "ranges": [
+                    [
+                      15,
+                      19
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000CriticalStrikeMultiplier\u000030\u0000#% increased Critical Spell Damage Bonus",
+              "modGroup": "CriticalStrikeMultiplier",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 30,
+              "tierLabel": "T4",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_274716455",
+                  "ranges": [
+                    [
+                      20,
+                      24
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000CriticalStrikeMultiplier\u000044\u0000#% increased Critical Spell Damage Bonus",
+              "modGroup": "CriticalStrikeMultiplier",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 44,
+              "tierLabel": "T3",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_274716455",
+                  "ranges": [
+                    [
+                      25,
+                      29
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000CriticalStrikeMultiplier\u000059\u0000#% increased Critical Spell Damage Bonus",
+              "modGroup": "CriticalStrikeMultiplier",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 59,
+              "tierLabel": "T2",
+              "weight": 250,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_274716455",
+                  "ranges": [
+                    [
+                      30,
+                      34
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000CriticalStrikeMultiplier\u000073\u0000#% increased Critical Spell Damage Bonus",
+              "modGroup": "CriticalStrikeMultiplier",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 73,
+              "tierLabel": "T1",
+              "weight": 125,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_274716455",
+                  "ranges": [
+                    [
+                      35,
+                      39
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000CriticalStrikeMultiplier\u00008\u0000#% increased Critical Spell Damage Bonus",
+              "modGroup": "CriticalStrikeMultiplier",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 8,
+              "tierLabel": "T6",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_274716455",
+                  "ranges": [
+                    [
+                      10,
+                      14
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000FreezeDamageIncrease\u000015\u0000#% increased Freeze Buildup",
+              "modGroup": "FreezeDamageIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 15,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_473429811",
+                  "ranges": [
+                    [
+                      31,
+                      40
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000FreezeDamageIncrease\u000030\u0000#% increased Freeze Buildup",
+              "modGroup": "FreezeDamageIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 30,
+              "tierLabel": "T4",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_473429811",
+                  "ranges": [
+                    [
+                      41,
+                      50
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000FreezeDamageIncrease\u000045\u0000#% increased Freeze Buildup",
+              "modGroup": "FreezeDamageIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 45,
+              "tierLabel": "T3",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_473429811",
+                  "ranges": [
+                    [
+                      51,
+                      60
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000FreezeDamageIncrease\u000060\u0000#% increased Freeze Buildup",
+              "modGroup": "FreezeDamageIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 60,
+              "tierLabel": "T2",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_473429811",
+                  "ranges": [
+                    [
+                      61,
+                      70
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000FreezeDamageIncrease\u000075\u0000#% increased Freeze Buildup",
+              "modGroup": "FreezeDamageIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 75,
+              "tierLabel": "T1",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_473429811",
+                  "ranges": [
+                    [
+                      71,
+                      80
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IgniteChanceIncrease\u000015\u0000#% increased Flammability Magnitude",
+              "modGroup": "IgniteChanceIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 15,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2968503605",
+                  "ranges": [
+                    [
+                      51,
+                      60
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IgniteChanceIncrease\u000030\u0000#% increased Flammability Magnitude",
+              "modGroup": "IgniteChanceIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 30,
+              "tierLabel": "T4",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2968503605",
+                  "ranges": [
+                    [
+                      61,
+                      70
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IgniteChanceIncrease\u000045\u0000#% increased Flammability Magnitude",
+              "modGroup": "IgniteChanceIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 45,
+              "tierLabel": "T3",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2968503605",
+                  "ranges": [
+                    [
+                      71,
+                      80
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IgniteChanceIncrease\u000060\u0000#% increased Flammability Magnitude",
+              "modGroup": "IgniteChanceIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 60,
+              "tierLabel": "T2",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2968503605",
+                  "ranges": [
+                    [
+                      81,
+                      90
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IgniteChanceIncrease\u000075\u0000#% increased Flammability Magnitude",
+              "modGroup": "IgniteChanceIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 75,
+              "tierLabel": "T1",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2968503605",
+                  "ranges": [
+                    [
+                      91,
+                      100
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000018\u0000+# to Level of all Chaos Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_chaos_spell_mods"
+              ],
+              "itemLevelMin": 18,
+              "tierLabel": "T4",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_4226189338",
+                  "ranges": [
+                    [
+                      2,
+                      2
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000018\u0000+# to Level of all Cold Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 18,
+              "tierLabel": "T4",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2254480358",
+                  "ranges": [
+                    [
+                      2,
+                      2
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000018\u0000+# to Level of all Fire Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 18,
+              "tierLabel": "T4",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_591105508",
+                  "ranges": [
+                    [
+                      2,
+                      2
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000018\u0000+# to Level of all Lightning Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 18,
+              "tierLabel": "T4",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1545858329",
+                  "ranges": [
+                    [
+                      2,
+                      2
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000018\u0000+# to Level of all Physical Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_physical_spell_mods"
+              ],
+              "itemLevelMin": 18,
+              "tierLabel": "T4",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1600707273",
+                  "ranges": [
+                    [
+                      2,
+                      2
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u00002\u0000+# to Level of all Chaos Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_chaos_spell_mods"
+              ],
+              "itemLevelMin": 2,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_4226189338",
+                  "ranges": [
+                    [
+                      1,
+                      1
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u00002\u0000+# to Level of all Cold Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 2,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2254480358",
+                  "ranges": [
+                    [
+                      1,
+                      1
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u00002\u0000+# to Level of all Fire Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 2,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_591105508",
+                  "ranges": [
+                    [
+                      1,
+                      1
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u00002\u0000+# to Level of all Lightning Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 2,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1545858329",
+                  "ranges": [
+                    [
+                      1,
+                      1
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u00002\u0000+# to Level of all Physical Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_physical_spell_mods"
+              ],
+              "itemLevelMin": 2,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1600707273",
+                  "ranges": [
+                    [
+                      1,
+                      1
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000025\u0000+# to Level of all Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 25,
+              "tierLabel": "T3",
+              "weight": 150,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_124131830",
+                  "ranges": [
+                    [
+                      2,
+                      2
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000036\u0000+# to Level of all Chaos Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_chaos_spell_mods"
+              ],
+              "itemLevelMin": 36,
+              "tierLabel": "T3",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_4226189338",
+                  "ranges": [
+                    [
+                      3,
+                      3
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000036\u0000+# to Level of all Cold Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 36,
+              "tierLabel": "T3",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2254480358",
+                  "ranges": [
+                    [
+                      3,
+                      3
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000036\u0000+# to Level of all Fire Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 36,
+              "tierLabel": "T3",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_591105508",
+                  "ranges": [
+                    [
+                      3,
+                      3
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000036\u0000+# to Level of all Lightning Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 36,
+              "tierLabel": "T3",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1545858329",
+                  "ranges": [
+                    [
+                      3,
+                      3
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000036\u0000+# to Level of all Physical Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_physical_spell_mods"
+              ],
+              "itemLevelMin": 36,
+              "tierLabel": "T3",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1600707273",
+                  "ranges": [
+                    [
+                      3,
+                      3
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u00005\u0000+# to Level of all Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 5,
+              "tierLabel": "T4",
+              "weight": 200,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_124131830",
+                  "ranges": [
+                    [
+                      1,
+                      1
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000055\u0000+# to Level of all Chaos Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_chaos_spell_mods"
+              ],
+              "itemLevelMin": 55,
+              "tierLabel": "T2",
+              "weight": 250,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_4226189338",
+                  "ranges": [
+                    [
+                      4,
+                      4
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000055\u0000+# to Level of all Cold Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 55,
+              "tierLabel": "T2",
+              "weight": 250,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2254480358",
+                  "ranges": [
+                    [
+                      4,
+                      4
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000055\u0000+# to Level of all Fire Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 55,
+              "tierLabel": "T2",
+              "weight": 250,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_591105508",
+                  "ranges": [
+                    [
+                      4,
+                      4
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000055\u0000+# to Level of all Lightning Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 55,
+              "tierLabel": "T2",
+              "weight": 250,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1545858329",
+                  "ranges": [
+                    [
+                      4,
+                      4
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000055\u0000+# to Level of all Physical Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_physical_spell_mods"
+              ],
+              "itemLevelMin": 55,
+              "tierLabel": "T2",
+              "weight": 250,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1600707273",
+                  "ranges": [
+                    [
+                      4,
+                      4
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000055\u0000+# to Level of all Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 55,
+              "tierLabel": "T2",
+              "weight": 100,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_124131830",
+                  "ranges": [
+                    [
+                      3,
+                      3
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000078\u0000+# to Level of all Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 78,
+              "tierLabel": "T1",
+              "weight": 50,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_124131830",
+                  "ranges": [
+                    [
+                      4,
+                      4
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000081\u0000+# to Level of all Chaos Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_chaos_spell_mods"
+              ],
+              "itemLevelMin": 81,
+              "tierLabel": "T1",
+              "weight": 100,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_4226189338",
+                  "ranges": [
+                    [
+                      5,
+                      5
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000081\u0000+# to Level of all Cold Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_cold_spell_mods"
+              ],
+              "itemLevelMin": 81,
+              "tierLabel": "T1",
+              "weight": 100,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2254480358",
+                  "ranges": [
+                    [
+                      5,
+                      5
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000081\u0000+# to Level of all Fire Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_lightning_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_fire_spell_mods"
+              ],
+              "itemLevelMin": 81,
+              "tierLabel": "T1",
+              "weight": 100,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_591105508",
+                  "ranges": [
+                    [
+                      5,
+                      5
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000081\u0000+# to Level of all Lightning Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_physical_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 81,
+              "tierLabel": "T1",
+              "weight": 100,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1545858329",
+                  "ranges": [
+                    [
+                      5,
+                      5
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreaseSocketedGemLevel\u000081\u0000+# to Level of all Physical Spell Skills",
+              "modGroup": "IncreaseSocketedGemLevel",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods",
+                "no_lightning_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_physical_spell_mods"
+              ],
+              "itemLevelMin": 81,
+              "tierLabel": "T1",
+              "weight": 100,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1600707273",
+                  "ranges": [
+                    [
+                      5,
+                      5
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreasedCastSpeed\u00001\u0000#% increased Cast Speed",
+              "modGroup": "IncreasedCastSpeed",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 1,
+              "tierLabel": "T7",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2891184298",
+                  "ranges": [
+                    [
+                      9,
+                      12
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreasedCastSpeed\u000015\u0000#% increased Cast Speed",
+              "modGroup": "IncreasedCastSpeed",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 15,
+              "tierLabel": "T6",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2891184298",
+                  "ranges": [
+                    [
+                      13,
+                      16
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreasedCastSpeed\u000030\u0000#% increased Cast Speed",
+              "modGroup": "IncreasedCastSpeed",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 30,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2891184298",
+                  "ranges": [
+                    [
+                      17,
+                      20
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreasedCastSpeed\u000045\u0000#% increased Cast Speed",
+              "modGroup": "IncreasedCastSpeed",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 45,
+              "tierLabel": "T4",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2891184298",
+                  "ranges": [
+                    [
+                      21,
+                      24
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreasedCastSpeed\u000060\u0000#% increased Cast Speed",
+              "modGroup": "IncreasedCastSpeed",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 60,
+              "tierLabel": "T3",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2891184298",
+                  "ranges": [
+                    [
+                      25,
+                      28
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreasedCastSpeed\u000070\u0000#% increased Cast Speed",
+              "modGroup": "IncreasedCastSpeed",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 70,
+              "tierLabel": "T2",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2891184298",
+                  "ranges": [
+                    [
+                      29,
+                      32
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000IncreasedCastSpeed\u000080\u0000#% increased Cast Speed",
+              "modGroup": "IncreasedCastSpeed",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 80,
+              "tierLabel": "T1",
+              "weight": 250,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_2891184298",
+                  "ranges": [
+                    [
+                      33,
+                      35
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000Intelligence\u00001\u0000+# to Intelligence",
+              "modGroup": "Intelligence",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 1,
+              "tierLabel": "T8",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_328541901",
+                  "ranges": [
+                    [
+                      5,
+                      8
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000Intelligence\u000011\u0000+# to Intelligence",
+              "modGroup": "Intelligence",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 11,
+              "tierLabel": "T7",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_328541901",
+                  "ranges": [
+                    [
+                      9,
+                      12
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000Intelligence\u000022\u0000+# to Intelligence",
+              "modGroup": "Intelligence",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 22,
+              "tierLabel": "T6",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_328541901",
+                  "ranges": [
+                    [
+                      13,
+                      16
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000Intelligence\u000033\u0000+# to Intelligence",
+              "modGroup": "Intelligence",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 33,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_328541901",
+                  "ranges": [
+                    [
+                      17,
+                      20
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000Intelligence\u000044\u0000+# to Intelligence",
+              "modGroup": "Intelligence",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 44,
+              "tierLabel": "T4",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_328541901",
+                  "ranges": [
+                    [
+                      21,
+                      24
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000Intelligence\u000055\u0000+# to Intelligence",
+              "modGroup": "Intelligence",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 55,
+              "tierLabel": "T3",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_328541901",
+                  "ranges": [
+                    [
+                      25,
+                      27
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000Intelligence\u000066\u0000+# to Intelligence",
+              "modGroup": "Intelligence",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 66,
+              "tierLabel": "T2",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_328541901",
+                  "ranges": [
+                    [
+                      28,
+                      30
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000Intelligence\u000074\u0000+# to Intelligence",
+              "modGroup": "Intelligence",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 74,
+              "tierLabel": "T1",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_328541901",
+                  "ranges": [
+                    [
+                      31,
+                      33
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LifeGainedFromEnemyDeath\u00001\u0000Gain # Life per enemy killed",
+              "modGroup": "LifeGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 1,
+              "tierLabel": "T8",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3695891184",
+                  "ranges": [
+                    [
+                      4,
+                      6
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LifeGainedFromEnemyDeath\u000011\u0000Gain # Life per enemy killed",
+              "modGroup": "LifeGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 11,
+              "tierLabel": "T7",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3695891184",
+                  "ranges": [
+                    [
+                      7,
+                      9
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LifeGainedFromEnemyDeath\u000022\u0000Gain # Life per enemy killed",
+              "modGroup": "LifeGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 22,
+              "tierLabel": "T6",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3695891184",
+                  "ranges": [
+                    [
+                      10,
+                      18
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LifeGainedFromEnemyDeath\u000033\u0000Gain # Life per enemy killed",
+              "modGroup": "LifeGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 33,
+              "tierLabel": "T5",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3695891184",
+                  "ranges": [
+                    [
+                      19,
+                      28
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LifeGainedFromEnemyDeath\u000044\u0000Gain # Life per enemy killed",
+              "modGroup": "LifeGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 44,
+              "tierLabel": "T4",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3695891184",
+                  "ranges": [
+                    [
+                      29,
+                      40
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LifeGainedFromEnemyDeath\u000055\u0000Gain # Life per enemy killed",
+              "modGroup": "LifeGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 55,
+              "tierLabel": "T3",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3695891184",
+                  "ranges": [
+                    [
+                      41,
+                      53
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LifeGainedFromEnemyDeath\u000066\u0000Gain # Life per enemy killed",
+              "modGroup": "LifeGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 66,
+              "tierLabel": "T2",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3695891184",
+                  "ranges": [
+                    [
+                      54,
+                      68
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LifeGainedFromEnemyDeath\u000077\u0000Gain # Life per enemy killed",
+              "modGroup": "LifeGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 77,
+              "tierLabel": "T1",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3695891184",
+                  "ranges": [
+                    [
+                      69,
+                      84
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LightRadiusAndManaRegeneration\u000015\u0000#% increased Mana Regeneration Rate\n#% increased Light Radius",
+              "modGroup": "LightRadiusAndManaRegeneration",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 15,
+              "tierLabel": "T2",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_789117908",
+                  "ranges": [
+                    [
+                      13,
+                      17
+                    ]
+                  ]
+                },
+                {
+                  "statId": "explicit.stat_1263695895",
+                  "ranges": [
+                    [
+                      10,
+                      10
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LightRadiusAndManaRegeneration\u000030\u0000#% increased Mana Regeneration Rate\n#% increased Light Radius",
+              "modGroup": "LightRadiusAndManaRegeneration",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 30,
+              "tierLabel": "T1",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_789117908",
+                  "ranges": [
+                    [
+                      18,
+                      22
+                    ]
+                  ]
+                },
+                {
+                  "statId": "explicit.stat_1263695895",
+                  "ranges": [
+                    [
+                      15,
+                      15
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LightRadiusAndManaRegeneration\u00008\u0000#% increased Mana Regeneration Rate\n#% increased Light Radius",
+              "modGroup": "LightRadiusAndManaRegeneration",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 8,
+              "tierLabel": "T3",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_789117908",
+                  "ranges": [
+                    [
+                      8,
+                      12
+                    ]
+                  ]
+                },
+                {
+                  "statId": "explicit.stat_1263695895",
+                  "ranges": [
+                    [
+                      5,
+                      5
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LocalAttributeRequirements\u000024\u0000#% reduced Attribute Requirements",
+              "modGroup": "LocalAttributeRequirements",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 24,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3639275092",
+                  "ranges": [
+                    [
+                      -15,
+                      -15
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LocalAttributeRequirements\u000032\u0000#% reduced Attribute Requirements",
+              "modGroup": "LocalAttributeRequirements",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 32,
+              "tierLabel": "T4",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3639275092",
+                  "ranges": [
+                    [
+                      -20,
+                      -20
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LocalAttributeRequirements\u000040\u0000#% reduced Attribute Requirements",
+              "modGroup": "LocalAttributeRequirements",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 40,
+              "tierLabel": "T3",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3639275092",
+                  "ranges": [
+                    [
+                      -25,
+                      -25
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LocalAttributeRequirements\u000052\u0000#% reduced Attribute Requirements",
+              "modGroup": "LocalAttributeRequirements",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 52,
+              "tierLabel": "T2",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3639275092",
+                  "ranges": [
+                    [
+                      -30,
+                      -30
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000LocalAttributeRequirements\u000060\u0000#% reduced Attribute Requirements",
+              "modGroup": "LocalAttributeRequirements",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 60,
+              "tierLabel": "T1",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_3639275092",
+                  "ranges": [
+                    [
+                      -35,
+                      -35
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ManaGainedFromEnemyDeath\u00001\u0000Gain # Mana per enemy killed",
+              "modGroup": "ManaGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 1,
+              "tierLabel": "T8",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1368271171",
+                  "ranges": [
+                    [
+                      2,
+                      3
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ManaGainedFromEnemyDeath\u000012\u0000Gain # Mana per enemy killed",
+              "modGroup": "ManaGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 12,
+              "tierLabel": "T7",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1368271171",
+                  "ranges": [
+                    [
+                      4,
+                      5
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ManaGainedFromEnemyDeath\u000023\u0000Gain # Mana per enemy killed",
+              "modGroup": "ManaGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 23,
+              "tierLabel": "T6",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1368271171",
+                  "ranges": [
+                    [
+                      6,
+                      9
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ManaGainedFromEnemyDeath\u000034\u0000Gain # Mana per enemy killed",
+              "modGroup": "ManaGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 34,
+              "tierLabel": "T5",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1368271171",
+                  "ranges": [
+                    [
+                      10,
+                      14
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ManaGainedFromEnemyDeath\u000045\u0000Gain # Mana per enemy killed",
+              "modGroup": "ManaGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 45,
+              "tierLabel": "T4",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1368271171",
+                  "ranges": [
+                    [
+                      15,
+                      20
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ManaGainedFromEnemyDeath\u000056\u0000Gain # Mana per enemy killed",
+              "modGroup": "ManaGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 56,
+              "tierLabel": "T3",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1368271171",
+                  "ranges": [
+                    [
+                      21,
+                      27
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ManaGainedFromEnemyDeath\u000067\u0000Gain # Mana per enemy killed",
+              "modGroup": "ManaGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 67,
+              "tierLabel": "T2",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1368271171",
+                  "ranges": [
+                    [
+                      28,
+                      35
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ManaGainedFromEnemyDeath\u000078\u0000Gain # Mana per enemy killed",
+              "modGroup": "ManaGainedFromEnemyDeath",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 78,
+              "tierLabel": "T1",
+              "weight": 750,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_1368271171",
+                  "ranges": [
+                    [
+                      36,
+                      45
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ManaRegeneration\u00001\u0000#% increased Mana Regeneration Rate",
+              "modGroup": "ManaRegeneration",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 1,
+              "tierLabel": "T6",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_789117908",
+                  "ranges": [
+                    [
+                      10,
+                      19
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ManaRegeneration\u000018\u0000#% increased Mana Regeneration Rate",
+              "modGroup": "ManaRegeneration",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 18,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_789117908",
+                  "ranges": [
+                    [
+                      20,
+                      29
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ManaRegeneration\u000029\u0000#% increased Mana Regeneration Rate",
+              "modGroup": "ManaRegeneration",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 29,
+              "tierLabel": "T4",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_789117908",
+                  "ranges": [
+                    [
+                      30,
+                      39
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ManaRegeneration\u000042\u0000#% increased Mana Regeneration Rate",
+              "modGroup": "ManaRegeneration",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 42,
+              "tierLabel": "T3",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_789117908",
+                  "ranges": [
+                    [
+                      40,
+                      49
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ManaRegeneration\u000055\u0000#% increased Mana Regeneration Rate",
+              "modGroup": "ManaRegeneration",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 55,
+              "tierLabel": "T2",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_789117908",
+                  "ranges": [
+                    [
+                      50,
+                      59
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ManaRegeneration\u000079\u0000#% increased Mana Regeneration Rate",
+              "modGroup": "ManaRegeneration",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 79,
+              "tierLabel": "T1",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_789117908",
+                  "ranges": [
+                    [
+                      60,
+                      69
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ShockChanceIncrease\u000015\u0000#% increased chance to Shock",
+              "modGroup": "ShockChanceIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 15,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_293638271",
+                  "ranges": [
+                    [
+                      51,
+                      60
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ShockChanceIncrease\u000030\u0000#% increased chance to Shock",
+              "modGroup": "ShockChanceIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 30,
+              "tierLabel": "T4",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_293638271",
+                  "ranges": [
+                    [
+                      61,
+                      70
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ShockChanceIncrease\u000045\u0000#% increased chance to Shock",
+              "modGroup": "ShockChanceIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 45,
+              "tierLabel": "T3",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_293638271",
+                  "ranges": [
+                    [
+                      71,
+                      80
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ShockChanceIncrease\u000060\u0000#% increased chance to Shock",
+              "modGroup": "ShockChanceIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 60,
+              "tierLabel": "T2",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_293638271",
+                  "ranges": [
+                    [
+                      81,
+                      90
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000ShockChanceIncrease\u000075\u0000#% increased chance to Shock",
+              "modGroup": "ShockChanceIncrease",
+              "addsTags": [
+                "no_chaos_spell_mods",
+                "no_cold_spell_mods",
+                "no_fire_spell_mods"
+              ],
+              "blockedByTags": [
+                "no_lightning_spell_mods"
+              ],
+              "itemLevelMin": 75,
+              "tierLabel": "T1",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_293638271",
+                  "ranges": [
+                    [
+                      91,
+                      100
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000SpellCriticalStrikeChanceIncrease\u000011\u0000#% increased Critical Hit Chance for Spells",
+              "modGroup": "SpellCriticalStrikeChanceIncrease",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 11,
+              "tierLabel": "T6",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_737908626",
+                  "ranges": [
+                    [
+                      27,
+                      33
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000SpellCriticalStrikeChanceIncrease\u000021\u0000#% increased Critical Hit Chance for Spells",
+              "modGroup": "SpellCriticalStrikeChanceIncrease",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 21,
+              "tierLabel": "T5",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_737908626",
+                  "ranges": [
+                    [
+                      34,
+                      39
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000SpellCriticalStrikeChanceIncrease\u000028\u0000#% increased Critical Hit Chance for Spells",
+              "modGroup": "SpellCriticalStrikeChanceIncrease",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 28,
+              "tierLabel": "T4",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_737908626",
+                  "ranges": [
+                    [
+                      40,
+                      46
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000SpellCriticalStrikeChanceIncrease\u000041\u0000#% increased Critical Hit Chance for Spells",
+              "modGroup": "SpellCriticalStrikeChanceIncrease",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 41,
+              "tierLabel": "T3",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_737908626",
+                  "ranges": [
+                    [
+                      47,
+                      53
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000SpellCriticalStrikeChanceIncrease\u000059\u0000#% increased Critical Hit Chance for Spells",
+              "modGroup": "SpellCriticalStrikeChanceIncrease",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 59,
+              "tierLabel": "T2",
+              "weight": 250,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_737908626",
+                  "ranges": [
+                    [
+                      54,
+                      59
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "suffix\u0000SpellCriticalStrikeChanceIncrease\u000076\u0000#% increased Critical Hit Chance for Spells",
+              "modGroup": "SpellCriticalStrikeChanceIncrease",
+              "addsTags": [],
+              "blockedByTags": [],
+              "itemLevelMin": 76,
+              "tierLabel": "T1",
+              "weight": 125,
+              "weightSource": "published",
+              "lines": [
+                {
+                  "statId": "explicit.stat_737908626",
+                  "ranges": [
+                    [
+                      60,
+                      73
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

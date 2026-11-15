@@ -1,13 +1,15 @@
 /** Drives the filter button and the filter modal, captures the `Blob` download, and reads its blocks back. */
 
 import { crossFileChecks, pickUpPurposes, rank } from '@poe/core';
-import type { PickUpPurpose } from '@poe/core';
+import type { CraftingItemLevel, PickUpPurpose } from '@poe/core';
 import { act } from 'react';
 import { onTestFinished, vi } from 'vitest';
 
 import { loadArtifacts } from '../load/load-artifacts';
 import { filterText, TREATMENTS } from '../pick-up-filter/filter-text';
+import { FIRST_VISIT_CRAFTING_ITEM_LEVEL } from '../shared/product';
 import { option, serveWorld, standardWorld } from '../recipe/craft-recipe/test-support';
+import { RECIPE_STORAGE_KEY } from '../recipe/recipe-storage';
 import { flush, settleTo } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry } from '../test-support/list-fixtures';
 import { blur, typeInto } from '../test-support/threshold-input';
@@ -127,8 +129,13 @@ export function captureDownloads(): DownloadCapture {
   return { downloads, revoked };
 }
 
-/** The filter text for the served artifacts at `threshold` and `recipeId`, ranked as the page ranks them. */
-export async function expectedFilterText(threshold: number, recipeId: string | undefined, importName: string): Promise<string> {
+/** The filter text for the served artifacts at `threshold`, `recipeId` and the level, ranked as the page ranks them. */
+export async function expectedFilterText(
+  threshold: number,
+  recipeId: string | undefined,
+  importName: string,
+  craftingItemLevel: CraftingItemLevel = FIRST_VISIT_CRAFTING_ITEM_LEVEL,
+): Promise<string> {
   const outcome = await loadArtifacts();
   if (outcome.kind !== 'ready') {
     throw new Error(`the artifacts did not load: ${outcome.kind}`);
@@ -144,6 +151,7 @@ export async function expectedFilterText(threshold: number, recipeId: string | u
     crossFileFailures: crossFileChecks(set.tracked.entries, set.weights).failures,
     recipes: set.recipes?.recipes ?? [],
     currencyRates: set.dataset.currencyRates,
+    craftingItemLevel,
   });
   return filterText(pickUpPurposes({ ranking, tracked: set.tracked.entries, recipeId }), importName);
 }
@@ -161,7 +169,11 @@ export function pickUpWorld(overrides: Parameters<typeof standardWorld>[0] = {})
   });
 }
 
-export async function ready(world: ReturnType<typeof standardWorld> = pickUpWorld()): Promise<void> {
+/** Serves `world` and mounts the page reopened on `savedRecipe`, or on a first visit when it is `false`. */
+export async function ready(world: ReturnType<typeof standardWorld> = pickUpWorld(), savedRecipe: string | false = 'greater'): Promise<void> {
+  if (savedRecipe !== false) {
+    localStorage.setItem(RECIPE_STORAGE_KEY, savedRecipe);
+  }
   serveWorld(world);
   mount();
   await settleTo('ready');

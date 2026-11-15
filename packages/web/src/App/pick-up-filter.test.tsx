@@ -19,6 +19,7 @@ import {
 } from '../pick-up-filter/filter-copy';
 import { FILTER_NAME_STORAGE_KEY } from '../pick-up-filter/filter-name';
 import { option, RATES, standardWorld, bows, belt } from '../recipe/craft-recipe/test-support';
+import { FIRST_VISIT_CRAFTING_ITEM_LEVEL } from '../shared/product';
 import { flush, rgb, unmount } from '../test-support/dom';
 import { hoursBefore, priced } from '../test-support/list-fixtures';
 import { blur, typeInto } from '../test-support/threshold-input';
@@ -95,7 +96,7 @@ describe('the filter modal', () => {
     openFilterModal();
     const modal = filterModal();
     expect(modal?.querySelector('h2')?.textContent).toBe(FILTER_MODAL_TITLE);
-    expect(inModal('[data-filter-lead]').textContent).toBe(filterLead(0.25, 'greater'));
+    expect(inModal('[data-filter-lead]').textContent).toBe(filterLead(0.25, 'greater', FIRST_VISIT_CRAFTING_ITEM_LEVEL));
     const steps = [...(modal?.querySelectorAll('ol > li[data-filter-step]') ?? [])];
     expect(steps).toHaveLength(4);
     for (const [index, step] of steps.entries()) {
@@ -144,7 +145,7 @@ describe('the filter modal', () => {
   it('AC: state 43 drops the recipe from the lead, shows the state 43 line, and the download stays enabled', async () => {
     await ready(pickUpWorld({ recipes: [] }));
     openFilterModal();
-    expect(inModal('[data-filter-lead]').textContent).toBe(filterLead(0.25, undefined));
+    expect(inModal('[data-filter-lead]').textContent).toBe(filterLead(0.25, undefined, FIRST_VISIT_CRAFTING_ITEM_LEVEL));
     expect(stateLine()).toBe(NO_RECIPE_LINE);
     enterName('My');
     expect(downloadAction().disabled).toBe(false);
@@ -154,7 +155,7 @@ describe('the filter modal', () => {
     await ready(pickUpWorld({ rates: RATES.slice(0, 2) }));
     clickOn(option('perfect'));
     openFilterModal();
-    expect(inModal('[data-filter-lead]').textContent).toBe(filterLead(0.25, 'perfect'));
+    expect(inModal('[data-filter-lead]').textContent).toBe(filterLead(0.25, 'perfect', FIRST_VISIT_CRAFTING_ITEM_LEVEL));
     expect(stateLine()).toBe(uncostableLine('perfect'));
     const line = inModal('[data-filter-state-line]');
     expect(line.compareDocumentPosition(downloadAction()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
@@ -243,7 +244,7 @@ describe('what survives a reload', () => {
       throw new Error('blocked');
     });
     const capture = captureDownloads();
-    await ready();
+    await ready(pickUpWorld(), false);
     openFilterModal();
     expect(nameField().value).toBe('');
     enterName('My');

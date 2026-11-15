@@ -2,7 +2,7 @@ import { canonicalKey, compareCanonicalKeys, type CraftedTrackedEntry, type Data
 import { classKeyOf, rank, type RecipelessClass } from '@poe/core';
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_THRESHOLD } from '../../shared/product';
+import { DEFAULT_THRESHOLD, FIRST_VISIT_CRAFTING_ITEM_LEVEL } from '../../shared/product';
 import { TEST_LEAGUE } from '../../test-support/artifact-server';
 import { NOW, NOW_ISO } from '../../test-support/dom';
 import { craftedEntry, hoursBefore, priced, rawEntry, unpriced } from '../../test-support/list-fixtures';
@@ -44,8 +44,8 @@ function recipeless(
 
 function rowsFor(tracked: readonly TrackedEntry[], dataset: readonly DatasetEntry[], classes: readonly RecipelessClass[]): ListRow[] {
   const raw = tracked.filter((entry) => entry.kind === 'raw');
-  const ranking = rank({ tracked: raw, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined });
-  return toDisplayRows({ ...ranking, recipeless: classes }, dataset, { crafted: { tracked, stats: new Map() } });
+  const ranking = rank({ tracked: raw, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined, craftingItemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL });
+  return toDisplayRows({ ...ranking, recipeless: classes }, dataset, { crafted: { tracked, stats: new Map(), itemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL, recipeWord: undefined } });
 }
 
 const asClass = (row: ListRow | undefined): ClassDisplayRow | undefined => (row?.unit === 'class' ? row : undefined);

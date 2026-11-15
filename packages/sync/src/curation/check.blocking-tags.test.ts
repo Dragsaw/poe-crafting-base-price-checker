@@ -67,16 +67,13 @@ describe('checkTracked: blocking tags (AD-17)', () => {
     expect(report.issues[0]?.message).toContain('"crafted","accessory.amulet","Amulets",75');
   });
 
-  it('lists a pair whose recipe floor leaves only blocked tiers under unreachable, on both slots', () => {
+  it('lists an entry whose recipe floor leaves only blocked tiers under unreachable', () => {
     const open = tierOf(SUFFIX_STAT, [3, 3], { itemLevelMin: 30 });
     const report = checkTracked(inputsOf([open, blockedSuffix(75)]));
 
     expect(report.ok).toBe(false);
     expect(report.checks).toContainEqual({ check: 'cross-file', status: 'passed' });
     expect(report.checks).toContainEqual({ check: 'recipe-reach', status: 'failed' });
-    expect(report.unreachable.map((row) => [row.recipeId, row.slot, row.path])).toEqual([
-      ['perfect', 'prefix', 'entries.0'],
-      ['perfect', 'suffix', 'entries.0'],
-    ]);
+    expect(report.unreachable.map((row) => row.path)).toEqual(['entries.0']);
   });
 });

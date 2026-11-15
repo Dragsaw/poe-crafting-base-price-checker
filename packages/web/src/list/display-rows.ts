@@ -1,5 +1,4 @@
 import {
-  canonicalKey,
   compareCanonicalKeys,
   type CraftedRankedRow,
   type CraftedTrackedEntry,
@@ -8,13 +7,18 @@ import {
   type PriceTrust,
   type TrackedEntry,
 } from '@poe/contracts';
-import { classKeyOf, isJewelCategory, type Ranking, type UnrankedEntry } from '@poe/core';
+import { classKeyOf, isJewelCategory, type CraftingItemLevel, type Ranking, type UnrankedEntry } from '@poe/core';
 
 import { formatDivine, LOSS_BELOW_PRINTABLE, MINUS } from '../shared/money';
-import { combinationText, type AffixPart, type StatTexts } from './combination-text';
+import { FIRST_VISIT_CRAFTING_ITEM_LEVEL } from '../shared/product';
+import { classLines, type CraftedCombination, type NotCountedCombination, type PrunedCombination } from './expansion/class-lines';
+import type { AffixPart, StatTexts } from './combination-text';
 import { unitLabel } from './format';
 import type { ActiveRanking } from './active-ranking';
 import { isHonestEmpty } from './list-statement';
+import { notCountedWords } from './row/trust-words';
+
+export type { CraftedCombination, NotCountedCombination, PrunedCombination } from './expansion/class-lines';
 
 /** Ranks 1–5, 6–10, 11 onward, by position only, never by kind (UX-DR11); state 35: per branch. */
 export type Tier = 1 | 2 | 3;
@@ -85,35 +89,19 @@ export interface ClassDisplayRow {
   readonly combinations: readonly CraftedCombination[];
   /** The class's pruned entries, by canonical key, behind `+ N pruned` (FR-15). */
   readonly pruned: readonly PrunedCombination[];
+  /** The entries that do not count at the level, in `core`'s order, behind `+ N not counted` (FR-38; state 49). */
+  readonly notCounted: readonly NotCountedCombination[];
 }
 
-/** One non-pruned crafted Tracked Entry as its expansion line prints it. */
-export interface CraftedCombination {
-  /** The entry's canonical key. */
-  readonly key: string;
-  readonly text: readonly AffixPart[];
-  readonly status: CurationStatus;
-  /** The price in Divine, or `undefined` where `—` prints beside the mark. */
-  readonly price: number | undefined;
-  /** `core`'s verdict on the entry (AD-17). */
-  readonly trust: PriceTrust;
-  /** A priced member of `core`'s `combinations`: below the threshold (state 20). */
-  readonly isBelowThreshold: boolean;
-  /** The entry's dataset entry, for its stored search. `undefined` when never synced. */
-  readonly entry: DatasetEntry | undefined;
-}
-
-/** One pruned crafted Tracked Entry: its text and the reason the curator gave (state 10). */
-export interface PrunedCombination {
-  readonly key: string;
-  readonly text: readonly AffixPart[];
-  readonly reason: string;
-}
-
-/** What a crafted row needs beyond `core`'s row: the tracked list, pruned entries included, and the catalogue's stat texts. */
+/**
+ * What a crafted row needs beyond `core`'s row: the tracked list, pruned entries included, the catalogue's stat
+ * texts, and the level and recipe word a not-counted reason names. `recipeWord` is unset with no active recipe.
+ */
 export interface CraftedContext {
   readonly tracked: readonly TrackedEntry[];
   readonly stats: StatTexts;
+  readonly itemLevel: CraftingItemLevel;
+  readonly recipeWord: string | undefined;
 }
 
 /** The chase column holds at most three cells; `chaseCellCount` picks three or two (DESIGN.md *The chase column*). */
@@ -137,7 +125,8 @@ export function tierOf(position: number): Tier {
   return position <= 10 ? 2 : 3;
 }
 
-const NO_CRAFTED_CONTEXT: CraftedContext = { tracked: [], stats: new Map() };
+/** It names no recipe, so `craftedDetail` throws on a not-counted combination. */
+const NO_CRAFTED_CONTEXT: CraftedContext = { tracked: [], stats: new Map(), itemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL, recipeWord: undefined };
 
 /** Every crafted entry, pruned included, grouped by its class key (`classKeyOf`). */
 function trackedByClass(tracked: readonly TrackedEntry[]): ReadonlyMap<string, readonly CraftedTrackedEntry[]> {
@@ -155,18 +144,27 @@ function trackedByClass(tracked: readonly TrackedEntry[]): ReadonlyMap<string, r
 /** `web` reorders nothing: `core`'s summands, then its combinations, then the pruned entries by key. */
 function craftedDetail(
   row: CraftedRankedRow,
-  { entries, byKey, crafted: { stats } }: ClassLineSource,
-): Pick<ClassDisplayRow, 'chase' | 'combinations' | 'pruned'> {
-  const { text, line, pruned } = classLines({ entries, byKey, stats });
+  { entries, byKey, crafted: { stats, itemLevel, recipeWord } }: ClassLineSource,
+): Pick<ClassDisplayRow, 'chase' | 'combinations' | 'pruned' | 'notCounted'> {
+  const { text, line, notCountedLine, pruned } = classLines({ entries, byKey, stats });
   return {
     chase: row.summands.slice(0, CHASE_CELLS).map((summand) => text(summand.entryKey)),
     combinations: [
       ...row.summands.flatMap((summand) => line(summand.entryKey, { trust: summand.trust, price: summand.priceDivine, isBelowThreshold: false })),
-      ...row.combinations.flatMap(({ entryKey, trust, priceDivine }) =>
-        line(entryKey, { trust, price: priceDivine, isBelowThreshold: priceDivine !== undefined }),
+      ...row.combinations.flatMap(({ entryKey, trust, priceDivine, notCounted }) =>
+        notCounted === undefined ? line(entryKey, { trust, price: priceDivine, isBelowThreshold: priceDivine !== undefined }) : [],
       ),
     ],
     pruned,
+    notCounted: row.combinations.flatMap(({ entryKey, notCounted }) => {
+      if (notCounted === undefined) {
+        return [];
+      }
+      if (recipeWord === undefined) {
+        throw new Error(`crafted row ${row.classKey} ranks under no active recipe`);
+      }
+      return notCountedLine(entryKey, notCountedWords(notCounted, { recipeWord, itemLevel }));
+    }),
   };
 }
 
@@ -174,40 +172,6 @@ interface ClassLineSource {
   readonly entries: readonly CraftedTrackedEntry[];
   readonly byKey: ReadonlyMap<string, DatasetEntry>;
   readonly crafted: CraftedContext;
-}
-
-type LineFigures = Pick<CraftedCombination, 'trust' | 'price' | 'isBelowThreshold'>;
-
-/** One class's line builders and its pruned lines; an entry key the tracked list lacks makes no line. */
-function classLines({
-  entries,
-  byKey,
-  stats,
-}: {
-  readonly entries: readonly CraftedTrackedEntry[];
-  readonly byKey: ReadonlyMap<string, DatasetEntry>;
-  readonly stats: StatTexts;
-}): {
-  readonly text: (entryKey: string) => readonly AffixPart[];
-  readonly line: (entryKey: string, figures: LineFigures) => CraftedCombination[];
-  readonly pruned: readonly PrunedCombination[];
-} {
-  const tracked = new Map(entries.map((entry) => [canonicalKey(entry), entry]));
-  const text = (entryKey: string): readonly AffixPart[] => {
-    const entry = tracked.get(entryKey);
-    return entry === undefined ? [] : combinationText(entry, stats);
-  };
-  const line = (entryKey: string, { trust, price, isBelowThreshold }: LineFigures): CraftedCombination[] => {
-    const entry = tracked.get(entryKey);
-    return entry === undefined
-      ? []
-      : [{ key: entryKey, text: text(entryKey), status: entry.status, price, trust, isBelowThreshold, entry: byKey.get(entryKey) }];
-  };
-  const pruned = [...tracked]
-    .filter(([, entry]) => entry.status === 'pruned')
-    .toSorted(([left], [right]) => compareCanonicalKeys(left, right))
-    .map(([entryKey, entry]) => ({ key: entryKey, text: text(entryKey), reason: entry.prunedReason ?? '' }));
-  return { text, line, pruned };
 }
 
 /** State 43: a recipeless class, unnumbered, `—` beside its mark, its lines in `core`'s order. */
@@ -230,6 +194,7 @@ function recipelessRows(ranking: Ranking, byKey: ReadonlyMap<string, DatasetEntr
         line(entryKey, { trust, price: priceDivine, isBelowThreshold: false }),
       ),
       pruned,
+      notCounted: [],
     };
   });
 }

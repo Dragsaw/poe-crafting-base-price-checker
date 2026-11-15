@@ -19,6 +19,8 @@ import type { RankInput, Ranking } from '../rank.ts';
 export const LEAGUE = 'Forbidden Rites';
 export const OLD_LEAGUE = 'Standard Rites';
 export const THRESHOLD = 0.25;
+/** The higher offered Crafting Item Level (FR-38): every fixture floor sits at or below it. */
+export const LEVEL = 82;
 export const ATTEMPTED = '2026-09-26T11:00:00Z';
 /** Two hours after `observation()`'s `observedAt`, so a default price is current. */
 export const NOW = '2026-09-26T12:00:00Z';
@@ -111,7 +113,7 @@ export function published(
 }
 
 export function ranked(input: Partial<RankInput> & Pick<RankInput, 'tracked'>): Ranking {
-  return rank({ dataset: [], activeLeague: LEAGUE, threshold: THRESHOLD, now: NOW, weights: WEIGHTS, ...input });
+  return rank({ dataset: [], activeLeague: LEAGUE, threshold: THRESHOLD, now: NOW, weights: WEIGHTS, craftingItemLevel: LEVEL, ...input });
 }
 
 export const keysOf = (items: readonly ({ entryKey: string } | { classKey: string })[]): string[] =>
@@ -234,10 +236,15 @@ export const RATES = [
 export const GREATER_COST = 0 + 0.01 + 0.02;
 export const PERFECT_COST = 0 + 0.1 + 0.2;
 
-/** Bows: the target is 1 in 10 of the prefix pool at floor 0, and 1 in 2 at floor 70. */
+/** Bows: the target is 1 in 10 of the prefix pool at floor 0, and 1 in 4 at floor 70. */
 export const BOWS_POOLS: Pools = [
-  // stat_low shares FILLER's group, so the perfect floor removes it (AD-17).
-  [tierOf(TARGET, 10, 75), tierOf(FILLER, 10, 75, 'filler'), tierOf('explicit.stat_low', 80, 1, 'filler')],
+  // stat_low's modifier has a tier at 75, outside every band, so the perfect floor removes its tier at 1 (AD-17).
+  [
+    tierOf(TARGET, 10, 75),
+    tierOf(FILLER, 10, 75, 'filler'),
+    tierOf('explicit.stat_low', 60, 1, 'low'),
+    { ...tierOf('explicit.stat_low', 20, 75, 'low'), lines: [{ statId: 'explicit.stat_low', ranges: [[11, 20]] }] },
+  ],
   [tierOf(SUFFIX_STAT, 10, 80)],
 ];
 
@@ -253,6 +260,7 @@ export function rankCrafted(input: Partial<RankInput> & Pick<RankInput, 'tracked
     weights: poolsFile(['weapon.bow', 'Bows', BOWS_POOLS]),
     recipes: [GREATER, PERFECT],
     currencyRates: RATES,
+    craftingItemLevel: LEVEL,
     ...input,
   });
 }

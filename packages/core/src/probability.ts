@@ -11,6 +11,9 @@ import type {
   WeightsPool,
 } from '@poe/contracts';
 
+import { memoByPool } from './probability/pool-memo.ts';
+import { lineDigits, nextOnGrid } from './probability/value-grid.ts';
+
 /**
  * The probability term (AD-11, AD-17): no epsilon in edge comparisons (AD-5).
  */
@@ -39,8 +42,8 @@ export type PoolLookup =
   | { readonly ok: true; readonly pools: WeightsClassPools }
   | { readonly ok: false; readonly reason: { readonly kind: 'class-absent' } };
 
-/** The affixes and the floor that scope a combination. A `CraftedTrackedEntry` satisfies it. */
-export type CombinationInput = Pick<CraftedTrackedEntry, 'itemLevelMin' | 'prefix' | 'suffix'>;
+/** The two affixes of a combination. A `CraftedTrackedEntry` satisfies it. */
+export type CombinationInput = Pick<CraftedTrackedEntry, 'prefix' | 'suffix'>;
 
 /**
  * A line's derived interval: two pairs give each edge's midpoint, pending OQ-12.
@@ -51,6 +54,71 @@ export function interval(line: WeightsLine): Interval {
     return { min: 1, max: 1 };
   }
   return second === undefined ? { min: first[0], max: first[1] } : { min: (first[0] + second[0]) / 2, max: (first[1] + second[1]) / 2 };
+}
+
+// Keyed by tier identity: `ownInterval` compares each tier's line set once per pool.
+const lineSetKeys = new WeakMap<ModifierWeight, string>();
+
+function lineSetKey(entry: ModifierWeight): string {
+  let key = lineSetKeys.get(entry);
+  if (key === undefined) {
+    key = JSON.stringify(lineSet(entry));
+    lineSetKeys.set(entry, key);
+  }
+  return key;
+}
+
+// Per pool: its tiers that can roll grouped by line set, and each line's own interval once derived.
+const ownIntervals = new WeakMap<WeightsPool, { readonly bySet: Map<string, ModifierWeight[]>; readonly own: Map<WeightsLine, Interval> }>();
+
+/** A tier's own interval on one line, over the unscoped slot pool's tiers whose weight is above 0 (AD-11). */
+export function ownInterval(line: WeightsLine, tier: ModifierWeight, pool: WeightsPool): Interval {
+  let memo = ownIntervals.get(pool);
+  if (memo === undefined) {
+    const rolling = pool.entries.filter((entry) => entry.weight > 0);
+    memo = { bySet: Map.groupBy(rolling, (entry) => lineSetKey(entry)), own: new Map() };
+    ownIntervals.set(pool, memo);
+  }
+  let own = memo.own.get(line);
+  if (own === undefined) {
+    own = deriveOwnInterval(line, tier, memo.bySet.get(lineSetKey(tier)) ?? []);
+    memo.own.set(line, own);
+  }
+  return own;
+}
+
+function deriveOwnInterval(line: WeightsLine, tier: ModifierWeight, entries: readonly ModifierWeight[]): Interval {
+  const derived = interval(line);
+  if (line.statId === null || line.ranges.length === 0) {
+    return derived;
+  }
+  let digits = lineDigits(line);
+  let highest = -Infinity;
+  for (const other of entries) {
+    const theirs = sameLine(line, tier, other);
+    if (theirs === undefined) {
+      continue;
+    }
+    digits = Math.max(digits, lineDigits(theirs));
+    const span = interval(theirs);
+    if (span.min <= derived.min && derived.min <= span.max) {
+      highest = Math.max(highest, span.max);
+    }
+  }
+  if (highest === -Infinity) {
+    return derived;
+  }
+  const min = nextOnGrid(highest, digits, line.ranges.length);
+  return min > derived.max ? derived : { min, max: derived.max };
+}
+
+/** The banded line on `line`'s `statId` of `other`, a tier of the same line set, or `undefined` for the tier itself. */
+function sameLine(line: WeightsLine, tier: ModifierWeight, other: ModifierWeight): WeightsLine | undefined {
+  if (other === tier) {
+    return undefined;
+  }
+  const theirs = other.lines.find((candidate) => candidate.statId === line.statId);
+  return theirs === undefined || theirs.ranges.length === 0 ? undefined : theirs;
 }
 
 /** `untrackable(entry)`: reads the weights file alone. */
@@ -85,16 +153,16 @@ export function statIds(reference: ModifierReference): readonly string[] {
 /** What `covers` tests a weights line against: a single-line reference, or one line of a hybrid one. */
 export type ReferenceLine = SingleLineModifierReference | HybridLine;
 
-/** `covers(rl, line)`: a banded `rl` needs the derived interval inside the band. */
-export function isCovering(rl: ReferenceLine, line: WeightsLine): boolean {
+/** `covers(rl, line)`: a banded `rl` needs the tier's own interval inside the band; `pool` is unscoped (AD-11). */
+export function isCovering(rl: ReferenceLine, line: WeightsLine, tier: ModifierWeight, pool: WeightsPool): boolean {
   if (line.statId !== rl.statId) {
     return false;
   }
   if (!('valueMin' in rl)) {
     return line.ranges.length === 0;
   }
-  const derived = interval(line);
-  return derived.min >= rl.valueMin && derived.max <= rl.valueMax;
+  const own = ownInterval(line, tier, pool);
+  return own.min >= rl.valueMin && own.max <= rl.valueMax;
 }
 
 /** The empty `S`, for a caller with no pair of entries. */
@@ -107,12 +175,17 @@ function haveSameIds(a: readonly string[], b: readonly string[]): boolean {
 /**
  * Whole-tier containment; `summed` is the summed-statId set `S`. Needs a `complete` pool: else `untrackable`.
  */
-export function isContaining(reference: ModifierReference, entry: ModifierWeight, summed: ReadonlySet<string> = NO_SUMMED): boolean {
+export function isContaining(
+  reference: ModifierReference,
+  entry: ModifierWeight,
+  pool: WeightsPool,
+  summed: ReadonlySet<string> = NO_SUMMED,
+): boolean {
   if (entry.weight === 0) {
     return false;
   }
   const isCoveredBy = (rl: ReferenceLine) =>
-    entry.lines.some((line) => (summed.has(rl.statId) ? line.statId === rl.statId : isCovering(rl, line)));
+    entry.lines.some((line) => (summed.has(rl.statId) ? line.statId === rl.statId : isCovering(rl, line, entry, pool)));
   return reference.kind === 'hybrid' ? haveSameIds(lineSet(entry), statIds(reference)) && reference.lines.every((line) => isCoveredBy(line)) : isCoveredBy(reference);
 }
 
@@ -123,41 +196,51 @@ export function poolOf(weights: WeightsFile, categoryId: string, className: stri
   return pools === undefined ? { ok: false, reason: { kind: 'class-absent' } } : { ok: true, pools };
 }
 
-/**
- * The recipe floor per `modGroup` over the unscoped pool, before the item-level scope (AD-17): a group
- * whose top positive-weight tier is below the floor keeps that top tier, but the scope can still drop it.
- */
-export function floored(pool: WeightsPool, modifierLevelMin: number): readonly ModifierWeight[] {
-  const top = new Map<string, number>();
-  for (const entry of pool.entries) {
-    if (entry.weight > 0) {
-      top.set(entry.modGroup, Math.max(top.get(entry.modGroup) ?? entry.itemLevelMin, entry.itemLevelMin));
-    }
+/** The scope of one eligible pool: the Crafting Item Level `L` and the recipe's floor (AD-17). */
+export interface RecipeScope {
+  readonly itemLevel: number;
+  readonly modifierLevelMin: number;
+}
+
+// Keyed by tier identity: a ranking pass asks for each tier's key once per entry and recipe.
+const modifierKeys = new WeakMap<ModifierWeight, string>();
+
+/** The modifier a tier belongs to: its `modGroup` with its line set (AD-17). */
+function modifierOf(entry: ModifierWeight): string {
+  let key = modifierKeys.get(entry);
+  if (key === undefined) {
+    key = JSON.stringify([entry.modGroup, lineSet(entry)]);
+    modifierKeys.set(entry, key);
   }
-  return pool.entries.filter(
-    (entry) => entry.itemLevelMin >= modifierLevelMin || (entry.weight > 0 && entry.itemLevelMin === top.get(entry.modGroup)),
+  return key;
+}
+
+/** One slot's eligible set: the scope, then the recipe floor per modifier (AD-17, FR-26). */
+export function eligible(pool: WeightsPool, itemLevel: number, modifierLevelMin: number): readonly ModifierWeight[] {
+  const scoped = pool.entries.filter((entry) => entry.itemLevelMin <= itemLevel);
+  const top = new Map<string, number>();
+  for (const entry of scoped) {
+    if (entry.weight === 0) {
+      continue;
+    }
+    const key = modifierOf(entry);
+    top.set(key, Math.max(top.get(key) ?? entry.itemLevelMin, entry.itemLevelMin));
+  }
+  return scoped.filter(
+    (entry) => entry.itemLevelMin >= modifierLevelMin || (entry.weight > 0 && entry.itemLevelMin === top.get(modifierOf(entry))),
   );
 }
 
-/** One slot's eligible set: the recipe floor, then the item-level scope (AD-5, AD-17). */
-export function eligible(
-  pool: WeightsPool,
-  itemLevelMin: number,
-  modifierLevelMin: number,
-): readonly ModifierWeight[] {
-  return floored(pool, modifierLevelMin).filter((entry) => entry.itemLevelMin <= itemLevelMin);
-}
-
-/** Whether a recipe can roll an entry: `combinationProbability` is defined, as the ranking backstop requires. */
+/** Whether a recipe can roll an entry at a scope: `combinationProbability` is defined and above `0`. */
 export type RecipeReach = { readonly reached: true } | { readonly reached: false; readonly slots: readonly Slot[] };
 
-/** The reach verdict of one `(entry, recipe)` pair (AD-17). */
-export function recipeReach(pools: WeightsClassPools, entry: CombinationInput, modifierLevelMin: number): RecipeReach {
-  const result = combinationProbability(pools, entry, modifierLevelMin);
+/** The reach verdict of one `(entry, recipe, L)` triple (AD-17). */
+export function recipeReach(pools: WeightsClassPools, entry: CombinationInput, scope: RecipeScope): RecipeReach {
+  const result = combinationProbability(pools, entry, scope);
   if (result.ok) {
     return result.p > 0 ? { reached: true } : { reached: false, slots: SLOTS };
   }
-  const empty = SLOTS.filter((slot) => containedIn(entry[slot], eligible(pools[slot], entry.itemLevelMin, modifierLevelMin)).length === 0);
+  const empty = SLOTS.filter((slot) => containedIn(entry[slot], eligible(pools[slot], scope.itemLevel, scope.modifierLevelMin), pools[slot]).length === 0);
   // Both contained sets are non-empty only when a first draw exhausts the other slot.
   return { reached: false, slots: empty.length > 0 ? empty : SLOTS.filter((slot) => !(result.reason.kind === 'augment-exhausted' && result.reason.firstDrawSlot === slot)) };
 }
@@ -170,19 +253,26 @@ function totalWeight(entries: readonly ModifierWeight[]): number {
   return total;
 }
 
+// One eligible set and its weight per pool and recipe scope `(itemLevel, modifierLevelMin)` (AD-24).
+const eligibleSets = memoByPool<WeightsPool, { readonly eligibleSet: readonly ModifierWeight[]; readonly total: number }>();
+
 /** A pool is empty when its total weight is `0`: the one definition for coverage (AD-17). */
 export function isEmptyPool(pool: WeightsPool): boolean {
   return totalWeight(pool.entries) === 0;
 }
 
-/** `C = contained(ref) ∩ E`. */
-export function containedIn(reference: ModifierReference, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
-  return eligibleSet.filter((entry) => isContaining(reference, entry));
+/** `C = contained(ref) ∩ E`; `pool` is the unscoped slot pool that `E` is drawn from. */
+export function containedIn(
+  reference: ModifierReference,
+  eligibleSet: readonly ModifierWeight[],
+  pool: WeightsPool,
+): readonly ModifierWeight[] {
+  return eligibleSet.filter((entry) => isContaining(reference, entry, pool));
 }
 
 /** `needs(ref)` over the unscoped pool: `undefined`, never `0`, if nothing is contained. */
 export function needs(reference: ModifierReference, pool: WeightsPool): number | undefined {
-  const tier = containedIn(reference, pool.entries).filter((entry) => !isUntrackable(entry, pool));
+  const tier = containedIn(reference, pool.entries, pool).filter((entry) => !isUntrackable(entry, pool));
   if (tier.length === 0) {
     return undefined;
   }
@@ -196,11 +286,11 @@ export function affixProbability(
   pools: WeightsClassPools,
   slot: Slot,
   reference: ModifierReference,
-  { itemLevelMin, modifierLevelMin }: { readonly itemLevelMin: number; readonly modifierLevelMin: number },
+  { itemLevel, modifierLevelMin }: RecipeScope,
 ): ProbabilityResult {
-  const eligibleSet = eligible(pools[slot], itemLevelMin, modifierLevelMin);
+  const eligibleSet = eligible(pools[slot], itemLevel, modifierLevelMin);
   const total = totalWeight(eligibleSet);
-  return total === 0 ? { ok: false, reason: { kind: 'empty-eligible-pool', slot } } : { ok: true, p: totalWeight(containedIn(reference, eligibleSet)) / total };
+  return total === 0 ? { ok: false, reason: { kind: 'empty-eligible-pool', slot } } : { ok: true, p: totalWeight(containedIn(reference, eligibleSet, pools[slot])) / total };
 }
 
 interface SlotSets {
@@ -262,16 +352,19 @@ function orderedTerm(
 }
 
 /**
- * `P(prefix ∧ suffix | recipe)`: floor, scope, renormalise, exclude, renormalise; reasons per slot.
+ * `P(prefix ∧ suffix | recipe, L)`: scope, floor, renormalise, exclude, renormalise (AD-17); reasons per slot.
  */
 export function combinationProbability(
   pools: WeightsClassPools,
   combination: CombinationInput,
-  modifierLevelMin: number,
+  { itemLevel, modifierLevelMin }: RecipeScope,
 ): ProbabilityResult {
   const setsOf = (slot: Slot, reference: ModifierReference): SlotSets => {
-    const eligibleSet = eligible(pools[slot], combination.itemLevelMin, modifierLevelMin);
-    return { slot, eligibleSet, contained: containedIn(reference, eligibleSet), total: totalWeight(eligibleSet) };
+    const { eligibleSet, total } = eligibleSets(pools[slot], `${String(itemLevel)}:${String(modifierLevelMin)}`, () => {
+      const entries = eligible(pools[slot], itemLevel, modifierLevelMin);
+      return { eligibleSet: entries, total: totalWeight(entries) };
+    });
+    return { slot, eligibleSet, contained: containedIn(reference, eligibleSet, pools[slot]), total };
   };
   const prefix = setsOf('prefix', combination.prefix);
   const suffix = setsOf('suffix', combination.suffix);

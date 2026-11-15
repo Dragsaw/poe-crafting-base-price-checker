@@ -1,4 +1,5 @@
-import { type CraftRecipe } from '@poe/contracts';
+import { type CraftRecipe, type WeightsFile } from '@poe/contracts';
+import { eligible } from '@poe/core';
 import { describe, expect, it } from 'vitest';
 
 import { LookupError, lookupMods, lookupTiers } from './lookup';
@@ -9,6 +10,14 @@ const recipe = (id: string, modifierLevelMin: number): CraftRecipe => ({
   currencies: [{ currencyId: `${id}-orb-of-transmutation`, quantity: 1 }],
   modifierLevelMin,
 });
+
+/** Each recipe of the Spirit case at both offered levels, with one verdict. */
+const both = (isReached: boolean) => [
+  ['greater', 79, isReached],
+  ['greater', 82, isReached],
+  ['perfect', 79, isReached],
+  ['perfect', 82, isReached],
+];
 
 describe('lookupMods', () => {
   it('prints one row per modGroup, a hybrid with all its statIds, verbatim', () => {
@@ -128,6 +137,12 @@ describe('the null-line rule in lookupMods and lookupTiers', () => {
       { statId: JSON_NULL, ranges: [] },
     ]);
     expect(t1).toMatchObject({ lineSet: [A, B], untrackable: JSON_NULL });
+    // The null line gets no `intervals` item; nor does a valueless line on a resolved statId.
+    expect(t1?.intervals).toEqual([
+      { statId: B, interval: [5, 6], ownInterval: [5, 6] },
+      { statId: A, interval: [3, 4], ownInterval: [3, 4] },
+    ]);
+    expect(complete.find((row) => row.modGroup === 'Flagged')?.intervals).toEqual([{ statId: A, interval: [7, 8], ownInterval: [7, 8] }]);
     expect(partial.find((row) => row.modGroup === 'Mixed' && row.tierLabel === 'T1')).toMatchObject({
       lineSet: [A],
       untrackable: 'partial-pool-null-line',
@@ -155,22 +170,55 @@ describe('lookupTiers', () => {
       weightSource: 'published',
       modGroup: 'BaseSpirit',
       lines: [{ statId: SPIRIT, ranges: [[30, 33]] }],
+      intervals: [{ statId: SPIRIT, interval: [30, 33], ownInterval: [30, 33] }],
       lineSet: [SPIRIT],
       untrackable: JSON_NULL,
     });
   });
 
-  it('says, per tier and recipe, whether the floor keeps the tier: a group below the floor keeps its top tier', () => {
+  it('prints each banded line of a hybrid tier with its interval and own interval, from core (AD-11)', () => {
+    const found = lookupTiers(WEIGHTS, EVASION, { className: 'Body_Armours_dex', category: 'armour.chest' });
+    expect(found.tiers.map((row) => row.intervals)).toEqual([
+      [
+        { statId: EVASION, interval: [14, 20], ownInterval: [14, 20] },
+        { statId: LIFE, interval: [11, 19], ownInterval: [11, 19] },
+      ],
+      [
+        { statId: EVASION, interval: [21, 26], ownInterval: [21, 26] },
+        { statId: LIFE, interval: [20, 23], ownInterval: [20, 23] },
+      ],
+    ]);
+  });
+
+  it('says, per tier, recipe and offered level, whether the floor keeps the tier: a modifier below the floor keeps its top tier', () => {
     const found = lookupTiers(WEIGHTS, SPIRIT, { className: 'Amulets', recipes: [recipe('greater', 44), recipe('perfect', 70)] });
 
-    expect(found.tiers.map((row) => [row.itemLevelMin, row.recipes?.map((item) => [item.recipeId, item.reached])])).toEqual([
-      [16, [['greater', false], ['perfect', false]]],
-      [25, [['greater', false], ['perfect', false]]],
-      [54, [['greater', true], ['perfect', true]]],
-      [40, [['greater', true], ['perfect', true]]],
+    expect(found.tiers.map((row) => [row.itemLevelMin, row.recipes?.map((item) => [item.recipeId, item.itemLevel, item.reached])])).toEqual([
+      [16, both(false)],
+      [25, both(false)],
+      [54, both(true)],
+      [40, both(true)],
     ]);
-    expect(found.tiers[2]?.recipes?.[0]).toEqual({ recipeId: 'greater', modifierLevelMin: 44, reached: true });
+    expect(found.tiers[2]?.recipes?.[0]).toEqual({ recipeId: 'greater', modifierLevelMin: 44, itemLevel: 79, reached: true });
     expect(lookupTiers(WEIGHTS, SPIRIT, { className: 'Amulets' }).tiers[0]).not.toHaveProperty('recipes');
+  });
+
+  it('reads the same eligible pool as the reach verdict: the Wand T2 Cold Spell levels tier at 79 and 82 (AD-17)', async () => {
+    const here = (import.meta as { readonly dirname: string }).dirname;
+    const data = ((await import(/* @vite-ignore */ `${here}/../../../../test/fixtures/wands-weights.json`)) as { default: WeightsFile }).default;
+    const found = lookupTiers(data, 'explicit.stat_2254480358', { className: 'Wands', recipes: [recipe('perfect', 70)] });
+    const t2 = found.tiers.find((row) => row.tierLabel === 'T2');
+
+    expect(t2?.recipes).toEqual([
+      { recipeId: 'perfect', modifierLevelMin: 70, itemLevel: 79, reached: true },
+      { recipeId: 'perfect', modifierLevelMin: 70, itemLevel: 82, reached: false },
+    ]);
+    const pool = data.bases['weapon.wand']?.Wands?.suffix;
+    const tier = pool?.entries.find((entry) => entry.itemLevelMin === t2?.itemLevelMin && entry.lines.some((line) => line.statId === 'explicit.stat_2254480358'));
+    const items = t2?.recipes ?? [];
+    for (const item of items) {
+      expect(pool !== undefined && tier !== undefined && eligible(pool, item.itemLevel, item.modifierLevelMin).includes(tier)).toBe(item.reached);
+    }
   });
 
   it('prints every line of a hybrid tier that carries the statId', () => {

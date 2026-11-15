@@ -105,4 +105,12 @@ describe('rank: the recipeless group (state 43)', () => {
     expect(result.recipeless).toEqual([]);
     expect([...craftedRows(result.ordering), ...result.unpricedCrafted].map((row) => row.recipeId)).toEqual(['greater', 'perfect']);
   });
+
+  it('takes the numeric lowest floor for itemLevelMin, though the canonically first entry is higher (FR-36)', () => {
+    const nine = { ...chase('Bows'), itemLevelMin: 9 };
+    const seventyFive = { ...chase('Bows', FILLER), itemLevelMin: 75 };
+    // Canonical keys compare floors as text, so "75" sorts before "9".
+    expect(compareCanonicalKeys(canonicalKey(seventyFive), canonicalKey(nine))).toBeLessThan(0);
+    expect(rankCrafted({ tracked: [nine, seventyFive], recipes: [] }).recipeless.map((row) => row.itemLevelMin)).toEqual([9]);
+  });
 });
