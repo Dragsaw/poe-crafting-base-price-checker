@@ -99,34 +99,4 @@ development_status:
   7-3-regenerate-tracked-json-for-t1-and-t2: done
   7-4-the-item-level-toggle: done
   epic-7-retrospective: optional
-action_items:
-  - id: "epic-6-retro-item-1-give-the-app-level-pick-up-filter-downlo"
-    epic: 6
-    action: "Give the App-level pick-up filter download tests a content oracle: named-block
-      treatment, downloads under states 35 and 43, a two-floor App world, rank-built
-      Unrankable and no-priced-Combination cases"
-    owner: "dev"
-    status: done
-    ref: "docs/stories/epic-6-retro-2026-11-01.md"
-  - id: "epic-6-retro-item-2-refuse-raw-tracked-entries-in-a-jewel-ca"
-    epic: 6
-    action: "Refuse raw tracked entries in a jewel category (tracked:check or pickUpPurposes)
-      with a test"
-    owner: "dev"
-    status: done
-    ref: "docs/stories/epic-6-retro-2026-11-01.md"
-  - id: "epic-6-retro-item-3-ledger-the-deferred-epic-6-review-findin"
-    epic: 6
-    action: "Ledger the deferred epic-6 review findings ADV-13 (duplicated recipe
-      narrowing), VG-2 (no File System Access test) and ADV-12 (JSON-text entry order)
-      in deferred-work.md"
-    owner: "dev"
-    status: done
-    ref: "docs/stories/epic-6-retro-2026-11-01.md"
-  - id: "epic-6-retro-item-4-rule-whether-an-unresolvable-raw-base-ge"
-    epic: 6
-    action: "Rule whether an unresolvable Raw Base gets pick-up blocks under FR-36
-      (ADV-1)"
-    owner: "PM"
-    status: done
-    ref: "docs/stories/epic-6-retro-2026-11-01.md"
+action_items: []
