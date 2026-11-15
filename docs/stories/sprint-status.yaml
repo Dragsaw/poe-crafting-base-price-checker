@@ -30,7 +30,7 @@
 #   with its last story, before finish-worktree pushes (AGENT-WORKFLOW.md, Story acceptance)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 11-15-2026 21:10
+last_updated: 11-15-2026 21:45
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -141,5 +141,5 @@ action_items:
     action: "Ledger ADV-2, ECH-3 (architect notes), VG-1, ADV-3, ADV-5 and B1 (filter-modal
       lead copy) in deferred-work.md"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-7-retro-2026-11-15.md"
