@@ -125,7 +125,7 @@ export function tierOf(position: number): Tier {
   return position <= 10 ? 2 : 3;
 }
 
-/** No tracked entry, so no line is built and the level is never printed. */
+/** It names no recipe, so `craftedDetail` throws on a not-counted combination. */
 const NO_CRAFTED_CONTEXT: CraftedContext = { tracked: [], stats: new Map(), itemLevel: FIRST_VISIT_CRAFTING_ITEM_LEVEL, recipeWord: undefined };
 
 /** Every crafted entry, pruned included, grouped by its class key (`classKeyOf`). */
