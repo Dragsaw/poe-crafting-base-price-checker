@@ -58,6 +58,13 @@ describe('ownInterval (AD-11)', () => {
     expect(ownOf(t1, pool)).toEqual({ min: 103.5, max: 123 });
   });
 
+  it('steps past a two-# maximum that is not an exact double, off the tier below (ECH-1)', () => {
+    // The low tier's maximum is (0.1 + 0.7) / 2, a few ulps under 0.4.
+    const low = tier([line(STAT, [0, 0.1], [0.4, 0.7])], 100);
+    const high = tier([line(STAT, [0.1, 0.5], [0.5, 1])], 100);
+    expect(ownOf(high, poolWith(low, high))).toEqual({ min: 0.45, max: 0.75 });
+  });
+
   it('lands on the next grid value above an off-grid maximum', () => {
     // A two-# tier's maximum 56.5 is off the one-# line's integer grid.
     const two = tier([line(STAT, [40, 53], [46, 60])], 100);
