@@ -1,12 +1,12 @@
 {
-  "runStartedAt": "2026-11-19T17:00:23.335Z",
+  "runStartedAt": "2026-11-19T23:20:46.786Z",
   "figures": {
     "requestsBySource": {
-      "tracked-list": 375,
+      "tracked-list": 89,
       "league-validation": 1,
       "session-probe": 1
     },
-    "notReachedCount": 2887,
+    "notReachedCount": 2843,
     "coverage": 1,
     "rankableClassCount": 40,
     "trackedListEditedAt": {
@@ -54,6 +54,13 @@
       "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",75,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_124131830\",3,3]]",
       "status": 405,
       "message": "[\"crafted\",\"accessory.amulet\",\"Amulets\",75,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_124131830\",3,3]]: the trade search answered 405; the chunk is aborted"
+    },
+    {
+      "kind": "run-failure",
+      "reason": "trade-request-rejected",
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",75,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_124131830\",3,3]]",
+      "status": 405,
+      "message": "[\"crafted\",\"accessory.amulet\",\"Amulets\",75,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_124131830\",3,3]]: the trade search answered 405; the chunk is aborted"
     }
   ],
   "schemaVersion": "1.3.0"
